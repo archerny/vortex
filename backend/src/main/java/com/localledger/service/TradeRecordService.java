@@ -30,10 +30,10 @@ public class TradeRecordService {
     private StrategyRepository strategyRepository;
 
     /**
-     * 查询所有未删除的交易记录（按交易日期倒序）
+     * 查询所有未删除的交易记录（按ID倒序）
      */
     public List<TradeRecord> findAll() {
-        return tradeRecordRepository.findByIsDeletedFalseOrderByTradeDateDesc();
+        return tradeRecordRepository.findByIsDeletedFalseOrderByIdDesc();
     }
 
     /**

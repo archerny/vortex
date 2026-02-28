@@ -13,6 +13,11 @@ import java.util.List;
 public interface TradeRecordRepository extends BaseRepository<TradeRecord, Long> {
 
     /**
+     * 查询所有未删除的交易记录（按ID倒序）
+     */
+    List<TradeRecord> findByIsDeletedFalseOrderByIdDesc();
+
+    /**
      * 查询所有未删除的交易记录（按交易日期倒序）
      */
     List<TradeRecord> findByIsDeletedFalseOrderByTradeDateDesc();
