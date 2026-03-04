@@ -11,9 +11,9 @@ public enum TradeType {
     SELL,
     /** 期权到期 */
     OPTION_EXPIRE,
-    /** 行权买入 */
+    /** 行权买股 */
     EXERCISE_BUY,
-    /** 行权卖出 */
+    /** 行权卖股 */
     EXERCISE_SELL,
     /** 提前行权 */
     EARLY_EXERCISE

@@ -21,8 +21,8 @@ const tradeTypeMap = {
   BUY: '买入',
   SELL: '卖出',
   OPTION_EXPIRE: '期权到期',
-  EXERCISE_BUY: '行权买入',
-  EXERCISE_SELL: '行权卖出',
+  EXERCISE_BUY: '行权买股',
+  EXERCISE_SELL: '行权卖股',
   EARLY_EXERCISE: '提前行权',
 };
 const tradeTypeReverseMap = Object.fromEntries(Object.entries(tradeTypeMap).map(([k, v]) => [v, k]));
