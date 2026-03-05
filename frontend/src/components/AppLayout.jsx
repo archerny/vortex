@@ -35,6 +35,7 @@ const AppLayout = () => {
   const [selectedMenu, setSelectedMenu] = useState(initialMenuKey);
   const [openKeys, setOpenKeys] = useState(getOpenKeysFromMenuKey(initialMenuKey));
   const [backendStatus, setBackendStatus] = useState('未连接');
+  const [siderCollapsed, setSiderCollapsed] = useState(false);
   const hasCheckedHealth = useRef(false);
 
   // 检查后端连接状态（仅首次挂载时执行一次）
@@ -112,6 +113,16 @@ const AppLayout = () => {
         breakpoint="lg"
         collapsedWidth="0"
         theme="dark"
+        onBreakpoint={(broken) => setSiderCollapsed(broken)}
+        style={{
+          overflow: 'auto',
+          height: '100vh',
+          position: 'fixed',
+          left: 0,
+          top: 0,
+          bottom: 0,
+          zIndex: 100,
+        }}
       >
         <div style={{ 
           height: 64, 
@@ -138,7 +149,7 @@ const AppLayout = () => {
           style={{ marginTop: 8 }}
         />
       </Sider>
-      <Layout>
+      <Layout style={{ marginLeft: siderCollapsed ? 0 : 200, transition: 'margin-left 0.2s' }}>
         <Header
           style={{
             padding: '0 24px',
