@@ -179,6 +179,7 @@ const TradeRecords = () => {
   const [submitting, setSubmitting] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState(null);
   const [selectedStrategy, setSelectedStrategy] = useState(null);
+  const [pageSize, setPageSize] = useState(10);
   const [form] = Form.useForm();
   const { amountVisible } = useAmountVisibility();
 
@@ -354,7 +355,12 @@ const TradeRecords = () => {
         })}
         loading={loading}
         rowKey="id"
-        pagination={{ pageSize: 10 }}
+        pagination={{
+          pageSize,
+          showSizeChanger: true,
+          pageSizeOptions: ['10', '20', '50', '100'],
+          onShowSizeChange: (_, size) => setPageSize(size),
+        }}
         size="middle"
       />
 
