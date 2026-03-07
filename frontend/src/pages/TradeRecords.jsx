@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Table, Tag, Button, message, Modal, Form, Input, DatePicker, Select, InputNumber, Row, Col, Space, Descriptions } from 'antd';
+import { Card, Table, Tag, Button, message, Modal, Form, Input, DatePicker, Select, InputNumber, Row, Col, Space, Descriptions, Statistic, Divider } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
+import { Pie } from '@ant-design/charts';
 import dayjs from 'dayjs';
 import { useAmountVisibility } from '../contexts/AmountVisibilityContext';
-import { fetchAllTradeRecords, createTradeRecord } from '../services/tradeRecordApi';
+import { fetchAllTradeRecords, createTradeRecord, fetchTradeStatistics } from '../services/tradeRecordApi';
 import { fetchActiveBrokers } from '../services/brokerApi';
 import { fetchAllStrategies } from '../services/strategyApi';
 
@@ -175,6 +176,7 @@ const TradeRecords = () => {
   const [brokerMap, setBrokerMap] = useState({});
   const [strategyMap, setStrategyMap] = useState({});
   const [loading, setLoading] = useState(false);
+  const [statistics, setStatistics] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState(null);
@@ -183,6 +185,18 @@ const TradeRecords = () => {
   const [pageSize, setPageSize] = useState(10);
   const [form] = Form.useForm();
   const { amountVisible } = useAmountVisibility();
+
+  // 加载统计数据
+  const loadStatistics = async () => {
+    try {
+      const result = await fetchTradeStatistics();
+      if (result.status === 'SUCCESS') {
+        setStatistics(result.data);
+      }
+    } catch (error) {
+      console.error('查询统计数据失败:', error);
+    }
+  };
 
   // 加载交易记录数据
   const loadTradeRecords = async () => {
@@ -243,6 +257,7 @@ const TradeRecords = () => {
     loadTradeRecords();
     loadBrokers();
     loadStrategies();
+    loadStatistics();
   }, []);
 
   // 查看详情
@@ -325,6 +340,7 @@ const TradeRecords = () => {
         form.resetFields();
         setSelectedTradeType('BUY');
         loadTradeRecords();
+        loadStatistics();
       } else {
         message.error(result.message || '新增交易记录失败');
       }
@@ -342,7 +358,183 @@ const TradeRecords = () => {
     }
   };
 
+  // 饼图数据
+  const pieData = statistics ? [
+    { type: '股票', value: statistics.stockCount || 0 },
+    { type: 'CALL期权', value: statistics.optionCallCount || 0 },
+    { type: 'PUT期权', value: statistics.optionPutCount || 0 },
+    { type: 'ETF', value: statistics.etfCount || 0 },
+  ].filter(item => item.value > 0) : [];
+
+  // 饼图配置
+  const pieConfig = {
+    data: pieData,
+    angleField: 'value',
+    colorField: 'type',
+    color: ['#1890ff', '#52c41a', '#f5222d', '#13c2c2'],
+    radius: 0.8,
+    innerRadius: 0.5,
+    label: {
+      text: (d) => `${statistics ? ((d.value / statistics.totalCount) * 100).toFixed(1) : 0}%`,
+      style: {
+        fontSize: 12,
+        fontWeight: 'bold',
+      },
+    },
+    legend: {
+      color: {
+        title: false,
+        position: 'right',
+        rowPadding: 5,
+        itemLabelText: (datum) => {
+          const item = pieData.find(d => d.type === datum.label);
+          const count = item ? item.value : 0;
+          return `${datum.label}  ${count}次`;
+        },
+      },
+    },
+    tooltip: {
+      title: 'type',
+      items: [
+        (d) => ({
+          name: d.type,
+          value: `${d.value}次 (${statistics ? ((d.value / statistics.totalCount) * 100).toFixed(1) : 0}%)`,
+        }),
+      ],
+    },
+    interactions: [{ type: 'element-active' }],
+    style: {
+      stroke: '#fff',
+      lineWidth: 2,
+    },
+  };
+
   return (
+    <div>
+      {/* 统计数据区域 */}
+      {statistics && (
+        <Row gutter={16} style={{ marginBottom: 16 }}>
+          {/* 左侧：交易概览 */}
+          <Col span={6}>
+            <Card title="交易概览" size="small" style={{ height: '100%' }}>
+              <Statistic
+                title="总交易次数"
+                value={statistics.totalCount}
+                suffix="次"
+                valueStyle={{ color: '#1890ff', fontSize: 28 }}
+              />
+              <Divider style={{ margin: '12px 0' }} />
+              <Statistic
+                title="涉及证券数"
+                value={statistics.distinctSymbolCount || 0}
+                suffix="只"
+                valueStyle={{ color: '#36cfc9', fontSize: 28 }}
+              />
+              <Divider style={{ margin: '12px 0' }} />
+              <div>
+                <div style={{ color: 'rgba(0, 0, 0, 0.45)', marginBottom: 8, fontSize: 14 }}>总交易费用</div>
+                {amountVisible ? (
+                  <div style={{ fontSize: 16 }}>
+                    {statistics.totalFeeUSD > 0 && (
+                      <div style={{ marginBottom: 4 }}>
+                        <span style={{ color: '#9254de', fontWeight: 'bold' }}>US$ {Number(statistics.totalFeeUSD).toFixed(2)}</span>
+                      </div>
+                    )}
+                    {statistics.totalFeeCNY > 0 && (
+                      <div style={{ marginBottom: 4 }}>
+                        <span style={{ color: '#69b1ff', fontWeight: 'bold' }}>¥ {Number(statistics.totalFeeCNY).toFixed(2)}</span>
+                      </div>
+                    )}
+                    {statistics.totalFeeHKD > 0 && (
+                      <div style={{ marginBottom: 4 }}>
+                        <span style={{ color: '#95de64', fontWeight: 'bold' }}>HK$ {Number(statistics.totalFeeHKD).toFixed(2)}</span>
+                      </div>
+                    )}
+                    {statistics.totalFeeUSD <= 0 && statistics.totalFeeCNY <= 0 && statistics.totalFeeHKD <= 0 && (
+                      <span style={{ color: '#999' }}>暂无费用数据</span>
+                    )}
+                  </div>
+                ) : (
+                  <span style={{ color: '#999', fontSize: 24, fontWeight: 'bold' }}>****</span>
+                )}
+              </div>
+            </Card>
+          </Col>
+          {/* 中间：交易类型分布饼图 */}
+          <Col span={9}>
+            <Card title="交易类型分布" size="small" style={{ height: '100%' }}>
+              {pieData.length > 0 ? (
+                <Pie {...pieConfig} height={280} />
+              ) : (
+                <div style={{ height: 280, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#999' }}>
+                  暂无交易数据
+                </div>
+              )}
+            </Card>
+          </Col>
+          {/* 右侧：Top 10 热门证券（纯 CSS 水平直方图） */}
+          <Col span={9}>
+            <Card title="Top 10 热门证券" size="small" style={{ height: '100%' }}>
+              {statistics.topSymbols && statistics.topSymbols.length > 0 ? (() => {
+                const barColors = ['#597ef7', '#73d13d', '#ff7a45', '#36cfc9', '#f759ab',
+                                   '#ffc53d', '#40a9ff', '#9254de', '#ff4d4f', '#95de64'];
+                const maxCount = Math.max(...statistics.topSymbols.map(d => d.count));
+                return (
+                  <div style={{ height: 280, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '4px 0' }}>
+                    {statistics.topSymbols.map((item, idx) => {
+                      const percent = maxCount > 0 ? (item.count / maxCount) * 100 : 0;
+                      return (
+                        <div key={item.symbol} style={{ display: 'flex', alignItems: 'center', height: 24 }}>
+                          {/* 证券名称 */}
+                          <div style={{
+                            width: 80,
+                            flexShrink: 0,
+                            fontSize: 12,
+                            color: '#333',
+                            textAlign: 'right',
+                            paddingRight: 8,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }} title={item.symbol}>
+                            {item.symbol}
+                          </div>
+                          {/* 条形区域 */}
+                          <div style={{ flex: 1, position: 'relative', height: 18 }}>
+                            <div style={{
+                              width: `${Math.max(percent, 2)}%`,
+                              height: '100%',
+                              backgroundColor: barColors[idx % barColors.length],
+                              borderRadius: '0 4px 4px 0',
+                              transition: 'width 0.3s ease',
+                            }} />
+                          </div>
+                          {/* 数值标签 */}
+                          <div style={{
+                            width: 40,
+                            flexShrink: 0,
+                            fontSize: 12,
+                            color: '#666',
+                            textAlign: 'left',
+                            paddingLeft: 6,
+                          }}>
+                            {item.count}次
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })() : (
+                <div style={{ height: 280, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#999' }}>
+                  暂无数据
+                </div>
+              )}
+            </Card>
+          </Col>
+        </Row>
+      )}
+
     <Card
       title="交易记录"
       extra={
@@ -639,6 +831,7 @@ const TradeRecords = () => {
         )}
       </Modal>
     </Card>
+    </div>
   );
 };
 

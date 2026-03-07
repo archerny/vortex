@@ -1,5 +1,6 @@
 package com.localledger.controller;
 
+import com.localledger.dto.TradeStatistics;
 import com.localledger.entity.TradeRecord;
 import com.localledger.entity.enums.AssetType;
 import com.localledger.service.TradeRecordService;
@@ -24,6 +25,16 @@ public class TradeRecordController {
 
     @Autowired
     private TradeRecordService tradeRecordService;
+
+    /**
+     * 查询交易记录统计数据
+     * GET /api/trade-records/statistics
+     */
+    @GetMapping("/statistics")
+    public ResponseEntity<Map<String, Object>> getStatistics() {
+        TradeStatistics stats = tradeRecordService.getStatistics();
+        return buildSuccessResponse("查询成功", stats);
+    }
 
     /**
      * 查询所有交易记录

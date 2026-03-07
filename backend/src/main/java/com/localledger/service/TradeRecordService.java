@@ -1,7 +1,9 @@
 package com.localledger.service;
 
+import com.localledger.dto.TradeStatistics;
 import com.localledger.entity.TradeRecord;
 import com.localledger.entity.enums.AssetType;
+import com.localledger.entity.enums.Currency;
 import com.localledger.repository.BrokerRepository;
 import com.localledger.repository.StrategyRepository;
 import com.localledger.repository.TradeRecordRepository;
@@ -11,8 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 交易记录业务逻辑服务
@@ -29,6 +31,39 @@ public class TradeRecordService {
 
     @Autowired
     private StrategyRepository strategyRepository;
+
+    /**
+     * 获取交易记录统计数据
+     * 包括：总交易次数、各类型交易次数、各币种交易费用总和
+     */
+    public TradeStatistics getStatistics() {
+        TradeStatistics stats = new TradeStatistics();
+        stats.setTotalCount(tradeRecordRepository.countByIsDeletedFalse());
+        stats.setStockCount(tradeRecordRepository.countByAssetTypeAndIsDeletedFalse(AssetType.STOCK));
+        stats.setOptionCallCount(tradeRecordRepository.countByAssetTypeAndIsDeletedFalse(AssetType.OPTION_CALL));
+        stats.setOptionPutCount(tradeRecordRepository.countByAssetTypeAndIsDeletedFalse(AssetType.OPTION_PUT));
+        stats.setEtfCount(tradeRecordRepository.countByAssetTypeAndIsDeletedFalse(AssetType.ETF));
+        stats.setTotalFeeUSD(tradeRecordRepository.sumFeeByIsDeletedFalseAndCurrency(Currency.USD));
+        stats.setTotalFeeCNY(tradeRecordRepository.sumFeeByIsDeletedFalseAndCurrency(Currency.CNY));
+        stats.setTotalFeeHKD(tradeRecordRepository.sumFeeByIsDeletedFalseAndCurrency(Currency.HKD));
+
+        // 涉及证券数量（underlyingSymbol 去重计数）
+        stats.setDistinctSymbolCount(tradeRecordRepository.countDistinctUnderlyingSymbol());
+
+        // Top 10 最常交易的证券
+        List<Object[]> topList = tradeRecordRepository.findTopTradedSymbols();
+        List<Map<String, Object>> topSymbols = topList.stream()
+                .limit(10)
+                .map(row -> {
+                    Map<String, Object> item = new LinkedHashMap<>();
+                    item.put("symbol", row[0]);
+                    item.put("count", row[1]);
+                    return item;
+                })
+                .collect(Collectors.toList());
+        stats.setTopSymbols(topSymbols);
+        return stats;
+    }
 
     /**
      * 查询所有未删除的交易记录（按ID倒序）

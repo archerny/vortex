@@ -12,6 +12,15 @@ export const fetchAllTradeRecords = async () => {
 };
 
 /**
+ * 查询交易记录统计数据
+ * GET /api/trade-records/statistics
+ */
+export const fetchTradeStatistics = async () => {
+  const response = await axios.get(`${BASE_URL}/statistics`);
+  return response.data;
+};
+
+/**
  * 根据ID查询交易记录
  * GET /api/trade-records/{id}
  */
