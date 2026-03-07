@@ -7,12 +7,12 @@ import { menuItems, menuKeyToPath, pathToMenuKey, menuKeyToParent } from '../con
 import Dashboard from '../pages/Dashboard';
 import CashFlow from '../pages/CashFlow';
 import BrokerManagement from '../pages/BrokerManagement';
-import TradeRecords from '../pages/TradeRecords';
+import TradeRecords from '../pages/trade/TradeRecords';
 import ProfitAnalysis from '../pages/ProfitAnalysis';
 import Settings from '../pages/Settings';
 import StrategyManagement from '../pages/StrategyManagement';
-import TradeAnomalyAnalysis from '../pages/TradeAnomalyAnalysis';
-import MarketEvents from '../pages/MarketEvents';
+import TradeAnomalyAnalysis from '../pages/analysis/TradeAnomalyAnalysis';
+import MarketEvents from '../pages/market-events/MarketEvents';
 import { AmountVisibilityProvider, useAmountVisibility } from '../contexts/AmountVisibilityContext';
 import './AppLayout.css';
 

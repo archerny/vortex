@@ -3,7 +3,6 @@ package com.localledger.controller;
 import com.localledger.entity.DividendInKindEvent;
 import com.localledger.entity.StockSplitEvent;
 import com.localledger.entity.SymbolChangeEvent;
-import com.localledger.entity.enums.Currency;
 import com.localledger.service.DividendInKindEventService;
 import com.localledger.service.StockSplitEventService;
 import com.localledger.service.SymbolChangeEventService;

@@ -5,6 +5,7 @@ import com.localledger.dto.TradeVerificationResult;
 import com.localledger.entity.TradeRecord;
 import com.localledger.entity.enums.AssetType;
 import com.localledger.service.TradeRecordService;
+import com.localledger.service.TradeVerificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,9 @@ public class TradeRecordController {
 
     @Autowired
     private TradeRecordService tradeRecordService;
+
+    @Autowired
+    private TradeVerificationService tradeVerificationService;
 
     /**
      * 查询交易记录统计数据
@@ -159,7 +163,7 @@ public class TradeRecordController {
      */
     @GetMapping("/verify")
     public ResponseEntity<Map<String, Object>> verifyTradeRecords() {
-        TradeVerificationResult result = tradeRecordService.verifyAll();
+        TradeVerificationResult result = tradeVerificationService.verifyAll();
         String message = result.isPassed() ? "核对通过，所有交易记录数据正常" :
                 "核对完成，发现 " + result.getErrorCount() + " 条异常记录";
         return buildSuccessResponse(message, result);
