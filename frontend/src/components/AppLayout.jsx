@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Layout, Menu, theme, Space, Button, Tag, Tooltip, message } from 'antd';
 import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
+import { TbTornado } from 'react-icons/tb';
 import axios from 'axios';
 import { menuItems, menuKeyToPath, pathToMenuKey, menuKeyToParent } from '../constants/menuConfig';
 import Dashboard from '../pages/Dashboard';
@@ -133,10 +134,10 @@ const AppLayout = () => {
           fontWeight: 'bold',
           color: '#fff',
           borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-          letterSpacing: '2px',
           padding: '0 16px'
         }}>
-          投资分析平台
+          <TbTornado style={{ marginRight: 8, fontSize: 24 }} />
+          <span style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', 'Segoe UI', sans-serif", fontWeight: 600, letterSpacing: '1px' }}>Vortex <span style={{ fontWeight: 300, fontSize: 22 }}>+</span></span>
         </div>
         <Menu
           theme="dark"
