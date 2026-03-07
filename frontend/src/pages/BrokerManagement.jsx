@@ -239,7 +239,7 @@ const BrokerManagement = () => {
                   { max: 100, message: '券商名称不能超过100个字符' },
                 ]}
               >
-                <Input placeholder="请输入券商名称，如：富途证券" />
+                <Input placeholder="请输入券商名称" />
               </Form.Item>
             </Col>
             <Col flex="100px">

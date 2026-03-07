@@ -4,15 +4,15 @@ import { PlusOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { useAmountVisibility } from '../contexts/AmountVisibilityContext';
 import { fetchAllTradeRecords, createTradeRecord } from '../services/tradeRecordApi';
-import { fetchAllBrokers } from '../services/brokerApi';
+import { fetchActiveBrokers } from '../services/brokerApi';
 import { fetchAllStrategies } from '../services/strategyApi';
 
 // 证券类型：后端枚举 <-> 前端中文
 const assetTypeMap = {
   STOCK: '股票',
   ETF: 'ETF',
-  OPTION_CALL: '期权CALL',
-  OPTION_PUT: '期权PUT',
+  OPTION_CALL: 'CALL期权',
+  OPTION_PUT: 'PUT期权',
 };
 const assetTypeReverseMap = Object.fromEntries(Object.entries(assetTypeMap).map(([k, v]) => [v, k]));
 
@@ -209,7 +209,7 @@ const TradeRecords = () => {
   // 加载券商列表
   const loadBrokers = async () => {
     try {
-      const result = await fetchAllBrokers();
+      const result = await fetchActiveBrokers();
       if (result.status === 'SUCCESS') {
         const list = result.data || [];
         setBrokerList(list);
@@ -269,6 +269,29 @@ const TradeRecords = () => {
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
+
+      // 期权证券代码格式校验：CALL期权格式为 "底层证券代码-YYYYMMDD-C价格"，PUT期权格式为 "底层证券代码-YYYYMMDD-P价格"
+      if (values.assetType === 'OPTION_CALL' || values.assetType === 'OPTION_PUT') {
+        const optionFlag = values.assetType === 'OPTION_CALL' ? 'C' : 'P';
+        const optionLabel = values.assetType === 'OPTION_CALL' ? 'CALL期权' : 'PUT期权';
+        const underlying = values.underlyingSymbol?.trim();
+        const symbol = values.symbol?.trim();
+        const expectedPattern = new RegExp(`^${underlying.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}-(\\d{8})-${optionFlag}[\\d.]+$`);
+
+        if (!expectedPattern.test(symbol)) {
+          message.error(`${optionLabel}的证券代码格式不正确，应为：${underlying}-YYYYMMDD-${optionFlag}价格，例如：${underlying}-20250321-${optionFlag}150`);
+          return;
+        }
+
+        // 校验日期部分是否为合法日期
+        const dateStr = symbol.match(new RegExp(`^${underlying.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}-(\\d{8})-${optionFlag}`))[1];
+        const dateObj = dayjs(dateStr, 'YYYYMMDD', true);
+        if (!dateObj.isValid()) {
+          message.error(`证券代码中的日期部分 ${dateStr} 不是合法日期，请检查`);
+          return;
+        }
+      }
+
       setSubmitting(true);
 
       // 构建后端要求的数据格式
