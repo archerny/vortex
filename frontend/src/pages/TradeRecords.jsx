@@ -179,6 +179,7 @@ const TradeRecords = () => {
   const [submitting, setSubmitting] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState(null);
   const [selectedStrategy, setSelectedStrategy] = useState(null);
+  const [selectedTradeType, setSelectedTradeType] = useState('BUY');
   const [pageSize, setPageSize] = useState(10);
   const [form] = Form.useForm();
   const { amountVisible } = useAmountVisibility();
@@ -262,6 +263,7 @@ const TradeRecords = () => {
   const handleCancel = () => {
     setIsModalVisible(false);
     form.resetFields();
+    setSelectedTradeType('BUY');
   };
 
   const handleSubmit = async () => {
@@ -270,9 +272,13 @@ const TradeRecords = () => {
       setSubmitting(true);
 
       // 构建后端要求的数据格式
+      const isOptionExpire = values.tradeType === 'OPTION_EXPIRE';
       // 期权（OPTION_CALL / OPTION_PUT）一个合约对应100股正股，金额需要乘以100
       const isOption = values.assetType === 'OPTION_CALL' || values.assetType === 'OPTION_PUT';
       const multiplier = isOption ? 100 : 1;
+      // 期权到期时，价格和费用均为0，金额也为0
+      const price = isOptionExpire ? 0 : values.price;
+      const fee = isOptionExpire ? 0 : values.fee;
       const payload = {
         tradeDate: values.date.format('YYYY-MM-DD'),
         brokerId: values.brokerId,
@@ -282,9 +288,9 @@ const TradeRecords = () => {
         underlyingSymbol: values.underlyingSymbol,
         tradeType: values.tradeType,
         quantity: values.quantity,
-        price: values.price,
-        amount: values.quantity * values.price * multiplier,
-        fee: values.fee,
+        price: price,
+        amount: values.quantity * price * multiplier,
+        fee: fee,
         currency: values.currency,
         strategyId: values.strategyId || null,
       };
@@ -294,6 +300,7 @@ const TradeRecords = () => {
         message.success('交易记录添加成功！');
         setIsModalVisible(false);
         form.resetFields();
+        setSelectedTradeType('BUY');
         loadTradeRecords();
       } else {
         message.error(result.message || '新增交易记录失败');
@@ -434,7 +441,15 @@ const TradeRecords = () => {
                 name="tradeType"
                 rules={[{ required: true, message: '请选择交易类型' }]}
               >
-                <Select>
+                <Select
+                  onChange={(value) => {
+                    setSelectedTradeType(value);
+                    if (value === 'OPTION_EXPIRE') {
+                      // 期权到期时，自动清除价格和费用字段
+                      form.setFieldsValue({ price: undefined, fee: undefined });
+                    }
+                  }}
+                >
                   {Object.entries(tradeTypeMap).map(([value, label]) => (
                     <Select.Option key={value} value={value}>{label}</Select.Option>
                   ))}
@@ -474,7 +489,7 @@ const TradeRecords = () => {
           </Form.Item>
 
           <Row gutter={16}>
-            <Col span={8}>
+            <Col span={selectedTradeType === 'OPTION_EXPIRE' ? 24 : 8}>
               <Form.Item
                 label="数量"
                 name="quantity"
@@ -486,30 +501,34 @@ const TradeRecords = () => {
                 <InputNumber style={{ width: '100%' }} placeholder="请输入数量" min={1} />
               </Form.Item>
             </Col>
-            <Col span={8}>
-              <Form.Item
-                label="成交价格"
-                name="price"
-                rules={[
-                  { required: true, message: '请输入成交价格' },
-                  { type: 'number', min: 0, message: '价格不能为负' },
-                ]}
-              >
-                <InputNumber style={{ width: '100%' }} placeholder="请输入价格" min={0} precision={4} />
-              </Form.Item>
-            </Col>
-            <Col span={8}>
-              <Form.Item
-                label="交易费用"
-                name="fee"
-                rules={[
-                  { required: true, message: '请输入交易费用' },
-                  { type: 'number', min: 0, message: '费用不能为负数' },
-                ]}
-              >
-                <InputNumber style={{ width: '100%' }} placeholder="请输入费用" min={0} precision={2} />
-              </Form.Item>
-            </Col>
+            {selectedTradeType !== 'OPTION_EXPIRE' && (
+              <>
+                <Col span={8}>
+                  <Form.Item
+                    label="成交价格"
+                    name="price"
+                    rules={[
+                      { required: true, message: '请输入成交价格' },
+                      { type: 'number', min: 0, message: '价格不能为负' },
+                    ]}
+                  >
+                    <InputNumber style={{ width: '100%' }} placeholder="请输入价格" min={0} precision={4} />
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
+                  <Form.Item
+                    label="交易费用"
+                    name="fee"
+                    rules={[
+                      { required: true, message: '请输入交易费用' },
+                      { type: 'number', min: 0, message: '费用不能为负数' },
+                    ]}
+                  >
+                    <InputNumber style={{ width: '100%' }} placeholder="请输入费用" min={0} precision={2} />
+                  </Form.Item>
+                </Col>
+              </>
+            )}
           </Row>
 
           <Row gutter={16}>
