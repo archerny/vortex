@@ -28,6 +28,7 @@
 | 3 | 关联 ID 方案 | 采用 `trigger_ref_id` + `trigger_ref_type` 组合 | `MARKET_EVENT` 对应 3 张不同的表，需要 `trigger_ref_type` 区分引用目标；同时保持 `trade_trigger` 枚举简洁，便于按大类统一操作 |
 | 4 | `trigger_ref_id` 默认值 | `NOT NULL DEFAULT 0`，`0` 表示无关联 | 避免 NULL 的语义歧义，数据库层面保障字段永远有值，查询友好 |
 | 5 | `trade_trigger` 默认值 | 不设默认值，`NOT NULL` | 强制调用方显式指定触发类型，漏填直接报错，防止脏数据进入 |
+| 6 | `trigger_ref_type` 默认值 | `NOT NULL DEFAULT 'NONE'`，`NONE` 表示无关联 | 与 `trigger_ref_id` 保持一致的非空策略，避免代码中处理 NULL 的复杂性 |
 
 ---
 
@@ -41,33 +42,34 @@
 |------|------|------|------|
 | `trade_trigger` | VARCHAR(32) | `NOT NULL`，无默认值 | 交易触发来源，枚举值见下方 |
 | `trigger_ref_id` | BIGINT | `NOT NULL DEFAULT 0` | 触发来源的关联记录 ID，`0` 表示无关联 |
-| `trigger_ref_type` | VARCHAR(32) | 可空 | 触发来源的关联记录类型，用于区分 `trigger_ref_id` 指向哪张表 |
+| `trigger_ref_type` | VARCHAR(32) | `NOT NULL DEFAULT 'NONE'` | 触发来源的关联记录类型，用于区分 `trigger_ref_id` 指向哪张表；`NONE` 表示无关联 |
 
 ### 3.2 `trade_trigger` 枚举值
 
 | 枚举值 | 含义 | 说明 |
 |--------|------|------|
 | `MANUAL` | 手动交易 | 用户在券商平台上主动下单执行的交易 |
-| `OPTION_EXERCISE` | 期权行权 | 期权到期/行权导致的被动买入或卖出 |
+| `OPTION` | 期权 | 期权相关事件（到期行权、提前行权、到期失效、被指派等）导致的被动买入或卖出 |
 | `MARKET_EVENT` | 市场事件 | 拆股、代码变更、实物分红等市场事件产生的系统交易记录 |
 
 ### 3.3 `trigger_ref_type` 枚举值
 
 | 枚举值 | 含义 | 关联表 |
 |--------|------|--------|
+| `NONE` | 无关联 | — |
 | `STOCK_SPLIT` | 拆股事件 | `events_stock_split` |
 | `SYMBOL_CHANGE` | 代码变更事件 | `events_symbol_change` |
 | `DIVIDEND_IN_KIND` | 实物分红事件 | `events_dividend_in_kind` |
 | `OPTION` | 期权记录 | 期权相关记录表（待定） |
 
-> 当 `trade_trigger = MANUAL` 时，`trigger_ref_type` 为 NULL，`trigger_ref_id` 为 0。
+> 当 `trade_trigger = MANUAL` 时，`trigger_ref_type` 为 `NONE`，`trigger_ref_id` 为 0。
 
 ### 3.4 字段组合语义
 
 | `trade_trigger` | `trigger_ref_type` | `trigger_ref_id` | 含义 |
 |-----------------|--------------------|--------------------|------|
-| `MANUAL` | NULL | 0 | 手动交易，无关联记录 |
-| `OPTION_EXERCISE` | `OPTION` | 期权记录 ID | 期权行权，关联到具体的期权记录 |
+| `MANUAL` | `NONE` | 0 | 手动交易，无关联记录 |
+| `OPTION` | `OPTION` | 期权记录 ID | 期权相关事件，关联到具体的期权记录 |
 | `MARKET_EVENT` | `STOCK_SPLIT` | 3 | 拆股事件触发，关联 `events_stock_split.id = 3` |
 | `MARKET_EVENT` | `SYMBOL_CHANGE` | 7 | 代码变更事件触发，关联 `events_symbol_change.id = 7` |
 | `MARKET_EVENT` | `DIVIDEND_IN_KIND` | 2 | 实物分红事件触发，关联 `events_dividend_in_kind.id = 2` |
@@ -79,9 +81,9 @@
 | 市场事件 | 生成的交易记录 | TradeType | 说明 |
 |----------|----------------|-----------|------|
 | 拆股（如 1:4） | BUY 增量数量（如原100股→新400股，增量300股） | `BUY` | 价格=0，费用=0，金额=0 |
-| 代码变更（如 FB→META） | ① SELL 旧代码股票 | `SELL` | 价格=0，费用=0，金额=0 |
-|  | ② BUY 新代码股票 | `BUY` | 价格=0，费用=0，金额=0 |
-| 实物分红 | BUY 分红股票 | `BUY` | 价格=0，费用=0，金额=0 |
+| 代码变更（如 FB→META） | ① SELL 旧代码股票 | `SELL` | 价格=原持仓平均成本，费用=0，金额=持仓总成本 |
+|  | ② BUY 新代码股票 | `BUY` | 价格=原持仓平均成本，费用=0，金额=持仓总成本 |
+| 实物分红 | BUY 分红股票 | `BUY` | 价格=公允价格（fairValuePerShare），费用=0，金额=公允价格×分红数量 |
 
 **为什么不新增 TradeType：**
 
@@ -94,9 +96,11 @@
 
 **注意事项：**
 
-- 市场事件生成的交易记录，价格、费用、金额均为 **0**，不影响收益统计
+- 拆股生成的交易记录，价格、费用、金额均为 **0**，不影响收益统计
+- 代码变更生成的交易记录，价格和金额继承原持仓的平均成本，确保成本从旧代码平滑转移到新代码，费用为 **0**
+- 实物分红生成的交易记录，价格采用公司公告中的**公允价格**（`fairValuePerShare`），金额 = 公允价格 × 分红数量，费用为 **0**。公允价格用于建立新持仓的成本基础，确保后续卖出时收益计算正确
 - 区分市场事件交易和普通交易，通过 `trade_trigger = MARKET_EVENT` 筛选，而非 TradeType
-- 收益计算模块需排除 `trade_trigger = MARKET_EVENT` 且金额为 0 的记录，或在统计时按 `trade_trigger` 分组
+- 收益计算模块需排除 `trade_trigger = MARKET_EVENT` 的记录，或在统计时按 `trade_trigger` 分组
 
 ### 3.6 与现有设计的关系
 
@@ -111,8 +115,8 @@
 |------|------|
 | `trade_trigger` 必填 | 新增交易记录时，后端必须校验该字段不为空 |
 | `MARKET_EVENT` 时 `trigger_ref_id` 不应为 0 | 市场事件生成的交易记录必须关联到具体的事件 |
-| `MARKET_EVENT` 时 `trigger_ref_type` 不应为空 | 必须指明关联的是哪种市场事件表 |
-| `MANUAL` 时 `trigger_ref_id` 应为 0 | 手动交易无关联记录 |
+| `MARKET_EVENT` 时 `trigger_ref_type` 不应为 `NONE` | 必须指明关联的是哪种市场事件表 |
+| `MANUAL` 时 `trigger_ref_id` 应为 0 且 `trigger_ref_type` 应为 `NONE` | 手动交易无关联记录 |
 
 ---
 

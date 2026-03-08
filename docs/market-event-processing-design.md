@@ -25,7 +25,7 @@
 |---------|--------|---------|---------|---------|
 | **拆股** | `StockSplitEvent` | `events_stock_split` | `symbol`, `eventDate`, `ratioFrom`, `ratioTo` | 持仓数量按 `ratioTo/ratioFrom` 调整。如 TSLA 1拆3，100股→300股 |
 | **代码变更** | `SymbolChangeEvent` | `events_symbol_change` | `symbol`, `eventDate`, `oldSymbol`, `newSymbol` | oldSymbol 的全部持仓转移到 newSymbol。如 FB→META |
-| **实物分红** | `DividendInKindEvent` | `events_dividend_in_kind` | `symbol`, `eventDate`, `dividendSymbol`, `dividendQtyPerShare` | 根据持仓数量新增 dividendSymbol 的持仓。如持有1000股A，每股分红0.5股B → 新增500股B |
+| **实物分红** | `DividendInKindEvent` | `events_dividend_in_kind` | `symbol`, `eventDate`, `dividendSymbol`, `dividendQtyPerShare`, `fairValuePerShare` | 根据持仓数量新增 dividendSymbol 的持仓。如持有1000股A，每股分红0.5股B，公允价格$150 → 新增500股B，持仓成本 = 500 × $150 = $75,000 |
 
 `BaseMarketEvent` 公共字段：
 - `symbol` - 涉及的证券代码
@@ -145,10 +145,12 @@ flowchart TD
 | 市场事件 | 生成的交易记录 | TradeType | 示例 |
 |---------|-------------|-----------|------|
 | **拆股 1:3** | 对持有该 symbol 的每个券商，生成一条 BUY 记录，数量 = 原持仓 × (ratioTo/ratioFrom - 1) | `BUY` | 持有100股，拆股1:3 → 生成 BUY 200股（价格=0，金额=0） |
-| **代码变更** | 对持有 oldSymbol 的每个券商，生成两条记录：① SELL oldSymbol 全部持仓 ② BUY newSymbol 同等数量 | `SELL` + `BUY` | FB 100股 → SELL FB 100 + BUY META 100（价格=0，金额=0） |
-| **实物分红** | 对持有该 symbol 的每个券商，生成一条 dividendSymbol 的 BUY 记录，数量 = 持仓 × dividendQtyPerShare | `BUY` | 持有1000股A，每股分红0.5股B → BUY B 500股（价格=0，金额=0） |
+| **代码变更** | 对持有 oldSymbol 的每个券商，生成两条记录：① SELL oldSymbol 全部持仓 ② BUY newSymbol 同等数量 | `SELL` + `BUY` | FB 100股（平均成本$300） → SELL FB 100（价格=$300，金额=$30000） + BUY META 100（价格=$300，金额=$30000），费用=0 |
+| **实物分红** | 对持有该 symbol 的每个券商，生成一条 dividendSymbol 的 BUY 记录，数量 = 持仓 × dividendQtyPerShare | `BUY` | 持有1000股A，每股分红0.5股B，公允价格$150 → BUY B 500股（价格=$150，金额=$75,000） |
 
-> 所有市场事件生成的交易记录，价格、费用、金额均为 **0**，不影响收益统计。
+> 拆股生成的交易记录，价格、费用、金额均为 **0**，不影响收益统计。
+> 代码变更生成的交易记录，价格和金额继承原持仓的平均成本，确保成本从旧代码平滑转移到新代码，费用为 **0**。
+> 实物分红生成的交易记录，价格采用公司公告中的**公允价格**（`fairValuePerShare`），金额 = 公允价格 × 分红数量，费用为 **0**。公允价格用于建立新持仓的成本基础，确保后续卖出时收益计算正确。
 
 ### 5.1 拆股事件详细逻辑
 
@@ -181,19 +183,22 @@ flowchart TD
 
 1. 计算 eventDate 前一天的持仓快照
 2. 从持仓快照中筛选出持有 oldSymbol 的所有 (brokerId, quantity) 记录
-3. 对每个持仓记录，生成两条系统交易记录：
+3. 对每个持仓记录：
+   - 计算该券商下 oldSymbol 的平均持仓成本 avgCost = 总成本 / 持仓数量
+   - 总成本 totalCost = avgCost × 持仓数量
+   - 生成两条系统交易记录：
    a) SELL oldSymbol：
      * tradeDate = eventDate
      * symbol = oldSymbol
      * tradeType = SELL
      * quantity = 原持仓数量
-     * price = 0, amount = 0, fee = 0
+     * price = avgCost, amount = totalCost, fee = 0
    b) BUY newSymbol：
      * tradeDate = eventDate
      * symbol = newSymbol
      * tradeType = BUY
      * quantity = 原持仓数量
-     * price = 0, amount = 0, fee = 0
+     * price = avgCost, amount = totalCost, fee = 0
    * 两条记录均设置：
      * trade_trigger = MARKET_EVENT
      * trigger_ref_id = event.id
@@ -203,18 +208,19 @@ flowchart TD
 ### 5.3 实物分红详细逻辑
 
 ```
-输入：DividendInKindEvent (symbol, eventDate, dividendSymbol, dividendQtyPerShare)
+输入：DividendInKindEvent (symbol, eventDate, dividendSymbol, dividendQtyPerShare, fairValuePerShare)
 
 1. 计算 eventDate 前一天的持仓快照
 2. 从持仓快照中筛选出持有该 symbol 且 quantity > 0 的所有记录
 3. 对每个持仓记录：
    - 分红数量 = (int)(quantity × dividendQtyPerShare)（向下取整，与券商碎股处理一致）
+   - 分红金额 = fairValuePerShare × 分红数量
    - 生成一条系统交易记录：
      * tradeDate = eventDate
      * symbol = dividendSymbol
      * tradeType = BUY
      * quantity = 分红数量
-     * price = 0, amount = 0, fee = 0
+     * price = fairValuePerShare, amount = 分红金额, fee = 0
      * brokerId = 持仓的 brokerId
      * trade_trigger = MARKET_EVENT
      * trigger_ref_id = event.id
