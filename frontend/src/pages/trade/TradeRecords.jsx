@@ -6,7 +6,7 @@ import { useAmountVisibility } from '../../contexts/AmountVisibilityContext';
 import { fetchAllTradeRecords, createTradeRecord, fetchTradeStatistics } from '../../services/tradeRecordApi';
 import { fetchActiveBrokers } from '../../services/brokerApi';
 import { fetchAllStrategies } from '../../services/strategyApi';
-import { assetTypeMap, tradeTypeMap, tradeTypeColorMap, assetTypeColorMap } from '../../constants/tradeConstants';
+import { assetTypeMap, tradeTypeMap, tradeTypeColorMap, assetTypeColorMap, tradeTriggerMap, tradeTriggerColorMap, triggerRefTypeMap } from '../../constants/tradeConstants';
 import getTradeColumns from './TradeColumns';
 import TradeStatisticsPanel from './TradeStatisticsPanel';
 
@@ -168,6 +168,7 @@ const TradeRecords = () => {
         fee: fee,
         currency: values.currency,
         strategyId: values.strategyId || null,
+        tradeTrigger: 'MANUAL',
       };
 
       const result = await createTradeRecord(payload);
@@ -489,6 +490,14 @@ const TradeRecords = () => {
             </Descriptions.Item>
             <Descriptions.Item label="所属策略">
               {detailRecord.strategyId ? (strategyMap[detailRecord.strategyId] || `ID:${detailRecord.strategyId}`) : '-'}
+            </Descriptions.Item>
+            <Descriptions.Item label="触发来源">
+              <Tag color={tradeTriggerColorMap[detailRecord.tradeTrigger] || 'default'}>
+                {tradeTriggerMap[detailRecord.tradeTrigger] || detailRecord.tradeTrigger || '-'}
+              </Tag>
+            </Descriptions.Item>
+            <Descriptions.Item label="触发关联类型">
+              {triggerRefTypeMap[detailRecord.triggerRefType] || detailRecord.triggerRefType || '-'}
             </Descriptions.Item>
           </Descriptions>
         )}

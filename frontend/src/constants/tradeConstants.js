@@ -56,3 +56,26 @@ export const currencyColorMap = {
   HKD: 'green',
   USD: 'purple',
 };
+
+// 交易触发来源：后端枚举 <-> 前端中文
+export const tradeTriggerMap = {
+  MANUAL: '手动交易',
+  OPTION: '期权',
+  MARKET_EVENT: '市场事件',
+};
+
+// 交易触发来源 Tag 颜色
+export const tradeTriggerColorMap = {
+  MANUAL: 'blue',
+  OPTION: 'purple',
+  MARKET_EVENT: 'orange',
+};
+
+// 触发关联类型：后端枚举 <-> 前端中文
+export const triggerRefTypeMap = {
+  NONE: '无关联',
+  STOCK_SPLIT: '拆股事件',
+  SYMBOL_CHANGE: '代码变更',
+  DIVIDEND_IN_KIND: '实物分红',
+  OPTION: '期权记录',
+};

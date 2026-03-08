@@ -4,6 +4,8 @@ import com.localledger.dto.TradeStatistics;
 import com.localledger.entity.TradeRecord;
 import com.localledger.entity.enums.AssetType;
 import com.localledger.entity.enums.Currency;
+import com.localledger.entity.enums.TradeTrigger;
+import com.localledger.entity.enums.TriggerRefType;
 import com.localledger.repository.BrokerRepository;
 import com.localledger.repository.StrategyRepository;
 import com.localledger.repository.TradeRecordRepository;
@@ -149,6 +151,20 @@ public class TradeRecordService {
         if (record.getPrice() == null || record.getPrice().signum() < 0) {
             throw new IllegalArgumentException("成交价格不能为负数");
         }
+        // 如果未指定交易触发来源，默认为手动交易
+        if (record.getTradeTrigger() == null) {
+            record.setTradeTrigger(TradeTrigger.MANUAL);
+        }
+        // 如果未指定触发关联类型，默认为无关联
+        if (record.getTriggerRefType() == null) {
+            record.setTriggerRefType(TriggerRefType.NONE);
+        }
+        // 如果未指定触发关联ID，默认为0
+        if (record.getTriggerRefId() == null) {
+            record.setTriggerRefId(0L);
+        }
+        // 校验触发来源与关联字段的一致性
+        validateTriggerConsistency(record);
         // 自动计算金额：期权（OPTION_CALL / OPTION_PUT）一个合约对应100股正股，金额需要乘以100
         recalculateAmount(record);
         return tradeRecordRepository.save(record);
@@ -187,24 +203,47 @@ public class TradeRecordService {
         existing.setFee(recordData.getFee());
         existing.setCurrency(recordData.getCurrency());
         existing.setStrategyId(recordData.getStrategyId());
+        // 更新触发来源字段（如果传入了则使用传入值，否则保持原值）
+        if (recordData.getTradeTrigger() != null) {
+            existing.setTradeTrigger(recordData.getTradeTrigger());
+        }
+        if (recordData.getTriggerRefId() != null) {
+            existing.setTriggerRefId(recordData.getTriggerRefId());
+        }
+        if (recordData.getTriggerRefType() != null) {
+            existing.setTriggerRefType(recordData.getTriggerRefType());
+        }
+        // 校验触发来源与关联字段的一致性
+        validateTriggerConsistency(existing);
         // 自动计算金额：期权（OPTION_CALL / OPTION_PUT）一个合约对应100股正股，金额需要乘以100
         recalculateAmount(existing);
         return tradeRecordRepository.save(existing);
     }
 
     /**
-     * 根据证券类型自动计算成交金额
-     * 期权（OPTION_CALL / OPTION_PUT）一个合约对应100股正股，金额 = 数量 × 价格 × 100
-     * 其他类型（股票、ETF等），金额 = 数量 × 价格
+     * 校验触发来源与关联字段的一致性
+     * - MANUAL: trigger_ref_id 应为 0，trigger_ref_type 应为 NONE
+     * - MARKET_EVENT: trigger_ref_id 不应为 0，trigger_ref_type 不应为 NONE
      */
-    private void recalculateAmount(TradeRecord record) {
-        if (record.getQuantity() != null && record.getPrice() != null) {
-            BigDecimal qty = BigDecimal.valueOf(record.getQuantity());
-            BigDecimal amount = qty.multiply(record.getPrice());
-            if (record.getAssetType() == AssetType.OPTION_CALL || record.getAssetType() == AssetType.OPTION_PUT) {
-                amount = amount.multiply(BigDecimal.valueOf(100));
+    private void validateTriggerConsistency(TradeRecord record) {
+        TradeTrigger trigger = record.getTradeTrigger();
+        Long refId = record.getTriggerRefId();
+        TriggerRefType refType = record.getTriggerRefType();
+
+        if (trigger == TradeTrigger.MANUAL) {
+            if (refId != null && refId != 0L) {
+                throw new IllegalArgumentException("手动交易的 trigger_ref_id 应为 0");
             }
-            record.setAmount(amount);
+            if (refType != null && refType != TriggerRefType.NONE) {
+                throw new IllegalArgumentException("手动交易的 trigger_ref_type 应为 NONE");
+            }
+        } else if (trigger == TradeTrigger.MARKET_EVENT) {
+            if (refId == null || refId == 0L) {
+                throw new IllegalArgumentException("市场事件触发的交易必须关联到具体的事件记录（trigger_ref_id 不能为 0）");
+            }
+            if (refType == null || refType == TriggerRefType.NONE) {
+                throw new IllegalArgumentException("市场事件触发的交易必须指明关联的事件类型（trigger_ref_type 不能为 NONE）");
+            }
         }
     }
 

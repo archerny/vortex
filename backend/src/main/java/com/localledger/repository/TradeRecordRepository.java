@@ -3,6 +3,8 @@ package com.localledger.repository;
 import com.localledger.entity.TradeRecord;
 import com.localledger.entity.enums.AssetType;
 import com.localledger.entity.enums.Currency;
+import com.localledger.entity.enums.TradeTrigger;
+import com.localledger.entity.enums.TriggerRefType;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -96,4 +98,17 @@ public interface TradeRecordRepository extends BaseRepository<TradeRecord, Long>
      * 查询截止某日期、指定券商的所有未删除交易记录（按交易日期正序）
      */
     List<TradeRecord> findByTradeDateLessThanEqualAndBrokerIdAndIsDeletedFalseOrderByTradeDateAsc(LocalDate date, Long brokerId);
+
+    // ============ 触发来源相关查询方法 ============
+
+    /**
+     * 根据触发关联ID和关联类型查询未删除的交易记录
+     * 用于查找某个市场事件/期权生成的所有交易记录
+     */
+    List<TradeRecord> findByTriggerRefIdAndTriggerRefTypeAndIsDeletedFalse(Long triggerRefId, TriggerRefType triggerRefType);
+
+    /**
+     * 根据交易触发来源查询未删除的交易记录
+     */
+    List<TradeRecord> findByTradeTriggerAndIsDeletedFalseOrderByTradeDateDesc(TradeTrigger tradeTrigger);
 }

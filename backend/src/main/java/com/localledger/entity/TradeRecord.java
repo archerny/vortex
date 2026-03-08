@@ -2,6 +2,8 @@ package com.localledger.entity;
 
 import com.localledger.entity.enums.AssetType;
 import com.localledger.entity.enums.Currency;
+import com.localledger.entity.enums.TradeTrigger;
+import com.localledger.entity.enums.TriggerRefType;
 import com.localledger.entity.enums.TradeType;
 import jakarta.persistence.*;
 import org.hibernate.annotations.JdbcType;
@@ -115,6 +117,26 @@ public class TradeRecord extends BaseEntity {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "strategy_id", insertable = false, updatable = false)
     private Strategy strategy;
+
+    /**
+     * 交易触发来源：MANUAL-手动交易，OPTION-期权相关，MARKET_EVENT-市场事件
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "trade_trigger", nullable = false, length = 32)
+    private TradeTrigger tradeTrigger;
+
+    /**
+     * 触发来源的关联记录ID，0表示无关联
+     */
+    @Column(name = "trigger_ref_id", nullable = false)
+    private Long triggerRefId = 0L;
+
+    /**
+     * 触发来源的关联记录类型：NONE-无关联，STOCK_SPLIT-拆股，SYMBOL_CHANGE-代码变更，DIVIDEND_IN_KIND-实物分红，OPTION-期权
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "trigger_ref_type", nullable = false, length = 32)
+    private TriggerRefType triggerRefType = TriggerRefType.NONE;
 
     /**
      * 软删除标记
@@ -249,6 +271,30 @@ public class TradeRecord extends BaseEntity {
         this.strategy = strategy;
     }
 
+    public TradeTrigger getTradeTrigger() {
+        return tradeTrigger;
+    }
+
+    public void setTradeTrigger(TradeTrigger tradeTrigger) {
+        this.tradeTrigger = tradeTrigger;
+    }
+
+    public Long getTriggerRefId() {
+        return triggerRefId;
+    }
+
+    public void setTriggerRefId(Long triggerRefId) {
+        this.triggerRefId = triggerRefId;
+    }
+
+    public TriggerRefType getTriggerRefType() {
+        return triggerRefType;
+    }
+
+    public void setTriggerRefType(TriggerRefType triggerRefType) {
+        this.triggerRefType = triggerRefType;
+    }
+
     public Boolean getIsDeleted() {
         return isDeleted;
     }
@@ -274,6 +320,9 @@ public class TradeRecord extends BaseEntity {
                 ", fee=" + fee +
                 ", currency=" + currency +
                 ", strategyId=" + strategyId +
+                ", tradeTrigger=" + tradeTrigger +
+                ", triggerRefId=" + triggerRefId +
+                ", triggerRefType=" + triggerRefType +
                 ", isDeleted=" + isDeleted +
                 '}';
     }
