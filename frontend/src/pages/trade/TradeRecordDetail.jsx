@@ -68,35 +68,66 @@ const TradeRecordDetail = ({ recordId, onBack }) => {
   }, [recordId]);
 
   /**
+   * 根据期权记录ID集合，在全量记录中找出被这些期权触发的股票交易
+   * 规则：assetType === 'STOCK' && tradeTrigger === 'OPTION' && triggerRefId 在期权ID集合中
+   */
+  const findTriggeredStockRecords = (optionIds, allRecords) => {
+    if (!optionIds || optionIds.size === 0) return [];
+    return allRecords.filter(
+      (r) => r.assetType === 'STOCK' && r.tradeTrigger === 'OPTION' && optionIds.has(r.triggerRefId)
+    );
+  };
+
+  /**
    * 根据当前交易记录，从所有记录中计算关联交易
-   * 1. 期权交易(OPTION_CALL/OPTION_PUT)：查找同一 symbol 的所有交易
-   * 2. 股票交易(STOCK) + 触发来源为期权(OPTION)：
-   *    先通过 triggerRefId 向后端获取触发源期权交易记录，
-   *    再根据该期权的 symbol 从全量数据中查找所有同 symbol 的交易记录
+   *
+   * 场景1：期权交易(OPTION_CALL/OPTION_PUT)
+   *   - 找到全量记录中所有 symbol 与当前期权相同的交易记录（相关期权记录）
+   *   - 再根据这些期权记录的 id，找出被它们触发的股票交易（assetType=STOCK, tradeTrigger=OPTION）
+   *
+   * 场景2：股票交易(STOCK) + 触发来源为期权(OPTION)
+   *   - 通过 triggerRefId 向后端请求获取触发源期权记录
+   *   - 用该期权的 symbol 查找全量记录中所有同 symbol 的交易（相关期权记录）
+   *   - 再根据这些期权记录的 id，找出被它们触发的股票交易
    */
   const computeRelatedRecords = async (currentRecord, allRecords) => {
     if (!currentRecord || !allRecords || allRecords.length === 0) return [];
 
     const { id, assetType, symbol, tradeTrigger, triggerRefId } = currentRecord;
 
-    // 场景1：期权交易 → 查找同一证券代码(symbol)的所有交易
+    // 场景1：期权交易 → 找同 symbol 的期权记录 + 被这些期权触发的股票交易
     if (assetType === 'OPTION_CALL' || assetType === 'OPTION_PUT') {
       if (!symbol) return [];
-      return allRecords.filter(
-        (r) => r.symbol === symbol
-      );
+      // 1. 找到同一期权合约（symbol）的所有交易记录
+      const sameSymbolRecords = allRecords.filter((r) => r.symbol === symbol);
+      // 2. 收集这些期权记录的 id 集合
+      const optionIds = new Set(sameSymbolRecords.map((r) => r.id));
+      // 3. 找出被这些期权记录触发的股票交易
+      const triggeredStocks = findTriggeredStockRecords(optionIds, allRecords);
+      // 4. 合并去重并返回（同 symbol 期权 + 被触发的股票）
+      const mergedMap = new Map();
+      [...sameSymbolRecords, ...triggeredStocks].forEach((r) => mergedMap.set(r.id, r));
+      return Array.from(mergedMap.values());
     }
 
-    // 场景2：股票交易 + 触发来源为期权 → 先找到触发源期权，再找同 symbol 的全部交易
+    // 场景2：股票交易 + 触发来源为期权 → 先找到触发源期权的 symbol，再找同 symbol 的全部期权 + 被触发的股票
     if (assetType === 'STOCK' && tradeTrigger === 'OPTION' && triggerRefId && triggerRefId !== 0) {
       try {
         // 通过 triggerRefId 向后端获取触发源期权交易记录
         const refResult = await fetchTradeRecordById(triggerRefId);
         if (refResult.status === 'SUCCESS' && refResult.data) {
           const optionSymbol = refResult.data.symbol;
-          // 根据期权 symbol 从全量数据中查找所有同 symbol 的交易记录
           if (optionSymbol) {
-            return allRecords.filter((r) => r.symbol === optionSymbol);
+            // 1. 根据期权 symbol 从全量数据中查找所有同 symbol 的期权记录
+            const sameSymbolRecords = allRecords.filter((r) => r.symbol === optionSymbol);
+            // 2. 收集这些期权记录的 id 集合
+            const optionIds = new Set(sameSymbolRecords.map((r) => r.id));
+            // 3. 找出被这些期权记录触发的股票交易
+            const triggeredStocks = findTriggeredStockRecords(optionIds, allRecords);
+            // 4. 合并去重并返回
+            const mergedMap = new Map();
+            [...sameSymbolRecords, ...triggeredStocks].forEach((r) => mergedMap.set(r.id, r));
+            return Array.from(mergedMap.values());
           }
         }
       } catch (error) {
@@ -425,17 +456,35 @@ const TradeRecordDetail = ({ recordId, onBack }) => {
             相关交易
             <span style={{ fontSize: 13, color: '#999', fontWeight: 'normal', marginLeft: 8 }}>
               {(record.assetType === 'OPTION_CALL' || record.assetType === 'OPTION_PUT')
-                ? `证券代码 ${record.symbol} 的全部交易记录`
-              : `触发本交易的期权（${relatedRecords.length > 0 ? relatedRecords[0].symbol : ''}）全部交易记录`
+                ? `期权合约 ${record.symbol} 的全部交易及触发的股票交易`
+              : `触发本交易的期权合约及相关全部交易记录`
               }
             </span>
           </h4>
+          <style>{`
+            .related-current-row td {
+              background-color: #e6f4ff !important;
+            }
+            .related-current-row td:first-child {
+              position: relative;
+            }
+            .related-current-row td:first-child::before {
+              content: '';
+              position: absolute;
+              left: 0;
+              top: 0;
+              bottom: 0;
+              width: 3px;
+              background-color: #1677ff;
+            }
+          `}</style>
           <Table
             columns={relatedColumns}
             dataSource={relatedRecords}
             rowKey="id"
             size="middle"
             pagination={relatedRecords.length > 10 ? { pageSize: 10 } : false}
+            rowClassName={(row) => row.id === record?.id ? 'related-current-row' : ''}
           />
         </div>
       )}
