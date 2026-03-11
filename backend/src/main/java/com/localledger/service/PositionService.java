@@ -2,7 +2,6 @@ package com.localledger.service;
 
 import com.localledger.dto.PositionSnapshot;
 import com.localledger.entity.TradeRecord;
-import com.localledger.entity.enums.AssetType;
 import com.localledger.entity.enums.TradeType;
 import com.localledger.repository.BrokerRepository;
 import com.localledger.repository.TradeRecordRepository;
@@ -18,7 +17,9 @@ import java.util.stream.Collectors;
  * 持仓计算服务
  * 根据交易记录计算截止某一时刻的持仓快照
  *
- * 简化版：暂不考虑市场事件（拆股/代码变更/实物分红）的影响，暂不计算平均成本价
+ * TradeType 已精简为 BUY / SELL 两个值，持仓计算逻辑统一且简洁。
+ * 期权行权 / 被指派等场景会生成独立的股票侧交易记录（TradeType = BUY/SELL），
+ * 不再需要在持仓计算中做特殊的行权影响处理。
  */
 @Service
 @Transactional(readOnly = true)
@@ -79,9 +80,6 @@ public class PositionService {
             if (record.getName() != null && !record.getName().isEmpty()) {
                 position.setName(record.getName());
             }
-
-            // 处理行权交易对正股的影响
-            handleExerciseImpactOnStock(record, positionMap, brokerNameMap);
         }
 
         // 4. 过滤掉持仓为0的记录，返回结果
@@ -92,6 +90,13 @@ public class PositionService {
 
     /**
      * 根据交易类型计算当前 symbol 的数量变动
+     *
+     * 重构后 TradeType 仅有 BUY / SELL 两个有效值：
+     * - BUY: 持仓增加
+     * - SELL: 持仓减少
+     *
+     * 旧枚举值（OPTION_EXPIRE / EXERCISE_BUY / EXERCISE_SELL）在语义上等同于 SELL（持仓减少），
+     * 保持向下兼容直到存量数据全部订正完成。
      */
     private int calculateQuantityDelta(TradeRecord record) {
         TradeType tradeType = record.getTradeType();
@@ -102,56 +107,13 @@ public class PositionService {
                 return quantity;
             case SELL:
                 return -quantity;
+            // 以下旧枚举值已废弃，保留兼容直到存量数据订正完成
             case OPTION_EXPIRE:
-                // 期权到期作废，持仓归零（减去持有数量）
-                return -quantity;
             case EXERCISE_BUY:
             case EXERCISE_SELL:
-                // 行权：期权合约被消耗（减去期权持仓）
                 return -quantity;
             default:
                 return 0;
-        }
-    }
-
-    /**
-     * 处理行权交易对正股持仓的影响
-     * EXERCISE_BUY: 行权买股 → 正股持仓 + quantity × 100
-     * EXERCISE_SELL: 行权卖股 → 正股持仓 - quantity × 100
-     */
-    private void handleExerciseImpactOnStock(TradeRecord record, Map<String, PositionSnapshot> positionMap, Map<Long, String> brokerNameMap) {
-        TradeType tradeType = record.getTradeType();
-        if (tradeType != TradeType.EXERCISE_BUY && tradeType != TradeType.EXERCISE_SELL) {
-            return;
-        }
-
-        String underlyingSymbol = record.getUnderlyingSymbol();
-        if (underlyingSymbol == null || underlyingSymbol.trim().isEmpty()) {
-            return;
-        }
-
-        // 正股的 key
-        String stockKey = underlyingSymbol + "|" + record.getBrokerId();
-        PositionSnapshot stockPosition = positionMap.computeIfAbsent(stockKey, k -> {
-            PositionSnapshot snapshot = new PositionSnapshot();
-            snapshot.setSymbol(underlyingSymbol);
-            snapshot.setName(null); // 正股名称暂时为空，后续可能被其他交易记录填充
-            snapshot.setUnderlyingSymbol(underlyingSymbol);
-            snapshot.setAssetType(AssetType.STOCK);
-            snapshot.setCurrency(record.getCurrency());
-            snapshot.setBrokerId(record.getBrokerId());
-            snapshot.setBrokerName(brokerNameMap.getOrDefault(record.getBrokerId(), "未知券商"));
-            snapshot.setQuantity(0);
-            return snapshot;
-        });
-
-        // 每个期权合约对应100股正股
-        int stockDelta = record.getQuantity() * 100;
-        if (tradeType == TradeType.EXERCISE_BUY) {
-            stockPosition.setQuantity(stockPosition.getQuantity() + stockDelta);
-        } else {
-            // EXERCISE_SELL
-            stockPosition.setQuantity(stockPosition.getQuantity() - stockDelta);
         }
     }
 

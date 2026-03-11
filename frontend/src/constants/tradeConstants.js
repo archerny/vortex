@@ -16,12 +16,14 @@ export const assetTypeColorMap = {
 };
 
 // 交易类型：后端枚举 <-> 前端中文
+// 重构后仅使用 BUY / SELL，旧值保留兼容存量数据展示
 export const tradeTypeMap = {
   BUY: '买入',
   SELL: '卖出',
-  OPTION_EXPIRE: '期权到期',
-  EXERCISE_BUY: '行权买股',
-  EXERCISE_SELL: '行权卖股',
+  // 以下旧值已废弃，保留仅为兼容存量历史数据展示，待数据订正完成后移除
+  OPTION_EXPIRE: '期权到期（旧）',
+  EXERCISE_BUY: '行权买股（旧）',
+  EXERCISE_SELL: '行权卖股（旧）',
 };
 export const tradeTypeReverseMap = Object.fromEntries(Object.entries(tradeTypeMap).map(([k, v]) => [v, k]));
 
@@ -29,6 +31,7 @@ export const tradeTypeReverseMap = Object.fromEntries(Object.entries(tradeTypeMa
 export const tradeTypeColorMap = {
   BUY: 'green',
   SELL: 'red',
+  // 以下旧值已废弃，保留仅为兼容存量历史数据展示
   OPTION_EXPIRE: 'default',
   EXERCISE_BUY: 'cyan',
   EXERCISE_SELL: 'orange',
@@ -38,6 +41,7 @@ export const tradeTypeColorMap = {
 export const amountColorMap = {
   BUY: '#cf1322',
   SELL: '#3f8600',
+  // 以下旧值已废弃，保留仅为兼容存量历史数据展示
   OPTION_EXPIRE: '#999999',
   EXERCISE_BUY: '#cf1322',
   EXERCISE_SELL: '#3f8600',
@@ -77,5 +81,21 @@ export const triggerRefTypeMap = {
   STOCK_SPLIT: '拆股事件',
   SYMBOL_CHANGE: '代码变更',
   DIVIDEND_IN_KIND: '实物分红',
-  OPTION: '期权记录',
+  OPTION_EXPIRE: '期权到期作废',
+  OPTION_EXERCISE: '行权',
+  OPTION_ASSIGNED: '被指派',
+  // 以下旧值已废弃，保留仅为兼容存量历史数据展示
+  OPTION: '期权记录（旧）',
+};
+
+// 触发关联类型 Tag 颜色
+export const triggerRefTypeColorMap = {
+  NONE: 'default',
+  STOCK_SPLIT: 'blue',
+  SYMBOL_CHANGE: 'green',
+  DIVIDEND_IN_KIND: 'orange',
+  OPTION_EXPIRE: 'red',
+  OPTION_EXERCISE: 'purple',
+  OPTION_ASSIGNED: 'magenta',
+  OPTION: 'default',
 };

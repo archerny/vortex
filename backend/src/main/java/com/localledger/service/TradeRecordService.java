@@ -223,7 +223,8 @@ public class TradeRecordService {
     /**
      * 校验触发来源与关联字段的一致性
      * - MANUAL: trigger_ref_id 应为 0，trigger_ref_type 应为 NONE
-     * - MARKET_EVENT: trigger_ref_id 不应为 0，trigger_ref_type 不应为 NONE
+     * - MARKET_EVENT: trigger_ref_id 不应为 0，trigger_ref_type 不应为 NONE，且 trigger_ref_type 应为市场事件子类型
+     * - OPTION: trigger_ref_type 应为 OPTION_EXPIRE / OPTION_EXERCISE / OPTION_ASSIGNED 三者之一
      */
     private void validateTriggerConsistency(TradeRecord record) {
         TradeTrigger trigger = record.getTradeTrigger();
@@ -243,6 +244,25 @@ public class TradeRecordService {
             }
             if (refType == null || refType == TriggerRefType.NONE) {
                 throw new IllegalArgumentException("市场事件触发的交易必须指明关联的事件类型（trigger_ref_type 不能为 NONE）");
+            }
+            // 市场事件的 trigger_ref_type 应为三种市场事件子类型之一
+            if (refType != TriggerRefType.STOCK_SPLIT
+                    && refType != TriggerRefType.SYMBOL_CHANGE
+                    && refType != TriggerRefType.DIVIDEND_IN_KIND) {
+                throw new IllegalArgumentException("市场事件的 trigger_ref_type 应为 STOCK_SPLIT / SYMBOL_CHANGE / DIVIDEND_IN_KIND 之一");
+            }
+        } else if (trigger == TradeTrigger.OPTION) {
+            // OPTION 场景：trigger_ref_type 必须为三种期权子类型之一
+            if (refType != TriggerRefType.OPTION_EXPIRE
+                    && refType != TriggerRefType.OPTION_EXERCISE
+                    && refType != TriggerRefType.OPTION_ASSIGNED) {
+                throw new IllegalArgumentException("期权触发的交易 trigger_ref_type 应为 OPTION_EXPIRE / OPTION_EXERCISE / OPTION_ASSIGNED 之一");
+            }
+            // 期权到期作废时，price 和 amount 应为 0
+            if (refType == TriggerRefType.OPTION_EXPIRE) {
+                if (record.getPrice() != null && record.getPrice().signum() != 0) {
+                    throw new IllegalArgumentException("期权到期作废的成交价格应为 0");
+                }
             }
         }
     }

@@ -66,7 +66,9 @@ public class TradeRecord extends BaseEntity {
     private String underlyingSymbol;
 
     /**
-     * 交易类型：BUY-买入，SELL-卖出，OPTION_EXPIRE-期权到期，EXERCISE_BUY-行权买股，EXERCISE_SELL-行权卖股
+     * 交易类型：BUY-买入，SELL-卖出
+     * 重构后仅使用 BUY / SELL，「为什么发生」由 tradeTrigger + triggerRefType 表达。
+     * 旧枚举值 OPTION_EXPIRE / EXERCISE_BUY / EXERCISE_SELL 已废弃，待存量数据订正后移除。
      */
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
@@ -132,7 +134,8 @@ public class TradeRecord extends BaseEntity {
     private Long triggerRefId = 0L;
 
     /**
-     * 触发来源的关联记录类型：NONE-无关联，STOCK_SPLIT-拆股，SYMBOL_CHANGE-代码变更，DIVIDEND_IN_KIND-实物分红，OPTION-期权
+     * 触发来源的关联记录类型：NONE-无关联，STOCK_SPLIT-拆股，SYMBOL_CHANGE-代码变更，
+     * DIVIDEND_IN_KIND-实物分红，OPTION_EXPIRE-期权到期作废，OPTION_EXERCISE-行权，OPTION_ASSIGNED-被指派
      */
     @Enumerated(EnumType.STRING)
     @Column(name = "trigger_ref_type", nullable = false, length = 32)

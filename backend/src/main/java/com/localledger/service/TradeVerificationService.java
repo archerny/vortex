@@ -4,7 +4,9 @@ import com.localledger.dto.TradeVerificationResult;
 import com.localledger.entity.TradeRecord;
 import com.localledger.entity.enums.AssetType;
 import com.localledger.entity.enums.Currency;
+import com.localledger.entity.enums.TradeTrigger;
 import com.localledger.entity.enums.TradeType;
+import com.localledger.entity.enums.TriggerRefType;
 import com.localledger.repository.TradeRecordRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -62,7 +64,7 @@ public class TradeVerificationService {
      * 当前核对规则：
      * 1. 期权证券代码格式核对（OPTION_CALL / OPTION_PUT）
      * 2. 港股证券代码格式核对（HKD 结算的交易）
-     * 3. 期权到期/行权交易的费用和价格核对
+     * 3. 期权被动操作交易的费用和价格核对（通过 trade_trigger + trigger_ref_type 识别）
      * 4. 美股证券代码格式核对（USD 结算的股票交易）
      * 5. 证券代码类别一致性核对（同一 symbol 不应分属不同 assetType）
      */
@@ -84,8 +86,8 @@ public class TradeVerificationService {
             verifyOptionSymbolFormat(record, result);
             // 规则2：港股证券代码格式核对
             verifyHkStockSymbolFormat(record, result);
-            // 规则3：期权到期/行权交易的费用和价格核对
-            verifyExerciseExpireFeeAndPrice(record, result);
+            // 规则3：期权被动操作交易的费用和价格核对（通过 trigger 机制识别）
+            verifyOptionTriggerFeeAndPrice(record, result);
             // 规则4：美股证券代码格式核对
             verifyUsStockSymbolFormat(record, result);
         }
@@ -238,31 +240,90 @@ public class TradeVerificationService {
     }
 
     /**
-     * 规则3：核对期权到期/行权交易的费用和价格
+     * 规则3：核对期权被动操作交易的费用和价格
      *
-     * 当交易类型为 OPTION_EXPIRE（期权到期）、EXERCISE_BUY（行权买股）、EXERCISE_SELL（行权卖股）时，
-     * 交易的费用（fee）和价格（price）都应为 0。
+     * 通过 trade_trigger = OPTION + trigger_ref_type 识别期权被动操作场景：
      *
-     * 其他交易类型跳过此规则。
+     * (a) 期权到期作废（OPTION_EXPIRE）：
+     *     期权侧记录的 fee 和 price 都应为 0（到期失效，无成交）
+     *
+     * (b) 行权/被指派 — 期权侧（OPTION_EXERCISE / OPTION_ASSIGNED，trigger_ref_id = 0）：
+     *     期权侧记录的 fee 应为 0（期权合约被消耗，不产生费用）
+     *
+     * 同时向下兼容旧 TradeType（OPTION_EXPIRE / EXERCISE_BUY / EXERCISE_SELL），
+     * 待存量数据订正完成后移除兼容逻辑。
+     *
+     * 非期权被动操作的记录跳过此规则。
      */
-    private void verifyExerciseExpireFeeAndPrice(TradeRecord record, TradeVerificationResult result) {
-        TradeType tradeType = record.getTradeType();
-        if (tradeType != TradeType.OPTION_EXPIRE
-                && tradeType != TradeType.EXERCISE_BUY
-                && tradeType != TradeType.EXERCISE_SELL) {
-            return; // 非期权到期/行权交易，跳过
+    private void verifyOptionTriggerFeeAndPrice(TradeRecord record, TradeVerificationResult result) {
+        // 新体系：通过 trade_trigger = OPTION 识别
+        if (record.getTradeTrigger() == TradeTrigger.OPTION) {
+            verifyOptionTriggerRecord(record, result);
+            return;
         }
 
+        // 旧体系兼容：通过旧 TradeType 识别（待存量数据订正后移除）
+        TradeType tradeType = record.getTradeType();
+        if (tradeType == TradeType.OPTION_EXPIRE
+                || tradeType == TradeType.EXERCISE_BUY
+                || tradeType == TradeType.EXERCISE_SELL) {
+            verifyLegacyExerciseExpireRecord(record, result);
+        }
+    }
+
+    /**
+     * 新体系：校验 trade_trigger = OPTION 的记录
+     */
+    private void verifyOptionTriggerRecord(TradeRecord record, TradeVerificationResult result) {
+        TriggerRefType refType = record.getTriggerRefType();
         BigDecimal fee = record.getFee();
         BigDecimal price = record.getPrice();
         List<String> issues = new ArrayList<>();
 
-        // 核对费用是否为0
+        if (refType == TriggerRefType.OPTION_EXPIRE) {
+            // 到期作废：fee 和 price 都应为 0
+            if (fee != null && fee.compareTo(BigDecimal.ZERO) != 0) {
+                issues.add("期权到期作废的交易费用应为 0，但实际为 " + fee);
+            }
+            if (price != null && price.compareTo(BigDecimal.ZERO) != 0) {
+                issues.add("期权到期作废的成交价格应为 0，但实际为 " + price);
+            }
+        } else if (refType == TriggerRefType.OPTION_EXERCISE || refType == TriggerRefType.OPTION_ASSIGNED) {
+            // 行权/被指派 — 期权侧（trigger_ref_id = 0）：fee 应为 0
+            if (record.getTriggerRefId() == 0L) {
+                if (fee != null && fee.compareTo(BigDecimal.ZERO) != 0) {
+                    issues.add("期权侧记录的交易费用应为 0，但实际为 " + fee);
+                }
+            }
+        }
+
+        if (!issues.isEmpty()) {
+            TradeVerificationResult.ErrorDetail error = new TradeVerificationResult.ErrorDetail();
+            error.setRecordId(record.getId());
+            error.setRuleName("期权被动操作费用价格");
+            error.setAssetType(record.getAssetType().name());
+            error.setActualSymbol(record.getSymbol());
+            error.setExpectedFormat("费用=0, 价格=0（到期作废）/ 费用=0（期权侧行权/被指派）");
+            error.setUnderlyingSymbol(record.getUnderlyingSymbol());
+            error.setMessage("触发类型 OPTION/" + refType.name() + "，" + String.join("；", issues));
+            result.addError(error);
+        }
+    }
+
+    /**
+     * 旧体系兼容：校验旧 TradeType（OPTION_EXPIRE / EXERCISE_BUY / EXERCISE_SELL）的记录
+     * @deprecated 待存量数据订正完成后移除
+     */
+    @Deprecated
+    private void verifyLegacyExerciseExpireRecord(TradeRecord record, TradeVerificationResult result) {
+        TradeType tradeType = record.getTradeType();
+        BigDecimal fee = record.getFee();
+        BigDecimal price = record.getPrice();
+        List<String> issues = new ArrayList<>();
+
         if (fee != null && fee.compareTo(BigDecimal.ZERO) != 0) {
             issues.add("交易费用应为 0，但实际为 " + fee);
         }
-
-        // 核对价格是否为0
         if (price != null && price.compareTo(BigDecimal.ZERO) != 0) {
             issues.add("成交价格应为 0，但实际为 " + price);
         }
@@ -270,12 +331,12 @@ public class TradeVerificationService {
         if (!issues.isEmpty()) {
             TradeVerificationResult.ErrorDetail error = new TradeVerificationResult.ErrorDetail();
             error.setRecordId(record.getId());
-            error.setRuleName("期权到期/行权交易费用价格");
+            error.setRuleName("期权被动操作费用价格");
             error.setAssetType(record.getAssetType().name());
             error.setActualSymbol(record.getSymbol());
             error.setExpectedFormat("费用=0, 价格=0");
             error.setUnderlyingSymbol(record.getUnderlyingSymbol());
-            error.setMessage("交易类型为 " + tradeType.name() + "，" + String.join("；", issues));
+            error.setMessage("[旧体系] 交易类型为 " + tradeType.name() + "，" + String.join("；", issues));
             result.addError(error);
         }
     }

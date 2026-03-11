@@ -7,6 +7,12 @@ import { fetchAllTradeRecords, createTradeRecord, fetchTradeStatistics } from '.
 import { fetchActiveBrokers } from '../../services/brokerApi';
 import { fetchAllStrategies } from '../../services/strategyApi';
 import { assetTypeMap, tradeTypeMap } from '../../constants/tradeConstants';
+
+// 新增表单中仅展示 BUY / SELL，不再展示旧枚举值
+const newTradeTypeOptions = {
+  BUY: '买入',
+  SELL: '卖出',
+};
 import getTradeColumns from './TradeColumns';
 import TradeStatisticsPanel from './TradeStatisticsPanel';
 
@@ -145,11 +151,10 @@ const TradeRecords = () => {
 
       setSubmitting(true);
 
-      const isOptionExpire = values.tradeType === 'OPTION_EXPIRE';
       const isOption = values.assetType === 'OPTION_CALL' || values.assetType === 'OPTION_PUT';
       const multiplier = isOption ? 100 : 1;
-      const price = isOptionExpire ? 0 : values.price;
-      const fee = isOptionExpire ? 0 : values.fee;
+      const price = values.price;
+      const fee = values.fee;
       const payload = {
         tradeDate: values.date.format('YYYY-MM-DD'),
         brokerId: values.brokerId,
@@ -320,12 +325,9 @@ const TradeRecords = () => {
                 <Select
                   onChange={(value) => {
                     setSelectedTradeType(value);
-                    if (value === 'OPTION_EXPIRE') {
-                      form.setFieldsValue({ price: undefined, fee: undefined });
-                    }
                   }}
                 >
-                  {Object.entries(tradeTypeMap).map(([value, label]) => (
+                  {Object.entries(newTradeTypeOptions).map(([value, label]) => (
                     <Select.Option key={value} value={value}>{label}</Select.Option>
                   ))}
                 </Select>
@@ -364,7 +366,7 @@ const TradeRecords = () => {
           </Form.Item>
 
           <Row gutter={16}>
-            <Col span={selectedTradeType === 'OPTION_EXPIRE' ? 24 : 8}>
+            <Col span={8}>
               <Form.Item
                 label="数量"
                 name="quantity"
@@ -376,8 +378,6 @@ const TradeRecords = () => {
                 <InputNumber style={{ width: '100%' }} placeholder="请输入数量" min={1} />
               </Form.Item>
             </Col>
-            {selectedTradeType !== 'OPTION_EXPIRE' && (
-              <>
                 <Col span={8}>
                   <Form.Item
                     label="成交价格"
@@ -402,8 +402,6 @@ const TradeRecords = () => {
                     <InputNumber style={{ width: '100%' }} placeholder="请输入费用" min={0} precision={2} />
                   </Form.Item>
                 </Col>
-              </>
-            )}
           </Row>
 
           <Row gutter={16}>

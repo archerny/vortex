@@ -17,7 +17,7 @@ const { Text } = Typography;
 const ruleColorMap = {
   '期权证券代码格式': 'purple',
   '港股证券代码格式': 'orange',
-  '期权到期/行权交易费用价格': 'red',
+  '期权被动操作费用价格': 'red',
   '美股证券代码格式': 'blue',
   '证券代码类别一致性': 'magenta',
 };
@@ -70,7 +70,7 @@ const AnomalyAnalysisTab = () => {
       filters: [
         { text: '期权证券代码格式', value: '期权证券代码格式' },
         { text: '港股证券代码格式', value: '港股证券代码格式' },
-        { text: '期权到期/行权交易费用价格', value: '期权到期/行权交易费用价格' },
+        { text: '期权被动操作费用价格', value: '期权被动操作费用价格' },
         { text: '美股证券代码格式', value: '美股证券代码格式' },
         { text: '证券代码类别一致性', value: '证券代码类别一致性' },
       ],
@@ -206,10 +206,12 @@ const AnomalyAnalysisTab = () => {
                     </tr>
                     <tr style={{ borderBottom: '1px solid #f0f0f0' }}>
                       <td style={{ padding: '10px 12px' }}>3</td>
-                      <td style={{ padding: '10px 12px' }}><Tag color="red">期权到期/行权交易费用价格</Tag></td>
+                      <td style={{ padding: '10px 12px' }}><Tag color="red">期权被动操作费用价格</Tag></td>
                       <td style={{ padding: '10px 12px' }}>
-                        当交易类型为 OPTION_EXPIRE（期权到期）、EXERCISE_BUY（行权买入）或 EXERCISE_SELL（行权卖出）时，
-                        校验交易费用与成交价格是否均为 0。此类交易不应产生额外费用或成交价格。
+                        当交易触发来源为 OPTION（期权）时，根据关联类型进行校验：
+                        期权到期作废（OPTION_EXPIRE）时 fee 和 price 应均为 0；
+                        行权/被指派的期权侧记录 fee 应为 0。
+                        同时兼容旧体系的 OPTION_EXPIRE / EXERCISE_BUY / EXERCISE_SELL 交易类型。
                       </td>
                     </tr>
                     <tr style={{ borderBottom: '1px solid #f0f0f0' }}>
