@@ -20,6 +20,7 @@ const ruleColorMap = {
   '期权被动操作费用价格': 'red',
   '美股证券代码格式': 'blue',
   '证券代码类别一致性': 'magenta',
+  '旧体系数据兼容': 'gold',
 };
 
 /**
@@ -60,7 +61,14 @@ const AnomalyAnalysisTab = () => {
       key: 'recordId',
       width: 80,
       sorter: (a, b) => a.recordId - b.recordId,
-      render: (id) => <Text strong>#{id}</Text>,
+      render: (id) => (
+        <a
+          onClick={() => { window.location.hash = `#/trade-detail/${id}`; }}
+          style={{ fontWeight: 600 }}
+        >
+          #{id}
+        </a>
+      ),
     },
     {
       title: '核对规则',
@@ -73,6 +81,7 @@ const AnomalyAnalysisTab = () => {
         { text: '期权被动操作费用价格', value: '期权被动操作费用价格' },
         { text: '美股证券代码格式', value: '美股证券代码格式' },
         { text: '证券代码类别一致性', value: '证券代码类别一致性' },
+        { text: '旧体系数据兼容', value: '旧体系数据兼容' },
       ],
       onFilter: (value, record) => record.ruleName === value,
       render: (ruleName) => {
@@ -176,7 +185,7 @@ const AnomalyAnalysisTab = () => {
             children: (
               <div style={{ padding: '4px 8px', fontSize: 13, lineHeight: 2 }}>
                 <p style={{ marginBottom: 12 }}>
-                  系统将依据以下 <Text strong>5 项规则</Text> 对所有交易记录逐一进行校验，任何不符合规则的记录均会被标记为异常：
+                  系统将依据以下 <Text strong>6 项规则</Text> 对所有交易记录逐一进行校验，任何不符合规则的记录均会被标记为异常：
                 </p>
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                   <thead>
@@ -222,13 +231,24 @@ const AnomalyAnalysisTab = () => {
                         （如 <Text code>AAPL</Text>、<Text code>TSLA</Text>）。
                       </td>
                     </tr>
-                    <tr>
+                    <tr style={{ borderBottom: '1px solid #f0f0f0' }}>
                       <td style={{ padding: '10px 12px' }}>5</td>
                       <td style={{ padding: '10px 12px' }}><Tag color="magenta">证券代码类别一致性</Tag></td>
                       <td style={{ padding: '10px 12px' }}>
                         校验同一证券代码在所有记录中是否始终对应唯一的资产类别。
                         同一代码不应同时归属于不同类别（如同一代码既被记录为 STOCK 又被记录为 ETF），
                         出现此类冲突表明部分记录的资产类别存在错误。
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style={{ padding: '10px 12px' }}>6</td>
+                      <td style={{ padding: '10px 12px' }}><Tag color="gold">旧体系数据兼容</Tag></td>
+                      <td style={{ padding: '10px 12px' }}>
+                        检测使用了已废弃交易类型或触发关联类型的历史记录。
+                        交易类型（TradeType）应仅使用 <Text code>BUY</Text> / <Text code>SELL</Text>，
+                        使用了 <Text code>OPTION_EXPIRE</Text>、<Text code>EXERCISE_BUY</Text>、<Text code>EXERCISE_SELL</Text> 的记录需订正；
+                        触发关联类型（TriggerRefType）中笼统的 <Text code>OPTION</Text> 已废弃，
+                        应更新为 <Text code>OPTION_EXPIRE</Text> / <Text code>OPTION_EXERCISE</Text> / <Text code>OPTION_ASSIGNED</Text> 之一。
                       </td>
                     </tr>
                   </tbody>
