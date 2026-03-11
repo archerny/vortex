@@ -68,13 +68,13 @@ const TradeRecordDetail = ({ recordId, onBack }) => {
   }, [recordId]);
 
   /**
-   * 根据期权记录ID集合，在全量记录中找出被这些期权触发的股票交易
-   * 规则：assetType === 'STOCK' && tradeTrigger === 'OPTION' && triggerRefId 在期权ID集合中
+   * 根据期权记录ID集合，在全量记录中找出被这些期权触发的股票/ETF交易
+   * 规则：assetType 为 STOCK 或 ETF && tradeTrigger === 'OPTION' && triggerRefId 在期权ID集合中
    */
   const findTriggeredStockRecords = (optionIds, allRecords) => {
     if (!optionIds || optionIds.size === 0) return [];
     return allRecords.filter(
-      (r) => r.assetType === 'STOCK' && r.tradeTrigger === 'OPTION' && optionIds.has(r.triggerRefId)
+      (r) => (r.assetType === 'STOCK' || r.assetType === 'ETF') && r.tradeTrigger === 'OPTION' && optionIds.has(r.triggerRefId)
     );
   };
 
@@ -85,10 +85,10 @@ const TradeRecordDetail = ({ recordId, onBack }) => {
    *   - 找到全量记录中所有 symbol 与当前期权相同的交易记录（相关期权记录）
    *   - 再根据这些期权记录的 id，找出被它们触发的股票交易（assetType=STOCK, tradeTrigger=OPTION）
    *
-   * 场景2：股票交易(STOCK) + 触发来源为期权(OPTION)
+   * 场景2：股票/ETF交易(STOCK/ETF) + 触发来源为期权(OPTION)
    *   - 通过 triggerRefId 向后端请求获取触发源期权记录
    *   - 用该期权的 symbol 查找全量记录中所有同 symbol 的交易（相关期权记录）
-   *   - 再根据这些期权记录的 id，找出被它们触发的股票交易
+   *   - 再根据这些期权记录的 id，找出被它们触发的股票/ETF交易
    */
   const computeRelatedRecords = async (currentRecord, allRecords) => {
     if (!currentRecord || !allRecords || allRecords.length === 0) return [];
@@ -110,8 +110,8 @@ const TradeRecordDetail = ({ recordId, onBack }) => {
       return Array.from(mergedMap.values());
     }
 
-    // 场景2：股票交易 + 触发来源为期权 → 先找到触发源期权的 symbol，再找同 symbol 的全部期权 + 被触发的股票
-    if (assetType === 'STOCK' && tradeTrigger === 'OPTION' && triggerRefId && triggerRefId !== 0) {
+    // 场景2：股票/ETF交易 + 触发来源为期权 → 先找到触发源期权的 symbol，再找同 symbol 的全部期权 + 被触发的股票/ETF
+    if ((assetType === 'STOCK' || assetType === 'ETF') && tradeTrigger === 'OPTION' && triggerRefId && triggerRefId !== 0) {
       try {
         // 通过 triggerRefId 向后端获取触发源期权交易记录
         const refResult = await fetchTradeRecordById(triggerRefId);
@@ -122,7 +122,7 @@ const TradeRecordDetail = ({ recordId, onBack }) => {
             const sameSymbolRecords = allRecords.filter((r) => r.symbol === optionSymbol);
             // 2. 收集这些期权记录的 id 集合
             const optionIds = new Set(sameSymbolRecords.map((r) => r.id));
-            // 3. 找出被这些期权记录触发的股票交易
+            // 3. 找出被这些期权记录触发的股票/ETF交易
             const triggeredStocks = findTriggeredStockRecords(optionIds, allRecords);
             // 4. 合并去重并返回
             const mergedMap = new Map();
@@ -456,7 +456,7 @@ const TradeRecordDetail = ({ recordId, onBack }) => {
             相关交易
             <span style={{ fontSize: 13, color: '#999', fontWeight: 'normal', marginLeft: 8 }}>
               {(record.assetType === 'OPTION_CALL' || record.assetType === 'OPTION_PUT')
-                ? `期权合约 ${record.symbol} 的全部交易及触发的股票交易`
+                ? `期权合约 ${record.symbol} 的全部交易及触发的股票/ETF交易`
               : `触发本交易的期权合约及相关全部交易记录`
               }
             </span>
