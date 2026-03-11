@@ -17,6 +17,7 @@ import StrategyManagement from '../pages/StrategyManagement';
 import TradeAnomalyAnalysis from '../pages/analysis/TradeAnomalyAnalysis';
 import MarketEvents from '../pages/market-events/MarketEvents';
 import { AmountVisibilityProvider, useAmountVisibility } from '../contexts/AmountVisibilityContext';
+import { TradeEditableProvider } from '../contexts/TradeEditableContext';
 import { PageHeaderProvider } from '../contexts/PageHeaderContext';
 import PageHeaderContext from '../contexts/PageHeaderContext';
 import { PageHeaderBreadcrumb } from './PageHeader';
@@ -261,9 +262,11 @@ const AmountVisibilityToggle = () => {
  */
 const AppLayoutWithProvider = () => (
   <AmountVisibilityProvider>
-    <PageHeaderProvider>
-      <AppLayout />
-    </PageHeaderProvider>
+    <TradeEditableProvider>
+      <PageHeaderProvider>
+        <AppLayout />
+      </PageHeaderProvider>
+    </TradeEditableProvider>
   </AmountVisibilityProvider>
 );
 
