@@ -33,3 +33,6 @@ application-local.properties
 .vscode/
 *.iml
 .DS_Store
+
+# ========== 构建产物 ==========
+deploy/output/
