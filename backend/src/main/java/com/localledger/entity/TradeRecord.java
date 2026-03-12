@@ -67,8 +67,7 @@ public class TradeRecord extends BaseEntity {
 
     /**
      * 交易类型：BUY-买入，SELL-卖出
-     * 重构后仅使用 BUY / SELL，「为什么发生」由 tradeTrigger + triggerRefType 表达。
-     * 旧枚举值 OPTION_EXPIRE / EXERCISE_BUY / EXERCISE_SELL 已废弃，待存量数据订正后移除。
+     * 「为什么发生」由 tradeTrigger + triggerRefType 表达。
      */
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)

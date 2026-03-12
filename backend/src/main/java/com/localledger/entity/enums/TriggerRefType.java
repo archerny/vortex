@@ -13,17 +13,10 @@ public enum TriggerRefType {
     SYMBOL_CHANGE,
     /** 实物分红事件，关联 events_dividend_in_kind 表 */
     DIVIDEND_IN_KIND,
-/** 期权到期，关联 trade_records 表（期权交易记录） */
+    /** 期权到期，关联 trade_records 表（期权交易记录） */
     OPTION_EXPIRE,
     /** 行权（含主动行权和到期自动行权，不区分），关联 trade_records 表（期权交易记录） */
     OPTION_EXERCISE,
     /** 被指派，关联 trade_records 表（期权交易记录） */
-    OPTION_ASSIGNED,
-
-    /**
-     * @deprecated 已废弃，请使用 OPTION_EXPIRE / OPTION_EXERCISE / OPTION_ASSIGNED 替代。
-     *             保留仅为兼容存量历史数据，待数据订正完成后移除。
-     */
-    @Deprecated
-    OPTION
+    OPTION_ASSIGNED
 }

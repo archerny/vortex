@@ -5,7 +5,6 @@ import com.localledger.entity.TradeRecord;
 import com.localledger.entity.enums.AssetType;
 import com.localledger.entity.enums.Currency;
 import com.localledger.entity.enums.TradeTrigger;
-import com.localledger.entity.enums.TradeType;
 import com.localledger.entity.enums.TriggerRefType;
 import com.localledger.repository.TradeRecordRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,8 +66,7 @@ public class TradeVerificationService {
      * 3. 期权被动操作交易的费用和价格核对（通过 trade_trigger + trigger_ref_type 识别）
      * 4. 美股证券代码格式核对（USD 结算的股票交易）
      * 5. 证券代码类别一致性核对（同一 symbol 不应分属不同 assetType）
-     * 6. 旧体系数据兼容核对（检测使用已废弃 TradeType / TriggerRefType 的历史记录）
-     * 7. 触发类型与关联类型一致性核对（OPTION 只能搭配期权类关联类型，MARKET_EVENT 只能搭配市场事件类关联类型）
+     * 6. 触发类型与关联类型一致性核对（OPTION 只能搭配期权类关联类型，MARKET_EVENT 只能搭配市场事件类关联类型）
      */
     public TradeVerificationResult verifyAll() {
         List<TradeRecord> records = tradeRecordRepository.findByIsDeletedFalseOrderByIdDesc();
@@ -92,9 +90,7 @@ public class TradeVerificationService {
             verifyOptionTriggerFeeAndPrice(record, result);
             // 规则4：美股证券代码格式核对
             verifyUsStockSymbolFormat(record, result);
-            // 规则6：旧体系数据兼容核对
-            verifyLegacyDataCompatibility(record, result);
-            // 规则7：触发类型与关联类型一致性核对
+            // 规则6：触发类型与关联类型一致性核对
             verifyTriggerRefTypeConsistency(record, result);
         }
 
@@ -256,24 +252,11 @@ public class TradeVerificationService {
      * (b) 行权/被指派 — 期权侧（OPTION_EXERCISE / OPTION_ASSIGNED，trigger_ref_id = 0）：
      *     期权侧记录的 fee 应为 0（期权合约被消耗，不产生费用）
      *
-     * 同时向下兼容旧 TradeType（OPTION_EXPIRE / EXERCISE_BUY / EXERCISE_SELL），
-     * 待存量数据订正完成后移除兼容逻辑。
-     *
      * 非期权被动操作的记录跳过此规则。
      */
     private void verifyOptionTriggerFeeAndPrice(TradeRecord record, TradeVerificationResult result) {
-        // 新体系：通过 trade_trigger = OPTION 识别
         if (record.getTradeTrigger() == TradeTrigger.OPTION) {
             verifyOptionTriggerRecord(record, result);
-            return;
-        }
-
-        // 旧体系兼容：通过旧 TradeType 识别（待存量数据订正后移除）
-        TradeType tradeType = record.getTradeType();
-        if (tradeType == TradeType.OPTION_EXPIRE
-                || tradeType == TradeType.EXERCISE_BUY
-                || tradeType == TradeType.EXERCISE_SELL) {
-            verifyLegacyExerciseExpireRecord(record, result);
         }
     }
 
@@ -312,37 +295,6 @@ public class TradeVerificationService {
             error.setExpectedFormat("费用=0, 价格=0（到期作废）/ 费用=0（期权侧行权/被指派）");
             error.setUnderlyingSymbol(record.getUnderlyingSymbol());
             error.setMessage("触发类型 OPTION/" + refType.name() + "，" + String.join("；", issues));
-            result.addError(error);
-        }
-    }
-
-    /**
-     * 旧体系兼容：校验旧 TradeType（OPTION_EXPIRE / EXERCISE_BUY / EXERCISE_SELL）的记录
-     * @deprecated 待存量数据订正完成后移除
-     */
-    @Deprecated
-    private void verifyLegacyExerciseExpireRecord(TradeRecord record, TradeVerificationResult result) {
-        TradeType tradeType = record.getTradeType();
-        BigDecimal fee = record.getFee();
-        BigDecimal price = record.getPrice();
-        List<String> issues = new ArrayList<>();
-
-        if (fee != null && fee.compareTo(BigDecimal.ZERO) != 0) {
-            issues.add("交易费用应为 0，但实际为 " + fee);
-        }
-        if (price != null && price.compareTo(BigDecimal.ZERO) != 0) {
-            issues.add("成交价格应为 0，但实际为 " + price);
-        }
-
-        if (!issues.isEmpty()) {
-            TradeVerificationResult.ErrorDetail error = new TradeVerificationResult.ErrorDetail();
-            error.setRecordId(record.getId());
-            error.setRuleName("期权被动操作费用价格");
-            error.setAssetType(record.getAssetType().name());
-            error.setActualSymbol(record.getSymbol());
-            error.setExpectedFormat("费用=0, 价格=0");
-            error.setUnderlyingSymbol(record.getUnderlyingSymbol());
-            error.setMessage("[旧体系] 交易类型为 " + tradeType.name() + "，" + String.join("；", issues));
             result.addError(error);
         }
     }
@@ -395,65 +347,7 @@ public class TradeVerificationService {
     }
 
     /**
-     * 规则6：检测使用了旧体系值的历史数据记录
-     *
-     * 重构后的设计要求：
-     *   - TradeType 只使用 BUY / SELL（OPTION_EXPIRE / EXERCISE_BUY / EXERCISE_SELL 已废弃）
-     *   - TriggerRefType 中笼统的 OPTION 已废弃，应使用 OPTION_EXPIRE / OPTION_EXERCISE / OPTION_ASSIGNED
-     *
-     * 此规则扫描所有记录，标记出仍然使用旧值的记录，便于用户定位并订正。
-     */
-    private void verifyLegacyDataCompatibility(TradeRecord record, TradeVerificationResult result) {
-        TradeType tradeType = record.getTradeType();
-        TriggerRefType triggerRefType = record.getTriggerRefType();
-
-        // 检测1：是否使用了已废弃的 TradeType
-        if (tradeType == TradeType.OPTION_EXPIRE
-                || tradeType == TradeType.EXERCISE_BUY
-                || tradeType == TradeType.EXERCISE_SELL) {
-
-            String suggestion;
-            switch (tradeType) {
-                case OPTION_EXPIRE:
-                    suggestion = "应改为 TradeType=SELL + TradeTrigger=OPTION + TriggerRefType=OPTION_EXPIRE";
-                    break;
-                case EXERCISE_BUY:
-                    suggestion = "应改为 TradeType=BUY + TradeTrigger=OPTION + TriggerRefType=OPTION_EXERCISE";
-                    break;
-                case EXERCISE_SELL:
-                    suggestion = "应改为 TradeType=SELL + TradeTrigger=OPTION + TriggerRefType=OPTION_EXERCISE";
-                    break;
-                default:
-                    suggestion = "";
-            }
-
-            TradeVerificationResult.ErrorDetail error = new TradeVerificationResult.ErrorDetail();
-            error.setRecordId(record.getId());
-            error.setRuleName("旧体系数据兼容");
-            error.setAssetType(record.getAssetType().name());
-            error.setActualSymbol(record.getSymbol());
-            error.setExpectedFormat("TradeType 仅使用 BUY / SELL");
-            error.setUnderlyingSymbol(record.getUnderlyingSymbol());
-            error.setMessage("交易类型使用了已废弃的值 " + tradeType.name() + "，" + suggestion);
-            result.addError(error);
-        }
-
-        // 检测2：是否使用了已废弃的 TriggerRefType.OPTION（笼统值）
-        if (triggerRefType == TriggerRefType.OPTION) {
-            TradeVerificationResult.ErrorDetail error = new TradeVerificationResult.ErrorDetail();
-            error.setRecordId(record.getId());
-            error.setRuleName("旧体系数据兼容");
-            error.setAssetType(record.getAssetType().name());
-            error.setActualSymbol(record.getSymbol());
-            error.setExpectedFormat("TriggerRefType 使用 OPTION_EXPIRE / OPTION_EXERCISE / OPTION_ASSIGNED");
-            error.setUnderlyingSymbol(record.getUnderlyingSymbol());
-            error.setMessage("触发关联类型使用了已废弃的笼统值 OPTION，应更新为 OPTION_EXPIRE / OPTION_EXERCISE / OPTION_ASSIGNED 之一");
-            result.addError(error);
-        }
-    }
-
-    /**
-     * 规则7：核对触发类型与关联类型的一致性
+     * 规则6：核对触发类型与关联类型的一致性
      *
      * 防止触发类型（trade_trigger）与关联类型（trigger_ref_type）出现交叉错配：
      *   - 当 trade_trigger = OPTION 时，trigger_ref_type 只能是

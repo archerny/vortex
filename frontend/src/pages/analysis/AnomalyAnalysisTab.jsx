@@ -20,7 +20,6 @@ const ruleColorMap = {
   '期权被动操作费用价格': 'red',
   '美股证券代码格式': 'blue',
   '证券代码类别一致性': 'magenta',
-  '旧体系数据兼容': 'gold',
   '触发类型关联类型一致性': 'cyan',
 };
 
@@ -84,7 +83,6 @@ const AnomalyAnalysisTab = () => {
         { text: '期权被动操作费用价格', value: '期权被动操作费用价格' },
         { text: '美股证券代码格式', value: '美股证券代码格式' },
         { text: '证券代码类别一致性', value: '证券代码类别一致性' },
-        { text: '旧体系数据兼容', value: '旧体系数据兼容' },
         { text: '触发类型关联类型一致性', value: '触发类型关联类型一致性' },
       ],
       onFilter: (value, record) => record.ruleName === value,
@@ -189,7 +187,7 @@ const AnomalyAnalysisTab = () => {
             children: (
               <div style={{ padding: '4px 8px', fontSize: 13, lineHeight: 2 }}>
                 <p style={{ marginBottom: 12 }}>
-                  系统将依据以下 <Text strong>7 项规则</Text> 对所有交易记录逐一进行校验，任何不符合规则的记录均会被标记为异常：
+                  系统将依据以下 <Text strong>6 项规则</Text> 对所有交易记录逐一进行校验，任何不符合规则的记录均会被标记为异常：
                 </p>
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                   <thead>
@@ -224,7 +222,6 @@ const AnomalyAnalysisTab = () => {
                         当交易触发来源为 OPTION（期权）时，根据关联类型进行校验：
 期权到期（OPTION_EXPIRE）时 fee 和 price 应均为 0；
                         行权/被指派的期权侧记录 fee 应为 0。
-                        同时兼容旧体系的 OPTION_EXPIRE / EXERCISE_BUY / EXERCISE_SELL 交易类型。
                       </td>
                     </tr>
                     <tr style={{ borderBottom: '1px solid #f0f0f0' }}>
@@ -244,19 +241,8 @@ const AnomalyAnalysisTab = () => {
                         出现此类冲突表明部分记录的资产类别存在错误。
                       </td>
                     </tr>
-                    <tr style={{ borderBottom: '1px solid #f0f0f0' }}>
-                      <td style={{ padding: '10px 12px' }}>6</td>
-                      <td style={{ padding: '10px 12px' }}><Tag color="gold">旧体系数据兼容</Tag></td>
-                      <td style={{ padding: '10px 12px' }}>
-                        检测使用了已废弃交易类型或触发关联类型的历史记录。
-                        交易类型（TradeType）应仅使用 <Text code>BUY</Text> / <Text code>SELL</Text>，
-                        使用了 <Text code>OPTION_EXPIRE</Text>、<Text code>EXERCISE_BUY</Text>、<Text code>EXERCISE_SELL</Text> 的记录需订正；
-                        触发关联类型（TriggerRefType）中笼统的 <Text code>OPTION</Text> 已废弃，
-                        应更新为 <Text code>OPTION_EXPIRE</Text> / <Text code>OPTION_EXERCISE</Text> / <Text code>OPTION_ASSIGNED</Text> 之一。
-                      </td>
-                    </tr>
                     <tr>
-                      <td style={{ padding: '10px 12px' }}>7</td>
+                      <td style={{ padding: '10px 12px' }}>6</td>
                       <td style={{ padding: '10px 12px' }}><Tag color="cyan">触发类型关联类型一致性</Tag></td>
                       <td style={{ padding: '10px 12px' }}>
                         校验触发类型（TradeTrigger）与关联类型（TriggerRefType）的搭配是否合法，防止出现交叉错配。

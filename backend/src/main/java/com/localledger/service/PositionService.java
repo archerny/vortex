@@ -91,12 +91,9 @@ public class PositionService {
     /**
      * 根据交易类型计算当前 symbol 的数量变动
      *
-     * 重构后 TradeType 仅有 BUY / SELL 两个有效值：
+     * TradeType 仅有 BUY / SELL 两个值：
      * - BUY: 持仓增加
      * - SELL: 持仓减少
-     *
-     * 旧枚举值（OPTION_EXPIRE / EXERCISE_BUY / EXERCISE_SELL）在语义上等同于 SELL（持仓减少），
-     * 保持向下兼容直到存量数据全部订正完成。
      */
     private int calculateQuantityDelta(TradeRecord record) {
         TradeType tradeType = record.getTradeType();
@@ -106,11 +103,6 @@ public class PositionService {
             case BUY:
                 return quantity;
             case SELL:
-                return -quantity;
-            // 以下旧枚举值已废弃，保留兼容直到存量数据订正完成
-            case OPTION_EXPIRE:
-            case EXERCISE_BUY:
-            case EXERCISE_SELL:
                 return -quantity;
             default:
                 return 0;
