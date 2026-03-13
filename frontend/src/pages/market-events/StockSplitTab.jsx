@@ -6,6 +6,8 @@ import {
 import {
   ExclamationCircleOutlined,
   PlusOutlined,
+  CheckCircleOutlined,
+  ClockCircleOutlined,
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import {
@@ -86,6 +88,20 @@ const StockSplitTab = () => {
           {record.ratioFrom} 拆 {record.ratioTo}
         </Tag>
       ),
+    },
+    {
+      title: '处理状态',
+      dataIndex: 'processed',
+      key: 'processed',
+      width: 100,
+      filters: [
+        { text: '已处理', value: true },
+        { text: '未处理', value: false },
+      ],
+      onFilter: (value, record) => record.processed === value,
+      render: (processed) => processed
+        ? <Tag icon={<CheckCircleOutlined />} color="success">已处理</Tag>
+        : <Tag icon={<ClockCircleOutlined />} color="warning">未处理</Tag>,
     },
     {
       title: '描述',

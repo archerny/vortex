@@ -6,6 +6,8 @@ import {
 import {
   ExclamationCircleOutlined,
   PlusOutlined,
+  CheckCircleOutlined,
+  ClockCircleOutlined,
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import {
@@ -99,6 +101,27 @@ const DividendInKindTab = () => {
       render: (val) => <Tag color="purple">{val}</Tag>,
     },
     {
+      title: '公允价格',
+      dataIndex: 'fairValuePerShare',
+      key: 'fairValuePerShare',
+      width: 120,
+      render: (val) => val != null ? <Tag color="blue">{val}</Tag> : <Text type="secondary">未设置</Text>,
+    },
+    {
+      title: '处理状态',
+      dataIndex: 'processed',
+      key: 'processed',
+      width: 100,
+      filters: [
+        { text: '已处理', value: true },
+        { text: '未处理', value: false },
+      ],
+      onFilter: (value, record) => record.processed === value,
+      render: (processed) => processed
+        ? <Tag icon={<CheckCircleOutlined />} color="success">已处理</Tag>
+        : <Tag icon={<ClockCircleOutlined />} color="warning">未处理</Tag>,
+    },
+    {
       title: '描述',
       dataIndex: 'description',
       key: 'description',
@@ -138,6 +161,7 @@ const DividendInKindTab = () => {
       dividendSymbol: record.dividendSymbol,
       dividendSymbolName: record.dividendSymbolName,
       dividendQtyPerShare: record.dividendQtyPerShare,
+      fairValuePerShare: record.fairValuePerShare,
       description: record.description,
     });
     setIsModalOpen(true);
@@ -267,9 +291,18 @@ const DividendInKindTab = () => {
               </Form.Item>
             </Col>
           </Row>
-          <Form.Item label="每股分红数量" name="dividendQtyPerShare" rules={[{ required: true, message: '请输入每股分红数量' }]}>
-            <InputNumber style={{ width: '100%' }} min={0} step={0.000001} precision={6} placeholder="每持有1股获得的分红数量" />
-          </Form.Item>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item label="每股分红数量" name="dividendQtyPerShare" rules={[{ required: true, message: '请输入每股分红数量' }]}>
+                <InputNumber style={{ width: '100%' }} min={0} step={0.000001} precision={6} placeholder="每持有1股获得的分红数量" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="公允价格(每股)" name="fairValuePerShare" tooltip="用于建立分红新持仓的成本基础，影响后续卖出时的收益计算">
+                <InputNumber style={{ width: '100%' }} min={0} step={0.01} precision={4} placeholder="分红证券的公允价格" />
+              </Form.Item>
+            </Col>
+          </Row>
           <Form.Item label="描述" name="description" rules={[{ max: 500, message: '描述不能超过500个字符' }]}>
             <Input.TextArea placeholder="事件描述（选填）" rows={3} showCount maxLength={500} />
           </Form.Item>
