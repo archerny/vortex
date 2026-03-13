@@ -68,7 +68,7 @@ public class MarketEventProcessingService {
      */
     @Transactional
     public void processStockSplitEvent(StockSplitEvent event) {
-        log.info("开始处理拆股事件: id={}, symbol={}, eventDate={}", event.getId(), event.getSymbol(), event.getEventDate());
+        log.info("Processing stock split event: id={}, symbol={}, eventDate={}", event.getId(), event.getSymbol(), event.getEventDate());
         Set<String> affectedSymbols = new HashSet<>();
         affectedSymbols.add(event.getSymbol());
         cascadeRecalculate(affectedSymbols, event.getEventDate());
@@ -80,7 +80,7 @@ public class MarketEventProcessingService {
      */
     @Transactional
     public void processSymbolChangeEvent(SymbolChangeEvent event) {
-        log.info("开始处理代码变更事件: id={}, oldSymbol={}, newSymbol={}, eventDate={}",
+        log.info("Processing symbol change event: id={}, oldSymbol={}, newSymbol={}, eventDate={}",
                 event.getId(), event.getOldSymbol(), event.getNewSymbol(), event.getEventDate());
         Set<String> affectedSymbols = new HashSet<>();
         affectedSymbols.add(event.getOldSymbol());
@@ -94,7 +94,7 @@ public class MarketEventProcessingService {
      */
     @Transactional
     public void processDividendInKindEvent(DividendInKindEvent event) {
-        log.info("开始处理实物分红事件: id={}, symbol={}, dividendSymbol={}, eventDate={}",
+        log.info("Processing dividend-in-kind event: id={}, symbol={}, dividendSymbol={}, eventDate={}",
                 event.getId(), event.getSymbol(), event.getDividendSymbol(), event.getEventDate());
         Set<String> affectedSymbols = new HashSet<>();
         affectedSymbols.add(event.getSymbol());
@@ -111,7 +111,7 @@ public class MarketEventProcessingService {
      */
     @Transactional
     public void processEventDeletion(Set<String> affectedSymbols, LocalDate eventDate) {
-        log.info("开始处理事件删除后的级联重算: symbols={}, eventDate={}", affectedSymbols, eventDate);
+        log.info("Processing cascade recalculation after event deletion: symbols={}, eventDate={}", affectedSymbols, eventDate);
         cascadeRecalculate(affectedSymbols, eventDate);
     }
 
@@ -128,7 +128,7 @@ public class MarketEventProcessingService {
     private void cascadeRecalculate(Set<String> affectedSymbols, LocalDate sinceDate) {
         // 1. 收集所有受影响的事件（按时间+优先级排序）
         List<EventWrapper> allEvents = collectAffectedEvents(affectedSymbols, sinceDate);
-        log.info("级联重算: 共找到 {} 个受影响的事件", allEvents.size());
+        log.info("Cascade recalculation: found {} affected events", allEvents.size());
 
         if (allEvents.isEmpty()) {
             return;
@@ -144,7 +144,7 @@ public class MarketEventProcessingService {
         // 3. 批量删除旧的系统交易记录
         for (Map.Entry<TriggerRefType, List<Long>> entry : idsToDelete.entrySet()) {
             tradeRecordRepository.deleteByTriggerRefTypeAndTriggerRefIdIn(entry.getKey(), entry.getValue());
-            log.info("已删除 triggerRefType={} 关联的系统交易记录, eventIds={}", entry.getKey(), entry.getValue());
+            log.info("Deleted system trade records for triggerRefType={}, eventIds={}", entry.getKey(), entry.getValue());
         }
 
         // 4. 将所有事件的 processed 状态重置为 false
@@ -155,10 +155,10 @@ public class MarketEventProcessingService {
             List<TradeRecord> generatedRecords = processOneEvent(wrapper);
             if (!generatedRecords.isEmpty()) {
                 tradeRecordRepository.saveAll(generatedRecords);
-                log.info("事件 {} (id={}) 生成了 {} 条系统交易记录",
+                log.info("Event {} (id={}) generated {} system trade records",
                         wrapper.triggerRefType, wrapper.eventId, generatedRecords.size());
             } else {
-                log.info("事件 {} (id={}) 处理完毕，无持仓影响，未生成交易记录",
+                log.info("Event {} (id={}) processed, no position impact, no trade records generated",
                         wrapper.triggerRefType, wrapper.eventId);
             }
             // 标记为已处理
@@ -219,7 +219,7 @@ public class MarketEventProcessingService {
             case SYMBOL_CHANGE -> processSymbolChange((SymbolChangeEvent) wrapper.event);
             case DIVIDEND_IN_KIND -> processDividendInKind((DividendInKindEvent) wrapper.event);
             default -> {
-                log.warn("未知的事件类型: {}", wrapper.triggerRefType);
+                log.warn("Unknown event type: {}", wrapper.triggerRefType);
                 yield Collections.emptyList();
             }
         };
@@ -248,7 +248,7 @@ public class MarketEventProcessingService {
                 .collect(Collectors.toList());
 
         if (relevantPositions.isEmpty()) {
-            log.info("拆股事件 (id={}, symbol={}): 事件发生时无持仓，跳过", event.getId(), event.getSymbol());
+            log.info("Stock split event (id={}, symbol={}): no position at event date, skipped", event.getId(), event.getSymbol());
             return records;
         }
 
@@ -281,7 +281,7 @@ public class MarketEventProcessingService {
             record.setIsDeleted(false);
 
             records.add(record);
-            log.debug("拆股: brokerId={}, symbol={}, 原持仓={}, 增量={}",
+            log.debug("Stock split: brokerId={}, symbol={}, originalQty={}, delta={}",
                     position.getBrokerId(), event.getSymbol(), position.getQuantity(), delta);
         }
 
@@ -314,7 +314,7 @@ public class MarketEventProcessingService {
                 .collect(Collectors.toList());
 
         if (relevantPositions.isEmpty()) {
-            log.info("代码变更事件 (id={}, {}->{}): 事件发生时无持仓，跳过",
+            log.info("Symbol change event (id={}, {}->{}): no position at event date, skipped",
                     event.getId(), event.getOldSymbol(), event.getNewSymbol());
             return records;
         }
@@ -364,7 +364,7 @@ public class MarketEventProcessingService {
             buyRecord.setIsDeleted(false);
             records.add(buyRecord);
 
-            log.debug("代码变更: brokerId={}, SELL {} {} 股 (avgCost={}), BUY {} {} 股",
+            log.debug("Symbol change: brokerId={}, SELL {} {} shares (avgCost={}), BUY {} {} shares",
                     position.getBrokerId(), event.getOldSymbol(), position.getQuantity(), avgCost,
                     event.getNewSymbol(), position.getQuantity());
         }
@@ -396,7 +396,7 @@ public class MarketEventProcessingService {
                 .collect(Collectors.toList());
 
         if (relevantPositions.isEmpty()) {
-            log.info("实物分红事件 (id={}, symbol={}): 事件发生时无持仓，跳过",
+            log.info("Dividend-in-kind event (id={}, symbol={}): no position at event date, skipped",
                     event.getId(), event.getSymbol());
             return records;
         }
@@ -435,7 +435,7 @@ public class MarketEventProcessingService {
             record.setIsDeleted(false);
 
             records.add(record);
-            log.debug("实物分红: brokerId={}, symbol={}, 持仓={}, 分红数量={}, 公允价格={}",
+            log.debug("Dividend-in-kind: brokerId={}, symbol={}, holdingQty={}, dividendQty={}, fairValue={}",
                     position.getBrokerId(), event.getDividendSymbol(), position.getQuantity(),
                     dividendQty, fairValue);
         }

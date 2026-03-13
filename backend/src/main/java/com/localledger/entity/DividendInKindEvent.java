@@ -49,7 +49,7 @@ public class DividendInKindEvent extends BaseMarketEvent {
     }
 
     public void setDividendSymbol(String dividendSymbol) {
-        this.dividendSymbol = dividendSymbol;
+        this.dividendSymbol = dividendSymbol != null ? dividendSymbol.trim() : null;
     }
 
     public String getDividendSymbolName() {

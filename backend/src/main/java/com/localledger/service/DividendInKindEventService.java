@@ -84,7 +84,7 @@ public class DividendInKindEventService {
     @Transactional
     public DividendInKindEvent create(DividendInKindEvent event) {
         DividendInKindEvent saved = dividendInKindEventRepository.save(event);
-        log.info("实物分红事件已保存: id={}, symbol={}, dividendSymbol={}, eventDate={}",
+        log.info("Dividend-in-kind event saved: id={}, symbol={}, dividendSymbol={}, eventDate={}",
                 saved.getId(), saved.getSymbol(), saved.getDividendSymbol(), saved.getEventDate());
         marketEventProcessingService.processDividendInKindEvent(saved);
         return saved;

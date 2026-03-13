@@ -73,11 +73,17 @@ public class StockSplitEventService {
 
     /**
      * 新增拆股事件，并自动生成系统交易记录
+     * 自动填充以下字段：
+     * - currency：从 symbol 的已有交易记录中获取
+     * - underlyingSymbolName：从 symbol 的已有交易记录中获取
      */
     @Transactional
     public StockSplitEvent create(StockSplitEvent event) {
+        // 从 symbol 的已有交易记录中自动填充 currency 和 underlyingSymbolName
+        autoFillFromExistingTradeRecord(event);
+
         StockSplitEvent saved = stockSplitEventRepository.save(event);
-        log.info("拆股事件已保存: id={}, symbol={}, eventDate={}", saved.getId(), saved.getSymbol(), saved.getEventDate());
+        log.info("Stock split event saved: id={}, symbol={}, eventDate={}", saved.getId(), saved.getSymbol(), saved.getEventDate());
         marketEventProcessingService.processStockSplitEvent(saved);
         return saved;
     }
@@ -96,12 +102,13 @@ public class StockSplitEventService {
         java.time.LocalDate oldDate = existing.getEventDate();
 
         existing.setSymbol(eventData.getSymbol());
-        existing.setUnderlyingSymbolName(eventData.getUnderlyingSymbolName());
-        existing.setCurrency(eventData.getCurrency());
         existing.setEventDate(eventData.getEventDate());
         existing.setRatioFrom(eventData.getRatioFrom());
         existing.setRatioTo(eventData.getRatioTo());
         existing.setDescription(eventData.getDescription());
+
+        // 重新自动填充 currency 和 underlyingSymbolName（symbol 可能已变更）
+        autoFillFromExistingTradeRecord(existing);
 
         StockSplitEvent saved = stockSplitEventRepository.save(existing);
 
@@ -135,5 +142,33 @@ public class StockSplitEventService {
         Set<String> affectedSymbols = new HashSet<>();
         affectedSymbols.add(existing.getSymbol());
         marketEventProcessingService.processEventDeletion(affectedSymbols, existing.getEventDate());
+    }
+
+    /**
+     * 从 symbol 的已有交易记录中自动填充 currency 和 underlyingSymbolName
+     * 如果 symbol 有交易记录，则用其 currency 和 name 填充
+     * 如果没有交易记录，则保持前端传入的值（如果有的话）
+     */
+    private void autoFillFromExistingTradeRecord(StockSplitEvent event) {
+        String querySymbol = event.getSymbol();
+
+        var tradeRecordOpt = tradeRecordRepository.findFirstBySymbolAndIsDeletedFalseOrderByTradeDateDesc(querySymbol);
+
+        if (tradeRecordOpt.isPresent()) {
+            var record = tradeRecordOpt.get();
+            // 自动填充币种
+            if (event.getCurrency() == null) {
+                event.setCurrency(record.getCurrency());
+                log.debug("Auto-filled currency: {} (from trade record of {})", record.getCurrency(), querySymbol);
+            }
+            // 自动填充底层证券名称
+            if (event.getUnderlyingSymbolName() == null || event.getUnderlyingSymbolName().isBlank()) {
+                event.setUnderlyingSymbolName(record.getName());
+                log.debug("Auto-filled underlyingSymbolName: '{}' (from trade record of {})", record.getName(), querySymbol);
+            }
+        } else {
+            log.error("Failed to auto-fill stock split event: no trade record found for symbol='{}', aborting to prevent dirty data", querySymbol);
+            throw new IllegalArgumentException("未找到证券代码 '" + querySymbol + "' 的交易记录，无法自动填充币种和证券名称，请先录入该证券的交易记录");
+        }
     }
 }

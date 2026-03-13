@@ -73,7 +73,7 @@ public abstract class BaseMarketEvent extends BaseEntity {
     }
 
     public void setSymbol(String symbol) {
-        this.symbol = symbol;
+        this.symbol = symbol != null ? symbol.trim() : null;
     }
 
     public String getUnderlyingSymbolName() {

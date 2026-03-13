@@ -101,7 +101,7 @@ public class SymbolChangeEventService {
         autoFillFromExistingTradeRecord(event);
 
         SymbolChangeEvent saved = symbolChangeEventRepository.save(event);
-        log.info("代码变更事件已保存: id={}, {}=>{}, eventDate={}",
+        log.info("Symbol change event saved: id={}, {}=>{}, eventDate={}",
                 saved.getId(), saved.getOldSymbol(), saved.getNewSymbol(), saved.getEventDate());
         marketEventProcessingService.processSymbolChangeEvent(saved);
         return saved;
@@ -173,18 +173,23 @@ public class SymbolChangeEventService {
      * 如果没有交易记录，则保持前端传入的值（如果有的话）
      */
     private void autoFillFromExistingTradeRecord(SymbolChangeEvent event) {
-        tradeRecordRepository.findFirstBySymbolAndIsDeletedFalseOrderByTradeDateDesc(event.getOldSymbol())
-                .ifPresent(record -> {
-                    // 自动填充币种
-                    if (event.getCurrency() == null) {
-                        event.setCurrency(record.getCurrency());
-                        log.debug("自动填充币种: {} (来自 {} 的交易记录)", record.getCurrency(), event.getOldSymbol());
-                    }
-                    // 自动填充旧的底层证券名称
-                    if (event.getUnderlyingSymbolName() == null || event.getUnderlyingSymbolName().isBlank()) {
-                        event.setUnderlyingSymbolName(record.getName());
-                        log.debug("自动填充旧底层证券名称: {} (来自 {} 的交易记录)", record.getName(), event.getOldSymbol());
-                    }
-                });
+        var tradeRecordOpt = tradeRecordRepository.findFirstBySymbolAndIsDeletedFalseOrderByTradeDateDesc(event.getOldSymbol());
+
+        if (tradeRecordOpt.isPresent()) {
+            var record = tradeRecordOpt.get();
+            // 自动填充币种
+            if (event.getCurrency() == null) {
+                event.setCurrency(record.getCurrency());
+                log.debug("Auto-filled currency: {} (from trade record of {})", record.getCurrency(), event.getOldSymbol());
+            }
+            // 自动填充旧的底层证券名称
+            if (event.getUnderlyingSymbolName() == null || event.getUnderlyingSymbolName().isBlank()) {
+                event.setUnderlyingSymbolName(record.getName());
+                log.debug("Auto-filled old underlyingSymbolName: {} (from trade record of {})", record.getName(), event.getOldSymbol());
+            }
+        } else {
+            log.error("Failed to auto-fill symbol change event: no trade record found for oldSymbol='{}', aborting to prevent dirty data", event.getOldSymbol());
+            throw new IllegalArgumentException("未找到证券代码 '" + event.getOldSymbol() + "' 的交易记录，无法自动填充币种和证券名称，请先录入该证券的交易记录");
+        }
     }
 }

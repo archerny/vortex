@@ -6,6 +6,8 @@ import com.localledger.entity.SymbolChangeEvent;
 import com.localledger.service.DividendInKindEventService;
 import com.localledger.service.StockSplitEventService;
 import com.localledger.service.SymbolChangeEventService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -24,6 +26,8 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/market-events")
 public class MarketEventController {
+
+    private static final Logger log = LoggerFactory.getLogger(MarketEventController.class);
 
     @Autowired
     private SymbolChangeEventService symbolChangeEventService;

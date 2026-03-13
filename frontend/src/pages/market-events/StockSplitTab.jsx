@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import {
   Card, Table, Tag, Button, message, Typography, Tooltip,
-  Modal, Form, Input, Select, DatePicker, InputNumber, Popconfirm, Row, Col, Space,
+  Modal, Form, Input, DatePicker, InputNumber, Row, Col,
 } from 'antd';
 import {
-  ExclamationCircleOutlined,
   PlusOutlined,
   CheckCircleOutlined,
   ClockCircleOutlined,
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import {
-  fetchAllStockSplitEvents, createStockSplitEvent, updateStockSplitEvent, deleteStockSplitEvent,
+  fetchAllStockSplitEvents, createStockSplitEvent,
 } from '../../services/marketEventApi';
 import { currencyOptions, currencyColorMap } from '../../constants/tradeConstants';
 
@@ -24,7 +23,6 @@ const StockSplitTab = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingRecord, setEditingRecord] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [form] = Form.useForm();
 
@@ -49,6 +47,14 @@ const StockSplitTab = () => {
 
   const columns = [
     {
+      title: '事件日期',
+      dataIndex: 'eventDate',
+      key: 'eventDate',
+      width: 120,
+      sorter: (a, b) => dayjs(a.eventDate).unix() - dayjs(b.eventDate).unix(),
+      render: (text) => text ? dayjs(text).format('YYYY-MM-DD') : '-',
+    },
+    {
       title: '证券代码',
       dataIndex: 'symbol',
       key: 'symbol',
@@ -63,23 +69,6 @@ const StockSplitTab = () => {
       render: (text) => text || <Text type="secondary">-</Text>,
     },
     {
-      title: '币种',
-      dataIndex: 'currency',
-      key: 'currency',
-      width: 80,
-      render: (currency) => currency ? <Tag color={currencyColorMap[currency] || 'default'}>{currency}</Tag> : '-',
-      filters: currencyOptions.map((item) => ({ text: item.value, value: item.value })),
-      onFilter: (value, record) => record.currency === value,
-    },
-    {
-      title: '事件日期',
-      dataIndex: 'eventDate',
-      key: 'eventDate',
-      width: 120,
-      sorter: (a, b) => dayjs(a.eventDate).unix() - dayjs(b.eventDate).unix(),
-      render: (text) => text ? dayjs(text).format('YYYY-MM-DD') : '-',
-    },
-    {
       title: '拆股比例',
       key: 'ratio',
       width: 120,
@@ -88,6 +77,15 @@ const StockSplitTab = () => {
           {record.ratioFrom} 拆 {record.ratioTo}
         </Tag>
       ),
+    },
+    {
+      title: '币种',
+      dataIndex: 'currency',
+      key: 'currency',
+      width: 80,
+      render: (currency) => currency ? <Tag color={currencyColorMap[currency] || 'default'}>{currency}</Tag> : '-',
+      filters: currencyOptions.map((item) => ({ text: item.value, value: item.value })),
+      onFilter: (value, record) => record.currency === value,
     },
     {
       title: '处理状态',
@@ -114,64 +112,16 @@ const StockSplitTab = () => {
         </Tooltip>
       ),
     },
-    {
-      title: '操作',
-      key: 'action',
-      width: 120,
-      render: (_, record) => (
-        <Space>
-          <a onClick={() => handleEdit(record)}>编辑</a>
-          <Popconfirm
-            title="确认删除" description="确定要删除该拆股事件吗？"
-            onConfirm={() => handleDelete(record)} okText="确认" cancelText="取消"
-            icon={<ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />}
-          >
-            <a style={{ color: '#ff4d4f' }}>删除</a>
-          </Popconfirm>
-        </Space>
-      ),
-    },
   ];
 
-  const handleEdit = (record) => {
-    setEditingRecord(record);
-    form.setFieldsValue({
-      symbol: record.symbol,
-      underlyingSymbolName: record.underlyingSymbolName,
-      currency: record.currency,
-      eventDate: record.eventDate ? dayjs(record.eventDate) : null,
-      ratioFrom: record.ratioFrom,
-      ratioTo: record.ratioTo,
-      description: record.description,
-    });
-    setIsModalOpen(true);
-  };
-
   const handleAdd = () => {
-    setEditingRecord(null);
     form.resetFields();
     setIsModalOpen(true);
   };
 
   const handleCancel = () => {
     setIsModalOpen(false);
-    setEditingRecord(null);
     form.resetFields();
-  };
-
-  const handleDelete = async (record) => {
-    try {
-      const result = await deleteStockSplitEvent(record.id);
-      if (result.status === 'SUCCESS') {
-        message.success('删除成功');
-        loadData();
-      } else {
-        message.error(result.message || '删除失败');
-      }
-    } catch (error) {
-      console.error('删除失败:', error);
-      message.error(error.response?.data?.message || '删除失败');
-    }
   };
 
   const handleSubmit = () => {
@@ -182,25 +132,14 @@ const StockSplitTab = () => {
           ...values,
           eventDate: values.eventDate ? values.eventDate.format('YYYY-MM-DD') : null,
         };
-        if (editingRecord) {
-          const result = await updateStockSplitEvent(editingRecord.id, payload);
-          if (result.status === 'SUCCESS') {
-            message.success('更新成功');
-            loadData();
-          } else {
-            message.error(result.message || '更新失败');
-          }
+        const result = await createStockSplitEvent(payload);
+        if (result.status === 'SUCCESS') {
+          message.success('新增成功');
+          loadData();
         } else {
-          const result = await createStockSplitEvent(payload);
-          if (result.status === 'SUCCESS') {
-            message.success('新增成功');
-            loadData();
-          } else {
-            message.error(result.message || '新增失败');
-          }
+          message.error(result.message || '新增失败');
         }
         setIsModalOpen(false);
-        setEditingRecord(null);
         form.resetFields();
       } catch (error) {
         console.error('操作失败:', error);
@@ -225,12 +164,12 @@ const StockSplitTab = () => {
       </Card>
 
       <Modal
-        title={editingRecord ? '编辑拆股事件' : '新增拆股事件'}
+        title="新增拆股事件"
         open={isModalOpen} onCancel={handleCancel} width={640} destroyOnClose
         footer={[
           <Button key="cancel" onClick={handleCancel}>取消</Button>,
           <Button key="submit" type="primary" loading={submitting} onClick={handleSubmit}>
-            {editingRecord ? '保存' : '提交'}
+            提交
           </Button>,
         ]}
       >
@@ -239,18 +178,6 @@ const StockSplitTab = () => {
             <Col span={12}>
               <Form.Item label="证券代码" name="symbol" rules={[{ required: true, message: '请输入证券代码' }]}>
                 <Input placeholder="如 TSLA" />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item label="底层证券名称" name="underlyingSymbolName">
-                <Input placeholder="底层证券名称（选填）" />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item label="币种" name="currency">
-                <Select placeholder="请选择币种" options={currencyOptions} allowClear />
               </Form.Item>
             </Col>
             <Col span={12}>

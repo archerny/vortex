@@ -41,7 +41,7 @@ public class SymbolChangeEvent extends BaseMarketEvent {
     }
 
     public void setOldSymbol(String oldSymbol) {
-        this.oldSymbol = oldSymbol;
+        this.oldSymbol = oldSymbol != null ? oldSymbol.trim() : null;
     }
 
     public String getNewSymbol() {
@@ -49,7 +49,7 @@ public class SymbolChangeEvent extends BaseMarketEvent {
     }
 
     public void setNewSymbol(String newSymbol) {
-        this.newSymbol = newSymbol;
+        this.newSymbol = newSymbol != null ? newSymbol.trim() : null;
     }
 
     public String getNewUnderlyingSymbolName() {
