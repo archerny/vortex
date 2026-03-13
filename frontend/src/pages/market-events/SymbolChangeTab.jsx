@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import {
   Card, Table, Tag, Button, message, Typography, Tooltip,
-  Modal, Form, Input, DatePicker, Popconfirm, Row, Col, Space,
+  Modal, Form, Input, DatePicker, Row, Col,
 } from 'antd';
 import {
-  ExclamationCircleOutlined,
   PlusOutlined,
   CheckCircleOutlined,
   ClockCircleOutlined,
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import {
-  fetchAllSymbolChangeEvents, createSymbolChangeEvent, updateSymbolChangeEvent, deleteSymbolChangeEvent,
+  fetchAllSymbolChangeEvents, createSymbolChangeEvent,
 } from '../../services/marketEventApi';
 import { currencyOptions, currencyColorMap } from '../../constants/tradeConstants';
 
@@ -24,7 +23,6 @@ const SymbolChangeTab = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingRecord, setEditingRecord] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [form] = Form.useForm();
 
@@ -118,62 +116,17 @@ const SymbolChangeTab = () => {
         </Tooltip>
       ),
     },
-    {
-      title: '操作',
-      key: 'action',
-      width: 120,
-      render: (_, record) => (
-        <Space>
-          <a onClick={() => handleEdit(record)}>编辑</a>
-          <Popconfirm
-            title="确认删除" description="确定要删除该代码变更事件吗？"
-            onConfirm={() => handleDelete(record)} okText="确认" cancelText="取消"
-            icon={<ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />}
-          >
-            <a style={{ color: '#ff4d4f' }}>删除</a>
-          </Popconfirm>
-        </Space>
-      ),
-    },
+
   ];
 
-  const handleEdit = (record) => {
-    setEditingRecord(record);
-    form.setFieldsValue({
-      eventDate: record.eventDate ? dayjs(record.eventDate) : null,
-      oldSymbol: record.oldSymbol,
-      newSymbol: record.newSymbol,
-      newUnderlyingSymbolName: record.newUnderlyingSymbolName,
-      description: record.description,
-    });
-    setIsModalOpen(true);
-  };
-
   const handleAdd = () => {
-    setEditingRecord(null);
     form.resetFields();
     setIsModalOpen(true);
   };
 
   const handleCancel = () => {
     setIsModalOpen(false);
-    setEditingRecord(null);
     form.resetFields();
-  };
-
-  const handleDelete = async (record) => {
-    try {
-      const result = await deleteSymbolChangeEvent(record.id);
-      if (result.status === 'SUCCESS') {
-        message.success('删除成功');
-        loadData();
-      } else {
-        message.error(result.message || '删除失败');
-      }
-    } catch (error) {
-      console.error('删除失败:', error);
-      message.error(error.response?.data?.message || '删除失败');
-    }
   };
 
   const handleSubmit = () => {
@@ -184,25 +137,14 @@ const SymbolChangeTab = () => {
           ...values,
           eventDate: values.eventDate ? values.eventDate.format('YYYY-MM-DD') : null,
         };
-        if (editingRecord) {
-          const result = await updateSymbolChangeEvent(editingRecord.id, payload);
-          if (result.status === 'SUCCESS') {
-            message.success('更新成功');
-            loadData();
-          } else {
-            message.error(result.message || '更新失败');
-          }
+        const result = await createSymbolChangeEvent(payload);
+        if (result.status === 'SUCCESS') {
+          message.success('新增成功');
+          loadData();
         } else {
-          const result = await createSymbolChangeEvent(payload);
-          if (result.status === 'SUCCESS') {
-            message.success('新增成功');
-            loadData();
-          } else {
-            message.error(result.message || '新增失败');
-          }
+          message.error(result.message || '新增失败');
         }
         setIsModalOpen(false);
-        setEditingRecord(null);
         form.resetFields();
       } catch (error) {
         console.error('操作失败:', error);
@@ -227,12 +169,12 @@ const SymbolChangeTab = () => {
       </Card>
 
       <Modal
-        title={editingRecord ? '编辑代码变更事件' : '新增代码变更事件'}
+        title="新增代码变更事件"
         open={isModalOpen} onCancel={handleCancel} width={640} destroyOnClose
         footer={[
           <Button key="cancel" onClick={handleCancel}>取消</Button>,
           <Button key="submit" type="primary" loading={submitting} onClick={handleSubmit}>
-            {editingRecord ? '保存' : '提交'}
+            提交
           </Button>,
         ]}
       >
