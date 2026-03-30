@@ -315,7 +315,142 @@ node scripts/index.js map "https://developer.schwab.com/" --limit 500 --json \
 
 ---
 
-## 5. 文档内容概览
+## 5. 待探索方案：真实浏览器模拟爬取
+
+> **状态**：🔬 方案已设计，待验证（2026-03-30）
+
+由于 `developer.schwab.com` 的 Akamai 反爬保护极强，所有服务端爬取工具（Firecrawl、curl、web_fetch）全部被拦截。下一步计划使用 **真实浏览器自动化**（Playwright）来绕过反爬保护，直接获取官方文档内容。
+
+### 5.1 为什么需要真实浏览器？
+
+Akamai Bot Manager 的检测维度包括：
+
+| 检测项 | 服务端爬取（Firecrawl/curl） | 真实浏览器（Playwright） |
+|--------|---------------------------|------------------------|
+| TLS 指纹 | ❌ 与浏览器不同 | ✅ 真实 Chromium 指纹 |
+| HTTP/2 特征 | ❌ 不完整 | ✅ 完整 |
+| JavaScript 执行 | ❌ 无法执行 / 有限 | ✅ 完整 V8 引擎 |
+| Angular SPA 渲染 | ❌ 仅得到空壳 HTML | ✅ 完整渲染 |
+| 浏览器指纹（Canvas/WebGL） | ❌ 无 | ✅ 真实指纹 |
+| `navigator.webdriver` | N/A | ⚠️ 需 stealth 插件隐藏 |
+
+### 5.2 推荐方案：Playwright + Stealth 模式
+
+#### 核心思路
+
+```python
+from playwright.sync_api import sync_playwright
+
+with sync_playwright() as p:
+    # 1. 启动真实 Chromium（非 headless 更难被检测）
+    browser = p.chromium.launch(headless=False)
+    context = browser.new_context()
+    page = context.new_page()
+
+    # 2. 导航到目标页面
+    page.goto("https://developer.schwab.com/products/trader-api--individual")
+
+    # 3. 等待 Angular SPA 完全渲染
+    page.wait_for_load_state("networkidle")
+
+    # 4. 提取渲染后的内容
+    content = page.inner_text("body")  # 纯文本
+    html = page.content()              # 完整 DOM
+```
+
+#### Stealth 配置要点
+
+- 使用 `playwright-stealth` 插件隐藏自动化特征
+- 设置真实的 User-Agent、视口大小、语言等
+- 模拟真实用户行为（随机延迟、滚动、鼠标移动）
+- 优先使用非 headless 模式
+
+### 5.3 登录问题处理
+
+部分 Schwab 开发者门户页面可能需要登录。根据分析：
+
+| 页面类型 | 示例 | 是否需要登录 |
+|----------|------|-------------|
+| 产品介绍 (`/products/*`) | API 功能描述 | ❌ 大概率不需要 |
+| 用户指南 (`/user-guides/*`) | 入门文档 | ❌ 大概率不需要 |
+| API 规范 (`/apis/*`) | Swagger/OpenAPI | ⚠️ 可能需要 |
+| 控制台 (`/dashboard`, `/apps/*`) | 应用管理 | ✅ 需要（但不需要爬取） |
+
+#### 方案 A：半自动登录 + Cookie 复用（推荐）
+
+```python
+# 第一次运行：手动登录并保存状态
+context = browser.new_context()
+page = context.new_page()
+page.goto("https://developer.schwab.com/login")
+
+# ⏸️ 暂停，等待用户在浏览器窗口中手动登录（支持 2FA）
+input("请在浏览器中完成登录，然后按回车继续...")
+
+# 保存登录状态（Cookie + localStorage + sessionStorage）
+context.storage_state(path="schwab-auth.json")
+
+# 后续运行：自动加载登录状态，无需再次登录
+context = browser.new_context(storage_state="schwab-auth.json")
+```
+
+**优点**：
+- 密码不经过脚本，安全性高
+- 支持任何 2FA 方式（短信、Authenticator 等）
+- Cookie 过期前都不需要重新登录
+
+#### 方案 B：持久化浏览器 Profile
+
+```python
+# 使用持久化 Profile，登录状态跨次运行保留
+context = playwright.chromium.launch_persistent_context(
+    user_data_dir="./schwab-browser-profile",
+    headless=False
+)
+# 首次手动登录后，Profile 中的 Cookie 会一直保留
+```
+
+### 5.4 完整执行计划
+
+```
+Step 1: 验证可行性（先不处理登录）
+  → 用 Playwright stealth 模式打开一个公开页面（如 /products/trader-api--individual）
+  → 确认能否绕过 Akamai 反爬，获取渲染后的页面内容
+  → 如果成功，进入 Step 2
+
+Step 2: 批量爬取公开文档页面
+  → 使用 map 发现的 32 个 URL 作为目标列表
+  → 逐页爬取，控制请求间隔（建议 5-10 秒），避免触发速率限制
+  → 将渲染后的 HTML 转换为 Markdown
+
+Step 3: 处理需要登录的页面（如有）
+  → 切换到方案 A（半自动登录 + Cookie 复用）
+  → 用户手动登录一次，脚本保存状态后自动完成剩余工作
+
+Step 4: 替换现有文档
+  → 用官方内容替换当前从 schwab-py 提取的文档
+  → 保留 schwab-py 源码作为 API 端点定义的交叉验证来源
+```
+
+### 5.5 风险与注意事项
+
+| 风险 | 说明 | 缓解措施 |
+|------|------|---------|
+| Akamai 高级检测 | 可能识别 Playwright 的自动化特征 | 使用 stealth 插件 + 非 headless 模式 |
+| 速率限制/IP 封禁 | 频繁访问可能触发封禁 | 控制间隔 5-10s，使用随机延迟 |
+| 登录态过期 | Cookie/Token 有时效 | 检测 401 响应，自动提示重新登录 |
+| 页面结构变化 | Angular 组件更新导致选择器失效 | 使用通用文本提取，避免依赖具体 CSS 选择器 |
+| Schwab ToS 合规 | 自动化爬取可能违反使用条款 | 仅用于个人离线参考，不公开分发 |
+
+### 5.6 所需工具
+
+- **Playwright**：`npm install playwright` 或 `pip install playwright`
+- **playwright-stealth**（可选）：隐藏自动化特征
+- **Turndown / html-to-markdown**：HTML → Markdown 转换
+
+---
+
+## 7. 文档内容概览
 
 ### User Guides（用户指南，`user-guides/`）
 
@@ -354,7 +489,7 @@ node scripts/index.js map "https://developer.schwab.com/" --limit 500 --json \
 
 ---
 
-## 6. 维护 Checklist
+## 8. 维护 Checklist
 
 当需要更新文档时，按以下步骤执行：
 
