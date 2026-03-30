@@ -1,8 +1,4 @@
-# 获取快照 | Futu API 文档 v10.2
-
-> 来源: https://openapi.futunn.com/futu-api-doc/quote/get-market-snapshot.html
-
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-market-snapshot.html#273)
+[#](./quote_get-market-snapshot.md#273)
  获取快照
 =====================================================================================
 
@@ -23,14 +19,14 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | code\_list | list | 股票代码列表<br>(ℹ️ 每次最多可请求 400 个标的  <br>list 内元素类型为 str) |
+    | code\_list | list | 股票代码列表<br>(ℹ️ 每次最多可请求 400 个标的)  <br>list 内元素类型为 str |
     
 
 *   **返回**
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | pd.DataFrame | 当 ret == RET\_OK，返回股票快照数据 |
     | str | 当 ret != RET\_OK，返回错误描述 |
     
@@ -40,7 +36,7 @@
         | --- | --- | --- |
         | code | str | 股票代码 |
         | name | str | 股票名称 |
-        | update\_time | str | 当前价更新时间<br>(ℹ️ 格式：yyyy-MM-dd HH:mm:ss  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间) |
+        | update\_time | str | 当前价更新时间<br>(ℹ️ 格式：yyyy-MM-dd HH:mm:ss)  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间 |
         | last\_price | float | 最新价格 |
         | open\_price | float | 今日开盘价 |
         | high\_price | float | 最高价格 |
@@ -71,7 +67,7 @@
         | stock\_owner | str | 窝轮所属正股的代码或期权的标的股代码 |
         | wrt\_valid | bool | 是否是窝轮<br>(ℹ️ 此字段返回为 True 时，以下窝轮相关字段才有合法数值) |
         | wrt\_conversion\_ratio | float | 换股比率 |
-        | wrt\_type | [WrtType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#926) | 窝轮类型 |
+        | wrt\_type | [WrtType](./quote_quote.md#926) | 窝轮类型 |
         | wrt\_strike\_price | float | 行使价格 |
         | wrt\_maturity\_date | str | 格式化窝轮到期时间 |
         | wrt\_end\_trade | str | 格式化窝轮最后交易时间 |
@@ -91,11 +87,11 @@
         | wrt\_premium | float | 窝轮溢价<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
         | wrt\_upper\_strike\_price | float | 上限价<br>(ℹ️ 仅界内证支持该字段) |
         | wrt\_lower\_strike\_price | float | 下限价<br>(ℹ️ 仅界内证支持该字段) |
-        | wrt\_inline\_price\_status | [PriceType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6407) | 界内界外<br>(ℹ️ 仅界内证支持该字段) |
+        | wrt\_inline\_price\_status | [PriceType](./quote_quote.md#6407) | 界内界外<br>(ℹ️ 仅界内证支持该字段) |
         | wrt\_issuer\_code | str | 发行人代码 |
         | option\_valid | bool | 是否是期权<br>(ℹ️ 此字段返回为 True 时，以下期权相关字段才有合法数值) |
-        | option\_type | [OptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3713) | 期权类型 |
-        | strike\_time | str | 期权行权日<br>(ℹ️ 格式：yyyy-MM-dd  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间) |
+        | option\_type | [OptionType](./quote_quote.md#3713) | 期权类型 |
+        | strike\_time | str | 期权行权日<br>(ℹ️ 格式：yyyy-MM-dd)  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间 |
         | option\_strike\_price | float | 行权价 |
         | option\_contract\_size | float | 每份合约数 |
         | option\_open\_interest | int | 总未平仓合约数 |
@@ -106,12 +102,12 @@
         | option\_vega | float | 希腊值 Vega |
         | option\_theta | float | 希腊值 Theta |
         | option\_rho | float | 希腊值 Rho |
-        | index\_option\_type | [IndexOptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5149) | 指数期权类型 |
+        | index\_option\_type | [IndexOptionType](./quote_quote.md#5149) | 指数期权类型 |
         | option\_net\_open\_interest | int | 净未平仓合约数<br>(ℹ️ 仅港股期权适用) |
         | option\_expiry\_date\_distance | int | 距离到期日天数<br>(ℹ️ 负数表示已过期) |
         | option\_contract\_nominal\_value | float | 合约名义金额<br>(ℹ️ 仅港股期权适用) |
         | option\_owner\_lot\_multiplier | float | 相等正股手数<br>(ℹ️ 指数期权无该字段，仅港股期权适用) |
-        | option\_area\_type | [OptionAreaType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#7077) | 期权类型（按行权时间） |
+        | option\_area\_type | [OptionAreaType](./quote_quote.md#7077) | 期权类型（按行权时间） |
         | option\_contract\_multiplier | float | 合约乘数 |
         | plate\_valid | bool | 是否为板块类型<br>(ℹ️ 此字段返回为 True 时，以下板块相关字段才有合法数值) |
         | plate\_raise\_count | int | 板块类型上涨支数 |
@@ -121,20 +117,20 @@
         | index\_raise\_count | int | 指数类型上涨支数 |
         | index\_fall\_count | int | 指数类型下跌支数 |
         | index\_equal\_count | int | 指数类型平盘支数 |
-        | lot\_size | int | 每手股数，股票期权表示每份合约的股数<br>(ℹ️ 指数期权无该字段<br><br>，期货表示合约乘数) |
+        | lot\_size | int | 每手股数，股票期权表示每份合约的股数<br>(ℹ️ 指数期权无该字段)<br><br>，期货表示合约乘数 |
         | price\_spread | float | 当前向上的摆盘价差<br>(ℹ️ 即摆盘数据的卖一价相邻档位的报价差) |
         | ask\_price | float | 卖价  |
         | bid\_price | float | 买价  |
         | ask\_vol | float | 卖量  |
         | bid\_vol | float | 买量  |
-        | enable\_margin | bool | 是否可融资（已废弃）<br>(ℹ️ 请使用 [获取融资融券数据](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html)<br> 接口获取) |
+        | enable\_margin | bool | 是否可融资（已废弃）<br>(ℹ️ 请使用 [获取融资融券数据](./trade_get-margin-ratio.md))<br> 接口获取 |
         | mortgage\_ratio | float | 股票抵押率（已废弃） |
-        | long\_margin\_initial\_ratio | float | 融资初始保证金率（已废弃）<br>(ℹ️ 请使用 [获取融资融券数据](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html)<br> 接口获取) |
-        | enable\_short\_sell | bool | 是否可卖空（已废弃）<br>(ℹ️ 请使用 [获取融资融券数据](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html)<br> 接口获取) |
-        | short\_sell\_rate | float | 卖空参考利率（已废弃）<br>(ℹ️ 请使用 [获取融资融券数据](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html)<br> 接口获取) |
-        | short\_available\_volume | int | 剩余可卖空数量（已废弃）<br>(ℹ️ 请使用 [获取融资融券数据](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html)<br> 接口获取) |
-        | short\_margin\_initial\_ratio | float | 卖空（融券）初始保证金率（已废弃）<br>(ℹ️ 请使用 [获取融资融券数据](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html)<br> 接口获取) |
-        | sec\_status | [SecurityStatus](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9969) | 股票状态 |
+        | long\_margin\_initial\_ratio | float | 融资初始保证金率（已废弃）<br>(ℹ️ 请使用 [获取融资融券数据](./trade_get-margin-ratio.md))<br> 接口获取 |
+        | enable\_short\_sell | bool | 是否可卖空（已废弃）<br>(ℹ️ 请使用 [获取融资融券数据](./trade_get-margin-ratio.md))<br> 接口获取 |
+        | short\_sell\_rate | float | 卖空参考利率（已废弃）<br>(ℹ️ 请使用 [获取融资融券数据](./trade_get-margin-ratio.md))<br> 接口获取 |
+        | short\_available\_volume | int | 剩余可卖空数量（已废弃）<br>(ℹ️ 请使用 [获取融资融券数据](./trade_get-margin-ratio.md))<br> 接口获取 |
+        | short\_margin\_initial\_ratio | float | 卖空（融券）初始保证金率（已废弃）<br>(ℹ️ 请使用 [获取融资融券数据](./trade_get-margin-ratio.md))<br> 接口获取 |
+        | sec\_status | [SecurityStatus](./quote_quote.md#9969) | 股票状态 |
         | amplitude | float | 振幅<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
         | avg\_price | float | 平均价 |
         | bid\_ask\_ratio | float | 委比<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
@@ -179,7 +175,7 @@
         | trust\_outstanding\_units | int | 总发行量 |
         | trust\_netAssetValue | float | 单位净值 |
         | trust\_premium | float | 溢价<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
-        | trust\_assetClass | [AssetClass](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4752) | 资产类别 |
+        | trust\_assetClass | [AssetClass](./quote_quote.md#4752) | 资产类别 |
         
 *   **Example**
     
@@ -242,7 +238,7 @@
 13  
 14  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-market-snapshot.html#338)
+[#](./quote_get-market-snapshot.md#338)
  Qot\_GetSecuritySnapshot.proto
 ---------------------------------------------------------------------------------------------------------------
 
@@ -274,7 +270,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -658,9 +654,9 @@
 187  
 188  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -699,7 +695,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -1083,9 +1079,9 @@
 187  
 188  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1247,7 +1243,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -1631,9 +1627,9 @@
 187  
 188  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1951,7 +1947,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -2335,9 +2331,9 @@
 187  
 188  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2676,7 +2672,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -3060,9 +3056,9 @@
 187  
 188  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -3341,14 +3337,14 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | code\_list | list | 股票代码列表<br>(ℹ️ 每次最多可请求 400 个标的  <br>list 内元素类型为 str) |
+    | code\_list | list | 股票代码列表<br>(ℹ️ 每次最多可请求 400 个标的)  <br>list 内元素类型为 str |
     
 
 *   **返回**
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | pd.DataFrame | 当 ret == RET\_OK，返回股票快照数据 |
     | str | 当 ret != RET\_OK，返回错误描述 |
     
@@ -3358,7 +3354,7 @@
         | --- | --- | --- |
         | code | str | 股票代码 |
         | name | str | 股票名称 |
-        | update\_time | str | 当前价更新时间<br>(ℹ️ 格式：yyyy-MM-dd HH:mm:ss  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间) |
+        | update\_time | str | 当前价更新时间<br>(ℹ️ 格式：yyyy-MM-dd HH:mm:ss)  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间 |
         | last\_price | float | 最新价格 |
         | open\_price | float | 今日开盘价 |
         | high\_price | float | 最高价格 |
@@ -3389,7 +3385,7 @@
         | stock\_owner | str | 窝轮所属正股的代码或期权的标的股代码 |
         | wrt\_valid | bool | 是否是窝轮<br>(ℹ️ 此字段返回为 True 时，以下窝轮相关字段才有合法数值) |
         | wrt\_conversion\_ratio | float | 换股比率 |
-        | wrt\_type | [WrtType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#926) | 窝轮类型 |
+        | wrt\_type | [WrtType](./quote_quote.md#926) | 窝轮类型 |
         | wrt\_strike\_price | float | 行使价格 |
         | wrt\_maturity\_date | str | 格式化窝轮到期时间 |
         | wrt\_end\_trade | str | 格式化窝轮最后交易时间 |
@@ -3409,11 +3405,11 @@
         | wrt\_premium | float | 窝轮溢价<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
         | wrt\_upper\_strike\_price | float | 上限价<br>(ℹ️ 仅界内证支持该字段) |
         | wrt\_lower\_strike\_price | float | 下限价<br>(ℹ️ 仅界内证支持该字段) |
-        | wrt\_inline\_price\_status | [PriceType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6407) | 界内界外<br>(ℹ️ 仅界内证支持该字段) |
+        | wrt\_inline\_price\_status | [PriceType](./quote_quote.md#6407) | 界内界外<br>(ℹ️ 仅界内证支持该字段) |
         | wrt\_issuer\_code | str | 发行人代码 |
         | option\_valid | bool | 是否是期权<br>(ℹ️ 此字段返回为 True 时，以下期权相关字段才有合法数值) |
-        | option\_type | [OptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3713) | 期权类型 |
-        | strike\_time | str | 期权行权日<br>(ℹ️ 格式：yyyy-MM-dd  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间) |
+        | option\_type | [OptionType](./quote_quote.md#3713) | 期权类型 |
+        | strike\_time | str | 期权行权日<br>(ℹ️ 格式：yyyy-MM-dd)  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间 |
         | option\_strike\_price | float | 行权价 |
         | option\_contract\_size | float | 每份合约数 |
         | option\_open\_interest | int | 总未平仓合约数 |
@@ -3424,12 +3420,12 @@
         | option\_vega | float | 希腊值 Vega |
         | option\_theta | float | 希腊值 Theta |
         | option\_rho | float | 希腊值 Rho |
-        | index\_option\_type | [IndexOptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5149) | 指数期权类型 |
+        | index\_option\_type | [IndexOptionType](./quote_quote.md#5149) | 指数期权类型 |
         | option\_net\_open\_interest | int | 净未平仓合约数<br>(ℹ️ 仅港股期权适用) |
         | option\_expiry\_date\_distance | int | 距离到期日天数<br>(ℹ️ 负数表示已过期) |
         | option\_contract\_nominal\_value | float | 合约名义金额<br>(ℹ️ 仅港股期权适用) |
         | option\_owner\_lot\_multiplier | float | 相等正股手数<br>(ℹ️ 指数期权无该字段，仅港股期权适用) |
-        | option\_area\_type | [OptionAreaType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#7077) | 期权类型（按行权时间） |
+        | option\_area\_type | [OptionAreaType](./quote_quote.md#7077) | 期权类型（按行权时间） |
         | option\_contract\_multiplier | float | 合约乘数 |
         | plate\_valid | bool | 是否为板块类型<br>(ℹ️ 此字段返回为 True 时，以下板块相关字段才有合法数值) |
         | plate\_raise\_count | int | 板块类型上涨支数 |
@@ -3439,20 +3435,20 @@
         | index\_raise\_count | int | 指数类型上涨支数 |
         | index\_fall\_count | int | 指数类型下跌支数 |
         | index\_equal\_count | int | 指数类型平盘支数 |
-        | lot\_size | int | 每手股数，股票期权表示每份合约的股数<br>(ℹ️ 指数期权无该字段<br><br>，期货表示合约乘数) |
+        | lot\_size | int | 每手股数，股票期权表示每份合约的股数<br>(ℹ️ 指数期权无该字段)<br><br>，期货表示合约乘数 |
         | price\_spread | float | 当前向上的摆盘价差<br>(ℹ️ 即摆盘数据的卖一价相邻档位的报价差) |
         | ask\_price | float | 卖价  |
         | bid\_price | float | 买价  |
         | ask\_vol | float | 卖量  |
         | bid\_vol | float | 买量  |
-        | enable\_margin | bool | 是否可融资（已废弃）<br>(ℹ️ 请使用 [获取融资融券数据](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html)<br> 接口获取) |
+        | enable\_margin | bool | 是否可融资（已废弃）<br>(ℹ️ 请使用 [获取融资融券数据](./trade_get-margin-ratio.md))<br> 接口获取 |
         | mortgage\_ratio | float | 股票抵押率（已废弃） |
-        | long\_margin\_initial\_ratio | float | 融资初始保证金率（已废弃）<br>(ℹ️ 请使用 [获取融资融券数据](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html)<br> 接口获取) |
-        | enable\_short\_sell | bool | 是否可卖空（已废弃）<br>(ℹ️ 请使用 [获取融资融券数据](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html)<br> 接口获取) |
-        | short\_sell\_rate | float | 卖空参考利率（已废弃）<br>(ℹ️ 请使用 [获取融资融券数据](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html)<br> 接口获取) |
-        | short\_available\_volume | int | 剩余可卖空数量（已废弃）<br>(ℹ️ 请使用 [获取融资融券数据](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html)<br> 接口获取) |
-        | short\_margin\_initial\_ratio | float | 卖空（融券）初始保证金率（已废弃）<br>(ℹ️ 请使用 [获取融资融券数据](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html)<br> 接口获取) |
-        | sec\_status | [SecurityStatus](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9969) | 股票状态 |
+        | long\_margin\_initial\_ratio | float | 融资初始保证金率（已废弃）<br>(ℹ️ 请使用 [获取融资融券数据](./trade_get-margin-ratio.md))<br> 接口获取 |
+        | enable\_short\_sell | bool | 是否可卖空（已废弃）<br>(ℹ️ 请使用 [获取融资融券数据](./trade_get-margin-ratio.md))<br> 接口获取 |
+        | short\_sell\_rate | float | 卖空参考利率（已废弃）<br>(ℹ️ 请使用 [获取融资融券数据](./trade_get-margin-ratio.md))<br> 接口获取 |
+        | short\_available\_volume | int | 剩余可卖空数量（已废弃）<br>(ℹ️ 请使用 [获取融资融券数据](./trade_get-margin-ratio.md))<br> 接口获取 |
+        | short\_margin\_initial\_ratio | float | 卖空（融券）初始保证金率（已废弃）<br>(ℹ️ 请使用 [获取融资融券数据](./trade_get-margin-ratio.md))<br> 接口获取 |
+        | sec\_status | [SecurityStatus](./quote_quote.md#9969) | 股票状态 |
         | amplitude | float | 振幅<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
         | avg\_price | float | 平均价 |
         | bid\_ask\_ratio | float | 委比<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
@@ -3497,7 +3493,7 @@
         | trust\_outstanding\_units | int | 总发行量 |
         | trust\_netAssetValue | float | 单位净值 |
         | trust\_premium | float | 溢价<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
-        | trust\_assetClass | [AssetClass](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4752) | 资产类别 |
+        | trust\_assetClass | [AssetClass](./quote_quote.md#4752) | 资产类别 |
         
 *   **Example**
     
@@ -3558,7 +3554,7 @@
 12  
 13  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-market-snapshot.html#338-2)
+[#](./quote_get-market-snapshot.md#338-2)
  Qot\_GetSecuritySnapshot.proto
 -----------------------------------------------------------------------------------------------------------------
 
@@ -3590,7 +3586,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -3974,9 +3970,9 @@
 187  
 188  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -4015,7 +4011,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -4399,9 +4395,9 @@
 187  
 188  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -4563,7 +4559,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -4947,9 +4943,9 @@
 187  
 188  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -5267,7 +5263,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -5651,9 +5647,9 @@
 187  
 188  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -5992,7 +5988,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -6376,9 +6372,9 @@
 187  
 188  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -6638,5 +6634,7 @@
 *   每 30 秒内最多请求 60 次快照。
 *   每次请求，接口参数 **股票代码列表** 支持传入的标的数量上限是 400 个。
 
-← [实时经纪队列回调](https://openapi.futunn.com/futu-api-doc/quote/update-broker.html) [获取实时报价](https://openapi.futunn.com/futu-api-doc/quote/get-stock-quote.html)
+← [实时经纪队列回调](./quote_update-broker.md) [获取实时报价](./quote_get-stock-quote.md)
  →
+
+[获取快照](./quote_get-market-snapshot.md)

@@ -1,79 +1,8 @@
- [![Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/img/logo.png) Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/)
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/qa/quote.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/qa/quote.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/qa/quote.html)
-    
-
-下载
-
-*   [PDF](https://openapi.futunn.com/pdfs/Futu-API-Doc-zh-Python.pdf)
-    
-*   [Markdown](https://openapi.futunn.com/mds/Futu-API-Doc-zh-Python.md)
-    
-*   [Skills](https://openapi.futunn.com/skills/opend-skills.zip)
-    
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/qa/quote.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/qa/quote.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/qa/quote.html)
-    
-
-*   介绍
-    
-*   快速上手
-    
-*   OpenD
-    
-*   行情接口
-    
-*   交易接口
-    
-*   基础接口
-    
-*   Q&A
-    
-    *   [OpenD 相关](https://openapi.futunn.com/futu-api-doc/qa/opend.html)
-        
-    *   [行情相关](https://openapi.futunn.com/futu-api-doc/qa/quote.html)
-        
-    *   [交易相关](https://openapi.futunn.com/futu-api-doc/qa/trade.html)
-        
-    *   [其他](https://openapi.futunn.com/futu-api-doc/qa/other.html)
-        
-    
-
-[#](https://openapi.futunn.com/futu-api-doc/qa/quote.html#390)
+[#](./qa_quote.md#390)
  行情相关
 ====================================================================
 
-[#](https://openapi.futunn.com/futu-api-doc/qa/quote.html#8880)
+[#](./qa_quote.md#8880)
  Q1：订阅失败
 ------------------------------------------------------------------------
 
@@ -81,7 +10,7 @@ A: 订阅接口返回错误，有以下两类常见情况：
 
 *   订阅额度不足：
     
-    订阅额度规则参见 [订阅额度 & 历史 K 线额度](https://openapi.futunn.com/futu-api-doc/intro/authority.html#1314)
+    订阅额度规则参见 [订阅额度 & 历史 K 线额度](./intro_authority.md#1314)
     
 *   订阅权限不足：
     
@@ -99,19 +28,19 @@ A: 订阅接口返回错误，有以下两类常见情况：
     | 期货  | LV1, LV2 |
     | A 股市场 | 股票  | LV1 |
     
-    获取行情权限的方式参见 [行情权限](https://openapi.futunn.com/futu-api-doc/intro/authority.html#2867)
+    获取行情权限的方式参见 [行情权限](./intro_authority.md#2867)
     
-    注意：若账号拥有上述权限，但仍订阅失败，可能存在被其他终端 [踢掉行情权限](https://openapi.futunn.com/futu-api-doc/qa/opend.html#1228)
+    注意：若账号拥有上述权限，但仍订阅失败，可能存在被其他终端 [踢掉行情权限](./qa_opend.md#1228)
      的情况。
     
 
-[#](https://openapi.futunn.com/futu-api-doc/qa/quote.html#3273)
+[#](./qa_quote.md#3273)
  Q2：反订阅失败
 -------------------------------------------------------------------------
 
 A: 订阅至少一分钟后才能反订阅。
 
-[#](https://openapi.futunn.com/futu-api-doc/qa/quote.html#9683)
+[#](./qa_quote.md#9683)
  Q3：反订阅成功但没释放额度
 -------------------------------------------------------------------------------
 
@@ -119,25 +48,25 @@ A: 所有连接都对该行情反订阅，才会释放额度。
 
 举例：A 连接和 B 连接都在订阅 HK.00700 的摆盘，当 A 连接反订阅后，由于 B 连接仍在调用腾讯的摆盘数据，因此 OpenD 的额度不会释放，直至所有连接都反订阅 HK.00700 的摆盘。
 
-[#](https://openapi.futunn.com/futu-api-doc/qa/quote.html#9319)
+[#](./qa_quote.md#9319)
  Q4：订阅不足一分钟关闭脚本连接，会释放额度吗？
 -----------------------------------------------------------------------------------------
 
 A: 不会。连接关闭后，订阅时长不足一分钟的标的类型，会在达到一分钟后才自动反订阅，并释放相应的订阅额度。
 
-[#](https://openapi.futunn.com/futu-api-doc/qa/quote.html#3487)
+[#](./qa_quote.md#3487)
  Q5：请求限频的具体限制逻辑是怎样？
 -----------------------------------------------------------------------------------
 
 A: 30 秒内最多 n 次，是指第 1 次和第 n+1 次请求间隔需要大于 30 秒。
 
-[#](https://openapi.futunn.com/futu-api-doc/qa/quote.html#1236)
+[#](./qa_quote.md#1236)
  Q6：自选股添加不上是什么原因？
 ---------------------------------------------------------------------------------
 
 A: 请先检查是否有超出上限，或者删除一部分自选。
 
-[#](https://openapi.futunn.com/futu-api-doc/qa/quote.html#5528)
+[#](./qa_quote.md#5528)
  Q7：为什么 API 端的美股报价和牛牛显示端的全美综合报价有不同？
 ---------------------------------------------------------------------------------------------------
 
@@ -147,7 +76,7 @@ A: 由于美股交易分散在很多家交易所，富途有提供两种美股�
 A: 由于美股交易分散在很多家交易所，富途有提供两种美股基本报价行情，一种是 Nasdaq Basic（Nasdaq 交易所的报价），另一种是全美综合报价（全美13家交易所的报价）。而 Moomoo API 的美股正股行情目前仅支持通过行情卡购买的方式获取 Nasdaq Basic，不支持全美综合报价。因此，如果您同时购买了显示端的全美综合报价行情卡，和仅用于 Moomoo API 的 Nasdaq Basic 行情卡，确实有可能出现牛牛显示端和 Moomoo API 端的报价差异。  
 因此，如果您发现美股当天开盘价与客户端显示不一致，这是因为Moomoo API实时上游行情仅会获取 Nasdaq Basic 数据。
 
-[#](https://openapi.futunn.com/futu-api-doc/qa/quote.html#887)
+[#](./qa_quote.md#887)
  Q8：API 行情卡在哪里购买？
 --------------------------------------------------------------------------------
 
@@ -193,21 +122,21 @@ A:
     *   [期权 OPRA 实时行情](https://qtcard.moomoo.com/buy?market_id=2&qtcard_channel=2&good_type=1024#/)
         
 
-[#](https://openapi.futunn.com/futu-api-doc/qa/quote.html#7600)
+[#](./qa_quote.md#7600)
  Q9：为什么有时候，获取实时数据的 get 接口响应比较慢？
 -----------------------------------------------------------------------------------------------
 
 A: 因为获取实时数据的 get 接口需要先订阅，并依赖后台给 OpenD 的推送。如果用户刚订阅就立刻用 get 接口请求，OpenD 有可能尚未收到后台推送。为了防止这种情况的发生，get 接口内置了等待逻辑，3 秒内收到推送会立刻返回给脚本，超过 3 秒仍未收到后台推送，才会给脚本返回空数据。  
 涉及的 get 接口包括：get\_rt\_ticker、get\_rt\_data、get\_cur\_kline、get\_order\_book、get\_broker\_queue、get\_stock\_quote。因此，当发现获取实时数据的 get 接口响应比较慢时，可以先检查一下是否是无成交数据的原因。
 
-[#](https://openapi.futunn.com/futu-api-doc/qa/quote.html#2962)
+[#](./qa_quote.md#2962)
  Q10：购买 API 美股 Nasdaq Basic 行情卡后，可以获取哪些数据？
 ----------------------------------------------------------------------------------------------------------
 
 A: Nasdaq Basic 行情卡购买激活后，可以获取的品类涵盖 Nasdaq、NYSE、NYSE MKT 交易所上市证券（包括美股正股和 ETF，不包括美股期货和美股期权）。  
 支持的数据接口包括：快照，历史 K 线，实时逐笔订阅，实时一档摆盘订阅，实时 K 线订阅，实时报价订阅，实时分时订阅，到价提醒。
 
-[#](https://openapi.futunn.com/futu-api-doc/qa/quote.html#5336)
+[#](./qa_quote.md#5336)
  Q11：各个行情品类的摆盘支持多少档？
 ------------------------------------------------------------------------------------
 
@@ -222,37 +151,37 @@ A:
 | 美股期货 | /   | 40档 | /   |
 | A 股 | 5   | /   | /   |
 
-[#](https://openapi.futunn.com/futu-api-doc/qa/quote.html#311)
+[#](./qa_quote.md#311)
  Q12：为什么我购买激活了行情卡之后，OpenD 仍然没有行情权限？
 --------------------------------------------------------------------------------------------------
 
 A:
 
 1.  由于 Futu API 的行情权限跟 APP 的行情权限不完全一样，部分行情卡仅适用于 APP 端（例如：Futu API美股行情卡需单独购买）。请先确认您所购买的行情卡是否是 OpenD 适用的。  
-    我们已将 Futu API 适用的 **所有** 行情卡列在《权限与限制》一节，请点击 [这里](https://openapi.futunn.com/futu-api-doc/intro/authority.html#2867)
+    我们已将 Futu API 适用的 **所有** 行情卡列在《权限与限制》一节，请点击 [这里](./intro_authority.md#2867)
      查看。
 2.  行情卡购买激活成功后，是立即生效的。请 **重新启动 OpenD** 后，再次查看权限状态。
 
 A:
 
 1.  由于 Moomoo API 的行情权限跟 APP 的行情权限不完全一样，部分行情卡仅适用于 APP 端（例如：Moomoo API美股行情卡需单独购买）。请先确认您所购买的行情卡是否是 OpenD 适用的。  
-    我们已将 Moomoo API 适用的 **所有** 行情卡列在《权限与限制》一节，请点击 [这里](https://openapi.futunn.com/futu-api-doc/intro/authority.html#2867)
+    我们已将 Moomoo API 适用的 **所有** 行情卡列在《权限与限制》一节，请点击 [这里](./intro_authority.md#2867)
      查看。
 2.  行情卡购买激活成功后，是立即生效的。请 **重新启动 OpenD** 后，再次查看权限状态。
 
-[#](https://openapi.futunn.com/futu-api-doc/qa/quote.html#2692)
+[#](./qa_quote.md#2692)
  Q13：如何通过订阅接口获取实时行情？
 ------------------------------------------------------------------------------------
 
 **第一步：订阅**
 
-将标的的代码和数据类型传入 [订阅接口](https://openapi.futunn.com/futu-api-doc/quote/sub.html)
+将标的的代码和数据类型传入 [订阅接口](./quote_sub.md)
 ，完成订阅。
 
 订阅接口支持了实时报价、实时摆盘、实时逐笔、实时分时、实时 K 线、实时经纪队列数据的获取。订阅成功后，OpenD 会持续收到富途服务器的实时数据推送。
 
-注意：订阅额度会根据您的总资产、交易笔数和交易量，来进行分配，具体规则参见 [订阅额度 & 历史 K 线额度](https://openapi.futunn.com/futu-api-doc/intro/authority.html#1314)
-。所以，如果您的订阅额度不足，可以先检查一下是否有无用的订阅在占用额度，及时 [反订阅](https://openapi.futunn.com/futu-api-doc/quote/sub.html)
+注意：订阅额度会根据您的总资产、交易笔数和交易量，来进行分配，具体规则参见 [订阅额度 & 历史 K 线额度](./intro_authority.md#1314)
+。所以，如果您的订阅额度不足，可以先检查一下是否有无用的订阅在占用额度，及时 [反订阅](./quote_sub.md)
  即可释放已占用的订阅额度。
 
 **第二步：取数据**
@@ -264,15 +193,15 @@ A:
 
 设置好回调函数后，OpenD 会将收到的实时数据，立即推给脚本的回调函数进行处理。
 
-如果所订阅的标的比较活跃，此时的推送数据可能数据量较大且频率较高。如果您希望适当降低 OpenD 给脚本的推送频率，建议在 [OpenD 启动参数](https://openapi.futunn.com/futu-api-doc/opend/opend-cmd.html#8799)
+如果所订阅的标的比较活跃，此时的推送数据可能数据量较大且频率较高。如果您希望适当降低 OpenD 给脚本的推送频率，建议在 [OpenD 启动参数](./opend_opend-cmd.md#8799)
  中配置 API 推送频率（`qot_push_frequency`）。
 
-方式 1 涉及的接口包括：[实时报价回调](https://openapi.futunn.com/futu-api-doc/quote/update-stock-quote.html)
-、[实时摆盘回调](https://openapi.futunn.com/futu-api-doc/quote/update-order-book.html)
-、[实时 K 线回调](https://openapi.futunn.com/futu-api-doc/quote/update-kl.html)
-、[实时分时回调](https://openapi.futunn.com/futu-api-doc/quote/update-rt.html)
-、[实时逐笔回调](https://openapi.futunn.com/futu-api-doc/quote/update-ticker.html)
-、[实时经纪队列回调](https://openapi.futunn.com/futu-api-doc/quote/update-broker.html)
+方式 1 涉及的接口包括：[实时报价回调](./quote_update-stock-quote.md)
+、[实时摆盘回调](./quote_update-order-book.md)
+、[实时 K 线回调](./quote_update-kl.md)
+、[实时分时回调](./quote_update-rt.md)
+、[实时逐笔回调](./quote_update-ticker.md)
+、[实时经纪队列回调](./quote_update-broker.md)
 。
 
 **方式 2：获取实时数据**  
@@ -280,15 +209,15 @@ A:
 
 由于是从 OpenD 接收的推送数据中取，所以这类接口没有频率限制。
 
-方式 2 涉及的接口包括：[获取实时报价](https://openapi.futunn.com/futu-api-doc/quote/get-stock-quote.html)
-、[获取实时摆盘](https://openapi.futunn.com/futu-api-doc/quote/get-order-book.html)
-、[获取实时 K 线](https://openapi.futunn.com/futu-api-doc/quote/get-kl.html)
-、[获取实时分时](https://openapi.futunn.com/futu-api-doc/quote/get-rt.html)
-、[获取实时逐笔](https://openapi.futunn.com/futu-api-doc/quote/get-ticker.html)
-、[获取实时经纪队列](https://openapi.futunn.com/futu-api-doc/quote/get-broker.html)
+方式 2 涉及的接口包括：[获取实时报价](./quote_get-stock-quote.md)
+、[获取实时摆盘](./quote_get-order-book.md)
+、[获取实时 K 线](./quote_get-kl.md)
+、[获取实时分时](./quote_get-rt.md)
+、[获取实时逐笔](./quote_get-ticker.md)
+、[获取实时经纪队列](./quote_get-broker.md)
 。
 
-[#](https://openapi.futunn.com/futu-api-doc/qa/quote.html#2090)
+[#](./qa_quote.md#2090)
  Q14：各个市场状态对应什么时间段？
 -----------------------------------------------------------------------------------
 
@@ -351,7 +280,7 @@ A:
 
 \* CST, EST, JST 分别表示中国时间，美东时间，日本时间
 
-[#](https://openapi.futunn.com/futu-api-doc/qa/quote.html#6241)
+[#](./qa_quote.md#6241)
  Q15：接口参数股票代码的格式
 --------------------------------------------------------------------------------
 
@@ -364,31 +293,31 @@ A：
         例如：腾讯控股，参数 code 传入'HK.00700'。
         
     *   **非 Python 用户**  
-        股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+        股票结构参见 [Security](./quote_quote.md#1377)
         。  
         例如：腾讯控股，参数 market 传入 QotMarket\_HK\_Security，参数 code 传入'00700'。
         
 *   查询方式：  
     通过 APP 查看代码和行情市场：行情 > 自选 > 全部。  
-    行情市场定义，请参考 [这里](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427)
+    行情市场定义，请参考 [这里](./quote_quote.md#427)
     。  
     ![code](https://openapi.futunn.com/futu-api-doc/assets/img/code.cee27ed6.png)
     
 
-[#](https://openapi.futunn.com/futu-api-doc/qa/quote.html#4226)
+[#](./qa_quote.md#4226)
  Q16：复权因子相关
 ---------------------------------------------------------------------------
 
 A：
 
-### [#](https://openapi.futunn.com/futu-api-doc/qa/quote.html#8831)
+### [#](./qa_quote.md#8831)
  概述
 
-所谓 [复权](https://openapi.futunn.com/futu-api-doc/quote/get-rehab.html#770)
+所谓 [复权](./quote_get-rehab.md#770)
  就是对股价和成交量进行权息修复，按照股票的实际涨跌绘制股价走势图，并把成交量调整为相同的股本口径。  
 公司行动（如：拆股、合股、送股、转增股、配股、增发股、分红）均可能对股价产生影响，而复权计算可对量价进行调整，剔除公司行动的影响，保持股价走势的连续性。
 
-### [#](https://openapi.futunn.com/futu-api-doc/qa/quote.html#6434)
+### [#](./qa_quote.md#6434)
  名词解释
 
 *   公司行动：上市公司进行一些股权、股票等影响公司股价和股东持仓变化的行为。
@@ -397,7 +326,7 @@ A：
 *   复权因子：即权息修复比例，用于计算复权后的价格及持仓数量。
 *   除权除息日：即股权登记日下一个交易日。在股票的除权除息日，证券交易所都要计算出股票的除权除息价，以作为股民在除权除息日开盘的参考。其意义是股票股利分配给股东的日期。
 
-### [#](https://openapi.futunn.com/futu-api-doc/qa/quote.html#6836)
+### [#](./qa_quote.md#6836)
  复权方法
 
 主流的复权计算方法分为两种：事件法和连乘法；而 Futu API 针对不同市场使用不同的计算方法。
@@ -411,10 +340,10 @@ A：
 *   API 对美股前复权使用连乘法，即将 复权因子 B 置为0。
 *   API 对除美股以外的标的（A股、港股、新加坡股票等）及美股后复权使用事件法。
 
-### [#](https://openapi.futunn.com/futu-api-doc/qa/quote.html#4211)
+### [#](./qa_quote.md#4211)
  计算公式
 
-#### [#](https://openapi.futunn.com/futu-api-doc/qa/quote.html#9449)
+#### [#](./qa_quote.md#9449)
  单次复权
 
 *   前复权：  
@@ -422,7 +351,7 @@ A：
 *   后复权：  
     后复权价格 = 不复权价格 × 后复权因子 A + 后复权因子 B
 
-#### [#](https://openapi.futunn.com/futu-api-doc/qa/quote.html#1077)
+#### [#](./qa_quote.md#1077)
  多次复权
 
 *   前复权：按照时间顺序，筛选出大于计算日期的复权因子，优先使用时间较早的复权因子进行复权计算。以两次复权为例：
@@ -434,10 +363,10 @@ A：
     ![code](https://openapi.futunn.com/futu-api-doc/assets/img/backward_fomula.3b5077da.png)
     
 
-### [#](https://openapi.futunn.com/futu-api-doc/qa/quote.html#4239)
+### [#](./qa_quote.md#4239)
  示例
 
-#### [#](https://openapi.futunn.com/futu-api-doc/qa/quote.html#4652)
+#### [#](./qa_quote.md#4652)
  单次前复权示例
 
 以牧原股份为例：
@@ -468,7 +397,7 @@ A：
     ![code](https://openapi.futunn.com/futu-api-doc/assets/img/forward_example.9bff79f5.png)
     
 
-#### [#](https://openapi.futunn.com/futu-api-doc/qa/quote.html#7881)
+#### [#](./qa_quote.md#7881)
  多次后复权示例
 
 接上一个例子，计算牧原股份在 2021/06/02 的后复权价格：
@@ -503,39 +432,39 @@ A：
     ![code](https://openapi.futunn.com/futu-api-doc/assets/img/backward_example.fc9d3401.jpg)
     
 
-← [OpenD 相关](https://openapi.futunn.com/futu-api-doc/qa/opend.html) [交易相关](https://openapi.futunn.com/futu-api-doc/qa/trade.html)
+← [OpenD 相关](./qa_opend.md) [交易相关](./qa_trade.md)
  →
 
-[行情相关](https://openapi.futunn.com/futu-api-doc/qa/quote.html)
+[行情相关](./qa_quote.md)
 
-*   [Q1：订阅失败](https://openapi.futunn.com/futu-api-doc/qa/quote.html#8880)
+*   [Q1：订阅失败](./qa_quote.md#8880)
     
-*   [Q2：反订阅失败](https://openapi.futunn.com/futu-api-doc/qa/quote.html#3273)
+*   [Q2：反订阅失败](./qa_quote.md#3273)
     
-*   [Q3：反订阅成功但没释放额度](https://openapi.futunn.com/futu-api-doc/qa/quote.html#9683)
+*   [Q3：反订阅成功但没释放额度](./qa_quote.md#9683)
     
-*   [Q4：订阅不足一分钟关闭脚本连接，会释放额度吗？](https://openapi.futunn.com/futu-api-doc/qa/quote.html#9319)
+*   [Q4：订阅不足一分钟关闭脚本连接，会释放额度吗？](./qa_quote.md#9319)
     
-*   [Q5：请求限频的具体限制逻辑是怎样？](https://openapi.futunn.com/futu-api-doc/qa/quote.html#3487)
+*   [Q5：请求限频的具体限制逻辑是怎样？](./qa_quote.md#3487)
     
-*   [Q6：自选股添加不上是什么原因？](https://openapi.futunn.com/futu-api-doc/qa/quote.html#1236)
+*   [Q6：自选股添加不上是什么原因？](./qa_quote.md#1236)
     
-*   [Q7：为什么 API 端的美股报价和牛牛显示端的全美综合报价有不同？](https://openapi.futunn.com/futu-api-doc/qa/quote.html#5528)
+*   [Q7：为什么 API 端的美股报价和牛牛显示端的全美综合报价有不同？](./qa_quote.md#5528)
     
-*   [Q8：API 行情卡在哪里购买？](https://openapi.futunn.com/futu-api-doc/qa/quote.html#887)
+*   [Q8：API 行情卡在哪里购买？](./qa_quote.md#887)
     
-*   [Q9：为什么有时候，获取实时数据的 get 接口响应比较慢？](https://openapi.futunn.com/futu-api-doc/qa/quote.html#7600)
+*   [Q9：为什么有时候，获取实时数据的 get 接口响应比较慢？](./qa_quote.md#7600)
     
-*   [Q10：购买 API 美股 Nasdaq Basic 行情卡后，可以获取哪些数据？](https://openapi.futunn.com/futu-api-doc/qa/quote.html#2962)
+*   [Q10：购买 API 美股 Nasdaq Basic 行情卡后，可以获取哪些数据？](./qa_quote.md#2962)
     
-*   [Q11：各个行情品类的摆盘支持多少档？](https://openapi.futunn.com/futu-api-doc/qa/quote.html#5336)
+*   [Q11：各个行情品类的摆盘支持多少档？](./qa_quote.md#5336)
     
-*   [Q12：为什么我购买激活了行情卡之后，OpenD 仍然没有行情权限？](https://openapi.futunn.com/futu-api-doc/qa/quote.html#311)
+*   [Q12：为什么我购买激活了行情卡之后，OpenD 仍然没有行情权限？](./qa_quote.md#311)
     
-*   [Q13：如何通过订阅接口获取实时行情？](https://openapi.futunn.com/futu-api-doc/qa/quote.html#2692)
+*   [Q13：如何通过订阅接口获取实时行情？](./qa_quote.md#2692)
     
-*   [Q14：各个市场状态对应什么时间段？](https://openapi.futunn.com/futu-api-doc/qa/quote.html#2090)
+*   [Q14：各个市场状态对应什么时间段？](./qa_quote.md#2090)
     
-*   [Q15：接口参数股票代码的格式](https://openapi.futunn.com/futu-api-doc/qa/quote.html#6241)
+*   [Q15：接口参数股票代码的格式](./qa_quote.md#6241)
     
-*   [Q16：复权因子相关](https://openapi.futunn.com/futu-api-doc/qa/quote.html#4226)
+*   [Q16：复权因子相关](./qa_quote.md#4226)

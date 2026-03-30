@@ -1,98 +1,4 @@
- [![Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/img/logo.png) Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/)
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/quote/get-ipo-list.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/quote/get-ipo-list.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/quote/get-ipo-list.html)
-    
-
-下载
-
-*   [PDF](https://openapi.futunn.com/pdfs/Futu-API-Doc-zh-Python.pdf)
-    
-*   [Markdown](https://openapi.futunn.com/mds/Futu-API-Doc-zh-Python.md)
-    
-*   [Skills](https://openapi.futunn.com/skills/opend-skills.zip)
-    
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/quote/get-ipo-list.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/quote/get-ipo-list.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/quote/get-ipo-list.html)
-    
-
-*   介绍
-    
-*   快速上手
-    
-*   OpenD
-    
-*   行情接口
-    
-    *   [行情接口总览](https://openapi.futunn.com/futu-api-doc/quote/overview.html)
-        
-    *   [行情对象](https://openapi.futunn.com/futu-api-doc/quote/base.html)
-        
-    *   实时行情
-        
-    *   基本数据
-        
-    *   相关衍生品
-        
-    *   全市场筛选
-        
-        *   [条件选股](https://openapi.futunn.com/futu-api-doc/quote/get-stock-filter.html)
-            
-        *   [获取板块内股票列表](https://openapi.futunn.com/futu-api-doc/quote/get-plate-stock.html)
-            
-        *   [获取板块列表](https://openapi.futunn.com/futu-api-doc/quote/get-plate-list.html)
-            
-        *   [获取静态数据](https://openapi.futunn.com/futu-api-doc/quote/get-static-info.html)
-            
-        *   [获取 IPO 信息](https://openapi.futunn.com/futu-api-doc/quote/get-ipo-list.html)
-            
-        *   [获取全局市场状态](https://openapi.futunn.com/futu-api-doc/quote/get-global-state.html)
-            
-        *   [获取交易日历](https://openapi.futunn.com/futu-api-doc/quote/request-trading-days.html)
-            
-        
-    *   个性化
-        
-    *   [行情定义](https://openapi.futunn.com/futu-api-doc/quote/quote.html)
-        
-    
-*   交易接口
-    
-*   基础接口
-    
-*   Q&A
-    
-
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-ipo-list.html#7768)
+[#](./quote_get-ipo-list.md#7768)
  获取 IPO 信息
 ====================================================================================
 
@@ -113,14 +19,14 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | market | [Market](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427) | 市场标识<br>(ℹ️ 注意：这里不区分沪和深，输入沪或者深都会返回沪深市场的股票) |
+    | market | [Market](./quote_quote.md#427) | 市场标识<br>(ℹ️ 注意：这里不区分沪和深，输入沪或者深都会返回沪深市场的股票) |
     
 
 *   **返回**
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | pd.DataFrame | 当 ret == RET\_OK，返回 IPO 数据 |
     | str | 当 ret != RET\_OK，返回错误描述 |
     
@@ -138,24 +44,24 @@
         | apply\_upper\_limit | int | 申购上限（A 股适用） |
         | apply\_limit\_market\_value | int | 顶格申购需配市值（A 股适用） |
         | is\_estimate\_ipo\_price | bool | 是否预估发行价（A 股适用） |
-        | ipo\_price | float | 发行价<br>(ℹ️ 预估值会因为募集资金、发行数量、发行费用等数据变动而变动，仅供参考。实际数据公布后会第一时间更新<br><br>（A 股适用）) |
+        | ipo\_price | float | 发行价<br>(ℹ️ 预估值会因为募集资金、发行数量、发行费用等数据变动而变动，仅供参考。实际数据公布后会第一时间更新)<br><br>（A 股适用） |
         | industry\_pe\_rate | float | 行业市盈率（A 股适用） |
         | is\_estimate\_winning\_ratio | bool | 是否预估中签率（A 股适用） |
-        | winning\_ratio | float | 中签率<br>(ℹ️ *   预估值会因为募集资金、发行数量、发行费用等数据变动而变动，仅供参考。实际数据公布后会第一时间更新<br>*   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%<br><br>（A 股适用）) |
+        | winning\_ratio | float | 中签率<br>(ℹ️ *   预估值会因为募集资金、发行数量、发行费用等数据变动而变动，仅供参考。实际数据公布后会第一时间更新)<br>*   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%<br><br>（A 股适用） |
         | issue\_pe\_rate | float | 发行市盈率（A 股适用） |
-        | apply\_time | str | 申购日期字符串<br>(ℹ️ 格式：yyyy-MM-dd<br><br>（A 股适用）) |
+        | apply\_time | str | 申购日期字符串<br>(ℹ️ 格式：yyyy-MM-dd)<br><br>（A 股适用） |
         | apply\_timestamp | float | 申购日期时间戳（A 股适用） |
-        | winning\_time | str | 公布中签日期字符串<br>(ℹ️ 格式：yyyy-MM-dd<br><br>（A 股适用）) |
+        | winning\_time | str | 公布中签日期字符串<br>(ℹ️ 格式：yyyy-MM-dd)<br><br>（A 股适用） |
         | winning\_timestamp | float | 公布中签日期时间戳（A 股适用） |
         | is\_has\_won | bool | 是否已经公布中签号（A 股适用） |
-        | winning\_num\_data | str | 中签号（A 股适用）<br>(ℹ️ 格式类似：  <br>末"五"位数：12345，12346  <br>末"六"位数：123456) |
+        | winning\_num\_data | str | 中签号（A 股适用）<br>(ℹ️ 格式类似：)  <br>末"五"位数：12345，12346  <br>末"六"位数：123456 |
         | ipo\_price\_min | float | 最低发售价（港股适用）；最低发行价（美股适用） |
         | ipo\_price\_max | float | 最高发售价（港股适用）；最高发行价（美股适用） |
         | list\_price | float | 上市价（港股适用） |
         | lot\_size | int | 每手股数 |
         | entrance\_price | float | 入场费（港股适用） |
-        | is\_subscribe\_status | bool | 是否为认购状态<br>(ℹ️ True：认购中  <br>False：待上市) |
-        | apply\_end\_time | str | 截止认购日期字符串<br>(ℹ️ 格式：yyyy-MM-dd<br><br>（港股适用）) |
+        | is\_subscribe\_status | bool | 是否为认购状态<br>(ℹ️ True：认购中)  <br>False：待上市 |
+        | apply\_end\_time | str | 截止认购日期字符串<br>(ℹ️ 格式：yyyy-MM-dd)<br><br>（港股适用） |
         | apply\_end\_timestamp | float | 截止认购日期时间戳 |
         
 *   **Example**
@@ -201,7 +107,7 @@
 4  
 5  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-ipo-list.html#4600)
+[#](./quote_get-ipo-list.md#4600)
  Qot\_GetIpoList.proto
 ------------------------------------------------------------------------------------------------
 
@@ -233,7 +139,7 @@
 8  
 9  
 
-> *   行情市场参见 [QotMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427)
+> *   行情市场参见 [QotMarket](./quote_quote.md#427)
 >     
 
 *   **返回**
@@ -403,9 +309,9 @@
 80  
 81  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -443,7 +349,7 @@
 8  
 9  
 
-> *   行情市场参见 [QotMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427)
+> *   行情市场参见 [QotMarket](./quote_quote.md#427)
 >     
 
 *   **返回**
@@ -613,9 +519,9 @@
 80  
 81  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -768,7 +674,7 @@
 8  
 9  
 
-> *   行情市场参见 [QotMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427)
+> *   行情市场参见 [QotMarket](./quote_quote.md#427)
 >     
 
 *   **返回**
@@ -938,9 +844,9 @@
 80  
 81  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1206,7 +1112,7 @@
 8  
 9  
 
-> *   行情市场参见 [QotMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427)
+> *   行情市场参见 [QotMarket](./quote_quote.md#427)
 >     
 
 *   **返回**
@@ -1376,9 +1282,9 @@
 80  
 81  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1671,7 +1577,7 @@
 8  
 9  
 
-> *   行情市场参见 [QotMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427)
+> *   行情市场参见 [QotMarket](./quote_quote.md#427)
 >     
 
 *   **返回**
@@ -1841,9 +1747,9 @@
 80  
 81  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2077,14 +1983,14 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | market | [Market](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427) | 市场标识<br>(ℹ️ 注意：这里不区分沪和深，输入沪或者深都会返回沪深市场的股票) |
+    | market | [Market](./quote_quote.md#427) | 市场标识<br>(ℹ️ 注意：这里不区分沪和深，输入沪或者深都会返回沪深市场的股票) |
     
 
 *   **返回**
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | pd.DataFrame | 当 ret == RET\_OK，返回 IPO 数据 |
     | str | 当 ret != RET\_OK，返回错误描述 |
     
@@ -2102,24 +2008,24 @@
         | apply\_upper\_limit | int | 申购上限（A 股适用） |
         | apply\_limit\_market\_value | int | 顶格申购需配市值（A 股适用） |
         | is\_estimate\_ipo\_price | bool | 是否预估发行价（A 股适用） |
-        | ipo\_price | float | 发行价<br>(ℹ️ 预估值会因为募集资金、发行数量、发行费用等数据变动而变动，仅供参考。实际数据公布后会第一时间更新<br><br>（A 股适用）) |
+        | ipo\_price | float | 发行价<br>(ℹ️ 预估值会因为募集资金、发行数量、发行费用等数据变动而变动，仅供参考。实际数据公布后会第一时间更新)<br><br>（A 股适用） |
         | industry\_pe\_rate | float | 行业市盈率（A 股适用） |
         | is\_estimate\_winning\_ratio | bool | 是否预估中签率（A 股适用） |
-        | winning\_ratio | float | 中签率<br>(ℹ️ *   预估值会因为募集资金、发行数量、发行费用等数据变动而变动，仅供参考。实际数据公布后会第一时间更新<br>*   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%<br><br>（A 股适用）) |
+        | winning\_ratio | float | 中签率<br>(ℹ️ *   预估值会因为募集资金、发行数量、发行费用等数据变动而变动，仅供参考。实际数据公布后会第一时间更新)<br>*   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%<br><br>（A 股适用） |
         | issue\_pe\_rate | float | 发行市盈率（A 股适用） |
-        | apply\_time | str | 申购日期字符串<br>(ℹ️ 格式：yyyy-MM-dd<br><br>（A 股适用）) |
+        | apply\_time | str | 申购日期字符串<br>(ℹ️ 格式：yyyy-MM-dd)<br><br>（A 股适用） |
         | apply\_timestamp | float | 申购日期时间戳（A 股适用） |
-        | winning\_time | str | 公布中签日期字符串<br>(ℹ️ 格式：yyyy-MM-dd<br><br>（A 股适用）) |
+        | winning\_time | str | 公布中签日期字符串<br>(ℹ️ 格式：yyyy-MM-dd)<br><br>（A 股适用） |
         | winning\_timestamp | float | 公布中签日期时间戳（A 股适用） |
         | is\_has\_won | bool | 是否已经公布中签号（A 股适用） |
-        | winning\_num\_data | str | 中签号（A 股适用）<br>(ℹ️ 格式类似：  <br>末"五"位数：12345，12346  <br>末"六"位数：123456) |
+        | winning\_num\_data | str | 中签号（A 股适用）<br>(ℹ️ 格式类似：)  <br>末"五"位数：12345，12346  <br>末"六"位数：123456 |
         | ipo\_price\_min | float | 最低发售价（港股适用）；最低发行价（美股适用） |
         | ipo\_price\_max | float | 最高发售价（港股适用）；最高发行价（美股适用） |
         | list\_price | float | 上市价（港股适用） |
         | lot\_size | int | 每手股数 |
         | entrance\_price | float | 入场费（港股适用） |
-        | is\_subscribe\_status | bool | 是否为认购状态<br>(ℹ️ True：认购中  <br>False：待上市) |
-        | apply\_end\_time | str | 截止认购日期字符串<br>(ℹ️ 格式：yyyy-MM-dd<br><br>（港股适用）) |
+        | is\_subscribe\_status | bool | 是否为认购状态<br>(ℹ️ True：认购中)  <br>False：待上市 |
+        | apply\_end\_time | str | 截止认购日期字符串<br>(ℹ️ 格式：yyyy-MM-dd)<br><br>（港股适用） |
         | apply\_end\_timestamp | float | 截止认购日期时间戳 |
         
 *   **Example**
@@ -2165,7 +2071,7 @@
 4  
 5  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-ipo-list.html#4600-2)
+[#](./quote_get-ipo-list.md#4600-2)
  Qot\_GetIpoList.proto
 --------------------------------------------------------------------------------------------------
 
@@ -2197,7 +2103,7 @@
 8  
 9  
 
-> *   行情市场参见 [QotMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427)
+> *   行情市场参见 [QotMarket](./quote_quote.md#427)
 >     
 
 *   **返回**
@@ -2367,9 +2273,9 @@
 80  
 81  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -2407,7 +2313,7 @@
 8  
 9  
 
-> *   行情市场参见 [QotMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427)
+> *   行情市场参见 [QotMarket](./quote_quote.md#427)
 >     
 
 *   **返回**
@@ -2577,9 +2483,9 @@
 80  
 81  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2732,7 +2638,7 @@
 8  
 9  
 
-> *   行情市场参见 [QotMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427)
+> *   行情市场参见 [QotMarket](./quote_quote.md#427)
 >     
 
 *   **返回**
@@ -2902,9 +2808,9 @@
 80  
 81  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -3170,7 +3076,7 @@
 8  
 9  
 
-> *   行情市场参见 [QotMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427)
+> *   行情市场参见 [QotMarket](./quote_quote.md#427)
 >     
 
 *   **返回**
@@ -3340,9 +3246,9 @@
 80  
 81  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -3635,7 +3541,7 @@
 8  
 9  
 
-> *   行情市场参见 [QotMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427)
+> *   行情市场参见 [QotMarket](./quote_quote.md#427)
 >     
 
 *   **返回**
@@ -3805,9 +3711,9 @@
 80  
 81  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -4024,7 +3930,7 @@
 
 *   每 30 秒内最多请求 10 次获取 IPO 信息接口
 
-← [获取静态数据](https://openapi.futunn.com/futu-api-doc/quote/get-static-info.html) [获取全局市场状态](https://openapi.futunn.com/futu-api-doc/quote/get-global-state.html)
+← [获取静态数据](./quote_get-static-info.md) [获取全局市场状态](./quote_get-global-state.md)
  →
 
-[获取 IPO 信息](https://openapi.futunn.com/futu-api-doc/quote/get-ipo-list.html)
+[获取 IPO 信息](./quote_get-ipo-list.md)

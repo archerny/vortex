@@ -1,79 +1,8 @@
- [![Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/img/logo.png) Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/)
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/qa/other.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/qa/other.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/qa/other.html)
-    
-
-下载
-
-*   [PDF](https://openapi.futunn.com/pdfs/Futu-API-Doc-zh-Python.pdf)
-    
-*   [Markdown](https://openapi.futunn.com/mds/Futu-API-Doc-zh-Python.md)
-    
-*   [Skills](https://openapi.futunn.com/skills/opend-skills.zip)
-    
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/qa/other.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/qa/other.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/qa/other.html)
-    
-
-*   介绍
-    
-*   快速上手
-    
-*   OpenD
-    
-*   行情接口
-    
-*   交易接口
-    
-*   基础接口
-    
-*   Q&A
-    
-    *   [OpenD 相关](https://openapi.futunn.com/futu-api-doc/qa/opend.html)
-        
-    *   [行情相关](https://openapi.futunn.com/futu-api-doc/qa/quote.html)
-        
-    *   [交易相关](https://openapi.futunn.com/futu-api-doc/qa/trade.html)
-        
-    *   [其他](https://openapi.futunn.com/futu-api-doc/qa/other.html)
-        
-    
-
-[#](https://openapi.futunn.com/futu-api-doc/qa/other.html#8691)
+[#](./qa_other.md#8691)
  其他
 ===================================================================
 
-[#](https://openapi.futunn.com/futu-api-doc/qa/other.html#4792)
+[#](./qa_other.md#4792)
  Q1：如何编译C++ API？
 --------------------------------------------------------------------------------
 
@@ -105,14 +34,14 @@ A: futu api c++ SDK支持Windows/MacOS/Linux，每个系统提供了以下编译
 6  
 7  
 
-#### [#](https://openapi.futunn.com/futu-api-doc/qa/other.html#9437)
+#### [#](./qa_other.md#9437)
  编译步骤：
 
 1.  重新编译protobuf：生成libprotobuf静态库
 2.  从协议proto文件中生成C++文件
 3.  重新编译FTAPI: 源码在Src/FTAPI，生成libFTAPI静态库
 
-#### [#](https://openapi.futunn.com/futu-api-doc/qa/other.html#6632)
+#### [#](./qa_other.md#6632)
  步骤1： 重新编译protobuf：
 
 *   Windows：
@@ -129,14 +58,14 @@ A: futu api c++ SDK支持Windows/MacOS/Linux，每个系统提供了以下编译
     *   使用brew安装这些依赖库：autoconf automake libtool
     *   执行./configure CC=clang CXX="clang++ -std=gnu++11 -stdlib=libc++" --disable-shared
 
-#### [#](https://openapi.futunn.com/futu-api-doc/qa/other.html#2227)
+#### [#](./qa_other.md#2227)
  步骤2: 重新生成proto代码
 
 *   上面编译Protobuf后会同时生成可执行文件protoc。用protoc将Include/Proto下面的.proto文件生成对应的.h和.cc文件。例如命令以下命令会从Common.proto生成对应的Common.pb.h和Common.pb.cc
     *   protoc -I="FTAPI路径/Include/Proto" --cpp\_out="." FTAPI路径/Include/Proto/Common.proto
 *   将生成的.h和.cc文件放到Include/Proto下面
 
-#### [#](https://openapi.futunn.com/futu-api-doc/qa/other.html#4984)
+#### [#](./qa_other.md#4984)
  步骤3: 重新编译FTAPI
 
 *   Windows：新建Visual Studio C++静态库工程，将Src/FTAPI和Include下的源码加入工程中，平台工具集设置为v120\_xp，然后编译
@@ -172,14 +101,14 @@ A: moomoo api c++ SDK支持Windows/MacOS/Linux，每个系统提供了以下编�
 6  
 7  
 
-#### [#](https://openapi.futunn.com/futu-api-doc/qa/other.html#9437-2)
+#### [#](./qa_other.md#9437-2)
  编译步骤：
 
 1.  重新编译protobuf：生成libprotobuf静态库
 2.  从协议proto文件中生成C++文件
 3.  重新编译MMAPI: 源码在Src/MMAPI，生成libMMAPI静态库
 
-#### [#](https://openapi.futunn.com/futu-api-doc/qa/other.html#6632-2)
+#### [#](./qa_other.md#6632-2)
  步骤1： 重新编译protobuf：
 
 *   Windows：
@@ -196,14 +125,14 @@ A: moomoo api c++ SDK支持Windows/MacOS/Linux，每个系统提供了以下编�
     *   使用brew安装这些依赖库：autoconf automake libtool
     *   执行./configure CC=clang CXX="clang++ -std=gnu++11 -stdlib=libc++" --disable-shared
 
-#### [#](https://openapi.futunn.com/futu-api-doc/qa/other.html#2227-2)
+#### [#](./qa_other.md#2227-2)
  步骤2: 重新生成proto代码
 
 *   上面编译Protobuf后会同时生成可执行文件protoc。用protoc将Include/Proto下面的.proto文件生成对应的.h和.cc文件。例如命令以下命令会从Common.proto生成对应的Common.pb.h和Common.pb.cc
     *   protoc -I="MMAPI路径/Include/Proto" --cpp\_out="." MMAPI路径/Include/Proto/Common.proto
 *   将生成的.h和.cc文件放到Include/Proto下面
 
-#### [#](https://openapi.futunn.com/futu-api-doc/qa/other.html#1970)
+#### [#](./qa_other.md#1970)
  步骤3: 重新编译MMAPI
 
 *   Windows：新建Visual Studio C++静态库工程，将Src/MMAPI和Include下的源码加入工程中，平台工具集设置为v120\_xp，然后编译
@@ -211,7 +140,7 @@ A: moomoo api c++ SDK支持Windows/MacOS/Linux，每个系统提供了以下编�
 *   Linux：使用CMake编译MMAPI静态库，在MMAPI路径/Src目录下执行：
     *   cmake -DTARGET\_OS=Linux
 
-[#](https://openapi.futunn.com/futu-api-doc/qa/other.html#1578)
+[#](./qa_other.md#1578)
  Q2：有没有更完整的策略样例可以参考？
 ------------------------------------------------------------------------------------
 
@@ -247,7 +176,7 @@ A:
 *   C++ 策略样例在 /MMAPI4CPP/Sample/ 文件夹下
 *   JavaScript 策略样例在 /MMAPI4JS/sample/ 文件夹下
 
-[#](https://openapi.futunn.com/futu-api-doc/qa/other.html#4857)
+[#](./qa_other.md#4857)
  Q3：使用 python API 导入异常
 --------------------------------------------------------------------------------------
 
@@ -287,7 +216,7 @@ A：
 
 2.  在命令行中，执行 `$ D:\software\anaconda3\python.exe -m pip install moomoo-api`（其中前半部分的文件路径来自第 1 步打印的路径）。 这样就可以在当前的 interpreter 中也安装一份 moomoo 模块。
 
-[#](https://openapi.futunn.com/futu-api-doc/qa/other.html#100)
+[#](./qa_other.md#100)
  Q4： import 成功了，仍然调用不了相关接口？
 ------------------------------------------------------------------------------------------
 
@@ -305,7 +234,7 @@ A：通常遇到这种情况，需要确认一下：成功导入的 futu，是�
 
 Futu API 的正确名称为`futu-api`，而非“futu”。
 
-如果您安装过名为“futu”的第三方库，请将其卸载，并 [下载 futu-api](https://openapi.futunn.com/futu-api-doc/quick/demo.html#4688)
+如果您安装过名为“futu”的第三方库，请将其卸载，并 [下载 futu-api](./quick_demo.md#4688)
 。
 
 以 PyCharm 为例：查看第三方库的安装情况。
@@ -327,7 +256,7 @@ A：通常遇到这种情况，需要确认一下：成功导入的 moomoo，是
 
 moomoo API 的正确名称为`moomoo-api`，而非“moomoo”。
 
-如果您安装过名为“moomoo”的第三方库，请将其卸载，并 [下载 moomoo-api](https://openapi.futunn.com/futu-api-doc/quick/demo.html#4688)
+如果您安装过名为“moomoo”的第三方库，请将其卸载，并 [下载 moomoo-api](./quick_demo.md#4688)
 。
 
 以 PyCharm 为例：查看第三方库的安装情况。
@@ -335,19 +264,19 @@ moomoo API 的正确名称为`moomoo-api`，而非“moomoo”。
 ![settings](https://openapi.futunn.com/futu-api-doc/assets/img/settings.a4197355.png)  
 ![moomooku](https://openapi.futunn.com/futu-api-doc/assets/img/mmku.b7d92af2.png)
 
-[#](https://openapi.futunn.com/futu-api-doc/qa/other.html#4601)
+[#](./qa_other.md#4601)
  Q5：协议加密相关
 --------------------------------------------------------------------------
 
 A：
 
-### [#](https://openapi.futunn.com/futu-api-doc/qa/other.html#8831)
+### [#](./qa_other.md#8831)
  概述
 
 您可以使用非对称加密算法 RSA，对策略程序（Futu API）与 OpenD 之间的请求和返回内容进行加密，以保证通信安全。  
 如果您的策略程序（Futu API）与 FutuOpenD 在同一台电脑上，则通常无需加密。
 
-### [#](https://openapi.futunn.com/futu-api-doc/qa/other.html#7493)
+### [#](./qa_other.md#7493)
  协议加密流程
 
 您可以尝试通过以下步骤解决此问题：
@@ -360,21 +289,21 @@ A：
     
 3.  在 OpenD 所在的电脑中，指定 **RSA 加密私钥** 的路径。
     
-    *   方式一：在 [可视化 OpenD](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#4147)
+    *   方式一：在 [可视化 OpenD](./quick_opend-base.md#4147)
          启动界面右侧的“加密私钥”一栏，指定上一步骤中放置 **RSA 加密私钥** 的路径。如下图所示：  
         ![ui-config](https://openapi.futunn.com/futu-api-doc/assets/img/nnrsa_ui-config.fbe741a1.png)
-    *   方式二：在 [命令行 OpenD](https://openapi.futunn.com/futu-api-doc/opend/opend-cmd.html#8799)
+    *   方式二：在 [命令行 OpenD](./opend_opend-cmd.md#8799)
          启动文件 OpenD.xml 中，找到参数`rsa_private_key`，将其配置为第 2 步中 **RSA 加密私钥** 的路径。如下图所示：  
         ![ui-config](https://openapi.futunn.com/futu-api-doc/assets/img/nnrsa_xml.6ed36914.png)
-4.  将第 2 步中 txt 文件另存至策略程序（Futu API）所在电脑的指定路径， 并在策略程序中将此路径 [设置为私钥路径](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#5641)
+4.  将第 2 步中 txt 文件另存至策略程序（Futu API）所在电脑的指定路径， 并在策略程序中将此路径 [设置为私钥路径](./ftapi_init.md#5641)
     。
     
 5.  在策略程序（Futu API）中启用协议加密。 启用协议加密的方式有两种，其中方式二的优先级更高。
     
-    *   方式一：对单条的连接加密（通用）。在对 [行情对象](https://openapi.futunn.com/futu-api-doc/quote/base.html#7902)
-         或 [交易对象](https://openapi.futunn.com/futu-api-doc/trade/base.html#7902)
+    *   方式一：对单条的连接加密（通用）。在对 [行情对象](./quote_base.md#7902)
+         或 [交易对象](./trade_base.md#7902)
          创建连接时，通过 **是否启用加密** 参数设置加密。
-    *   方式二：对所有的连接加密（仅 Python）。通过`enable_proto_encrypt`接口设置加密，详见 [这里](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#319)
+    *   方式二：对所有的连接加密（仅 Python）。通过`enable_proto_encrypt`接口设置加密，详见 [这里](./ftapi_init.md#319)
         。
 
 提示
@@ -384,13 +313,13 @@ A：
 
 A:
 
-### [#](https://openapi.futunn.com/futu-api-doc/qa/other.html#8831-2)
+### [#](./qa_other.md#8831-2)
  概述
 
 您可以使用非对称加密算法 RSA，对策略程序（moomoo API）与 OpenD 之间的请求和返回内容进行加密，以保证通信安全。  
 如果您的策略程序（moomoo API）与 OpenD 在同一台电脑上，则通常无需加密。
 
-### [#](https://openapi.futunn.com/futu-api-doc/qa/other.html#7493-2)
+### [#](./qa_other.md#7493-2)
  协议加密流程
 
 您可以尝试通过以下步骤解决此问题：
@@ -403,21 +332,21 @@ A:
     
 3.  在 OpenD 所在的电脑中，指定 **RSA 加密私钥** 的路径。
     
-    *   方式一：在 [可视化 OpenD](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#4147)
+    *   方式一：在 [可视化 OpenD](./quick_opend-base.md#4147)
          启动界面右侧的“加密私钥”一栏，指定上一步骤中放置 **RSA 加密私钥** 的路径。如下图所示：  
         ![ui-config](https://openapi.futunn.com/futu-api-doc/assets/img/mmrsa_ui-config.4cb56b13.png)
-    *   方式二：在 [命令行 OpenD](https://openapi.futunn.com/futu-api-doc/opend/opend-cmd.html#8799)
+    *   方式二：在 [命令行 OpenD](./opend_opend-cmd.md#8799)
          启动文件 OpenD.xml 中，找到参数`rsa_private_key`，将其配置为第 2 步中 **RSA 加密私钥** 的路径。如下图所示：  
         ![ui-config](https://openapi.futunn.com/futu-api-doc/assets/img/mmrsa_xml.5faae8a3.png)
-4.  将第 2 步中 txt 文件另存至策略程序（moomoo API）所在电脑的指定路径， 并在策略程序中将此路径 [设置为私钥路径](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#5641)
+4.  将第 2 步中 txt 文件另存至策略程序（moomoo API）所在电脑的指定路径， 并在策略程序中将此路径 [设置为私钥路径](./ftapi_init.md#5641)
     。
     
 5.  在策略程序（moomoo API）中启用协议加密。 启用协议加密的方式有两种，其中方式二的优先级更高。
     
-    *   方式一：对单条的连接加密（通用）。在对 [行情对象](https://openapi.futunn.com/futu-api-doc/quote/base.html#7902)
-         或 [交易对象](https://openapi.futunn.com/futu-api-doc/trade/base.html#7902)
+    *   方式一：对单条的连接加密（通用）。在对 [行情对象](./quote_base.md#7902)
+         或 [交易对象](./trade_base.md#7902)
          创建连接时，通过 **是否启用加密** 参数设置加密。
-    *   方式二：对所有的连接加密（仅 Python）。通过`enable_proto_encrypt`接口设置加密，详见 [这里](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#319)
+    *   方式二：对所有的连接加密（仅 Python）。通过`enable_proto_encrypt`接口设置加密，详见 [这里](./ftapi_init.md#319)
         。
 
 提示
@@ -425,7 +354,7 @@ A:
 *   在 OpenD 或策略程序（moomoo API）中指定 **RSA 加密私钥** 路径时，需指定至 txt 文件本身。
 *   RSA 加密公钥无需保存，可通过私钥计算得到。
 
-[#](https://openapi.futunn.com/futu-api-doc/qa/other.html#6418)
+[#](./qa_other.md#6418)
  Q6：为什么我获取的 DataFrame 数据，只能展示一部分 ？
 --------------------------------------------------------------------------------------------------
 
@@ -443,7 +372,7 @@ A：打印 pandas.DataFrame 数据的时候，如果行列数过多，pandas 默
 3  
 4  
 
-[#](https://openapi.futunn.com/futu-api-doc/qa/other.html#3535)
+[#](./qa_other.md#3535)
  Q7：Mac 机器使用 C++ 语言的 API，遇到 “无法打开 libFTAPIChannel.dylib” 的问题
 ----------------------------------------------------------------------------------------------------------------------------
 
@@ -451,7 +380,7 @@ A：在对应库目录中执行以下命令即可解决:`$ xattr -r -d com.apple
 
 A：在对应库目录中执行以下命令即可解决:`$ xattr -r -d com.apple.quarantine libAPIChannel.dylib`。
 
-[#](https://openapi.futunn.com/futu-api-doc/qa/other.html#4750)
+[#](./qa_other.md#4750)
  Q8：Python 用户，为什么在 OpenD 配置文件中设置了日志级别为 no 后，log 文件夹下仍然持续产生超大容量的日志文件？
 ------------------------------------------------------------------------------------------------------------------------------------
 
@@ -464,7 +393,7 @@ A：OpenD 配置文件中的日志级别参数，只用来控制 OpenD 产生的
 1  
 2  
 
-[#](https://openapi.futunn.com/futu-api-doc/qa/other.html#5759)
+[#](./qa_other.md#5759)
  Q9：对于 5.4 及以上的版本，Java API 的库名和配置方式的变更
 ------------------------------------------------------------------------------------------------------
 
@@ -474,7 +403,7 @@ A: \* 如果您是 Java API 5.3 及以下版本的用户，在更新版本时，
 
 1.  通过 [富途牛牛官网](https://www.futunn.com/download/OpenAPI)
      下载 Futu API。
-2.  解压下载好的 FTAPI 文件，`/FTAPI4J` 是 Java API 的目录，将目录结构中的 `/lib/futu-api-.x.y.z.jar` 添加到您的工程设置中。创建 futu-api 工程请参考 [这里](https://openapi.futunn.com/futu-api-doc/quick/demo.html#2927)
+2.  解压下载好的 FTAPI 文件，`/FTAPI4J` 是 Java API 的目录，将目录结构中的 `/lib/futu-api-.x.y.z.jar` 添加到您的工程设置中。创建 futu-api 工程请参考 [这里](./quick_demo.md#2927)
     。
 
 **目录结构的变更**：
@@ -494,7 +423,7 @@ A: \* 如果您是 Java API 5.3 及以下版本的用户，在更新版本时，
     ```
     
 
-*   如果您第一次接触 Futu API，我们提供了更便捷的通过 maven 仓库配置 Java API 的方式。配置流程请参考 [这里](https://openapi.futunn.com/futu-api-doc/quick/demo.html#5757)
+*   如果您第一次接触 Futu API，我们提供了更便捷的通过 maven 仓库配置 Java API 的方式。配置流程请参考 [这里](./quick_demo.md#5757)
     。
 
 A: \* 如果您是 Java API 5.3 及以下版本的用户，在更新版本时，请注意以下变更：
@@ -503,7 +432,7 @@ A: \* 如果您是 Java API 5.3 及以下版本的用户，在更新版本时，
 
 1.  通过 [moomoo 官网](https://www.moomoo.com/download/)
      下载 moomoo API。
-2.  解压下载好的 mmAPI 文件，`/MMAPI4J` 是 Java API 的目录，将目录结构中的 `/lib/moomoo-api-.x.y.z.jar` 添加到您的工程设置中。创建 moomoo-api 工程请参考 [这里](https://openapi.futunn.com/futu-api-doc/quick/demo.html#2927)
+2.  解压下载好的 mmAPI 文件，`/MMAPI4J` 是 Java API 的目录，将目录结构中的 `/lib/moomoo-api-.x.y.z.jar` 添加到您的工程设置中。创建 moomoo-api 工程请参考 [这里](./quick_demo.md#2927)
     。
 
 **目录结构的变更**：
@@ -523,10 +452,10 @@ A: \* 如果您是 Java API 5.3 及以下版本的用户，在更新版本时，
     ```
     
 
-*   如果您第一次接触 moomoo API，我们提供了更便捷的通过 maven 仓库配置 Java API 的方式。配置流程请参考 [这里](https://openapi.futunn.com/futu-api-doc/quick/demo.html#5757)
+*   如果您第一次接触 moomoo API，我们提供了更便捷的通过 maven 仓库配置 Java API 的方式。配置流程请参考 [这里](./quick_demo.md#5757)
     。
 
-[#](https://openapi.futunn.com/futu-api-doc/qa/other.html#5449)
+[#](./qa_other.md#5449)
  Q10：Python 用户，使用 pyinstaller 打包脚本时报错：找不到 Common\_pb2 模块
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -604,7 +533,7 @@ A：你可以尝试通过以下步骤解决此问题：
 5.  再次尝试运行 main.exe
     
 
-[#](https://openapi.futunn.com/futu-api-doc/qa/other.html#7695)
+[#](./qa_other.md#7695)
  Q11：接口调用结果正常，但其返回表现不符合预期？
 ------------------------------------------------------------------------------------------
 
@@ -612,10 +541,10 @@ A:
 
 *   接口调用结果正常，表示富途已经成功收到并响应了您的请求，但接口返回表现可能与您的预期不符。
     
-    例如：若您在非交易时段调用 [订阅](https://openapi.futunn.com/futu-api-doc/quote/sub.html)
+    例如：若您在非交易时段调用 [订阅](./quote_sub.md)
      接口，虽然您的请求可以被成功响应，并且接口调用结果正常，但在非交易时段下，交易所无行情数据变动，所以您将暂时无法收到行情数据推送，直至市场重新回到交易时段。
     
-*   接口调用结果可以通过返回字段（定义参见：[接口调用结果](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+*   接口调用结果可以通过返回字段（定义参见：[接口调用结果](./ftapi_common.md#7467)
     ）查看，返回字段为 0 代表接口调用正常，非 0 代表接口调用失败。
     
     对于 Python 用户，下面两种写法等价：
@@ -631,13 +560,13 @@ A:
     1  
     
 
-[#](https://openapi.futunn.com/futu-api-doc/qa/other.html#6319)
+[#](./qa_other.md#6319)
  Q12：WebSocket相关
 --------------------------------------------------------------------------------
 
 A：
 
-### [#](https://openapi.futunn.com/futu-api-doc/qa/other.html#8831-3)
+### [#](./qa_other.md#8831-3)
  概述
 
 Futu API 中，WebSocket 主要用于以下两方面：
@@ -650,7 +579,7 @@ Futu API 中，WebSocket 主要用于以下两方面：
 *   当 WebSocket 启动时，命令行 OpenD 会与 **FTWebSocket 中转服务** 建立 Socket 连接（TCP），这一连接会用到默认的 **监听地址** 和 **API 协议监听端口**。
 *   同时，JavaScript API 会与 **FTWebSocket 中转服务** 建立 WebSocket 连接（HTTP），这一连接会用到 **WebSocket 监听地址** 和 **WebSocket 端口**。
 
-### [#](https://openapi.futunn.com/futu-api-doc/qa/other.html#2830)
+### [#](./qa_other.md#2830)
  使用
 
 为保证账户安全，当 WebSocket 监听来自非本地请求时，我们强烈建议您启用 SSL 并配置 **WebSocket 鉴权密钥**。
@@ -664,7 +593,7 @@ SSL 通过在配置 **WebSocket 证书** 以及 **WebSocket 私钥** 来启用�
 
 如果证书是自签的，则需要在调用 JavaScript 接口所在机器上安装该证书，或者设置不验证证书。
 
-#### [#](https://openapi.futunn.com/futu-api-doc/qa/other.html#2347)
+#### [#](./qa_other.md#2347)
  生成自签证书
 
 自签证书生成详细资料不便在此文档展开，请自行查阅。  
@@ -702,7 +631,7 @@ Moomoo API 中，WebSocket 主要用于以下两方面：
 *   当 WebSocket 启动时，命令行 OpenD 会与 **MMWebSocket 中转服务** 建立 Socket 连接（TCP），这一连接会用到默认的 **监听地址** 和 **API 协议监听端口**。
 *   同时，JavaScript API 会与 **MMWebSocket 中转服务** 建立 WebSocket 连接（HTTP），这一连接会用到 **WebSocket 监听地址** 和 **WebSocket 端口**。
 
-### [#](https://openapi.futunn.com/futu-api-doc/qa/other.html#2830-2)
+### [#](./qa_other.md#2830-2)
  使用
 
 为保证账户安全，当 WebSocket 监听来自非本地请求时，我们强烈建议您启用 SSL 并配置 **WebSocket 鉴权密钥**。
@@ -716,7 +645,7 @@ SSL 通过在配置 **WebSocket 证书** 以及 **WebSocket 私钥** 来启用�
 
 如果证书是自签的，则需要在调用 JavaScript 接口所在机器上安装该证书，或者设置不验证证书。
 
-#### [#](https://openapi.futunn.com/futu-api-doc/qa/other.html#2347-2)
+#### [#](./qa_other.md#2347-2)
  生成自签证书
 
 自签证书生成详细资料不便在此文档展开，请自行查阅。  
@@ -744,7 +673,7 @@ SSL 通过在配置 **WebSocket 证书** 以及 **WebSocket 私钥** 来启用�
 *   [moomoo.key](https://openapi.futunn.com/futu-api-doc/file/key)
     
 
-[#](https://openapi.futunn.com/futu-api-doc/qa/other.html#9759)
+[#](./qa_other.md#9759)
  Q13：API 的行情和交易服务分别部署在哪里？
 -----------------------------------------------------------------------------------------
 
@@ -769,11 +698,11 @@ A：
 | moomoo证券(加拿大) | AWS加拿大 |
 | moomoo证券(日本) | 腾讯云日本 |
 
-[#](https://openapi.futunn.com/futu-api-doc/qa/other.html#7297)
+[#](./qa_other.md#7297)
  Q14：关于综合账户升级的过渡指引
 ----------------------------------------------------------------------------------
 
-### [#](https://openapi.futunn.com/futu-api-doc/qa/other.html#6379)
+### [#](./qa_other.md#6379)
  1. [**综合账户升级**](https://www.futuhk.com/hans/support/topic2_1734)
 
 综合账户支持以多种货币在同一个账户内交易不同市场品类。从单币种账户升级到综合账户，是在您原来的牛牛号下，进行账户迁移。主要包括：
@@ -782,70 +711,70 @@ A：
 *   将您原来单币种业务账户里的资产，转移到综合账户里
 *   关闭原来的单币种账户
 
-### [#](https://openapi.futunn.com/futu-api-doc/qa/other.html#2164)
+### [#](./qa_other.md#2164)
  2. **OpenD版本升级**
 
 我们会在 2024年9月14日、15日 集中为 Futu API 客户的账户做升级，请提前检查 OpenD 和 API 版本号：
 
 *   **7.01 及以下版本**  
-    OpenD 因版本过旧，将于 2024/09/14 停止服务。届时，已登录的账户会被强制退出登录。我们建议您在 9/14 之前升级 [OpenD](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#4147)
-     和 [API](https://openapi.futunn.com/futu-api-doc/quick/demo.html#4688)
+    OpenD 因版本过旧，将于 2024/09/14 停止服务。届时，已登录的账户会被强制退出登录。我们建议您在 9/14 之前升级 [OpenD](./quick_opend-base.md#4147)
+     和 [API](./quick_demo.md#4688)
      至最新版本，且不要在 9/14~9/15 期间跨周末运行策略。
 *   **7.02 ~ 8.2 版本**  
-    OpenD 版本较旧，无法获取综合账户。我们建议您在 9/14 之前升级 [OpenD](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#4147)
-     和 [API](https://openapi.futunn.com/futu-api-doc/quick/demo.html#4688)
+    OpenD 版本较旧，无法获取综合账户。我们建议您在 9/14 之前升级 [OpenD](./quick_opend-base.md#4147)
+     和 [API](./quick_demo.md#4688)
      至最新版本，且不要在 9/14~9/15 期间跨周末运行策略。
 *   **8.3 及以上版本**  
     可以正常使用，我们建议您不要在 9/14~9/15 期间跨周末运行策略。
 
 综合账户升级时，您的资产会转移到新的综合账户，如果策略指定旧的账户，可能会运行异常。同时，在实盘交易之前，建议您进行必要的检查与测试，确保一切设置正常。
 
-### [#](https://openapi.futunn.com/futu-api-doc/qa/other.html#7686)
+### [#](./qa_other.md#7686)
  3. **账户升级后，Futu API有哪些表现？**
 
-*   Python API 将不再支持使用 OpenHKTradeContext, OpenUSTradeContext, OpenHKCCTradeContext, OpenCNTradeContext 创建交易对象，请参考 [创建交易对象连接](https://openapi.futunn.com/futu-api-doc/trade/base.html#7902)
+*   Python API 将不再支持使用 OpenHKTradeContext, OpenUSTradeContext, OpenHKCCTradeContext, OpenCNTradeContext 创建交易对象，请参考 [创建交易对象连接](./trade_base.md#7902)
      改用 OpenSecTradeContext。
 *   非Python API用户，在使用 Trd\_GetAccList 接口时，需要将 needGeneralSecAccount 参数设为 true，才能获取到综合账户的相关信息。
-*   账户新增 [账户状态](https://openapi.futunn.com/futu-api-doc/trade/trade.html#121)
-    : 在使用 [获取交易业务账户列表](https://openapi.futunn.com/futu-api-doc/trade/get-acc-list.html#5754)
+*   账户新增 [账户状态](./trade_trade.md#121)
+    : 在使用 [获取交易业务账户列表](./trade_get-acc-list.md#5754)
      时，返回结果新增了账户状态 。综合账户标记为 `ACTIVE` 生效账户，被停用的单币种账户标记为 `DISABLED` 失效账户。
-*   [下单](https://openapi.futunn.com/futu-api-doc/trade/place-order.html#4080)
-    、[改单撤单](https://openapi.futunn.com/futu-api-doc/trade/modify-order.html#7408)
-    、[查询最大可买可卖](https://openapi.futunn.com/futu-api-doc/trade/get-max-trd-qtys.html#2713)
+*   [下单](./trade_place-order.md#4080)
+    、[改单撤单](./trade_modify-order.md#7408)
+    、[查询最大可买可卖](./trade_get-max-trd-qtys.md#2713)
      等交易接口表现
     *   支持使用 `ACTIVE` 生效账户所对应的 acc\_id或acc\_index 进行购买力查询与交易。
     *   不支持使用 `DISABLED` 失效账户所对应的 acc\_id或acc\_index 进行购买力查询与交易，若使用，将会出现报错信息。
     *   Python API用户：在接口入参中，请指定 acc\_id 为升级后的综合账户。
     *   非Python API用户：在 TrdHeader 中，请指定accID为升级后的综合账户。
 
-← [交易相关](https://openapi.futunn.com/futu-api-doc/qa/trade.html)
+← [交易相关](./qa_trade.md)
 
-[其他](https://openapi.futunn.com/futu-api-doc/qa/other.html)
+[其他](./qa_other.md)
 
-*   [Q1：如何编译C++ API？](https://openapi.futunn.com/futu-api-doc/qa/other.html#4792)
+*   [Q1：如何编译C++ API？](./qa_other.md#4792)
     
-*   [Q2：有没有更完整的策略样例可以参考？](https://openapi.futunn.com/futu-api-doc/qa/other.html#1578)
+*   [Q2：有没有更完整的策略样例可以参考？](./qa_other.md#1578)
     
-*   [Q3：使用 python API 导入异常](https://openapi.futunn.com/futu-api-doc/qa/other.html#4857)
+*   [Q3：使用 python API 导入异常](./qa_other.md#4857)
     
-*   [Q4： import 成功了，仍然调用不了相关接口？](https://openapi.futunn.com/futu-api-doc/qa/other.html#100)
+*   [Q4： import 成功了，仍然调用不了相关接口？](./qa_other.md#100)
     
-*   [Q5：协议加密相关](https://openapi.futunn.com/futu-api-doc/qa/other.html#4601)
+*   [Q5：协议加密相关](./qa_other.md#4601)
     
-*   [Q6：为什么我获取的 DataFrame 数据，只能展示一部分 ？](https://openapi.futunn.com/futu-api-doc/qa/other.html#6418)
+*   [Q6：为什么我获取的 DataFrame 数据，只能展示一部分 ？](./qa_other.md#6418)
     
-*   [Q7：Mac 机器使用 C++ 语言的 API，遇到 “无法打开 libFTAPIChannel.dylib” 的问题](https://openapi.futunn.com/futu-api-doc/qa/other.html#3535)
+*   [Q7：Mac 机器使用 C++ 语言的 API，遇到 “无法打开 libFTAPIChannel.dylib” 的问题](./qa_other.md#3535)
     
-*   [Q8：Python 用户，为什么在 OpenD 配置文件中设置了日志级别为 no 后，log 文件夹下仍然持续产生超大容量的日志文件？](https://openapi.futunn.com/futu-api-doc/qa/other.html#4750)
+*   [Q8：Python 用户，为什么在 OpenD 配置文件中设置了日志级别为 no 后，log 文件夹下仍然持续产生超大容量的日志文件？](./qa_other.md#4750)
     
-*   [Q9：对于 5.4 及以上的版本，Java API 的库名和配置方式的变更](https://openapi.futunn.com/futu-api-doc/qa/other.html#5759)
+*   [Q9：对于 5.4 及以上的版本，Java API 的库名和配置方式的变更](./qa_other.md#5759)
     
-*   [Q10：Python 用户，使用 pyinstaller 打包脚本时报错：找不到 Common\_pb2 模块](https://openapi.futunn.com/futu-api-doc/qa/other.html#5449)
+*   [Q10：Python 用户，使用 pyinstaller 打包脚本时报错：找不到 Common\_pb2 模块](./qa_other.md#5449)
     
-*   [Q11：接口调用结果正常，但其返回表现不符合预期？](https://openapi.futunn.com/futu-api-doc/qa/other.html#7695)
+*   [Q11：接口调用结果正常，但其返回表现不符合预期？](./qa_other.md#7695)
     
-*   [Q12：WebSocket相关](https://openapi.futunn.com/futu-api-doc/qa/other.html#6319)
+*   [Q12：WebSocket相关](./qa_other.md#6319)
     
-*   [Q13：API 的行情和交易服务分别部署在哪里？](https://openapi.futunn.com/futu-api-doc/qa/other.html#9759)
+*   [Q13：API 的行情和交易服务分别部署在哪里？](./qa_other.md#9759)
     
-*   [Q14：关于综合账户升级的过渡指引](https://openapi.futunn.com/futu-api-doc/qa/other.html#7297)
+*   [Q14：关于综合账户升级的过渡指引](./qa_other.md#7297)

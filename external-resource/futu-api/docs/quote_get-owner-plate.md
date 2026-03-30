@@ -1,8 +1,4 @@
-# 获取股票所属板块 | Futu API 文档 v10.2
-
-> 来源: https://openapi.futunn.com/futu-api-doc/quote/get-owner-plate.html
-
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-owner-plate.html#9960)
+[#](./quote_get-owner-plate.md#9960)
  获取股票所属板块
 ======================================================================================
 
@@ -23,14 +19,14 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | code\_list | list | 股票代码列表<br>(ℹ️ 仅支持正股、指数  <br>list 中元素类型是 str) |
+    | code\_list | list | 股票代码列表<br>(ℹ️ 仅支持正股、指数)  <br>list 中元素类型是 str |
     
 
 *   **返回**
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | pd.DataFrame | 当 ret == RET\_OK，返回所属板块数据 |
     | str | 当 ret != RET\_OK，返回错误描述 |
     
@@ -42,7 +38,7 @@
         | name | str | 股票名称 |
         | plate\_code | str | 板块代码 |
         | plate\_name | str | 板块名字 |
-        | plate\_type | [Plate](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1362) | 板块类型<br>(ℹ️ 行业板块或概念板块) |
+        | plate\_type | [Plate](./quote_quote.md#1362) | 板块类型<br>(ℹ️ 行业板块或概念板块) |
         
 *   **Example**
     
@@ -95,7 +91,7 @@
 7  
 8  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-owner-plate.html#1138)
+[#](./quote_get-owner-plate.md#1138)
  Qot\_GetOwnerPlate.proto
 ------------------------------------------------------------------------------------------------------
 
@@ -127,7 +123,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -175,11 +171,11 @@
 19  
 20  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   板块信息结构参见 [PlateInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2571)
+> *   板块信息结构参见 [PlateInfo](./quote_quote.md#2571)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -217,7 +213,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -265,11 +261,11 @@
 19  
 20  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   板块信息结构参见 [PlateInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2571)
+> *   板块信息结构参见 [PlateInfo](./quote_quote.md#2571)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -430,7 +426,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -478,11 +474,11 @@
 19  
 20  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   板块信息结构参见 [PlateInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2571)
+> *   板块信息结构参见 [PlateInfo](./quote_quote.md#2571)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -716,7 +712,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -764,11 +760,11 @@
 19  
 20  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   板块信息结构参见 [PlateInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2571)
+> *   板块信息结构参见 [PlateInfo](./quote_quote.md#2571)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1031,7 +1027,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -1079,11 +1075,11 @@
 19  
 20  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   板块信息结构参见 [PlateInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2571)
+> *   板块信息结构参见 [PlateInfo](./quote_quote.md#2571)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1291,14 +1287,14 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | code\_list | list | 股票代码列表<br>(ℹ️ 仅支持正股、指数  <br>list 中元素类型是 str) |
+    | code\_list | list | 股票代码列表<br>(ℹ️ 仅支持正股、指数)  <br>list 中元素类型是 str |
     
 
 *   **返回**
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | pd.DataFrame | 当 ret == RET\_OK，返回所属板块数据 |
     | str | 当 ret != RET\_OK，返回错误描述 |
     
@@ -1310,7 +1306,7 @@
         | name | str | 股票名称 |
         | plate\_code | str | 板块代码 |
         | plate\_name | str | 板块名字 |
-        | plate\_type | [Plate](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1362) | 板块类型<br>(ℹ️ 行业板块或概念板块) |
+        | plate\_type | [Plate](./quote_quote.md#1362) | 板块类型<br>(ℹ️ 行业板块或概念板块) |
         
 *   **Example**
     
@@ -1363,7 +1359,7 @@
 7  
 8  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-owner-plate.html#1138-2)
+[#](./quote_get-owner-plate.md#1138-2)
  Qot\_GetOwnerPlate.proto
 --------------------------------------------------------------------------------------------------------
 
@@ -1395,7 +1391,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -1443,11 +1439,11 @@
 19  
 20  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   板块信息结构参见 [PlateInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2571)
+> *   板块信息结构参见 [PlateInfo](./quote_quote.md#2571)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -1485,7 +1481,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -1533,11 +1529,11 @@
 19  
 20  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   板块信息结构参见 [PlateInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2571)
+> *   板块信息结构参见 [PlateInfo](./quote_quote.md#2571)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1698,7 +1694,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -1746,11 +1742,11 @@
 19  
 20  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   板块信息结构参见 [PlateInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2571)
+> *   板块信息结构参见 [PlateInfo](./quote_quote.md#2571)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1984,7 +1980,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -2032,11 +2028,11 @@
 19  
 20  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   板块信息结构参见 [PlateInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2571)
+> *   板块信息结构参见 [PlateInfo](./quote_quote.md#2571)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2299,7 +2295,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -2347,11 +2343,11 @@
 19  
 20  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   板块信息结构参见 [PlateInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2571)
+> *   板块信息结构参见 [PlateInfo](./quote_quote.md#2571)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2542,5 +2538,7 @@
 *   每次请求的股票列表中，股票个数上限为 200 个
 *   仅支持正股和指数
 
-← [获取资金分布](https://openapi.futunn.com/futu-api-doc/quote/get-capital-distribution.html) [获取历史 K 线](https://openapi.futunn.com/futu-api-doc/quote/request-history-kline.html)
+← [获取资金分布](./quote_get-capital-distribution.md) [获取历史 K 线](./quote_request-history-kline.md)
  →
+
+[获取股票所属板块](./quote_get-owner-plate.md)

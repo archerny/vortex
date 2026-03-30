@@ -1,8 +1,4 @@
-# 获取实时经纪队列 | Futu API 文档 v10.2
-
-> 来源: https://openapi.futunn.com/futu-api-doc/quote/get-broker.html
-
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-broker.html#9883)
+[#](./quote_get-broker.md#9883)
  获取实时经纪队列
 =================================================================================
 
@@ -30,7 +26,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | bid\_frame\_table | pd.DataFrame | 当 ret == RET\_OK，bid\_frame\_table 返回买盘经纪队列数据 |
     | str | 当 ret != RET\_OK，bid\_frame\_table 返回错误描述 |
     | ask\_frame\_table | pd.DataFrame | 当 ret == RET\_OK，ask\_frame\_table 返回卖盘经纪队列数据 |
@@ -45,7 +41,7 @@
         | bid\_broker\_id | int | 经纪买盘 ID |
         | bid\_broker\_name | str | 经纪买盘名称 |
         | bid\_broker\_pos | int | 经纪档位 |
-        | order\_id | int | 交易所订单 ID<br>(ℹ️ *   不是下单接口返回的订单 ID<br>*   只有港股 SF 行情权限支持返回该字段) |
+        | order\_id | int | 交易所订单 ID<br>(ℹ️ *   不是下单接口返回的订单 ID)<br>*   只有港股 SF 行情权限支持返回该字段 |
         | order\_volume | int | 单笔委托数量<br>(ℹ️ 只有港股 SF 行情权限支持返回该字段) |
         
     *   卖盘经纪队列格式如下：
@@ -57,7 +53,7 @@
         | ask\_broker\_id | int | 经纪卖盘 ID |
         | ask\_broker\_name | str | 经纪卖盘名称 |
         | ask\_broker\_pos | int | 经纪档位 |
-        | order\_id | int | 交易所订单 ID<br>(ℹ️ *   不是下单接口返回的订单 ID<br>*   只有港股 SF 行情权限支持返回该字段) |
+        | order\_id | int | 交易所订单 ID<br>(ℹ️ *   不是下单接口返回的订单 ID)<br>*   只有港股 SF 行情权限支持返回该字段 |
         | order\_volume | int | 单笔委托数量<br>(ℹ️ 只有港股 SF 行情权限支持返回该字段) |
         
 *   **Example**
@@ -109,7 +105,7 @@
 5  
 6  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-broker.html#2229)
+[#](./quote_get-broker.md#2229)
  Qot\_GetBroker.proto
 ---------------------------------------------------------------------------------------------
 
@@ -141,7 +137,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -179,11 +175,11 @@
 14  
 15  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   经纪队列结构参见 [Broker](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4135)
+> *   经纪队列结构参见 [Broker](./quote_quote.md#4135)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -221,7 +217,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -259,11 +255,11 @@
 14  
 15  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   经纪队列结构参见 [Broker](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4135)
+> *   经纪队列结构参见 [Broker](./quote_quote.md#4135)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -470,7 +466,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -508,11 +504,11 @@
 14  
 15  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   经纪队列结构参见 [Broker](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4135)
+> *   经纪队列结构参见 [Broker](./quote_quote.md#4135)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -790,7 +786,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -828,11 +824,11 @@
 14  
 15  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   经纪队列结构参见 [Broker](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4135)
+> *   经纪队列结构参见 [Broker](./quote_quote.md#4135)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1143,7 +1139,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -1181,11 +1177,11 @@
 14  
 15  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   经纪队列结构参见 [Broker](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4135)
+> *   经纪队列结构参见 [Broker](./quote_quote.md#4135)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1416,9 +1412,9 @@
 
 提示
 
-*   此接口提供了一次性获取实时数据的功能，如需持续获取推送数据，请参考 [实时经纪队列回调](https://openapi.futunn.com/futu-api-doc/quote/update-broker.html)
+*   此接口提供了一次性获取实时数据的功能，如需持续获取推送数据，请参考 [实时经纪队列回调](./quote_update-broker.md)
      接口
-*   获取实时数据 和 实时数据回调 的差别，请参考 [如何通过订阅接口获取实时行情？](https://openapi.futunn.com/futu-api-doc/qa/quote.html#2692)
+*   获取实时数据 和 实时数据回调 的差别，请参考 [如何通过订阅接口获取实时行情？](./qa_quote.md#2692)
     
 *   港股 BMP及LV1 权限下，不支持获取经纪队列数据
 
@@ -1446,7 +1442,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | bid\_frame\_table | pd.DataFrame | 当 ret == RET\_OK，bid\_frame\_table 返回买盘经纪队列数据 |
     | str | 当 ret != RET\_OK，bid\_frame\_table 返回错误描述 |
     | ask\_frame\_table | pd.DataFrame | 当 ret == RET\_OK，ask\_frame\_table 返回卖盘经纪队列数据 |
@@ -1461,7 +1457,7 @@
         | bid\_broker\_id | int | 经纪买盘 ID |
         | bid\_broker\_name | str | 经纪买盘名称 |
         | bid\_broker\_pos | int | 经纪档位 |
-        | order\_id | int | 交易所订单 ID<br>(ℹ️ *   不是下单接口返回的订单 ID<br>*   只有港股 SF 行情权限支持返回该字段) |
+        | order\_id | int | 交易所订单 ID<br>(ℹ️ *   不是下单接口返回的订单 ID)<br>*   只有港股 SF 行情权限支持返回该字段 |
         | order\_volume | int | 单笔委托数量<br>(ℹ️ 只有港股 SF 行情权限支持返回该字段) |
         
     *   卖盘经纪队列格式如下：
@@ -1473,7 +1469,7 @@
         | ask\_broker\_id | int | 经纪卖盘 ID |
         | ask\_broker\_name | str | 经纪卖盘名称 |
         | ask\_broker\_pos | int | 经纪档位 |
-        | order\_id | int | 交易所订单 ID<br>(ℹ️ *   不是下单接口返回的订单 ID<br>*   只有港股 SF 行情权限支持返回该字段) |
+        | order\_id | int | 交易所订单 ID<br>(ℹ️ *   不是下单接口返回的订单 ID)<br>*   只有港股 SF 行情权限支持返回该字段 |
         | order\_volume | int | 单笔委托数量<br>(ℹ️ 只有港股 SF 行情权限支持返回该字段) |
         
 *   **Example**
@@ -1525,7 +1521,7 @@
 5  
 6  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-broker.html#2229-2)
+[#](./quote_get-broker.md#2229-2)
  Qot\_GetBroker.proto
 -----------------------------------------------------------------------------------------------
 
@@ -1557,7 +1553,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -1595,11 +1591,11 @@
 14  
 15  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   经纪队列结构参见 [Broker](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4135)
+> *   经纪队列结构参见 [Broker](./quote_quote.md#4135)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -1637,7 +1633,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -1675,11 +1671,11 @@
 14  
 15  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   经纪队列结构参见 [Broker](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4135)
+> *   经纪队列结构参见 [Broker](./quote_quote.md#4135)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1886,7 +1882,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -1924,11 +1920,11 @@
 14  
 15  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   经纪队列结构参见 [Broker](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4135)
+> *   经纪队列结构参见 [Broker](./quote_quote.md#4135)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2206,7 +2202,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -2244,11 +2240,11 @@
 14  
 15  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   经纪队列结构参见 [Broker](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4135)
+> *   经纪队列结构参见 [Broker](./quote_quote.md#4135)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2559,7 +2555,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -2597,11 +2593,11 @@
 14  
 15  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   经纪队列结构参见 [Broker](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4135)
+> *   经纪队列结构参见 [Broker](./quote_quote.md#4135)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2832,11 +2828,13 @@
 
 提示
 
-*   此接口提供了一次性获取实时数据的功能，如需持续获取推送数据，请参考 [实时经纪队列回调](https://openapi.futunn.com/futu-api-doc/quote/update-broker.html)
+*   此接口提供了一次性获取实时数据的功能，如需持续获取推送数据，请参考 [实时经纪队列回调](./quote_update-broker.md)
      接口
-*   获取实时数据 和 实时数据回调 的差别，请参考 [如何通过订阅接口获取实时行情？](https://openapi.futunn.com/futu-api-doc/qa/quote.html#2692)
+*   获取实时数据 和 实时数据回调 的差别，请参考 [如何通过订阅接口获取实时行情？](./qa_quote.md#2692)
     
 *   港股 LV1 权限下，不支持获取经纪队列数据
 
-← [获取实时逐笔](https://openapi.futunn.com/futu-api-doc/quote/get-ticker.html) [获取标的市场状态](https://openapi.futunn.com/futu-api-doc/quote/get-market-state.html)
+← [获取实时逐笔](./quote_get-ticker.md) [获取标的市场状态](./quote_get-market-state.md)
  →
+
+[获取实时经纪队列](./quote_get-broker.md)

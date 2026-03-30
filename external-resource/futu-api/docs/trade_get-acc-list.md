@@ -1,86 +1,4 @@
- [![Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/img/logo.png) Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/)
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/trade/get-acc-list.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/trade/get-acc-list.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/trade/get-acc-list.html)
-    
-
-下载
-
-*   [PDF](https://openapi.futunn.com/pdfs/Futu-API-Doc-zh-Python.pdf)
-    
-*   [Markdown](https://openapi.futunn.com/mds/Futu-API-Doc-zh-Python.md)
-    
-*   [Skills](https://openapi.futunn.com/skills/opend-skills.zip)
-    
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/trade/get-acc-list.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/trade/get-acc-list.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/trade/get-acc-list.html)
-    
-
-*   介绍
-    
-*   快速上手
-    
-*   OpenD
-    
-*   行情接口
-    
-*   交易接口
-    
-    *   [交易接口总览](https://openapi.futunn.com/futu-api-doc/trade/overview.html)
-        
-    *   [交易对象](https://openapi.futunn.com/futu-api-doc/trade/base.html)
-        
-    *   账户
-        
-        *   [获取交易业务账户列表](https://openapi.futunn.com/futu-api-doc/trade/get-acc-list.html)
-            
-        *   [解锁交易](https://openapi.futunn.com/futu-api-doc/trade/unlock.html)
-            
-        
-    *   资产持仓
-        
-    *   订单
-        
-    *   成交
-        
-    *   [交易定义](https://openapi.futunn.com/futu-api-doc/trade/trade.html)
-        
-    
-*   基础接口
-    
-*   Q&A
-    
-
-[#](https://openapi.futunn.com/futu-api-doc/trade/get-acc-list.html#5754)
+[#](./trade_get-acc-list.md#5754)
  获取交易业务账户列表
 =====================================================================================
 
@@ -105,7 +23,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | pd.DataFrame | 当 ret == RET\_OK 时，返回交易业务账户列表 |
     | str | 当 ret != RET\_OK 时，返回错误描述 |
     
@@ -114,16 +32,16 @@
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
         | acc\_id | int | 交易业务账户 |
-        | trd\_env | [TrdEnv](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6374) | 交易环境 |
-        | acc\_type | [TrdAccType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#3974) | 账户类型 |
+        | trd\_env | [TrdEnv](./trade_trade.md#6374) | 交易环境 |
+        | acc\_type | [TrdAccType](./trade_trade.md#3974) | 账户类型 |
         | uni\_card\_num | str | 综合账户卡号，同移动端内的展示 |
         | card\_num | str | 业务账户卡号<br>(ℹ️ 综合账户下包含一个或多个业务账户（综合证券账户、综合期货账户等等），与交易品种有关) |
-        | security\_firm | [SecurityFirm](https://openapi.futunn.com/futu-api-doc/trade/trade.html#572) | 所属券商 |
-        | sim\_acc\_type | [SimAccType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6449) | 模拟账户类型<br>(ℹ️ 仅模拟账户适用) |
-        | trdmarket\_auth | list | 交易市场权限<br>(ℹ️ list 中元素类型是 [TrdMarket](https://openapi.futunn.com/futu-api-doc/trade/trade.html#719)) |
-        | acc\_status | [TrdAccStatus](https://openapi.futunn.com/futu-api-doc/trade/trade.html#121) | 账户状态 |
-        | acc\_role | [TrdAccRole](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6395) | 账户结构<br>(ℹ️ 用于区分主子账户结构<br><br>*   MASTER: 主账户<br>*   NORMAL: 普通账户<br>*   IPO: 马来西亚 IPO 账户) |
-        | jp\_acc\_type | list | 日本账户类型<br>(ℹ️ list 中元素类型是[SubAccType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6112)<br>，仅对日本券商生效) |
+        | security\_firm | [SecurityFirm](./trade_trade.md#572) | 所属券商 |
+        | sim\_acc\_type | [SimAccType](./trade_trade.md#6449) | 模拟账户类型<br>(ℹ️ 仅模拟账户适用) |
+        | trdmarket\_auth | list | 交易市场权限<br>(ℹ️ list 中元素类型是 [TrdMarket](./trade_trade.md#719)) |
+        | acc\_status | [TrdAccStatus](./trade_trade.md#121) | 账户状态 |
+        | acc\_role | [TrdAccRole](./trade_trade.md#6395) | 账户结构<br>(ℹ️ 用于区分主子账户结构)<br><br>*   MASTER: 主账户<br>*   NORMAL: 普通账户<br>*   IPO: 马来西亚 IPO 账户 |
+        | jp\_acc\_type | list | 日本账户类型<br>(ℹ️ list 中元素类型是[SubAccType](./trade_trade.md#6112))<br>，仅对日本券商生效 |
         
 *   **说明**
     
@@ -175,7 +93,7 @@
 6  
 7  
 
-[#](https://openapi.futunn.com/futu-api-doc/trade/get-acc-list.html#3852)
+[#](./trade_get-acc-list.md#3852)
  Trd\_GetAccList.proto
 ------------------------------------------------------------------------------------------------
 
@@ -244,11 +162,11 @@
 13  
 14  
 
-> *   交易品类 [TrdCategory](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6504)
+> *   交易品类 [TrdCategory](./trade_trade.md#6504)
 >     
-> *   交易业务账户结构参见 [TrdAcc](https://openapi.futunn.com/futu-api-doc/trade/trade.html#8680)
+> *   交易业务账户结构参见 [TrdAcc](./trade_trade.md#8680)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -324,11 +242,11 @@
 13  
 14  
 
-> *   交易品类 [TrdCategory](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6504)
+> *   交易品类 [TrdCategory](./trade_trade.md#6504)
 >     
-> *   交易业务账户结构参见 [TrdAcc](https://openapi.futunn.com/futu-api-doc/trade/trade.html#8680)
+> *   交易业务账户结构参见 [TrdAcc](./trade_trade.md#8680)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -517,11 +435,11 @@
 13  
 14  
 
-> *   交易品类 [TrdCategory](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6504)
+> *   交易品类 [TrdCategory](./trade_trade.md#6504)
 >     
-> *   交易业务账户结构参见 [TrdAcc](https://openapi.futunn.com/futu-api-doc/trade/trade.html#8680)
+> *   交易业务账户结构参见 [TrdAcc](./trade_trade.md#8680)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -776,11 +694,11 @@
 13  
 14  
 
-> *   交易品类 [TrdCategory](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6504)
+> *   交易品类 [TrdCategory](./trade_trade.md#6504)
 >     
-> *   交易业务账户结构参见 [TrdAcc](https://openapi.futunn.com/futu-api-doc/trade/trade.html#8680)
+> *   交易业务账户结构参见 [TrdAcc](./trade_trade.md#8680)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1070,11 +988,11 @@
 13  
 14  
 
-> *   交易品类 [TrdCategory](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6504)
+> *   交易品类 [TrdCategory](./trade_trade.md#6504)
 >     
-> *   交易业务账户结构参见 [TrdAcc](https://openapi.futunn.com/futu-api-doc/trade/trade.html#8680)
+> *   交易业务账户结构参见 [TrdAcc](./trade_trade.md#8680)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1268,7 +1186,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | pd.DataFrame | 当 ret == RET\_OK 时，返回交易业务账户列表 |
     | str | 当 ret != RET\_OK 时，返回错误描述 |
     
@@ -1277,16 +1195,16 @@
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
         | acc\_id | int | 交易业务账户 |
-        | trd\_env | [TrdEnv](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6374) | 交易环境 |
-        | acc\_type | [TrdAccType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#3974) | 账户类型 |
+        | trd\_env | [TrdEnv](./trade_trade.md#6374) | 交易环境 |
+        | acc\_type | [TrdAccType](./trade_trade.md#3974) | 账户类型 |
         | uni\_card\_num | str | 综合账户卡号，同移动端内的展示 |
         | card\_num | str | 业务账户卡号<br>(ℹ️ 综合账户下包含一个或多个业务账户（综合证券账户、综合期货账户等等），与交易品种有关) |
-        | security\_firm | [SecurityFirm](https://openapi.futunn.com/futu-api-doc/trade/trade.html#572) | 所属券商 |
-        | sim\_acc\_type | [SimAccType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6449) | 模拟账户类型<br>(ℹ️ 仅模拟账户适用) |
-        | trdmarket\_auth | list | 交易市场权限<br>(ℹ️ list 中元素类型是 [TrdMarket](https://openapi.futunn.com/futu-api-doc/trade/trade.html#719)) |
-        | acc\_status | [TrdAccStatus](https://openapi.futunn.com/futu-api-doc/trade/trade.html#121) | 账户状态 |
-        | acc\_role | [TrdAccRole](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6395) | 账户结构<br>(ℹ️ 用于区分主子账户结构<br><br>*   MASTER: 主账户<br>*   NORMAL: 普通账户<br>*   IPO: 马来西亚 IPO 账户) |
-        | jp\_acc\_type | list | 日本账户类型<br>(ℹ️ list 中元素类型是[SubAccType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6112)<br>，仅对日本券商生效) |
+        | security\_firm | [SecurityFirm](./trade_trade.md#572) | 所属券商 |
+        | sim\_acc\_type | [SimAccType](./trade_trade.md#6449) | 模拟账户类型<br>(ℹ️ 仅模拟账户适用) |
+        | trdmarket\_auth | list | 交易市场权限<br>(ℹ️ list 中元素类型是 [TrdMarket](./trade_trade.md#719)) |
+        | acc\_status | [TrdAccStatus](./trade_trade.md#121) | 账户状态 |
+        | acc\_role | [TrdAccRole](./trade_trade.md#6395) | 账户结构<br>(ℹ️ 用于区分主子账户结构)<br><br>*   MASTER: 主账户<br>*   NORMAL: 普通账户<br>*   IPO: 马来西亚 IPO 账户 |
+        | jp\_acc\_type | list | 日本账户类型<br>(ℹ️ list 中元素类型是[SubAccType](./trade_trade.md#6112))<br>，仅对日本券商生效 |
         
 *   **说明**
     
@@ -1336,7 +1254,7 @@
 5  
 6  
 
-[#](https://openapi.futunn.com/futu-api-doc/trade/get-acc-list.html#3852-2)
+[#](./trade_get-acc-list.md#3852-2)
  Trd\_GetAccList.proto
 --------------------------------------------------------------------------------------------------
 
@@ -1403,11 +1321,11 @@
 13  
 14  
 
-> *   交易品类 [TrdCategory](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6504)
+> *   交易品类 [TrdCategory](./trade_trade.md#6504)
 >     
-> *   交易业务账户结构参见 [TrdAcc](https://openapi.futunn.com/futu-api-doc/trade/trade.html#8680)
+> *   交易业务账户结构参见 [TrdAcc](./trade_trade.md#8680)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -1483,11 +1401,11 @@
 13  
 14  
 
-> *   交易品类 [TrdCategory](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6504)
+> *   交易品类 [TrdCategory](./trade_trade.md#6504)
 >     
-> *   交易业务账户结构参见 [TrdAcc](https://openapi.futunn.com/futu-api-doc/trade/trade.html#8680)
+> *   交易业务账户结构参见 [TrdAcc](./trade_trade.md#8680)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1676,11 +1594,11 @@
 13  
 14  
 
-> *   交易品类 [TrdCategory](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6504)
+> *   交易品类 [TrdCategory](./trade_trade.md#6504)
 >     
-> *   交易业务账户结构参见 [TrdAcc](https://openapi.futunn.com/futu-api-doc/trade/trade.html#8680)
+> *   交易业务账户结构参见 [TrdAcc](./trade_trade.md#8680)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1935,11 +1853,11 @@
 13  
 14  
 
-> *   交易品类 [TrdCategory](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6504)
+> *   交易品类 [TrdCategory](./trade_trade.md#6504)
 >     
-> *   交易业务账户结构参见 [TrdAcc](https://openapi.futunn.com/futu-api-doc/trade/trade.html#8680)
+> *   交易业务账户结构参见 [TrdAcc](./trade_trade.md#8680)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2231,11 +2149,11 @@
 13  
 14  
 
-> *   交易品类 [TrdCategory](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6504)
+> *   交易品类 [TrdCategory](./trade_trade.md#6504)
 >     
-> *   交易业务账户结构参见 [TrdAcc](https://openapi.futunn.com/futu-api-doc/trade/trade.html#8680)
+> *   交易业务账户结构参见 [TrdAcc](./trade_trade.md#8680)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2408,7 +2326,7 @@
 27  
 28  
 
-← [交易对象](https://openapi.futunn.com/futu-api-doc/trade/base.html) [解锁交易](https://openapi.futunn.com/futu-api-doc/trade/unlock.html)
+← [交易对象](./trade_base.md) [解锁交易](./trade_unlock.md)
  →
 
-[获取交易业务账户列表](https://openapi.futunn.com/futu-api-doc/trade/get-acc-list.html)
+[获取交易业务账户列表](./trade_get-acc-list.md)

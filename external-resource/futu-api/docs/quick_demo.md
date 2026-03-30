@@ -1,8 +1,4 @@
-# 简易程序运行 | Futu API 文档 v10.2
-
-> 来源: https://openapi.futunn.com/futu-api-doc/quick/demo.html
-
-[#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#7090)
+[#](./quick_demo.md#7090)
  简易程序运行
 =========================================================================
 
@@ -13,17 +9,17 @@
 *   Proto
 *   JavaScript
 
-[#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#7846)
+[#](./quick_demo.md#7846)
  Python 示例
 ----------------------------------------------------------------------------
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#5519)
+### [#](./quick_demo.md#5519)
  第一步：下载安装登录 OpenD
 
-请参考 [这里](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html)
+请参考 [这里](./quick_opend-base.md)
 ，完成 OpenD 的下载、安装和登录。
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#4688)
+### [#](./quick_demo.md#4688)
  第二步：下载 Python API
 
 *   方式一：在 cmd 中直接使用 pip 安装。
@@ -34,14 +30,14 @@
      安装包。
     
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#4480)
+### [#](./quick_demo.md#4480)
  第三步：创建新项目
 
 打开 PyCharm，在 Welcome to PyCharm 窗口中，点击 New Project。如果你已经创建了一个项目，可以选择打开该项目。
 
 ![demo-newproject](https://openapi.futunn.com/futu-api-doc/assets/img/demo-newproject.2fb2c25b.png)
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#6733)
+### [#](./quick_demo.md#6733)
  第四步：创建新文件
 
 在该项目下，创建新 Python 文件，并把下面的示例代码拷贝到文件里。  
@@ -72,7 +68,7 @@
 10  
 11  
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#1469)
+### [#](./quick_demo.md#1469)
  第五步：运行文件
 
 右键点击运行，可以看到运行成功的返回信息如下：
@@ -120,17 +116,17 @@
 19  
 20  
 
-[#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#1169)
+[#](./quick_demo.md#1169)
  C# 示例
 ------------------------------------------------------------------------
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#5519-2)
+### [#](./quick_demo.md#5519-2)
  第一步：下载安装登录 OpenD
 
-请参考 [这里](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html)
+请参考 [这里](./quick_opend-base.md)
 ，完成 OpenD 的下载、安装和登录。
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#7339)
+### [#](./quick_demo.md#7339)
  第二步：下载 C# API
 
 我们提供了两种方式下载和升级 C# API，您可以任选其一：
@@ -138,11 +134,11 @@
 *   方式一：在 cmd 中直接使用 nuget 下载或升级 `$ dotnet add package futu-api`（nuget 仅支持 C# API 源码下载，如需获取更多的示例代码，请参考方式二）。
     
 *   方式二：点击下载最新版本的 [C# API](https://www.futunn.com/download/fetch-lasted-link?name=openapi-csharp)
-     安装包。解压下载好的 FTAPI 文件，`/FTAPI4NET` 是 C# API 的目录，具体目录结构请参见 [FTAPI4NET 目录结构](https://openapi.futunn.com/futu-api-doc/quick/demo.html#1735)
+     安装包。解压下载好的 FTAPI 文件，`/FTAPI4NET` 是 C# API 的目录，具体目录结构请参见 [FTAPI4NET 目录结构](./quick_demo.md#1735)
     。
     
 
-#### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#1735)
+#### [#](./quick_demo.md#1735)
  FTAPI4NET 目录结构
 
     +---FTAPI4Net                                          FTAPI4NET 的源码。如果所用 .NET 版本不兼容，可以用源码重新编译出 FTAPI4Net.dll
@@ -178,12 +174,12 @@
 14  
 15  
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#3373)
+### [#](./quick_demo.md#3373)
  第三步：导入示例项目
 
 打开 Visual Studio 开发环境，导入目录下的项目文件 FTAPI4NetCore.sln。
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#4390)
+### [#](./quick_demo.md#4390)
  第四步：运行
 
 首先，检查文件中跑的示例程序中使用的接口配置是否跟 OpenD 的配置一致。
@@ -241,22 +237,22 @@
 
 *   如果遇到找不到 FTAPIChannel 动态库文件，需要从 lib 文件夹里的对应平台的 FTAPIChannel 文件，拷贝到程序运行的当前目录下。
 
-[#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#3369)
+[#](./quick_demo.md#3369)
  Java 示例
 --------------------------------------------------------------------------
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#5519-3)
+### [#](./quick_demo.md#5519-3)
  第一步：下载安装登录 OpenD
 
-请参考 [这里](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html)
+请参考 [这里](./quick_opend-base.md)
 ，完成 OpenD 的下载、安装和登录。
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#4042)
+### [#](./quick_demo.md#4042)
  第二步：下载 Java API
 
 我们提供了两种方式下载和升级 Java API，您可以任选其一：
 
-#### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#5757)
+#### [#](./quick_demo.md#5757)
  方式一：通过 maven 仓库配置
 
 1.  在 [maven](https://search.maven.org/artifact/com.futunn.openapi/futu-api)
@@ -264,15 +260,15 @@
 2.  将网页右侧的相关配置复制添加至您的工程设置中。  
     举例：使用 Apache Maven 来管理项目的用户，可以将下图红框中的代码复制至您的工程设置中。 ![maven](https://openapi.futunn.com/futu-api-doc/assets/img/maven.75366f6c.png)
 
-#### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#3963)
+#### [#](./quick_demo.md#3963)
  方式二：下载 Java API
 
 1.  点击下载最新版本的 [Java API](https://www.futunn.com/download/fetch-lasted-link?name=openapi-java)
      安装包。
-2.  解压下载好的 FTAPI 文件，`/FTAPI4J` 是 Java API 的目录，将 [FTAPI4J 目录结构](https://openapi.futunn.com/futu-api-doc/quick/demo.html#4144)
+2.  解压下载好的 FTAPI 文件，`/FTAPI4J` 是 Java API 的目录，将 [FTAPI4J 目录结构](./quick_demo.md#4144)
      中的 `/lib/futu-api-.x.y.z.jar` 添加到您的工程设置中。
 
-#### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#4144)
+#### [#](./quick_demo.md#4144)
  FTAPI4J 目录结构
 
     +---ftapi4j                      futu-api 源码，如果所用 JDK 版本不兼容，您可以用这里的工程重新编译出 futu-api.jar
@@ -294,7 +290,7 @@
 7  
 8  
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#2927)
+### [#](./quick_demo.md#2927)
  第三步：创建 futu-api 工程
 
 以 IntelliJ IDEA 为例：
@@ -327,12 +323,12 @@
     ![maven_api](https://openapi.futunn.com/futu-api-doc/assets/img/maven_api.e3682d1f.png)
     
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#6041)
+### [#](./quick_demo.md#6041)
  第四步：导入示例项目
 
 示例提供了 maven 编译脚本，可以用支持 maven 的 IDE 导入 `/sample` 目录下的工程。
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#9038)
+### [#](./quick_demo.md#9038)
  第五步：运行
 
 1.  检查 main.java 文件中跑的示例程序中使用的配置是否跟 OpenD 的配置一致。
@@ -375,26 +371,26 @@
 
 *   如果遇到找不到 FTAPIChannel 动态库文件，需要将 `/lib` 文件夹里的对应平台的 FTAPIChannel 文件，拷贝到程序运行的当前目录下。
 
-[#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#5895)
+[#](./quick_demo.md#5895)
  C++ 示例
 -------------------------------------------------------------------------
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#5519-4)
+### [#](./quick_demo.md#5519-4)
  第一步：下载安装登录 OpenD
 
-请参考 [这里](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html)
+请参考 [这里](./quick_opend-base.md)
 ，完成 OpenD 的下载、安装和登录。
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#4792)
+### [#](./quick_demo.md#4792)
  第二步：下载 C++ API
 
 下载最新版本的 [C++ API](https://www.futunn.com/download/fetch-lasted-link?name=openapi-cpp)
  安装包。
 
-解压下载好的 FTAPI 文件，`/FTAPI4CPP` 是 C++ API 的目录，具体目录结构请参见 [FTAPI4CPP 目录结构](https://openapi.futunn.com/futu-api-doc/quick/demo.html#227)
+解压下载好的 FTAPI 文件，`/FTAPI4CPP` 是 C++ API 的目录，具体目录结构请参见 [FTAPI4CPP 目录结构](./quick_demo.md#227)
 。
 
-#### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#227)
+#### [#](./quick_demo.md#227)
  FTAPI4CPP 目录结构
 
     +---Bin                  存放各种系统默认编译环境编译出的公共库文件
@@ -412,12 +408,12 @@
 5  
 6  
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#3373-2)
+### [#](./quick_demo.md#3373-2)
  第三步：导入示例项目
 
 示例提供了 Visual Studio 和 XCode 的工程文件，可以用 Visual Studio 或 XCode 开发环境导入 Sample 项目。
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#4390-2)
+### [#](./quick_demo.md#4390-2)
  第四步：运行
 
 1.  检查 simpleSample.cpp 文件中跑的示例程序中使用的接口配置是否跟 OpenD 的配置一致。
@@ -469,17 +465,17 @@
 点击下载最新版本的[Protobuf API](https://www.futunn.com/download/fetch-lasted-link?name=openapi-protobuf)
  安装包。
 
-[#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#6969)
+[#](./quick_demo.md#6969)
  JavaScript 示例
 --------------------------------------------------------------------------------
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#5519-5)
+### [#](./quick_demo.md#5519-5)
  第一步：下载安装登录 OpenD
 
-请参考 [这里](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html)
+请参考 [这里](./quick_opend-base.md)
 ，完成 OpenD 的下载、安装和登录。
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#7122)
+### [#](./quick_demo.md#7122)
  第二步：下载 JavaScript API
 
 *   方式一：在 cmd 中直接使用 npm 安装或升级（npm 仅支持 JavaScript API 源码的下载，如需获取更多的示例代码，请参考方式二）。
@@ -490,10 +486,10 @@
      安装包。
     
 
-解压下载好的 FTAPI 文件，`/FTAPI4JS`是 JavaScript API 的目录，具体目录结构请参见 [FTAPI4JS 目录结构](https://openapi.futunn.com/futu-api-doc/quick/demo.html#147)
+解压下载好的 FTAPI 文件，`/FTAPI4JS`是 JavaScript API 的目录，具体目录结构请参见 [FTAPI4JS 目录结构](./quick_demo.md#147)
 。
 
-#### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#147)
+#### [#](./quick_demo.md#147)
  FTAPI4JS 目录结构
 
     +---Sample               示例工程    
@@ -503,12 +499,12 @@
 1  
 2  
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#1856)
+### [#](./quick_demo.md#1856)
  第三步：运行示例
 
 1.  使用 Visual Studio Code 打开示例代码目录 `FTAPI4JS/sample`。
     
-2.  找到每个 Demo 文件中启动 WebSocket 相关代码，如下图，修改成 OpenD 对应的配置（注意：可视化 OpenD 默认会启动 WebSocket，命令行 OpenD 则需要 [配置参数](https://openapi.futunn.com/futu-api-doc/opend/opend-cmd.html#8799)
+2.  找到每个 Demo 文件中启动 WebSocket 相关代码，如下图，修改成 OpenD 对应的配置（注意：可视化 OpenD 默认会启动 WebSocket，命令行 OpenD 则需要 [配置参数](./opend_opend-cmd.md#8799)
      自行启动 WebSocket）。 ![websocket-demo-config](https://openapi.futunn.com/futu-api-doc/assets/img/websocket-demo-config.ceb49a91.png)
     
 3.  在 Visual Studio Code 控制台中输入 `npm install` 安装项目依赖。 ![websocket-demo-depend](https://openapi.futunn.com/futu-api-doc/assets/img/websocket-demo-depend.a7efb4a8.png)
@@ -528,17 +524,17 @@
 *   Proto
 *   JavaScript
 
-[#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#7846-2)
+[#](./quick_demo.md#7846-2)
  Python 示例
 ------------------------------------------------------------------------------
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#5519-6)
+### [#](./quick_demo.md#5519-6)
  第一步：下载安装登录 OpenD
 
-请参考 [这里](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html)
+请参考 [这里](./quick_opend-base.md)
 ，完成 OpenD 的下载、安装和登录。
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#4688-2)
+### [#](./quick_demo.md#4688-2)
  第二步：下载 Python API
 
 *   方式一：在 cmd 中直接使用 pip 安装。
@@ -549,14 +545,14 @@
      下载最新版本的 Python API。
     
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#4480-2)
+### [#](./quick_demo.md#4480-2)
  第三步：创建新项目
 
 打开 PyCharm，在 Welcome to PyCharm 窗口中，点击 New Project。如果你已经创建了一个项目，可以选择打开该项目。
 
 ![demo-newproject](https://openapi.futunn.com/futu-api-doc/assets/img/demo-newproject.2fb2c25b.png)
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#6733-2)
+### [#](./quick_demo.md#6733-2)
  第四步：创建新文件
 
 在该项目下，创建新 Python 文件，并把下面的示例代码拷贝到文件里。  
@@ -587,7 +583,7 @@
 10  
 11  
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#1469-2)
+### [#](./quick_demo.md#1469-2)
  第五步：运行文件
 
 右键点击运行，可以看到运行成功的返回信息如下：
@@ -635,17 +631,17 @@
 19  
 20  
 
-[#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#1169-2)
+[#](./quick_demo.md#1169-2)
  C# 示例
 --------------------------------------------------------------------------
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#5519-7)
+### [#](./quick_demo.md#5519-7)
  第一步：下载安装登录 OpenD
 
-请参考 [这里](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html)
+请参考 [这里](./quick_opend-base.md)
 ，完成 OpenD 的下载、安装和登录。
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#7339-2)
+### [#](./quick_demo.md#7339-2)
  第二步：下载 C# API
 
 我们提供了两种方式下载和升级 C# API，您可以任选其一：
@@ -653,11 +649,11 @@
 *   方式一：在 cmd 中直接使用 nuget 下载或升级 `$ dotnet add package moomoo-api`（nuget 仅支持 C# API 源码下载，如需获取更多的示例代码，请参考方式二）。
     
 *   方式二：通过 [moomoo 官网](https://www.moomoo.com/download/OpenAPI)
-     下载最新版本的 C# API。解压下载好的 MMAPI 文件，`/MMAPI4NET` 是 C# API 的目录，具体目录结构请参见 [MMAPI4NET 目录结构](https://openapi.futunn.com/futu-api-doc/quick/demo.html#1735)
+     下载最新版本的 C# API。解压下载好的 MMAPI 文件，`/MMAPI4NET` 是 C# API 的目录，具体目录结构请参见 [MMAPI4NET 目录结构](./quick_demo.md#1735)
     。
     
 
-#### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#1883)
+#### [#](./quick_demo.md#1883)
  MMAPI4NET 目录结构
 
     +---MMAPI4Net                                          MMAPI4NET 的源码。如果所用 .NET 版本不兼容，可以用源码重新编译出 MMAPI4Net.dll
@@ -693,12 +689,12 @@
 14  
 15  
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#3373-3)
+### [#](./quick_demo.md#3373-3)
  第三步：导入示例项目
 
 打开 Visual Studio 开发环境，导入目录下的项目文件 mmAPI4NetCore.sln。
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#4390-3)
+### [#](./quick_demo.md#4390-3)
  第四步：运行
 
 首先，检查文件中跑的示例程序中使用的接口配置是否跟 OpenD 的配置一致。
@@ -756,22 +752,22 @@
 
 *   如果遇到找不到 MMAPIChannel 动态库文件，需要从 lib 文件夹里的对应平台的 MMAPIChannel 文件，拷贝到程序运行的当前目录下。
 
-[#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#3369-2)
+[#](./quick_demo.md#3369-2)
  Java 示例
 ----------------------------------------------------------------------------
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#5519-8)
+### [#](./quick_demo.md#5519-8)
  第一步：下载安装登录 OpenD
 
-请参考 [这里](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html)
+请参考 [这里](./quick_opend-base.md)
 ，完成 OpenD 的下载、安装和登录。
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#4042-2)
+### [#](./quick_demo.md#4042-2)
  第二步：下载 Java API
 
 我们提供了两种方式下载和升级 Java API，您可以任选其一：
 
-#### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#5757-2)
+#### [#](./quick_demo.md#5757-2)
  方式一：通过 maven 仓库配置
 
 1.  在 [maven](https://search.maven.org/artifact/com.moomoo.openapi/moomoo-api)
@@ -779,15 +775,15 @@
 2.  将网页右侧的相关配置复制添加至您的工程设置中。  
     举例：使用 Apache Maven 来管理项目的用户，可以将下图红框中的代码复制至您的工程设置中。 ![maven](https://openapi.futunn.com/futu-api-doc/assets/img/mm-maven.95db9106.png)
 
-#### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#6826)
+#### [#](./quick_demo.md#6826)
  方式二：通过官网下载 Java API
 
 1.  进入 [moomoo 官网](https://www.moomoo.com/download/OpenAPI)
      下载最新版本的 Java API。
-2.  解压下载好的 MMAPI 文件，`/MMAPI4J` 是 Java API 的目录，将 [MMAPI4J 目录结构](https://openapi.futunn.com/futu-api-doc/quick/demo.html#4144)
+2.  解压下载好的 MMAPI 文件，`/MMAPI4J` 是 Java API 的目录，将 [MMAPI4J 目录结构](./quick_demo.md#4144)
      中的 `/lib/moomoo-api-.x.y.z.jar` 添加到您的工程设置中。
 
-#### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#5224)
+#### [#](./quick_demo.md#5224)
  MMAPI4J 目录结构
 
     +---mmapi4j                      moomoo-api 源码，如果所用 JDK 版本不兼容，您可以用这里的工程重新编译出 moomoo-api.jar
@@ -809,7 +805,7 @@
 7  
 8  
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#5950)
+### [#](./quick_demo.md#5950)
  第三步：创建 moomoo-api 工程
 
 以 IntelliJ IDEA 为例：
@@ -842,12 +838,12 @@
     ![maven_api](https://openapi.futunn.com/futu-api-doc/assets/img/mm-maven_api.2cffc3d9.png)
     
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#6041-2)
+### [#](./quick_demo.md#6041-2)
  第四步：导入示例项目
 
 示例提供了 maven 编译脚本，可以用支持 maven 的 IDE 导入 `/sample` 目录下的工程。
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#9038-2)
+### [#](./quick_demo.md#9038-2)
  第五步：运行
 
 1.  检查 main.java 文件中跑的示例程序中使用的配置是否跟 OpenD 的配置一致。
@@ -890,26 +886,26 @@
 
 *   如果遇到找不到 MMAPIChannel 动态库文件，需要将 `/lib` 文件夹里的对应平台的 MMAPIChannel 文件，拷贝到程序运行的当前目录下。
 
-[#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#5895-2)
+[#](./quick_demo.md#5895-2)
  C++ 示例
 ---------------------------------------------------------------------------
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#5519-9)
+### [#](./quick_demo.md#5519-9)
  第一步：下载安装登录 OpenD
 
-请参考 [这里](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html)
+请参考 [这里](./quick_opend-base.md)
 ，完成 OpenD 的下载、安装和登录。
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#4792-2)
+### [#](./quick_demo.md#4792-2)
  第二步：下载 C++ API
 
 通过 [moomoo 官网](https://www.moomoo.com/download/OpenAPI)
  下载最新版本的 C++ API。
 
-解压下载好的 MMAPI 文件，`/MMAPI4CPP` 是 C++ API 的目录，具体目录结构请参见 [MMAPI4CPP 目录结构](https://openapi.futunn.com/futu-api-doc/quick/demo.html#227)
+解压下载好的 MMAPI 文件，`/MMAPI4CPP` 是 C++ API 的目录，具体目录结构请参见 [MMAPI4CPP 目录结构](./quick_demo.md#227)
 。
 
-#### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#267)
+#### [#](./quick_demo.md#267)
  MMAPI4CPP 目录结构
 
     +---Bin                  存放各种系统默认编译环境编译出的公共库文件
@@ -927,12 +923,12 @@
 5  
 6  
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#3373-4)
+### [#](./quick_demo.md#3373-4)
  第三步：导入示例项目
 
 示例提供了 Visual Studio 和 XCode 的工程文件，可以用 Visual Studio 或 XCode 开发环境导入 Sample 项目。
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#4390-4)
+### [#](./quick_demo.md#4390-4)
  第四步：运行
 
 1.  检查 simpleSample.cpp 文件中跑的示例程序中使用的接口配置是否跟 OpenD 的配置一致。
@@ -984,17 +980,17 @@
 您可以通过 [moomoo 官网](https://www.moomoo.com/download/OpenAPI)
  下载最新版本的 Protobuf API。
 
-[#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#6969-2)
+[#](./quick_demo.md#6969-2)
  JavaScript 示例
 ----------------------------------------------------------------------------------
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#5519-10)
+### [#](./quick_demo.md#5519-10)
  第一步：下载安装登录 OpenD
 
-请参考 [这里](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html)
+请参考 [这里](./quick_opend-base.md)
 ，完成 OpenD 的下载、安装和登录。
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#7122-2)
+### [#](./quick_demo.md#7122-2)
  第二步：下载 JavaScript API
 
 *   方式一：在 cmd 中直接使用 npm 安装或升级（npm 仅支持 JavaScript API 源码的下载，如需获取更多的示例代码，请参考方式二）。
@@ -1005,10 +1001,10 @@
      下载最新版本的 JavaScript API。
     
 
-解压下载好的 MMAPI 文件，`/MMAPI4JS`是 JavaScript API 的目录，具体目录结构请参见 [MMAPI4JS 目录结构](https://openapi.futunn.com/futu-api-doc/quick/demo.html#147)
+解压下载好的 MMAPI 文件，`/MMAPI4JS`是 JavaScript API 的目录，具体目录结构请参见 [MMAPI4JS 目录结构](./quick_demo.md#147)
 。
 
-#### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#1291)
+#### [#](./quick_demo.md#1291)
  MMAPI4JS 目录结构
 
     +---Sample               示例工程    
@@ -1018,12 +1014,12 @@
 1  
 2  
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/demo.html#1856-2)
+### [#](./quick_demo.md#1856-2)
  第三步：运行示例
 
 1.  使用 Visual Studio Code 打开示例代码目录 `MMAPI4JS/sample`。
     
-2.  找到每个 Demo 文件中启动 WebSocket 相关代码，如下图，修改成 OpenD 对应的配置（注意：可视化 OpenD 默认会启动 WebSocket，命令行 OpenD 则需要 [配置参数](https://openapi.futunn.com/futu-api-doc/opend/opend-cmd.html#8799)
+2.  找到每个 Demo 文件中启动 WebSocket 相关代码，如下图，修改成 OpenD 对应的配置（注意：可视化 OpenD 默认会启动 WebSocket，命令行 OpenD 则需要 [配置参数](./opend_opend-cmd.md#8799)
      自行启动 WebSocket）。 ![websocket-demo-config](https://openapi.futunn.com/futu-api-doc/assets/img/mm-websocket-demo-config.e4b9ca5c.png)
     
 3.  在 Visual Studio Code 控制台中输入 `npm install` 安装项目依赖。 ![websocket-demo-depend](https://openapi.futunn.com/futu-api-doc/assets/img/mm-websocket-demo-depend.d1365ef4.png)
@@ -1036,5 +1032,7 @@
     ![websocket-demo-page](https://openapi.futunn.com/futu-api-doc/assets/img/mm-websocket-demo-page.8967fce9.png)
     
 
-← [编程环境搭建](https://openapi.futunn.com/futu-api-doc/quick/env.html) [交易策略搭建示例](https://openapi.futunn.com/futu-api-doc/quick/strategy-sample.html)
+← [编程环境搭建](./quick_env.md) [交易策略搭建示例](./quick_strategy-sample.md)
  →
+
+[简易程序运行](./quick_demo.md)

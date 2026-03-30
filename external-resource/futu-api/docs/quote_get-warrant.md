@@ -1,94 +1,4 @@
- [![Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/img/logo.png) Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/)
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/quote/get-warrant.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/quote/get-warrant.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/quote/get-warrant.html)
-    
-
-下载
-
-*   [PDF](https://openapi.futunn.com/pdfs/Futu-API-Doc-zh-Python.pdf)
-    
-*   [Markdown](https://openapi.futunn.com/mds/Futu-API-Doc-zh-Python.md)
-    
-*   [Skills](https://openapi.futunn.com/skills/opend-skills.zip)
-    
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/quote/get-warrant.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/quote/get-warrant.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/quote/get-warrant.html)
-    
-
-*   介绍
-    
-*   快速上手
-    
-*   OpenD
-    
-*   行情接口
-    
-    *   [行情接口总览](https://openapi.futunn.com/futu-api-doc/quote/overview.html)
-        
-    *   [行情对象](https://openapi.futunn.com/futu-api-doc/quote/base.html)
-        
-    *   实时行情
-        
-    *   基本数据
-        
-    *   相关衍生品
-        
-        *   [获取期权链到期日](https://openapi.futunn.com/futu-api-doc/quote/get-option-expiration-date.html)
-            
-        *   [获取期权链](https://openapi.futunn.com/futu-api-doc/quote/get-option-chain.html)
-            
-        *   [筛选窝轮](https://openapi.futunn.com/futu-api-doc/quote/get-warrant.html)
-            
-        *   [获取窝轮和期货列表](https://openapi.futunn.com/futu-api-doc/quote/get-referencestock-list.html)
-            
-        *   [获取期货合约资料](https://openapi.futunn.com/futu-api-doc/quote/get-future-info.html)
-            
-        
-    *   全市场筛选
-        
-    *   个性化
-        
-    *   [行情定义](https://openapi.futunn.com/futu-api-doc/quote/quote.html)
-        
-    
-*   交易接口
-    
-*   基础接口
-    
-*   Q&A
-    
-
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-warrant.html#2037)
+[#](./quote_get-warrant.md#2037)
  筛选窝轮
 ==============================================================================
 
@@ -118,44 +28,44 @@
         | --- | --- | --- |
         | begin | int | 数据起始点 |
         | num | int | 请求数据个数<br>(ℹ️ 最大 200) |
-        | sort\_field | [SortField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2930) | 根据哪个字段排序 |
-        | ascend | bool | 排序方向<br>(ℹ️ True：升序  <br>False：降序) |
-        | type\_list | list | 窝轮类型过滤列表<br>(ℹ️ list 中元素类型是 [WrtType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#926)) |
-        | issuer\_list | list | 发行人过滤列表<br>(ℹ️ list 中元素类型是 [Issuer](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8363)) |
+        | sort\_field | [SortField](./quote_quote.md#2930) | 根据哪个字段排序 |
+        | ascend | bool | 排序方向<br>(ℹ️ True：升序)  <br>False：降序 |
+        | type\_list | list | 窝轮类型过滤列表<br>(ℹ️ list 中元素类型是 [WrtType](./quote_quote.md#926)) |
+        | issuer\_list | list | 发行人过滤列表<br>(ℹ️ list 中元素类型是 [Issuer](./quote_quote.md#8363)) |
         | maturity\_time\_min | str | 到期日过滤范围的开始时间 |
         | maturity\_time\_max | str | 到期日过滤范围的结束时间 |
-        | ipo\_period | [IpoPeriod](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9546) | 上市时段 |
-        | price\_type | [PriceType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6407) | 价内/价外<br>(ℹ️ 暂不支持界内证的界内外筛选) |
-        | status | [WarrantStatus](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6556) | 窝轮状态 |
-        | cur\_price\_min | float | 最新价的过滤下限<br>(ℹ️ 闭区间  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
-        | cur\_price\_max | float | 最新价的过滤上限<br>(ℹ️ 闭区间  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
-        | strike\_price\_min | float | 行使价的过滤下限<br>(ℹ️ 闭区间  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
-        | strike\_price\_max | float | 行使价的过滤上限<br>(ℹ️ 闭区间  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
-        | street\_min | float | 街货占比的过滤下限<br>(ℹ️ 闭区间  <br>不传代表下限为 -∞  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。  <br>精确到小数点后 3 位，超出部分会被舍弃) |
-        | street\_max | float | 街货占比的过滤上限<br>(ℹ️ 闭区间  <br>不传代表上限为 +∞  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。  <br>精确到小数点后 3 位，超出部分会被舍弃) |
-        | conversion\_min | float | 换股比率的过滤下限<br>(ℹ️ 闭区间  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
-        | conversion\_max | float | 换股比率的过滤上限<br>(ℹ️ 闭区间  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
-        | vol\_min | int | 成交量的过滤下限<br>(ℹ️ 闭区间  <br>不传代表下限为 -∞) |
-        | vol\_max | int | 成交量的过滤上限<br>(ℹ️ 闭区间  <br>不传代表上限为 +∞) |
-        | premium\_min | float | 溢价的过滤下限<br>(ℹ️ 闭区间  <br>不传代表下限为 -∞  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。  <br>精确到小数点后 3 位，超出部分会被舍弃) |
-        | premium\_max | float | 溢价的过滤上限<br>(ℹ️ 闭区间  <br>不传代表上限为 +∞  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。  <br>精确到小数点后 3 位，超出部分会被舍弃) |
-        | leverage\_ratio\_min | float | 杠杆比率的过滤下限<br>(ℹ️ 闭区间  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
-        | leverage\_ratio\_max | float | 杠杆比率的过滤上限<br>(ℹ️ 闭区间  <br>不传代表上限为 +∞) |
-        | delta\_min | float | 对冲值的过滤下限<br>(ℹ️ 闭区间  <br>仅认购认沽支持此字段过滤  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
-        | delta\_max | float | 对冲值的过滤上限<br>(ℹ️ 闭区间  <br>仅认购认沽支持此字段过滤  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
-        | implied\_min | float | 引伸波幅的过滤下限<br>(ℹ️ 闭区间  <br>仅认购认沽支持此字段过滤  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
-        | implied\_max | float | 引伸波幅的过滤上限<br>(ℹ️ 闭区间  <br>仅认购认沽支持此字段过滤  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
-        | recovery\_price\_min | float | 收回价的过滤下限<br>(ℹ️ 闭区间  <br>仅牛熊证支持此字段过滤  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
-        | recovery\_price\_max | float | 收回价的过滤上限<br>(ℹ️ 闭区间  <br>仅牛熊证支持此字段过滤  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
-        | price\_recovery\_ratio\_min | float | 正股距收回价的过滤下限<br>(ℹ️ 闭区间  <br>仅牛熊证支持此字段过滤  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
-        | price\_recovery\_ratio\_max | float | 正股距收回价的过滤上限<br>(ℹ️ 闭区间  <br>仅牛熊证支持此字段过滤  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
+        | ipo\_period | [IpoPeriod](./quote_quote.md#9546) | 上市时段 |
+        | price\_type | [PriceType](./quote_quote.md#6407) | 价内/价外<br>(ℹ️ 暂不支持界内证的界内外筛选) |
+        | status | [WarrantStatus](./quote_quote.md#6556) | 窝轮状态 |
+        | cur\_price\_min | float | 最新价的过滤下限<br>(ℹ️ 闭区间)  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
+        | cur\_price\_max | float | 最新价的过滤上限<br>(ℹ️ 闭区间)  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
+        | strike\_price\_min | float | 行使价的过滤下限<br>(ℹ️ 闭区间)  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
+        | strike\_price\_max | float | 行使价的过滤上限<br>(ℹ️ 闭区间)  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
+        | street\_min | float | 街货占比的过滤下限<br>(ℹ️ 闭区间)  <br>不传代表下限为 -∞  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。  <br>精确到小数点后 3 位，超出部分会被舍弃 |
+        | street\_max | float | 街货占比的过滤上限<br>(ℹ️ 闭区间)  <br>不传代表上限为 +∞  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。  <br>精确到小数点后 3 位，超出部分会被舍弃 |
+        | conversion\_min | float | 换股比率的过滤下限<br>(ℹ️ 闭区间)  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
+        | conversion\_max | float | 换股比率的过滤上限<br>(ℹ️ 闭区间)  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
+        | vol\_min | int | 成交量的过滤下限<br>(ℹ️ 闭区间)  <br>不传代表下限为 -∞ |
+        | vol\_max | int | 成交量的过滤上限<br>(ℹ️ 闭区间)  <br>不传代表上限为 +∞ |
+        | premium\_min | float | 溢价的过滤下限<br>(ℹ️ 闭区间)  <br>不传代表下限为 -∞  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。  <br>精确到小数点后 3 位，超出部分会被舍弃 |
+        | premium\_max | float | 溢价的过滤上限<br>(ℹ️ 闭区间)  <br>不传代表上限为 +∞  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。  <br>精确到小数点后 3 位，超出部分会被舍弃 |
+        | leverage\_ratio\_min | float | 杠杆比率的过滤下限<br>(ℹ️ 闭区间)  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
+        | leverage\_ratio\_max | float | 杠杆比率的过滤上限<br>(ℹ️ 闭区间)  <br>不传代表上限为 +∞ |
+        | delta\_min | float | 对冲值的过滤下限<br>(ℹ️ 闭区间)  <br>仅认购认沽支持此字段过滤  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
+        | delta\_max | float | 对冲值的过滤上限<br>(ℹ️ 闭区间)  <br>仅认购认沽支持此字段过滤  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
+        | implied\_min | float | 引伸波幅的过滤下限<br>(ℹ️ 闭区间)  <br>仅认购认沽支持此字段过滤  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
+        | implied\_max | float | 引伸波幅的过滤上限<br>(ℹ️ 闭区间)  <br>仅认购认沽支持此字段过滤  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
+        | recovery\_price\_min | float | 收回价的过滤下限<br>(ℹ️ 闭区间)  <br>仅牛熊证支持此字段过滤  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
+        | recovery\_price\_max | float | 收回价的过滤上限<br>(ℹ️ 闭区间)  <br>仅牛熊证支持此字段过滤  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
+        | price\_recovery\_ratio\_min | float | 正股距收回价的过滤下限<br>(ℹ️ 闭区间)  <br>仅牛熊证支持此字段过滤  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
+        | price\_recovery\_ratio\_max | float | 正股距收回价的过滤上限<br>(ℹ️ 闭区间)  <br>仅牛熊证支持此字段过滤  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
         
 
 *   **返回**
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | tuple | 当 ret == RET\_OK，返回窝轮数据 |
     | str | 当 ret != RET\_OK，返回错误描述 |
     
@@ -164,7 +74,7 @@
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
         | warrant\_data\_list | pd.DataFrame | 筛选后的窝轮数据 |
-        | last\_page | bool | 是否是最后一页<br>(ℹ️ True：是最后一页  <br>False：不是最后一页) |
+        | last\_page | bool | 是否是最后一页<br>(ℹ️ True：是最后一页)  <br>False：不是最后一页 |
         | all\_count | int | 筛选结果中的窝轮总数量 |
         
         *   warrant\_data\_list 返回的 pd dataframe 数据格式：
@@ -173,8 +83,8 @@
             | --- | --- | --- |
             | stock | str | 窝轮代码 |
             | stock\_owner | str | 所属正股 |
-            | type | [WrtType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#926) | 窝轮类型 |
-            | issuer | [Issuer](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8363) | 发行人 |
+            | type | [WrtType](./quote_quote.md#926) | 窝轮类型 |
+            | issuer | [Issuer](./quote_quote.md#8363) | 发行人 |
             | maturity\_time | str | 到期日<br>(ℹ️ 格式：yyyy-MM-dd) |
             | list\_time | str | 上市时间<br>(ℹ️ 格式：yyyy-MM-dd) |
             | last\_trade\_time | str | 最后交易日<br>(ℹ️ 格式：yyyy-MM-dd) |
@@ -186,7 +96,7 @@
             | name | str | 名称  |
             | cur\_price | float | 当前价 |
             | price\_change\_val | float | 涨跌额 |
-            | status | [WarrantStatus](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6556) | 窝轮状态 |
+            | status | [WarrantStatus](./quote_quote.md#6556) | 窝轮状态 |
             | bid\_price | float | 买入价 |
             | ask\_price | float | 卖出价 |
             | bid\_vol | int | 买量  |
@@ -198,7 +108,7 @@
             | break\_even\_point | float | 打和点 |
             | leverage | float | 杠杆比率<br>(ℹ️ 单位：倍) |
             | ipop | float | 价内/价外<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
-            | price\_recovery\_ratio | float | 正股距收回价<br>(ℹ️ 仅牛熊证支持此字段  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | price\_recovery\_ratio | float | 正股距收回价<br>(ℹ️ 仅牛熊证支持此字段)  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
             | conversion\_price | float | 换股价 |
             | street\_rate | float | 街货占比<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
             | street\_vol | int | 街货量 |
@@ -211,7 +121,7 @@
             | effective\_leverage | float | 有效杠杆<br>(ℹ️ 仅认购认沽支持此字段) |
             | upper\_strike\_price | float | 上限价<br>(ℹ️ 仅界内证支持此字段) |
             | lower\_strike\_price | float | 下限价<br>(ℹ️ 仅界内证支持此字段) |
-            | inline\_price\_status | [PriceType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6407) | 界内界外<br>(ℹ️ 仅界内证支持此字段) |
+            | inline\_price\_status | [PriceType](./quote_quote.md#6407) | 界内界外<br>(ℹ️ 仅界内证支持此字段) |
             
 *   **Example**
     
@@ -310,7 +220,7 @@
 14  
 15  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-warrant.html#8023)
+[#](./quote_get-warrant.md#8023)
  Qot\_GetWarrant.proto
 -----------------------------------------------------------------------------------------------
 
@@ -412,19 +322,19 @@
 43  
 44  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   排序类型参见 [SortField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2930)
+> *   排序类型参见 [SortField](./quote_quote.md#2930)
 >     
-> *   窝轮类型过滤列表参见 [WarrantType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#926)
+> *   窝轮类型过滤列表参见 [WarrantType](./quote_quote.md#926)
 >     
-> *   发行人过滤列表参见 [Issuer](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8363)
+> *   发行人过滤列表参见 [Issuer](./quote_quote.md#8363)
 >     
-> *   上市日类型参见 [IpoPeriod](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9546)
+> *   上市日类型参见 [IpoPeriod](./quote_quote.md#9546)
 >     
-> *   价内价外类型参见 [PriceType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6407)
+> *   价内价外类型参见 [PriceType](./quote_quote.md#6407)
 >     
-> *   窝轮状态类型参见 [WarrantStatus](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6556)
+> *   窝轮状态类型参见 [WarrantStatus](./quote_quote.md#6556)
 >     
 
 *   **返回**
@@ -564,17 +474,17 @@
 65  
 66  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   窝轮类型过滤列表参见 [WarrantType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#926)
+> *   窝轮类型过滤列表参见 [WarrantType](./quote_quote.md#926)
 >     
-> *   发行人过滤列表参见 [Issuer](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8363)
+> *   发行人过滤列表参见 [Issuer](./quote_quote.md#8363)
 >     
-> *   价内价外类型参见 [PriceType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6407)
+> *   价内价外类型参见 [PriceType](./quote_quote.md#6407)
 >     
-> *   窝轮状态类型参见 [WarrantStatus](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6556)
+> *   窝轮状态类型参见 [WarrantStatus](./quote_quote.md#6556)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -683,19 +593,19 @@
 43  
 44  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   排序类型参见 [SortField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2930)
+> *   排序类型参见 [SortField](./quote_quote.md#2930)
 >     
-> *   窝轮类型过滤列表参见 [WarrantType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#926)
+> *   窝轮类型过滤列表参见 [WarrantType](./quote_quote.md#926)
 >     
-> *   发行人过滤列表参见 [Issuer](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8363)
+> *   发行人过滤列表参见 [Issuer](./quote_quote.md#8363)
 >     
-> *   上市日类型参见 [IpoPeriod](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9546)
+> *   上市日类型参见 [IpoPeriod](./quote_quote.md#9546)
 >     
-> *   价内价外类型参见 [PriceType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6407)
+> *   价内价外类型参见 [PriceType](./quote_quote.md#6407)
 >     
-> *   窝轮状态类型参见 [WarrantStatus](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6556)
+> *   窝轮状态类型参见 [WarrantStatus](./quote_quote.md#6556)
 >     
 
 *   **返回**
@@ -835,17 +745,17 @@
 65  
 66  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   窝轮类型过滤列表参见 [WarrantType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#926)
+> *   窝轮类型过滤列表参见 [WarrantType](./quote_quote.md#926)
 >     
-> *   发行人过滤列表参见 [Issuer](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8363)
+> *   发行人过滤列表参见 [Issuer](./quote_quote.md#8363)
 >     
-> *   价内价外类型参见 [PriceType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6407)
+> *   价内价外类型参见 [PriceType](./quote_quote.md#6407)
 >     
-> *   窝轮状态类型参见 [WarrantStatus](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6556)
+> *   窝轮状态类型参见 [WarrantStatus](./quote_quote.md#6556)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1075,19 +985,19 @@
 43  
 44  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   排序类型参见 [SortField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2930)
+> *   排序类型参见 [SortField](./quote_quote.md#2930)
 >     
-> *   窝轮类型过滤列表参见 [WarrantType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#926)
+> *   窝轮类型过滤列表参见 [WarrantType](./quote_quote.md#926)
 >     
-> *   发行人过滤列表参见 [Issuer](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8363)
+> *   发行人过滤列表参见 [Issuer](./quote_quote.md#8363)
 >     
-> *   上市日类型参见 [IpoPeriod](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9546)
+> *   上市日类型参见 [IpoPeriod](./quote_quote.md#9546)
 >     
-> *   价内价外类型参见 [PriceType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6407)
+> *   价内价外类型参见 [PriceType](./quote_quote.md#6407)
 >     
-> *   窝轮状态类型参见 [WarrantStatus](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6556)
+> *   窝轮状态类型参见 [WarrantStatus](./quote_quote.md#6556)
 >     
 
 *   **返回**
@@ -1227,17 +1137,17 @@
 65  
 66  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   窝轮类型过滤列表参见 [WarrantType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#926)
+> *   窝轮类型过滤列表参见 [WarrantType](./quote_quote.md#926)
 >     
-> *   发行人过滤列表参见 [Issuer](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8363)
+> *   发行人过滤列表参见 [Issuer](./quote_quote.md#8363)
 >     
-> *   价内价外类型参见 [PriceType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6407)
+> *   价内价外类型参见 [PriceType](./quote_quote.md#6407)
 >     
-> *   窝轮状态类型参见 [WarrantStatus](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6556)
+> *   窝轮状态类型参见 [WarrantStatus](./quote_quote.md#6556)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1691,19 +1601,19 @@
 43  
 44  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   排序类型参见 [SortField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2930)
+> *   排序类型参见 [SortField](./quote_quote.md#2930)
 >     
-> *   窝轮类型过滤列表参见 [WarrantType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#926)
+> *   窝轮类型过滤列表参见 [WarrantType](./quote_quote.md#926)
 >     
-> *   发行人过滤列表参见 [Issuer](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8363)
+> *   发行人过滤列表参见 [Issuer](./quote_quote.md#8363)
 >     
-> *   上市日类型参见 [IpoPeriod](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9546)
+> *   上市日类型参见 [IpoPeriod](./quote_quote.md#9546)
 >     
-> *   价内价外类型参见 [PriceType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6407)
+> *   价内价外类型参见 [PriceType](./quote_quote.md#6407)
 >     
-> *   窝轮状态类型参见 [WarrantStatus](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6556)
+> *   窝轮状态类型参见 [WarrantStatus](./quote_quote.md#6556)
 >     
 
 *   **返回**
@@ -1843,17 +1753,17 @@
 65  
 66  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   窝轮类型过滤列表参见 [WarrantType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#926)
+> *   窝轮类型过滤列表参见 [WarrantType](./quote_quote.md#926)
 >     
-> *   发行人过滤列表参见 [Issuer](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8363)
+> *   发行人过滤列表参见 [Issuer](./quote_quote.md#8363)
 >     
-> *   价内价外类型参见 [PriceType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6407)
+> *   价内价外类型参见 [PriceType](./quote_quote.md#6407)
 >     
-> *   窝轮状态类型参见 [WarrantStatus](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6556)
+> *   窝轮状态类型参见 [WarrantStatus](./quote_quote.md#6556)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2334,19 +2244,19 @@
 43  
 44  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   排序类型参见 [SortField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2930)
+> *   排序类型参见 [SortField](./quote_quote.md#2930)
 >     
-> *   窝轮类型过滤列表参见 [WarrantType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#926)
+> *   窝轮类型过滤列表参见 [WarrantType](./quote_quote.md#926)
 >     
-> *   发行人过滤列表参见 [Issuer](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8363)
+> *   发行人过滤列表参见 [Issuer](./quote_quote.md#8363)
 >     
-> *   上市日类型参见 [IpoPeriod](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9546)
+> *   上市日类型参见 [IpoPeriod](./quote_quote.md#9546)
 >     
-> *   价内价外类型参见 [PriceType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6407)
+> *   价内价外类型参见 [PriceType](./quote_quote.md#6407)
 >     
-> *   窝轮状态类型参见 [WarrantStatus](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6556)
+> *   窝轮状态类型参见 [WarrantStatus](./quote_quote.md#6556)
 >     
 
 *   **返回**
@@ -2486,17 +2396,17 @@
 65  
 66  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   窝轮类型过滤列表参见 [WarrantType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#926)
+> *   窝轮类型过滤列表参见 [WarrantType](./quote_quote.md#926)
 >     
-> *   发行人过滤列表参见 [Issuer](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8363)
+> *   发行人过滤列表参见 [Issuer](./quote_quote.md#8363)
 >     
-> *   价内价外类型参见 [PriceType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6407)
+> *   价内价外类型参见 [PriceType](./quote_quote.md#6407)
 >     
-> *   窝轮状态类型参见 [WarrantStatus](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6556)
+> *   窝轮状态类型参见 [WarrantStatus](./quote_quote.md#6556)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2859,44 +2769,44 @@
         | --- | --- | --- |
         | begin | int | 数据起始点 |
         | num | int | 请求数据个数<br>(ℹ️ 最大 200) |
-        | sort\_field | [SortField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2930) | 根据哪个字段排序 |
-        | ascend | bool | 排序方向<br>(ℹ️ True：升序  <br>False：降序) |
-        | type\_list | list | 窝轮类型过滤列表<br>(ℹ️ list 中元素类型是 [WrtType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#926)) |
-        | issuer\_list | list | 发行人过滤列表<br>(ℹ️ list 中元素类型是 [Issuer](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8363)) |
+        | sort\_field | [SortField](./quote_quote.md#2930) | 根据哪个字段排序 |
+        | ascend | bool | 排序方向<br>(ℹ️ True：升序)  <br>False：降序 |
+        | type\_list | list | 窝轮类型过滤列表<br>(ℹ️ list 中元素类型是 [WrtType](./quote_quote.md#926)) |
+        | issuer\_list | list | 发行人过滤列表<br>(ℹ️ list 中元素类型是 [Issuer](./quote_quote.md#8363)) |
         | maturity\_time\_min | str | 到期日过滤范围的开始时间 |
         | maturity\_time\_max | str | 到期日过滤范围的结束时间 |
-        | ipo\_period | [IpoPeriod](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9546) | 上市时段 |
-        | price\_type | [PriceType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6407) | 价内/价外<br>(ℹ️ 暂不支持界内证的界内外筛选) |
-        | status | [WarrantStatus](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6556) | 窝轮状态 |
-        | cur\_price\_min | float | 最新价的过滤下限<br>(ℹ️ 闭区间  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
-        | cur\_price\_max | float | 最新价的过滤上限<br>(ℹ️ 闭区间  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
-        | strike\_price\_min | float | 行使价的过滤下限<br>(ℹ️ 闭区间  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
-        | strike\_price\_max | float | 行使价的过滤上限<br>(ℹ️ 闭区间  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
-        | street\_min | float | 街货占比的过滤下限<br>(ℹ️ 闭区间  <br>不传代表下限为 -∞  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。  <br>精确到小数点后 3 位，超出部分会被舍弃) |
-        | street\_max | float | 街货占比的过滤上限<br>(ℹ️ 闭区间  <br>不传代表上限为 +∞  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。  <br>精确到小数点后 3 位，超出部分会被舍弃) |
-        | conversion\_min | float | 换股比率的过滤下限<br>(ℹ️ 闭区间  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
-        | conversion\_max | float | 换股比率的过滤上限<br>(ℹ️ 闭区间  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
-        | vol\_min | int | 成交量的过滤下限<br>(ℹ️ 闭区间  <br>不传代表下限为 -∞) |
-        | vol\_max | int | 成交量的过滤上限<br>(ℹ️ 闭区间  <br>不传代表上限为 +∞) |
-        | premium\_min | float | 溢价的过滤下限<br>(ℹ️ 闭区间  <br>不传代表下限为 -∞  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。  <br>精确到小数点后 3 位，超出部分会被舍弃) |
-        | premium\_max | float | 溢价的过滤上限<br>(ℹ️ 闭区间  <br>不传代表上限为 +∞  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。  <br>精确到小数点后 3 位，超出部分会被舍弃) |
-        | leverage\_ratio\_min | float | 杠杆比率的过滤下限<br>(ℹ️ 闭区间  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
-        | leverage\_ratio\_max | float | 杠杆比率的过滤上限<br>(ℹ️ 闭区间  <br>不传代表上限为 +∞) |
-        | delta\_min | float | 对冲值的过滤下限<br>(ℹ️ 闭区间  <br>仅认购认沽支持此字段过滤  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
-        | delta\_max | float | 对冲值的过滤上限<br>(ℹ️ 闭区间  <br>仅认购认沽支持此字段过滤  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
-        | implied\_min | float | 引伸波幅的过滤下限<br>(ℹ️ 闭区间  <br>仅认购认沽支持此字段过滤  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
-        | implied\_max | float | 引伸波幅的过滤上限<br>(ℹ️ 闭区间  <br>仅认购认沽支持此字段过滤  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
-        | recovery\_price\_min | float | 收回价的过滤下限<br>(ℹ️ 闭区间  <br>仅牛熊证支持此字段过滤  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
-        | recovery\_price\_max | float | 收回价的过滤上限<br>(ℹ️ 闭区间  <br>仅牛熊证支持此字段过滤  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
-        | price\_recovery\_ratio\_min | float | 正股距收回价的过滤下限<br>(ℹ️ 闭区间  <br>仅牛熊证支持此字段过滤  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
-        | price\_recovery\_ratio\_max | float | 正股距收回价的过滤上限<br>(ℹ️ 闭区间  <br>仅牛熊证支持此字段过滤  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
+        | ipo\_period | [IpoPeriod](./quote_quote.md#9546) | 上市时段 |
+        | price\_type | [PriceType](./quote_quote.md#6407) | 价内/价外<br>(ℹ️ 暂不支持界内证的界内外筛选) |
+        | status | [WarrantStatus](./quote_quote.md#6556) | 窝轮状态 |
+        | cur\_price\_min | float | 最新价的过滤下限<br>(ℹ️ 闭区间)  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
+        | cur\_price\_max | float | 最新价的过滤上限<br>(ℹ️ 闭区间)  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
+        | strike\_price\_min | float | 行使价的过滤下限<br>(ℹ️ 闭区间)  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
+        | strike\_price\_max | float | 行使价的过滤上限<br>(ℹ️ 闭区间)  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
+        | street\_min | float | 街货占比的过滤下限<br>(ℹ️ 闭区间)  <br>不传代表下限为 -∞  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。  <br>精确到小数点后 3 位，超出部分会被舍弃 |
+        | street\_max | float | 街货占比的过滤上限<br>(ℹ️ 闭区间)  <br>不传代表上限为 +∞  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。  <br>精确到小数点后 3 位，超出部分会被舍弃 |
+        | conversion\_min | float | 换股比率的过滤下限<br>(ℹ️ 闭区间)  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
+        | conversion\_max | float | 换股比率的过滤上限<br>(ℹ️ 闭区间)  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
+        | vol\_min | int | 成交量的过滤下限<br>(ℹ️ 闭区间)  <br>不传代表下限为 -∞ |
+        | vol\_max | int | 成交量的过滤上限<br>(ℹ️ 闭区间)  <br>不传代表上限为 +∞ |
+        | premium\_min | float | 溢价的过滤下限<br>(ℹ️ 闭区间)  <br>不传代表下限为 -∞  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。  <br>精确到小数点后 3 位，超出部分会被舍弃 |
+        | premium\_max | float | 溢价的过滤上限<br>(ℹ️ 闭区间)  <br>不传代表上限为 +∞  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。  <br>精确到小数点后 3 位，超出部分会被舍弃 |
+        | leverage\_ratio\_min | float | 杠杆比率的过滤下限<br>(ℹ️ 闭区间)  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
+        | leverage\_ratio\_max | float | 杠杆比率的过滤上限<br>(ℹ️ 闭区间)  <br>不传代表上限为 +∞ |
+        | delta\_min | float | 对冲值的过滤下限<br>(ℹ️ 闭区间)  <br>仅认购认沽支持此字段过滤  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
+        | delta\_max | float | 对冲值的过滤上限<br>(ℹ️ 闭区间)  <br>仅认购认沽支持此字段过滤  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
+        | implied\_min | float | 引伸波幅的过滤下限<br>(ℹ️ 闭区间)  <br>仅认购认沽支持此字段过滤  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
+        | implied\_max | float | 引伸波幅的过滤上限<br>(ℹ️ 闭区间)  <br>仅认购认沽支持此字段过滤  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
+        | recovery\_price\_min | float | 收回价的过滤下限<br>(ℹ️ 闭区间)  <br>仅牛熊证支持此字段过滤  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
+        | recovery\_price\_max | float | 收回价的过滤上限<br>(ℹ️ 闭区间)  <br>仅牛熊证支持此字段过滤  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
+        | price\_recovery\_ratio\_min | float | 正股距收回价的过滤下限<br>(ℹ️ 闭区间)  <br>仅牛熊证支持此字段过滤  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
+        | price\_recovery\_ratio\_max | float | 正股距收回价的过滤上限<br>(ℹ️ 闭区间)  <br>仅牛熊证支持此字段过滤  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
         
 
 *   **返回**
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | tuple | 当 ret == RET\_OK，返回窝轮数据 |
     | str | 当 ret != RET\_OK，返回错误描述 |
     
@@ -2905,7 +2815,7 @@
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
         | warrant\_data\_list | pd.DataFrame | 筛选后的窝轮数据 |
-        | last\_page | bool | 是否是最后一页<br>(ℹ️ True：是最后一页  <br>False：不是最后一页) |
+        | last\_page | bool | 是否是最后一页<br>(ℹ️ True：是最后一页)  <br>False：不是最后一页 |
         | all\_count | int | 筛选结果中的窝轮总数量 |
         
         *   warrant\_data\_list 返回的 pd dataframe 数据格式：
@@ -2914,8 +2824,8 @@
             | --- | --- | --- |
             | stock | str | 窝轮代码 |
             | stock\_owner | str | 所属正股 |
-            | type | [WrtType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#926) | 窝轮类型 |
-            | issuer | [Issuer](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8363) | 发行人 |
+            | type | [WrtType](./quote_quote.md#926) | 窝轮类型 |
+            | issuer | [Issuer](./quote_quote.md#8363) | 发行人 |
             | maturity\_time | str | 到期日<br>(ℹ️ 格式：yyyy-MM-dd) |
             | list\_time | str | 上市时间<br>(ℹ️ 格式：yyyy-MM-dd) |
             | last\_trade\_time | str | 最后交易日<br>(ℹ️ 格式：yyyy-MM-dd) |
@@ -2927,7 +2837,7 @@
             | name | str | 名称  |
             | cur\_price | float | 当前价 |
             | price\_change\_val | float | 涨跌额 |
-            | status | [WarrantStatus](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6556) | 窝轮状态 |
+            | status | [WarrantStatus](./quote_quote.md#6556) | 窝轮状态 |
             | bid\_price | float | 买入价 |
             | ask\_price | float | 卖出价 |
             | bid\_vol | int | 买量  |
@@ -2939,7 +2849,7 @@
             | break\_even\_point | float | 打和点 |
             | leverage | float | 杠杆比率<br>(ℹ️ 单位：倍) |
             | ipop | float | 价内/价外<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
-            | price\_recovery\_ratio | float | 正股距收回价<br>(ℹ️ 仅牛熊证支持此字段  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | price\_recovery\_ratio | float | 正股距收回价<br>(ℹ️ 仅牛熊证支持此字段)  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
             | conversion\_price | float | 换股价 |
             | street\_rate | float | 街货占比<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
             | street\_vol | int | 街货量 |
@@ -2952,7 +2862,7 @@
             | effective\_leverage | float | 有效杠杆 |
             | upper\_strike\_price | float | 上限价<br>(ℹ️ 仅界内证支持此字段) |
             | lower\_strike\_price | float | 下限价<br>(ℹ️ 仅界内证支持此字段) |
-            | inline\_price\_status | [PriceType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6407) | 界内界外<br>(ℹ️ 仅界内证支持此字段) |
+            | inline\_price\_status | [PriceType](./quote_quote.md#6407) | 界内界外<br>(ℹ️ 仅界内证支持此字段) |
             
 *   **Example**
     
@@ -3051,7 +2961,7 @@
 14  
 15  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-warrant.html#8023-2)
+[#](./quote_get-warrant.md#8023-2)
  Qot\_GetWarrant.proto
 -------------------------------------------------------------------------------------------------
 
@@ -3153,19 +3063,19 @@
 43  
 44  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   排序类型参见 [SortField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2930)
+> *   排序类型参见 [SortField](./quote_quote.md#2930)
 >     
-> *   窝轮类型过滤列表参见 [WarrantType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#926)
+> *   窝轮类型过滤列表参见 [WarrantType](./quote_quote.md#926)
 >     
-> *   发行人过滤列表参见 [Issuer](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8363)
+> *   发行人过滤列表参见 [Issuer](./quote_quote.md#8363)
 >     
-> *   上市日类型参见 [IpoPeriod](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9546)
+> *   上市日类型参见 [IpoPeriod](./quote_quote.md#9546)
 >     
-> *   价内价外类型参见 [PriceType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6407)
+> *   价内价外类型参见 [PriceType](./quote_quote.md#6407)
 >     
-> *   窝轮状态类型参见 [WarrantStatus](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6556)
+> *   窝轮状态类型参见 [WarrantStatus](./quote_quote.md#6556)
 >     
 
 *   **返回**
@@ -3305,17 +3215,17 @@
 65  
 66  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   窝轮类型过滤列表参见 [WarrantType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#926)
+> *   窝轮类型过滤列表参见 [WarrantType](./quote_quote.md#926)
 >     
-> *   发行人过滤列表参见 [Issuer](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8363)
+> *   发行人过滤列表参见 [Issuer](./quote_quote.md#8363)
 >     
-> *   价内价外类型参见 [PriceType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6407)
+> *   价内价外类型参见 [PriceType](./quote_quote.md#6407)
 >     
-> *   窝轮状态类型参见 [WarrantStatus](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6556)
+> *   窝轮状态类型参见 [WarrantStatus](./quote_quote.md#6556)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -3424,19 +3334,19 @@
 43  
 44  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   排序类型参见 [SortField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2930)
+> *   排序类型参见 [SortField](./quote_quote.md#2930)
 >     
-> *   窝轮类型过滤列表参见 [WarrantType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#926)
+> *   窝轮类型过滤列表参见 [WarrantType](./quote_quote.md#926)
 >     
-> *   发行人过滤列表参见 [Issuer](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8363)
+> *   发行人过滤列表参见 [Issuer](./quote_quote.md#8363)
 >     
-> *   上市日类型参见 [IpoPeriod](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9546)
+> *   上市日类型参见 [IpoPeriod](./quote_quote.md#9546)
 >     
-> *   价内价外类型参见 [PriceType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6407)
+> *   价内价外类型参见 [PriceType](./quote_quote.md#6407)
 >     
-> *   窝轮状态类型参见 [WarrantStatus](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6556)
+> *   窝轮状态类型参见 [WarrantStatus](./quote_quote.md#6556)
 >     
 
 *   **返回**
@@ -3576,17 +3486,17 @@
 65  
 66  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   窝轮类型过滤列表参见 [WarrantType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#926)
+> *   窝轮类型过滤列表参见 [WarrantType](./quote_quote.md#926)
 >     
-> *   发行人过滤列表参见 [Issuer](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8363)
+> *   发行人过滤列表参见 [Issuer](./quote_quote.md#8363)
 >     
-> *   价内价外类型参见 [PriceType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6407)
+> *   价内价外类型参见 [PriceType](./quote_quote.md#6407)
 >     
-> *   窝轮状态类型参见 [WarrantStatus](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6556)
+> *   窝轮状态类型参见 [WarrantStatus](./quote_quote.md#6556)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -3816,19 +3726,19 @@
 43  
 44  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   排序类型参见 [SortField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2930)
+> *   排序类型参见 [SortField](./quote_quote.md#2930)
 >     
-> *   窝轮类型过滤列表参见 [WarrantType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#926)
+> *   窝轮类型过滤列表参见 [WarrantType](./quote_quote.md#926)
 >     
-> *   发行人过滤列表参见 [Issuer](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8363)
+> *   发行人过滤列表参见 [Issuer](./quote_quote.md#8363)
 >     
-> *   上市日类型参见 [IpoPeriod](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9546)
+> *   上市日类型参见 [IpoPeriod](./quote_quote.md#9546)
 >     
-> *   价内价外类型参见 [PriceType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6407)
+> *   价内价外类型参见 [PriceType](./quote_quote.md#6407)
 >     
-> *   窝轮状态类型参见 [WarrantStatus](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6556)
+> *   窝轮状态类型参见 [WarrantStatus](./quote_quote.md#6556)
 >     
 
 *   **返回**
@@ -3968,17 +3878,17 @@
 65  
 66  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   窝轮类型过滤列表参见 [WarrantType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#926)
+> *   窝轮类型过滤列表参见 [WarrantType](./quote_quote.md#926)
 >     
-> *   发行人过滤列表参见 [Issuer](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8363)
+> *   发行人过滤列表参见 [Issuer](./quote_quote.md#8363)
 >     
-> *   价内价外类型参见 [PriceType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6407)
+> *   价内价外类型参见 [PriceType](./quote_quote.md#6407)
 >     
-> *   窝轮状态类型参见 [WarrantStatus](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6556)
+> *   窝轮状态类型参见 [WarrantStatus](./quote_quote.md#6556)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -4432,19 +4342,19 @@
 43  
 44  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   排序类型参见 [SortField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2930)
+> *   排序类型参见 [SortField](./quote_quote.md#2930)
 >     
-> *   窝轮类型过滤列表参见 [WarrantType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#926)
+> *   窝轮类型过滤列表参见 [WarrantType](./quote_quote.md#926)
 >     
-> *   发行人过滤列表参见 [Issuer](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8363)
+> *   发行人过滤列表参见 [Issuer](./quote_quote.md#8363)
 >     
-> *   上市日类型参见 [IpoPeriod](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9546)
+> *   上市日类型参见 [IpoPeriod](./quote_quote.md#9546)
 >     
-> *   价内价外类型参见 [PriceType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6407)
+> *   价内价外类型参见 [PriceType](./quote_quote.md#6407)
 >     
-> *   窝轮状态类型参见 [WarrantStatus](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6556)
+> *   窝轮状态类型参见 [WarrantStatus](./quote_quote.md#6556)
 >     
 
 *   **返回**
@@ -4584,17 +4494,17 @@
 65  
 66  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   窝轮类型过滤列表参见 [WarrantType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#926)
+> *   窝轮类型过滤列表参见 [WarrantType](./quote_quote.md#926)
 >     
-> *   发行人过滤列表参见 [Issuer](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8363)
+> *   发行人过滤列表参见 [Issuer](./quote_quote.md#8363)
 >     
-> *   价内价外类型参见 [PriceType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6407)
+> *   价内价外类型参见 [PriceType](./quote_quote.md#6407)
 >     
-> *   窝轮状态类型参见 [WarrantStatus](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6556)
+> *   窝轮状态类型参见 [WarrantStatus](./quote_quote.md#6556)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -5075,19 +4985,19 @@
 43  
 44  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   排序类型参见 [SortField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2930)
+> *   排序类型参见 [SortField](./quote_quote.md#2930)
 >     
-> *   窝轮类型过滤列表参见 [WarrantType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#926)
+> *   窝轮类型过滤列表参见 [WarrantType](./quote_quote.md#926)
 >     
-> *   发行人过滤列表参见 [Issuer](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8363)
+> *   发行人过滤列表参见 [Issuer](./quote_quote.md#8363)
 >     
-> *   上市日类型参见 [IpoPeriod](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9546)
+> *   上市日类型参见 [IpoPeriod](./quote_quote.md#9546)
 >     
-> *   价内价外类型参见 [PriceType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6407)
+> *   价内价外类型参见 [PriceType](./quote_quote.md#6407)
 >     
-> *   窝轮状态类型参见 [WarrantStatus](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6556)
+> *   窝轮状态类型参见 [WarrantStatus](./quote_quote.md#6556)
 >     
 
 *   **返回**
@@ -5227,17 +5137,17 @@
 65  
 66  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   窝轮类型过滤列表参见 [WarrantType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#926)
+> *   窝轮类型过滤列表参见 [WarrantType](./quote_quote.md#926)
 >     
-> *   发行人过滤列表参见 [Issuer](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8363)
+> *   发行人过滤列表参见 [Issuer](./quote_quote.md#8363)
 >     
-> *   价内价外类型参见 [PriceType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6407)
+> *   价内价外类型参见 [PriceType](./quote_quote.md#6407)
 >     
-> *   窝轮状态类型参见 [WarrantStatus](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6556)
+> *   窝轮状态类型参见 [WarrantStatus](./quote_quote.md#6556)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -5574,7 +5484,7 @@
 *   每 30 秒内最多请求 60 次筛选窝轮接口
 *   每次请求的数据个数上限为 200 个
 
-← [获取期权链](https://openapi.futunn.com/futu-api-doc/quote/get-option-chain.html) [获取窝轮和期货列表](https://openapi.futunn.com/futu-api-doc/quote/get-referencestock-list.html)
+← [获取期权链](./quote_get-option-chain.md) [获取窝轮和期货列表](./quote_get-referencestock-list.md)
  →
 
-[筛选窝轮](https://openapi.futunn.com/futu-api-doc/quote/get-warrant.html)
+[筛选窝轮](./quote_get-warrant.md)

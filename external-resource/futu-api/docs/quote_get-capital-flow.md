@@ -1,8 +1,4 @@
-# 获取资金流向 | Futu API 文档 v10.2
-
-> 来源: https://openapi.futunn.com/futu-api-doc/quote/get-capital-flow.html
-
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-capital-flow.html#3443)
+[#](./quote_get-capital-flow.md#3443)
  获取资金流向
 =====================================================================================
 
@@ -24,9 +20,9 @@
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
     | stock\_code | str | 股票代码 |
-    | period\_type | [PeriodType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2644) | 周期类型 |
-    | start | str | 开始时间<br>(ℹ️ 格式：yyyy-MM-dd  <br>例如：“2017-06-20”) |
-    | end | str | 结束时间<br>(ℹ️ 格式：yyyy-MM-dd  <br>例如：“2017-06-20”) |
+    | period\_type | [PeriodType](./quote_quote.md#2644) | 周期类型 |
+    | start | str | 开始时间<br>(ℹ️ 格式：yyyy-MM-dd)  <br>例如：“2017-06-20” |
+    | end | str | 结束时间<br>(ℹ️ 格式：yyyy-MM-dd)  <br>例如：“2017-06-20” |
     
     *   start 和 end 的组合如下
         
@@ -42,7 +38,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | pd.DataFrame | 当 ret == RET\_OK，返回资金流向数据 |
     | str | 当 ret != RET\_OK，返回错误描述 |
     
@@ -56,7 +52,7 @@
         | big\_in\_flow | float | 大单净流入 |
         | mid\_in\_flow | float | 中单净流入 |
         | sml\_in\_flow | float | 小单净流入 |
-        | capital\_flow\_item\_time | str | 开始时间<br>(ℹ️ 格式：yyyy-MM-dd HH:mm:ss  <br>精确到分钟) |
+        | capital\_flow\_item\_time | str | 开始时间<br>(ℹ️ 格式：yyyy-MM-dd HH:mm:ss)  <br>精确到分钟 |
         | last\_valid\_time | str | 数据最后有效时间<br>(ℹ️ 仅实时周期有效) |
         
 *   **Example**
@@ -112,7 +108,7 @@
 9  
 10  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-capital-flow.html#2370)
+[#](./quote_get-capital-flow.md#2370)
  Qot\_GetCapitalFlow.proto
 --------------------------------------------------------------------------------------------------------
 
@@ -150,9 +146,9 @@
 11  
 12  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   周期类型参见 [PeriodType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2644)
+> *   周期类型参见 [PeriodType](./quote_quote.md#2644)
 >     
 
 *   **返回**
@@ -216,7 +212,7 @@
 27  
 28  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -260,9 +256,9 @@
 11  
 12  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   周期类型参见 [PeriodType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2644)
+> *   周期类型参见 [PeriodType](./quote_quote.md#2644)
 >     
 
 *   **返回**
@@ -324,7 +320,7 @@
 26  
 27  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -619,9 +615,9 @@
 11  
 12  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   周期类型参见 [PeriodType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2644)
+> *   周期类型参见 [PeriodType](./quote_quote.md#2644)
 >     
 
 *   **返回**
@@ -683,7 +679,7 @@
 26  
 27  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1021,9 +1017,9 @@
 11  
 12  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   周期类型参见 [PeriodType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2644)
+> *   周期类型参见 [PeriodType](./quote_quote.md#2644)
 >     
 
 *   **返回**
@@ -1085,7 +1081,7 @@
 26  
 27  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1386,9 +1382,9 @@
 11  
 12  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   周期类型参见 [PeriodType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2644)
+> *   周期类型参见 [PeriodType](./quote_quote.md#2644)
 >     
 
 *   **返回**
@@ -1450,7 +1446,7 @@
 26  
 27  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1642,9 +1638,9 @@
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
     | stock\_code | str | 股票代码 |
-    | period\_type | [PeriodType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2644) | 周期类型 |
-    | start | str | 开始时间<br>(ℹ️ 格式：yyyy-MM-dd  <br>例如：“2017-06-20”) |
-    | end | str | 结束时间<br>(ℹ️ 格式：yyyy-MM-dd  <br>例如：“2017-06-20”) |
+    | period\_type | [PeriodType](./quote_quote.md#2644) | 周期类型 |
+    | start | str | 开始时间<br>(ℹ️ 格式：yyyy-MM-dd)  <br>例如：“2017-06-20” |
+    | end | str | 结束时间<br>(ℹ️ 格式：yyyy-MM-dd)  <br>例如：“2017-06-20” |
     
     *   start 和 end 的组合如下
         
@@ -1660,7 +1656,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | pd.DataFrame | 当 ret == RET\_OK，返回资金流向数据 |
     | str | 当 ret != RET\_OK，返回错误描述 |
     
@@ -1674,7 +1670,7 @@
         | big\_in\_flow | float | 大单净流入 |
         | mid\_in\_flow | float | 中单净流入 |
         | sml\_in\_flow | float | 小单净流入 |
-        | capital\_flow\_item\_time | str | 开始时间<br>(ℹ️ 格式：yyyy-MM-dd HH:mm:ss  <br>精确到分钟) |
+        | capital\_flow\_item\_time | str | 开始时间<br>(ℹ️ 格式：yyyy-MM-dd HH:mm:ss)  <br>精确到分钟 |
         | last\_valid\_time | str | 数据最后有效时间<br>(ℹ️ 仅实时周期有效) |
         
 *   **Example**
@@ -1730,7 +1726,7 @@
 9  
 10  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-capital-flow.html#2370-2)
+[#](./quote_get-capital-flow.md#2370-2)
  Qot\_GetCapitalFlow.proto
 ----------------------------------------------------------------------------------------------------------
 
@@ -1768,9 +1764,9 @@
 11  
 12  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   周期类型参见 [PeriodType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2644)
+> *   周期类型参见 [PeriodType](./quote_quote.md#2644)
 >     
 
 *   **返回**
@@ -1834,7 +1830,7 @@
 27  
 28  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -1878,9 +1874,9 @@
 11  
 12  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   周期类型参见 [PeriodType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2644)
+> *   周期类型参见 [PeriodType](./quote_quote.md#2644)
 >     
 
 *   **返回**
@@ -1942,7 +1938,7 @@
 26  
 27  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2237,9 +2233,9 @@
 11  
 12  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   周期类型参见 [PeriodType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2644)
+> *   周期类型参见 [PeriodType](./quote_quote.md#2644)
 >     
 
 *   **返回**
@@ -2301,7 +2297,7 @@
 26  
 27  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2639,9 +2635,9 @@
 11  
 12  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   周期类型参见 [PeriodType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2644)
+> *   周期类型参见 [PeriodType](./quote_quote.md#2644)
 >     
 
 *   **返回**
@@ -2703,7 +2699,7 @@
 26  
 27  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -3004,9 +3000,9 @@
 11  
 12  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   周期类型参见 [PeriodType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2644)
+> *   周期类型参见 [PeriodType](./quote_quote.md#2644)
 >     
 
 *   **返回**
@@ -3068,7 +3064,7 @@
 26  
 27  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -3242,5 +3238,7 @@
 *   历史周期（日、月、年）仅提供最近 1 年数据；实时周期仅提供最新一天的数据。
 *   返回数据只包括盘中数据，不包含盘前盘后数据。
 
-← [获取标的市场状态](https://openapi.futunn.com/futu-api-doc/quote/get-market-state.html) [获取资金分布](https://openapi.futunn.com/futu-api-doc/quote/get-capital-distribution.html)
+← [获取标的市场状态](./quote_get-market-state.md) [获取资金分布](./quote_get-capital-distribution.md)
  →
+
+[获取资金流向](./quote_get-capital-flow.md)

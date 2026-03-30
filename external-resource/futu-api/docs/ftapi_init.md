@@ -1,73 +1,4 @@
- [![Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/img/logo.png) Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/)
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/ftapi/init.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/ftapi/init.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/ftapi/init.html)
-    
-
-下载
-
-*   [PDF](https://openapi.futunn.com/pdfs/Futu-API-Doc-zh-Python.pdf)
-    
-*   [Markdown](https://openapi.futunn.com/mds/Futu-API-Doc-zh-Python.md)
-    
-*   [Skills](https://openapi.futunn.com/skills/opend-skills.zip)
-    
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/ftapi/init.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/ftapi/init.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/ftapi/init.html)
-    
-
-*   介绍
-    
-*   快速上手
-    
-*   OpenD
-    
-*   行情接口
-    
-*   交易接口
-    
-*   基础接口
-    
-    *   [基础功能](https://openapi.futunn.com/futu-api-doc/ftapi/init.html)
-        
-    *   [通用定义](https://openapi.futunn.com/futu-api-doc/ftapi/common.html)
-        
-    *   [底层协议介绍](https://openapi.futunn.com/futu-api-doc/ftapi/protocol.html)
-        
-    
-*   Q&A
-    
-
-[#](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#3032)
+[#](./ftapi_init.md#3032)
  基础功能
 =======================================================================
 
@@ -80,12 +11,12 @@
 
 | 协议 ID | Protobuf 文件 | 说明  |
 | --- | --- | --- |
-| 1001 | [InitConnect](https://openapi.futunn.com/futu-api-doc/quote/base.html) | 初始化连接 |
-| 1002 | [GetGlobalState](https://openapi.futunn.com/futu-api-doc/quote/get-global-state.html) | 获取全局状态 |
-| 1003 | [Notify](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#6884) | 事件通知推送 |
-| 1004 | [KeepAlive](https://openapi.futunn.com/futu-api-doc/ftapi/protocol.html#2603) | 保活心跳 |
+| 1001 | [InitConnect](./quote_base.md) | 初始化连接 |
+| 1002 | [GetGlobalState](./quote_get-global-state.md) | 获取全局状态 |
+| 1003 | [Notify](./ftapi_init.md#6884) | 事件通知推送 |
+| 1004 | [KeepAlive](./ftapi_protocol.md#2603) | 保活心跳 |
 
-[#](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#7518)
+[#](./ftapi_init.md#7518)
  设置接口信息
 -------------------------------------------------------------------------
 
@@ -284,7 +215,7 @@ InitConnect.proto
     在初始化连接协议中 clientVer、clientID 字段设置该信息。
     
 
-[#](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#1515)
+[#](./ftapi_init.md#1515)
  设置协议格式
 -------------------------------------------------------------------------
 
@@ -303,7 +234,7 @@ InitConnect.proto
     
 *   **参数**
     
-    *   proto\_fmt: 协议格式，参见[ProtoFMT](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#1222)
+    *   proto\_fmt: 协议格式，参见[ProtoFMT](./ftapi_common.md#1222)
         
 
     from futu import *
@@ -383,11 +314,11 @@ InitConnect.proto
 *   **介绍**
     
     在初始化连接协议中 pushProtoFmt 字段指定该连接上推送数据格式。  
-    请求数据格式参见[协议头](https://openapi.futunn.com/futu-api-doc/ftapi/protocol.html#8205)
+    请求数据格式参见[协议头](./ftapi_protocol.md#8205)
     中的 nProtoFmtType 字段。
     
 
-[#](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#319)
+[#](./ftapi_init.md#319)
  对所有连接设置协议加密
 -----------------------------------------------------------------------------
 
@@ -402,7 +333,7 @@ InitConnect.proto
 
 *   **介绍**
     
-    对所有连接的请求和返回内容加密。如需了解协议加密流程，详见 [这里](https://openapi.futunn.com/futu-api-doc/qa/other.html#4601)
+    对所有连接的请求和返回内容加密。如需了解协议加密流程，详见 [这里](./qa_other.md#4601)
     。
     
 *   **参数**
@@ -454,7 +385,7 @@ InitConnect.proto
     
     *   ip: OpenD 监听的 WebSocket 地址
     *   port: OpenD 监听的 WebSocket 端口
-    *   ssl: 是否启用 SSL 加密，参见 [WebSocket 相关](https://openapi.futunn.com/futu-api-doc/qa/other.html#6319)
+    *   ssl: 是否启用 SSL 加密，参见 [WebSocket 相关](./qa_other.md#6319)
         
     *   key：连接的密钥，否则会连接超时，密钥在在 OpenD 可配置，UI 版本在不指定的情况下会随机指定
 *   **Example**
@@ -485,7 +416,7 @@ InitConnect.proto
     
     *   ip: OpenD 监听的 WebSocket 地址
     *   port: OpenD 监听的 WebSocket 端口
-    *   ssl: 是否启用 SSL 加密，参见 [WebSocket 相关](https://openapi.futunn.com/futu-api-doc/qa/other.html#6319)
+    *   ssl: 是否启用 SSL 加密，参见 [WebSocket 相关](./qa_other.md#6319)
         
     *   key：连接的密钥，否则会连接超时，密钥在在 OpenD 可配置，UI 版本在不指定的情况下会随机指定
 
@@ -506,7 +437,7 @@ InitConnect.proto
 6  
 7  
 
-[#](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#5641)
+[#](./ftapi_init.md#5641)
  设置私钥路径
 -------------------------------------------------------------------------
 
@@ -521,7 +452,7 @@ InitConnect.proto
 
 *   **介绍**
     
-    设置 RSA 私钥文件路径。如需了解协议加密流程，详见 [这里](https://openapi.futunn.com/futu-api-doc/qa/other.html#4601)
+    设置 RSA 私钥文件路径。如需了解协议加密流程，详见 [这里](./qa_other.md#4601)
     。
     
 *   **参数**
@@ -1013,7 +944,7 @@ InitConnect.proto
     
     *   ip: OpenD 监听的 WebSocket 地址
     *   port: OpenD 监听的 WebSocket 端口
-    *   ssl: 是否启用 SSL 加密，参见 [WebSocket 相关](https://openapi.futunn.com/futu-api-doc/qa/other.html#6319)
+    *   ssl: 是否启用 SSL 加密，参见 [WebSocket 相关](./qa_other.md#6319)
         
     *   key：连接的密钥，否则会连接超时，密钥在在 OpenD 可配置，UI 版本在不指定的情况下会随机指定
 *   **Example**
@@ -1040,7 +971,7 @@ InitConnect.proto
     
     *   ip: OpenD 监听的 WebSocket 地址
     *   port: OpenD 监听的 WebSocket 端口
-    *   ssl: 是否启用 SSL 加密，参见 [WebSocket 相关](https://openapi.futunn.com/futu-api-doc/qa/other.html#6319)
+    *   ssl: 是否启用 SSL 加密，参见 [WebSocket 相关](./qa_other.md#6319)
         
     *   key：连接的密钥，否则会连接超时，密钥在在 OpenD 可配置，UI 版本在不指定的情况下会随机指定
 *   **Example**
@@ -1116,10 +1047,10 @@ InitConnect.proto
 *   **介绍**
     
     在初始化连接协议中 packetEncAlgo 字段指定该连接上加密算法。  
-    协议加密详情，参见[加密通信流程](https://openapi.futunn.com/futu-api-doc/ftapi/protocol.html#2846)
+    协议加密详情，参见[加密通信流程](./ftapi_protocol.md#2846)
     
 
-[#](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#4570)
+[#](./ftapi_init.md#4570)
  设置线程模式
 -------------------------------------------------------------------------
 
@@ -1144,7 +1075,7 @@ InitConnect.proto
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | all\_daemon | bool | 是否设置为 daemon 线程<br>(ℹ️ *   True：设置为 daemon 线程<br>*   False：设置为非 daemon 线程<br>*   默认为 False) |
+    | all\_daemon | bool | 是否设置为 daemon 线程<br>(ℹ️ *   True：设置为 daemon 线程)<br>*   False：设置为非 daemon 线程<br>*   默认为 False |
     
 *   **Example**
     
@@ -1171,7 +1102,7 @@ InitConnect.proto
 3  
 4  
 
-[#](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#8035)
+[#](./ftapi_init.md#8035)
  设置回调
 -----------------------------------------------------------------------
 
@@ -1194,16 +1125,16 @@ InitConnect.proto
         
         | 类   | 说明  |
         | --- | --- |
-        | SysNotifyHandlerBase | [OpenD 通知处理基类](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#6884) |
-        | StockQuoteHandlerBase | [报价处理基类](https://openapi.futunn.com/futu-api-doc/quote/update-stock-quote.html) |
-        | OrderBookHandlerBase | [摆盘处理基类](https://openapi.futunn.com/futu-api-doc/quote/update-order-book.html) |
-        | CurKlineHandlerBase | [实时 K 线处理基类](https://openapi.futunn.com/futu-api-doc/quote/update-kl.html) |
-        | TickerHandlerBase | [逐笔处理基类](https://openapi.futunn.com/futu-api-doc/quote/update-ticker.html) |
-        | RTDataHandlerBase | [分时数据处理基类](https://openapi.futunn.com/futu-api-doc/quote/update-rt.html) |
-        | BrokerHandlerBase | [经济队列处理基类](https://openapi.futunn.com/futu-api-doc/quote/update-broker.html) |
-        | PriceReminderHandlerBase | [到价提醒处理基类](https://openapi.futunn.com/futu-api-doc/quote/update-price-reminder.html) |
-        | TradeOrderHandlerBase | [订单处理基类](https://openapi.futunn.com/futu-api-doc/trade/update-order.html) |
-        | TradeDealHandlerBase | [成交处理基类](https://openapi.futunn.com/futu-api-doc/trade/update-order-fill.html) |
+        | SysNotifyHandlerBase | [OpenD 通知处理基类](./ftapi_init.md#6884) |
+        | StockQuoteHandlerBase | [报价处理基类](./quote_update-stock-quote.md) |
+        | OrderBookHandlerBase | [摆盘处理基类](./quote_update-order-book.md) |
+        | CurKlineHandlerBase | [实时 K 线处理基类](./quote_update-kl.md) |
+        | TickerHandlerBase | [逐笔处理基类](./quote_update-ticker.md) |
+        | RTDataHandlerBase | [分时数据处理基类](./quote_update-rt.md) |
+        | BrokerHandlerBase | [经济队列处理基类](./quote_update-broker.md) |
+        | PriceReminderHandlerBase | [到价提醒处理基类](./quote_update-price-reminder.md) |
+        | TradeOrderHandlerBase | [订单处理基类](./trade_update-order.md) |
+        | TradeDealHandlerBase | [成交处理基类](./trade_update-order-fill.md) |
         
 
 *   **Example**
@@ -1803,7 +1734,7 @@ InitConnect.proto
 19  
 20  
 
-[#](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#1990)
+[#](./ftapi_init.md#1990)
  获取连接 ID
 --------------------------------------------------------------------------
 
@@ -2351,7 +2282,7 @@ InitConnect.proto
     InitConnect 协议回包中的 connID 字段
     
 
-[#](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#6884)
+[#](./ftapi_init.md#6884)
  事件通知回调
 -------------------------------------------------------------------------
 
@@ -2376,7 +2307,7 @@ InitConnect.proto
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | tuple | 当 ret == RET\_OK 时，返回 **事件通知数据** |
     | str | 当 ret != RET\_OK，返回错误描述 |
     
@@ -2386,9 +2317,9 @@ InitConnect.proto
         
         | 参数  | 类型  | 说明  |
         | --- | --- | --- |
-        | notify\_type | [SysNotifyType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#5896) | 通知类型 |
-        | sub\_type | [ProgramStatusType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#6427) | 子类型。当 notify\_type == SysNotifyType.PROGRAM\_STATUS 时，sub\_type 返回程序状态类型 |
-        | [GtwEventType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7799) | 子类型。当 notify\_type == SysNotifyType.GTW\_EVENT 时，sub\_type 返回 OpenD 事件通知类型 |
+        | notify\_type | [SysNotifyType](./ftapi_common.md#5896) | 通知类型 |
+        | sub\_type | [ProgramStatusType](./ftapi_common.md#6427) | 子类型。当 notify\_type == SysNotifyType.PROGRAM\_STATUS 时，sub\_type 返回程序状态类型 |
+        | [GtwEventType](./ftapi_common.md#7799) | 子类型。当 notify\_type == SysNotifyType.GTW\_EVENT 时，sub\_type 返回 OpenD 事件通知类型 |
         | 0   | 当 notify\_type != SysNotifyType.PROGRAM\_STATUS 且 notify\_type != SysNotifyType.GTW\_EVENT 时，sub\_type 返回 0 |
         | msg | dict | 事件信息。当 notify\_type == SysNotifyType.CONN\_STATUS 时，msg 返回 **连接状态事件信息** 字典 |
         | 事件信息。当 notify\_type == SysNotifyType.QOT\_RIGHT 时，msg 返回 **行情权限事件信息** 字典 |
@@ -2406,7 +2337,7 @@ InitConnect.proto
             3  
             4  
             
-        *   **行情权限事件信息** 字典结构如下（点击了解 [行情权限](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2867)
+        *   **行情权限事件信息** 字典结构如下（点击了解 [行情权限](./quote_quote.md#2867)
             ）:
             
                 {
@@ -2792,23 +2723,23 @@ Notify.proto
 18  
 19  
 
-← [交易定义](https://openapi.futunn.com/futu-api-doc/trade/trade.html) [通用定义](https://openapi.futunn.com/futu-api-doc/ftapi/common.html)
+← [交易定义](./trade_trade.md) [通用定义](./ftapi_common.md)
  →
 
-[基础功能](https://openapi.futunn.com/futu-api-doc/ftapi/init.html)
+[基础功能](./ftapi_init.md)
 
-*   [设置接口信息](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#7518)
+*   [设置接口信息](./ftapi_init.md#7518)
     
-*   [设置协议格式](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#1515)
+*   [设置协议格式](./ftapi_init.md#1515)
     
-*   [对所有连接设置协议加密](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#319)
+*   [对所有连接设置协议加密](./ftapi_init.md#319)
     
-*   [设置私钥路径](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#5641)
+*   [设置私钥路径](./ftapi_init.md#5641)
     
-*   [设置线程模式](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#4570)
+*   [设置线程模式](./ftapi_init.md#4570)
     
-*   [设置回调](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#8035)
+*   [设置回调](./ftapi_init.md#8035)
     
-*   [获取连接 ID](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#1990)
+*   [获取连接 ID](./ftapi_init.md#1990)
     
-*   [事件通知回调](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#6884)
+*   [事件通知回调](./ftapi_init.md#6884)

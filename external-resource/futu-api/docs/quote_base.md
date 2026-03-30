@@ -1,8 +1,4 @@
-# 行情对象 | Futu API 文档 v10.2
-
-> 来源: https://openapi.futunn.com/futu-api-doc/quote/base.html
-
-[#](https://openapi.futunn.com/futu-api-doc/quote/base.html#3219)
+[#](./quote_base.md#3219)
  行情对象
 =======================================================================
 
@@ -13,7 +9,7 @@
 *   C++
 *   JavaScript
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/base.html#7902)
+[#](./quote_base.md#7902)
  创建连接
 -----------------------------------------------------------------------
 
@@ -29,7 +25,7 @@
     | --- | --- | --- |
     | host | str | OpenD 监听的 IP 地址 |
     | port | int | OpenD 监听的端口 |
-    | is\_encrypt | bool | 是否启用加密<br>(ℹ️ *   默认为 None，表示使用 [enable\_proto\_encrypt](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#319)<br>     的设置<br>*   True：强制加密  <br>    False：强制不加密) |
+    | is\_encrypt | bool | 是否启用加密<br>(ℹ️ *   默认为 None，表示使用 [enable\_proto\_encrypt](./ftapi_init.md#319))<br>     的设置<br>*   True：强制加密  <br>    False：强制不加密 |
     
 *   **Example**
     
@@ -43,7 +39,7 @@
 2  
 3  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/base.html#1360)
+[#](./quote_base.md#1360)
  关闭连接
 -----------------------------------------------------------------------
 
@@ -51,7 +47,7 @@
 
 *   **介绍**
     
-    关闭行情接口类对象。默认情况下，Futu API 内部创建的线程会阻止进程退出，只有当所有 Context 都 close 后，进程才能正常退出。但通过 [set\_all\_thread\_daemon](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#4570)
+    关闭行情接口类对象。默认情况下，Futu API 内部创建的线程会阻止进程退出，只有当所有 Context 都 close 后，进程才能正常退出。但通过 [set\_all\_thread\_daemon](./ftapi_init.md#4570)
      可以设置所有内部线程为 daemon 线程，这时即使没有调用 Context 的 close，进程也可以正常退出。
     
 *   **Example**
@@ -66,7 +62,7 @@
 2  
 3  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/base.html#9943)
+[#](./quote_base.md#9943)
  启动
 ---------------------------------------------------------------------
 
@@ -77,7 +73,7 @@
     启动异步接收推送数据
     
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/base.html#9952)
+[#](./quote_base.md#9952)
  停止
 ---------------------------------------------------------------------
 
@@ -88,7 +84,7 @@
     停止异步接收推送数据
     
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/base.html#7613)
+[#](./quote_base.md#7613)
  InitConnect.proto
 ------------------------------------------------------------------------------------
 
@@ -175,7 +171,7 @@
 17  
 18  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -183,7 +179,7 @@
     1001
     
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/base.html#7902-2)
+[#](./quote_base.md#7902-2)
  创建连接
 -------------------------------------------------------------------------
 
@@ -281,7 +277,7 @@
 
 1  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/base.html#8436)
+[#](./quote_base.md#8436)
  销毁连接
 -----------------------------------------------------------------------
 
@@ -303,7 +299,7 @@
 2  
 3  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/base.html#7902-3)
+[#](./quote_base.md#7902-3)
  创建连接
 -------------------------------------------------------------------------
 
@@ -404,7 +400,7 @@
 36  
 37  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/base.html#8436-2)
+[#](./quote_base.md#8436-2)
  销毁连接
 -------------------------------------------------------------------------
 
@@ -426,7 +422,7 @@
 2  
 3  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/base.html#7902-4)
+[#](./quote_base.md#7902-4)
  创建连接
 -------------------------------------------------------------------------
 
@@ -457,7 +453,7 @@
 2  
 3  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/base.html#8436-3)
+[#](./quote_base.md#8436-3)
  销毁连接
 -------------------------------------------------------------------------
 
@@ -482,7 +478,7 @@
 2  
 3  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/base.html#7902-5)
+[#](./quote_base.md#7902-5)
  创建连接
 -------------------------------------------------------------------------
 
@@ -498,7 +494,7 @@
     | --- | --- | --- |
     | ip  | str | OpenD 监听的 WebSocket 地址 |
     | port | int | OpenD 监听的 WebSocket 端口 |
-    | ssl | bool | 是否启用 SSL 加密，参见 [WebSocket 相关](https://openapi.futunn.com/futu-api-doc/qa/other.html#6319) |
+    | ssl | bool | 是否启用 SSL 加密，参见 [WebSocket 相关](./qa_other.md#6319) |
     | key | str | 连接的密钥，否则会连接超时，密钥在在 OpenD 可配置，可视化版本在不指定的情况下会随机指定 |
     
 *   **Example**
@@ -521,7 +517,7 @@
 6  
 7  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/base.html#1360-2)
+[#](./quote_base.md#1360-2)
  关闭连接
 -------------------------------------------------------------------------
 
@@ -560,7 +556,7 @@
 *   C++
 *   JavaScript
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/base.html#7902-6)
+[#](./quote_base.md#7902-6)
  创建连接
 -------------------------------------------------------------------------
 
@@ -576,7 +572,7 @@
     | --- | --- | --- |
     | host | str | OpenD 监听的 IP 地址 |
     | port | int | OpenD 监听的端口 |
-    | is\_encrypt | bool | 是否启用加密<br>(ℹ️ *   默认为 None，表示使用 [enable\_proto\_encrypt](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#319)<br>     的设置<br>*   True：强制加密  <br>    False：强制不加密) |
+    | is\_encrypt | bool | 是否启用加密<br>(ℹ️ *   默认为 None，表示使用 [enable\_proto\_encrypt](./ftapi_init.md#319))<br>     的设置<br>*   True：强制加密  <br>    False：强制不加密 |
     
 *   **Example**
     
@@ -590,7 +586,7 @@
 2  
 3  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/base.html#1360-3)
+[#](./quote_base.md#1360-3)
  关闭连接
 -------------------------------------------------------------------------
 
@@ -598,7 +594,7 @@
 
 *   **介绍**
     
-    关闭行情接口类对象。默认情况下，moomoo API 内部创建的线程会阻止进程退出，只有当所有 Context 都 close 后，进程才能正常退出。但通过 [set\_all\_thread\_daemon](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#4570)
+    关闭行情接口类对象。默认情况下，moomoo API 内部创建的线程会阻止进程退出，只有当所有 Context 都 close 后，进程才能正常退出。但通过 [set\_all\_thread\_daemon](./ftapi_init.md#4570)
      可以设置所有内部线程为 daemon 线程，这时即使没有调用 Context 的 close，进程也可以正常退出。
     
 *   **Example**
@@ -613,7 +609,7 @@
 2  
 3  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/base.html#9943-2)
+[#](./quote_base.md#9943-2)
  启动
 -----------------------------------------------------------------------
 
@@ -624,7 +620,7 @@
     启动异步接收推送数据
     
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/base.html#9952-2)
+[#](./quote_base.md#9952-2)
  停止
 -----------------------------------------------------------------------
 
@@ -635,7 +631,7 @@
     停止异步接收推送数据
     
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/base.html#7613-2)
+[#](./quote_base.md#7613-2)
  InitConnect.proto
 --------------------------------------------------------------------------------------
 
@@ -722,7 +718,7 @@
 17  
 18  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -730,7 +726,7 @@
     1001
     
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/base.html#7902-7)
+[#](./quote_base.md#7902-7)
  创建连接
 -------------------------------------------------------------------------
 
@@ -828,7 +824,7 @@
 
 1  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/base.html#8436-4)
+[#](./quote_base.md#8436-4)
  销毁连接
 -------------------------------------------------------------------------
 
@@ -850,7 +846,7 @@
 2  
 3  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/base.html#7902-8)
+[#](./quote_base.md#7902-8)
  创建连接
 -------------------------------------------------------------------------
 
@@ -951,7 +947,7 @@
 36  
 37  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/base.html#8436-5)
+[#](./quote_base.md#8436-5)
  销毁连接
 -------------------------------------------------------------------------
 
@@ -973,7 +969,7 @@
 2  
 3  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/base.html#7902-9)
+[#](./quote_base.md#7902-9)
  创建连接
 -------------------------------------------------------------------------
 
@@ -1004,7 +1000,7 @@
 2  
 3  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/base.html#8436-6)
+[#](./quote_base.md#8436-6)
  销毁连接
 -------------------------------------------------------------------------
 
@@ -1029,7 +1025,7 @@
 2  
 3  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/base.html#7902-10)
+[#](./quote_base.md#7902-10)
  创建连接
 --------------------------------------------------------------------------
 
@@ -1045,7 +1041,7 @@
     | --- | --- | --- |
     | ip  | str | OpenD 监听的 WebSocket 地址 |
     | port | int | OpenD 监听的 WebSocket 端口 |
-    | ssl | bool | 是否启用 SSL 加密，参见 [WebSocket 相关](https://openapi.futunn.com/futu-api-doc/qa/other.html#6319) |
+    | ssl | bool | 是否启用 SSL 加密，参见 [WebSocket 相关](./qa_other.md#6319) |
     | key | str | 连接的密钥，否则会连接超时，密钥在在 OpenD 可配置，可视化版本在不指定的情况下会随机指定 |
     
 *   **Example**
@@ -1068,7 +1064,7 @@
 6  
 7  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/base.html#1360-4)
+[#](./quote_base.md#1360-4)
  关闭连接
 -------------------------------------------------------------------------
 
@@ -1100,5 +1096,7 @@
 7  
 8  
 
-← [行情接口总览](https://openapi.futunn.com/futu-api-doc/quote/overview.html) [订阅反订阅](https://openapi.futunn.com/futu-api-doc/quote/sub.html)
+← [行情接口总览](./quote_overview.md) [订阅反订阅](./quote_sub.md)
  →
+
+[行情对象](./quote_base.md)

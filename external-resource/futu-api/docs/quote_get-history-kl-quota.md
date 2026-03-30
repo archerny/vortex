@@ -1,98 +1,4 @@
- [![Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/img/logo.png) Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/)
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/quote/get-history-kl-quota.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/quote/get-history-kl-quota.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/quote/get-history-kl-quota.html)
-    
-
-下载
-
-*   [PDF](https://openapi.futunn.com/pdfs/Futu-API-Doc-zh-Python.pdf)
-    
-*   [Markdown](https://openapi.futunn.com/mds/Futu-API-Doc-zh-Python.md)
-    
-*   [Skills](https://openapi.futunn.com/skills/opend-skills.zip)
-    
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/quote/get-history-kl-quota.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/quote/get-history-kl-quota.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/quote/get-history-kl-quota.html)
-    
-
-*   介绍
-    
-*   快速上手
-    
-*   OpenD
-    
-*   行情接口
-    
-    *   [行情接口总览](https://openapi.futunn.com/futu-api-doc/quote/overview.html)
-        
-    *   [行情对象](https://openapi.futunn.com/futu-api-doc/quote/base.html)
-        
-    *   实时行情
-        
-    *   基本数据
-        
-    *   相关衍生品
-        
-    *   全市场筛选
-        
-    *   个性化
-        
-        *   [获取历史 K 线额度使用明细](https://openapi.futunn.com/futu-api-doc/quote/get-history-kl-quota.html)
-            
-        *   [设置到价提醒](https://openapi.futunn.com/futu-api-doc/quote/set-price-reminder.html)
-            
-        *   [获取到价提醒列表](https://openapi.futunn.com/futu-api-doc/quote/get-price-reminder.html)
-            
-        *   [获取自选股列表](https://openapi.futunn.com/futu-api-doc/quote/get-user-security.html)
-            
-        *   [获取自选股分组](https://openapi.futunn.com/futu-api-doc/quote/get-user-security-group.html)
-            
-        *   [修改自选股列表](https://openapi.futunn.com/futu-api-doc/quote/modify-user-security.html)
-            
-        *   [到价提醒回调](https://openapi.futunn.com/futu-api-doc/quote/update-price-reminder.html)
-            
-        
-    *   [行情定义](https://openapi.futunn.com/futu-api-doc/quote/quote.html)
-        
-    
-*   交易接口
-    
-*   基础接口
-    
-*   Q&A
-    
-
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-history-kl-quota.html#4184)
+[#](./quote_get-history-kl-quota.md#4184)
  获取历史 K 线额度使用明细
 =================================================================================================
 
@@ -113,14 +19,14 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | get\_detail | bool | 是否返回拉取历史 K 线的详细纪录<br>(ℹ️ True：返回  <br>False：不返回) |
+    | get\_detail | bool | 是否返回拉取历史 K 线的详细纪录<br>(ℹ️ True：返回)  <br>False：不返回 |
     
 
 *   **返回**
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | tuple | 当 ret == RET\_OK，返回历史 K 线额度数据 |
     | str | 当 ret != RET\_OK，返回错误描述 |
     
@@ -171,7 +77,7 @@
 
 1  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-history-kl-quota.html#4658)
+[#](./quote_get-history-kl-quota.md#4658)
  Qot\_RequestHistoryKLQuota.proto
 -------------------------------------------------------------------------------------------------------------------
 
@@ -254,9 +160,9 @@
 22  
 23  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -348,9 +254,9 @@
 23  
 24  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -563,9 +469,9 @@
 22  
 23  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -804,9 +710,9 @@
 22  
 23  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1062,9 +968,9 @@
 22  
 23  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1207,7 +1113,7 @@
 
 接口限制
 
-*   我们会根据您账户的资产和交易的情况，下发历史 K 线额度。因此，30 天内您只能获取有限只股票的历史 K 线数据。具体规则参见 [订阅额度 & 历史 K 线额度](https://openapi.futunn.com/futu-api-doc/intro/authority.html#1314)
+*   我们会根据您账户的资产和交易的情况，下发历史 K 线额度。因此，30 天内您只能获取有限只股票的历史 K 线数据。具体规则参见 [订阅额度 & 历史 K 线额度](./intro_authority.md#1314)
     。
 *   您当日消耗的历史 K 线额度，会在 30 天后自动释放。
 
@@ -1228,14 +1134,14 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | get\_detail | bool | 是否返回拉取历史 K 线的详细纪录<br>(ℹ️ True：返回  <br>False：不返回) |
+    | get\_detail | bool | 是否返回拉取历史 K 线的详细纪录<br>(ℹ️ True：返回)  <br>False：不返回 |
     
 
 *   **返回**
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | tuple | 当 ret == RET\_OK，返回历史 K 线额度数据 |
     | str | 当 ret != RET\_OK，返回错误描述 |
     
@@ -1286,7 +1192,7 @@
 
 1  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-history-kl-quota.html#4658-2)
+[#](./quote_get-history-kl-quota.md#4658-2)
  Qot\_RequestHistoryKLQuota.proto
 ---------------------------------------------------------------------------------------------------------------------
 
@@ -1369,9 +1275,9 @@
 22  
 23  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -1463,9 +1369,9 @@
 23  
 24  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1678,9 +1584,9 @@
 22  
 23  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1919,9 +1825,9 @@
 22  
 23  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2177,9 +2083,9 @@
 22  
 23  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2322,11 +2228,11 @@
 
 接口限制
 
-*   我们会根据您账户的资产和交易的情况，下发历史 K 线额度。因此，30 天内您只能获取有限只股票的历史 K 线数据。具体规则参见 [订阅额度 & 历史 K 线额度](https://openapi.futunn.com/futu-api-doc/intro/authority.html#1314)
+*   我们会根据您账户的资产和交易的情况，下发历史 K 线额度。因此，30 天内您只能获取有限只股票的历史 K 线数据。具体规则参见 [订阅额度 & 历史 K 线额度](./intro_authority.md#1314)
     。
 *   您当日消耗的历史 K 线额度，会在 30 天后自动释放。
 
-← [获取交易日历](https://openapi.futunn.com/futu-api-doc/quote/request-trading-days.html) [设置到价提醒](https://openapi.futunn.com/futu-api-doc/quote/set-price-reminder.html)
+← [获取交易日历](./quote_request-trading-days.md) [设置到价提醒](./quote_set-price-reminder.md)
  →
 
-[获取历史 K 线额度使用明细](https://openapi.futunn.com/futu-api-doc/quote/get-history-kl-quota.html)
+[获取历史 K 线额度使用明细](./quote_get-history-kl-quota.md)

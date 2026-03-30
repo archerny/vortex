@@ -1,98 +1,4 @@
- [![Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/img/logo.png) Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/)
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/quote/get-static-info.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/quote/get-static-info.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/quote/get-static-info.html)
-    
-
-下载
-
-*   [PDF](https://openapi.futunn.com/pdfs/Futu-API-Doc-zh-Python.pdf)
-    
-*   [Markdown](https://openapi.futunn.com/mds/Futu-API-Doc-zh-Python.md)
-    
-*   [Skills](https://openapi.futunn.com/skills/opend-skills.zip)
-    
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/quote/get-static-info.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/quote/get-static-info.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/quote/get-static-info.html)
-    
-
-*   介绍
-    
-*   快速上手
-    
-*   OpenD
-    
-*   行情接口
-    
-    *   [行情接口总览](https://openapi.futunn.com/futu-api-doc/quote/overview.html)
-        
-    *   [行情对象](https://openapi.futunn.com/futu-api-doc/quote/base.html)
-        
-    *   实时行情
-        
-    *   基本数据
-        
-    *   相关衍生品
-        
-    *   全市场筛选
-        
-        *   [条件选股](https://openapi.futunn.com/futu-api-doc/quote/get-stock-filter.html)
-            
-        *   [获取板块内股票列表](https://openapi.futunn.com/futu-api-doc/quote/get-plate-stock.html)
-            
-        *   [获取板块列表](https://openapi.futunn.com/futu-api-doc/quote/get-plate-list.html)
-            
-        *   [获取静态数据](https://openapi.futunn.com/futu-api-doc/quote/get-static-info.html)
-            
-        *   [获取 IPO 信息](https://openapi.futunn.com/futu-api-doc/quote/get-ipo-list.html)
-            
-        *   [获取全局市场状态](https://openapi.futunn.com/futu-api-doc/quote/get-global-state.html)
-            
-        *   [获取交易日历](https://openapi.futunn.com/futu-api-doc/quote/request-trading-days.html)
-            
-        
-    *   个性化
-        
-    *   [行情定义](https://openapi.futunn.com/futu-api-doc/quote/quote.html)
-        
-    
-*   交易接口
-    
-*   基础接口
-    
-*   Q&A
-    
-
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-static-info.html#4898)
+[#](./quote_get-static-info.md#4898)
  获取静态数据
 ====================================================================================
 
@@ -113,9 +19,9 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | market | [Market](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427) | 市场类型 |
-    | stock\_type | [SecurityType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3325) | 股票类型，但不支持传入 SecurityType.DRVT |
-    | code\_list | list | 股票列表<br>(ℹ️ *   默认为 None，代表获取全市场股票的静态信息<br>*   若传入股票列表，只返回指定股票的信息<br>*   list 中元素类型是 str) |
+    | market | [Market](./quote_quote.md#427) | 市场类型 |
+    | stock\_type | [SecurityType](./quote_quote.md#3325) | 股票类型，但不支持传入 SecurityType.DRVT |
+    | code\_list | list | 股票列表<br>(ℹ️ *   默认为 None，代表获取全市场股票的静态信息)<br>*   若传入股票列表，只返回指定股票的信息<br>*   list 中元素类型是 str |
     
     注：当 market 和 code\_list 同时存在时，会忽略 market，仅对 code\_list 进行查询。
     
@@ -124,7 +30,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | pd.DataFrame | 当 ret == RET\_OK，返回股票静态数据 |
     | str | 当 ret != RET\_OK，返回错误描述 |
     
@@ -134,21 +40,21 @@
         | --- | --- | --- |
         | code | str | 股票代码 |
         | name | str | 股票名称 |
-        | lot\_size | int | 每手股数，期权表示每份合约股数<br>(ℹ️ 指数期权无该字段<br><br>，期货表示合约乘数) |
-        | stock\_type | [SecurityType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3325) | 股票类型 |
-        | stock\_child\_type | [WrtType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#926) | 窝轮子类型 |
+        | lot\_size | int | 每手股数，期权表示每份合约股数<br>(ℹ️ 指数期权无该字段)<br><br>，期货表示合约乘数 |
+        | stock\_type | [SecurityType](./quote_quote.md#3325) | 股票类型 |
+        | stock\_child\_type | [WrtType](./quote_quote.md#926) | 窝轮子类型 |
         | stock\_owner | str | 窝轮所属正股的代码，或期权标的股的代码 |
-        | option\_type | [OptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3713) | 期权类型 |
-        | strike\_time | str | 期权行权日<br>(ℹ️ 格式：yyyy-MM-dd  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间) |
+        | option\_type | [OptionType](./quote_quote.md#3713) | 期权类型 |
+        | strike\_time | str | 期权行权日<br>(ℹ️ 格式：yyyy-MM-dd)  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间 |
         | strike\_price | float | 期权行权价 |
-        | suspension | bool | 期权是否停牌<br>(ℹ️ True：停牌  <br>False：未停牌) |
-        | listing\_date | str | 上市时间<br>(ℹ️ 此字段停止维护，不建议使用  <br>格式：yyyy-MM-dd) |
+        | suspension | bool | 期权是否停牌<br>(ℹ️ True：停牌)  <br>False：未停牌 |
+        | listing\_date | str | 上市时间<br>(ℹ️ 此字段停止维护，不建议使用)  <br>格式：yyyy-MM-dd |
         | stock\_id | int | 股票 ID |
         | delisting | bool | 是否退市 |
         | index\_option\_type | str | 指数期权类型 |
         | main\_contract | bool | 是否主连合约 |
         | last\_trade\_time | str | 最后交易时间<br>(ℹ️ 主连，当月，下月等期货没有该字段) |
-        | exchange\_type | [ExchType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6898) | 所属交易所 |
+        | exchange\_type | [ExchType](./quote_quote.md#6898) | 所属交易所 |
         
 *   **Example**
     
@@ -217,7 +123,7 @@
 11  
 12  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-static-info.html#9277)
+[#](./quote_get-static-info.md#9277)
  Qot\_GetStaticInfo.proto
 ------------------------------------------------------------------------------------------------------
 
@@ -255,11 +161,11 @@
 11  
 12  
 
-> *   股票结构参见[Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见[Security](./quote_quote.md#1377)
 >     
-> *   行情市场参见[QotMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427)
+> *   行情市场参见[QotMarket](./quote_quote.md#427)
 >     
-> *   股票类型参见[SecurityType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3325)
+> *   股票类型参见[SecurityType](./quote_quote.md#3325)
 >     
 
 *   **返回**
@@ -293,9 +199,9 @@
 12  
 13  
 
-> *   股票静态信息结构参见[SecurityStaticInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#609)
+> *   股票静态信息结构参见[SecurityStaticInfo](./quote_quote.md#609)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -340,11 +246,11 @@
 11  
 12  
 
-> *   股票结构参见[Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见[Security](./quote_quote.md#1377)
 >     
-> *   行情市场参见[QotMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427)
+> *   行情市场参见[QotMarket](./quote_quote.md#427)
 >     
-> *   股票类型参见[SecurityType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3325)
+> *   股票类型参见[SecurityType](./quote_quote.md#3325)
 >     
 
 *   **返回**
@@ -378,9 +284,9 @@
 12  
 13  
 
-> *   股票静态信息结构参见[SecurityStaticInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#609)
+> *   股票静态信息结构参见[SecurityStaticInfo](./quote_quote.md#609)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -544,11 +450,11 @@
 11  
 12  
 
-> *   股票结构参见[Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见[Security](./quote_quote.md#1377)
 >     
-> *   行情市场参见[QotMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427)
+> *   行情市场参见[QotMarket](./quote_quote.md#427)
 >     
-> *   股票类型参见[SecurityType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3325)
+> *   股票类型参见[SecurityType](./quote_quote.md#3325)
 >     
 
 *   **返回**
@@ -582,9 +488,9 @@
 12  
 13  
 
-> *   股票静态信息结构参见[SecurityStaticInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#609)
+> *   股票静态信息结构参见[SecurityStaticInfo](./quote_quote.md#609)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -814,11 +720,11 @@
 11  
 12  
 
-> *   股票结构参见[Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见[Security](./quote_quote.md#1377)
 >     
-> *   行情市场参见[QotMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427)
+> *   行情市场参见[QotMarket](./quote_quote.md#427)
 >     
-> *   股票类型参见[SecurityType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3325)
+> *   股票类型参见[SecurityType](./quote_quote.md#3325)
 >     
 
 *   **返回**
@@ -852,9 +758,9 @@
 12  
 13  
 
-> *   股票静态信息结构参见[SecurityStaticInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#609)
+> *   股票静态信息结构参见[SecurityStaticInfo](./quote_quote.md#609)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1105,11 +1011,11 @@
 11  
 12  
 
-> *   股票结构参见[Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见[Security](./quote_quote.md#1377)
 >     
-> *   行情市场参见[QotMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427)
+> *   行情市场参见[QotMarket](./quote_quote.md#427)
 >     
-> *   股票类型参见[SecurityType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3325)
+> *   股票类型参见[SecurityType](./quote_quote.md#3325)
 >     
 
 *   **返回**
@@ -1143,9 +1049,9 @@
 12  
 13  
 
-> *   股票静态信息结构参见[SecurityStaticInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#609)
+> *   股票静态信息结构参见[SecurityStaticInfo](./quote_quote.md#609)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1324,9 +1230,9 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | market | [Market](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427) | 市场类型 |
-    | stock\_type | [SecurityType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3325) | 股票类型，但不支持传入 SecurityType.DRVT |
-    | code\_list | list | 股票列表<br>(ℹ️ *   默认为 None，代表获取全市场股票的静态信息<br>*   若传入股票列表，只返回指定股票的信息<br>*   list 中元素类型是 str) |
+    | market | [Market](./quote_quote.md#427) | 市场类型 |
+    | stock\_type | [SecurityType](./quote_quote.md#3325) | 股票类型，但不支持传入 SecurityType.DRVT |
+    | code\_list | list | 股票列表<br>(ℹ️ *   默认为 None，代表获取全市场股票的静态信息)<br>*   若传入股票列表，只返回指定股票的信息<br>*   list 中元素类型是 str |
     
     注：当 market 和 code\_list 同时存在时，会忽略 market，仅对 code\_list 进行查询。
     
@@ -1335,7 +1241,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | pd.DataFrame | 当 ret == RET\_OK，返回股票静态数据 |
     | str | 当 ret != RET\_OK，返回错误描述 |
     
@@ -1345,21 +1251,21 @@
         | --- | --- | --- |
         | code | str | 股票代码 |
         | name | str | 股票名称 |
-        | lot\_size | int | 每手股数，期权表示每份合约股数<br>(ℹ️ 指数期权无该字段<br><br>，期货表示合约乘数) |
-        | stock\_type | [SecurityType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3325) | 股票类型 |
-        | stock\_child\_type | [WrtType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#926) | 窝轮子类型 |
+        | lot\_size | int | 每手股数，期权表示每份合约股数<br>(ℹ️ 指数期权无该字段)<br><br>，期货表示合约乘数 |
+        | stock\_type | [SecurityType](./quote_quote.md#3325) | 股票类型 |
+        | stock\_child\_type | [WrtType](./quote_quote.md#926) | 窝轮子类型 |
         | stock\_owner | str | 窝轮所属正股的代码，或期权标的股的代码 |
-        | option\_type | [OptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3713) | 期权类型 |
-        | strike\_time | str | 期权行权日<br>(ℹ️ 格式：yyyy-MM-dd  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间) |
+        | option\_type | [OptionType](./quote_quote.md#3713) | 期权类型 |
+        | strike\_time | str | 期权行权日<br>(ℹ️ 格式：yyyy-MM-dd)  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间 |
         | strike\_price | float | 期权行权价 |
-        | suspension | bool | 期权是否停牌<br>(ℹ️ True：停牌  <br>False：未停牌) |
-        | listing\_date | str | 上市时间<br>(ℹ️ 此字段停止维护，不建议使用  <br>格式：yyyy-MM-dd) |
+        | suspension | bool | 期权是否停牌<br>(ℹ️ True：停牌)  <br>False：未停牌 |
+        | listing\_date | str | 上市时间<br>(ℹ️ 此字段停止维护，不建议使用)  <br>格式：yyyy-MM-dd |
         | stock\_id | int | 股票 ID |
         | delisting | bool | 是否退市 |
         | index\_option\_type | str | 指数期权类型 |
         | main\_contract | bool | 是否主连合约 |
         | last\_trade\_time | str | 最后交易时间<br>(ℹ️ 主连，当月，下月等期货没有该字段) |
-        | exchange\_type | [ExchType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6898) | 所属交易所 |
+        | exchange\_type | [ExchType](./quote_quote.md#6898) | 所属交易所 |
         
 *   **Example**
     
@@ -1428,7 +1334,7 @@
 11  
 12  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-static-info.html#9277-2)
+[#](./quote_get-static-info.md#9277-2)
  Qot\_GetStaticInfo.proto
 --------------------------------------------------------------------------------------------------------
 
@@ -1466,11 +1372,11 @@
 11  
 12  
 
-> *   股票结构参见[Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见[Security](./quote_quote.md#1377)
 >     
-> *   行情市场参见[QotMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427)
+> *   行情市场参见[QotMarket](./quote_quote.md#427)
 >     
-> *   股票类型参见[SecurityType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3325)
+> *   股票类型参见[SecurityType](./quote_quote.md#3325)
 >     
 
 *   **返回**
@@ -1504,9 +1410,9 @@
 12  
 13  
 
-> *   股票静态信息结构参见[SecurityStaticInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#609)
+> *   股票静态信息结构参见[SecurityStaticInfo](./quote_quote.md#609)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -1551,11 +1457,11 @@
 11  
 12  
 
-> *   股票结构参见[Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见[Security](./quote_quote.md#1377)
 >     
-> *   行情市场参见[QotMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427)
+> *   行情市场参见[QotMarket](./quote_quote.md#427)
 >     
-> *   股票类型参见[SecurityType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3325)
+> *   股票类型参见[SecurityType](./quote_quote.md#3325)
 >     
 
 *   **返回**
@@ -1589,9 +1495,9 @@
 12  
 13  
 
-> *   股票静态信息结构参见[SecurityStaticInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#609)
+> *   股票静态信息结构参见[SecurityStaticInfo](./quote_quote.md#609)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1755,11 +1661,11 @@
 11  
 12  
 
-> *   股票结构参见[Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见[Security](./quote_quote.md#1377)
 >     
-> *   行情市场参见[QotMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427)
+> *   行情市场参见[QotMarket](./quote_quote.md#427)
 >     
-> *   股票类型参见[SecurityType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3325)
+> *   股票类型参见[SecurityType](./quote_quote.md#3325)
 >     
 
 *   **返回**
@@ -1793,9 +1699,9 @@
 12  
 13  
 
-> *   股票静态信息结构参见[SecurityStaticInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#609)
+> *   股票静态信息结构参见[SecurityStaticInfo](./quote_quote.md#609)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2025,11 +1931,11 @@
 11  
 12  
 
-> *   股票结构参见[Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见[Security](./quote_quote.md#1377)
 >     
-> *   行情市场参见[QotMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427)
+> *   行情市场参见[QotMarket](./quote_quote.md#427)
 >     
-> *   股票类型参见[SecurityType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3325)
+> *   股票类型参见[SecurityType](./quote_quote.md#3325)
 >     
 
 *   **返回**
@@ -2063,9 +1969,9 @@
 12  
 13  
 
-> *   股票静态信息结构参见[SecurityStaticInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#609)
+> *   股票静态信息结构参见[SecurityStaticInfo](./quote_quote.md#609)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2316,11 +2222,11 @@
 11  
 12  
 
-> *   股票结构参见[Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见[Security](./quote_quote.md#1377)
 >     
-> *   行情市场参见[QotMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427)
+> *   行情市场参见[QotMarket](./quote_quote.md#427)
 >     
-> *   股票类型参见[SecurityType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3325)
+> *   股票类型参见[SecurityType](./quote_quote.md#3325)
 >     
 
 *   **返回**
@@ -2354,9 +2260,9 @@
 12  
 13  
 
-> *   股票静态信息结构参见[SecurityStaticInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#609)
+> *   股票静态信息结构参见[SecurityStaticInfo](./quote_quote.md#609)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2518,7 +2424,7 @@
 *   当传入程序无法识别的股票时（包括很久之前退市的股票和不存在的股票），此接口仍然返回股票信息，用“是否退市”字段来标识该股票不存在。统一处理为：代码正常显示，股票名显示为“未知股票”，其他字段均为默认值（整型默认是0，字符串默认是空字符串）。
 *   此接口与其他的行情接口不同，其他接口遇到程序无法识别的股票时，会拒绝请求并返回错误描述“未知股票”。
 
-← [获取板块列表](https://openapi.futunn.com/futu-api-doc/quote/get-plate-list.html) [获取 IPO 信息](https://openapi.futunn.com/futu-api-doc/quote/get-ipo-list.html)
+← [获取板块列表](./quote_get-plate-list.md) [获取 IPO 信息](./quote_get-ipo-list.md)
  →
 
-[获取静态数据](https://openapi.futunn.com/futu-api-doc/quote/get-static-info.html)
+[获取静态数据](./quote_get-static-info.md)

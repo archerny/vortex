@@ -34,6 +34,9 @@ application-local.properties
 *.iml
 .DS_Store
 
+# ========== Firecrawl 临时数据 ==========
+.firecrawl/
+
 # ========== 构建产物 ==========
 deploy/output/
 deploy/*.tar.gz

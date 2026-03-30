@@ -1,94 +1,4 @@
- [![Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/img/logo.png) Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/)
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/quote/get-option-chain.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/quote/get-option-chain.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/quote/get-option-chain.html)
-    
-
-下载
-
-*   [PDF](https://openapi.futunn.com/pdfs/Futu-API-Doc-zh-Python.pdf)
-    
-*   [Markdown](https://openapi.futunn.com/mds/Futu-API-Doc-zh-Python.md)
-    
-*   [Skills](https://openapi.futunn.com/skills/opend-skills.zip)
-    
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/quote/get-option-chain.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/quote/get-option-chain.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/quote/get-option-chain.html)
-    
-
-*   介绍
-    
-*   快速上手
-    
-*   OpenD
-    
-*   行情接口
-    
-    *   [行情接口总览](https://openapi.futunn.com/futu-api-doc/quote/overview.html)
-        
-    *   [行情对象](https://openapi.futunn.com/futu-api-doc/quote/base.html)
-        
-    *   实时行情
-        
-    *   基本数据
-        
-    *   相关衍生品
-        
-        *   [获取期权链到期日](https://openapi.futunn.com/futu-api-doc/quote/get-option-expiration-date.html)
-            
-        *   [获取期权链](https://openapi.futunn.com/futu-api-doc/quote/get-option-chain.html)
-            
-        *   [筛选窝轮](https://openapi.futunn.com/futu-api-doc/quote/get-warrant.html)
-            
-        *   [获取窝轮和期货列表](https://openapi.futunn.com/futu-api-doc/quote/get-referencestock-list.html)
-            
-        *   [获取期货合约资料](https://openapi.futunn.com/futu-api-doc/quote/get-future-info.html)
-            
-        
-    *   全市场筛选
-        
-    *   个性化
-        
-    *   [行情定义](https://openapi.futunn.com/futu-api-doc/quote/quote.html)
-        
-    
-*   交易接口
-    
-*   基础接口
-    
-*   Q&A
-    
-
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-option-chain.html#1700)
+[#](./quote_get-option-chain.md#1700)
  获取期权链
 ====================================================================================
 
@@ -103,7 +13,7 @@
 
 *   **介绍**
     
-    通过标的股票查询期权链。此接口仅返回期权链的静态信息，如需获取报价或摆盘等动态信息，请用此接口返回的股票代码，自行 [订阅](https://openapi.futunn.com/futu-api-doc/quote/sub.html)
+    通过标的股票查询期权链。此接口仅返回期权链的静态信息，如需获取报价或摆盘等动态信息，请用此接口返回的股票代码，自行 [订阅](./quote_sub.md)
      所需要的类型。
     
 *   **参数**
@@ -111,11 +21,11 @@
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
     | code | str | 标的股票代码 |
-    | index\_option\_type | [IndexOptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5149) | 指数期权类型<br>(ℹ️ 仅对港股指数期权筛选有效，正股、ETFs、美股指数期权可忽略此参数) |
+    | index\_option\_type | [IndexOptionType](./quote_quote.md#5149) | 指数期权类型<br>(ℹ️ 仅对港股指数期权筛选有效，正股、ETFs、美股指数期权可忽略此参数) |
     | start | str | 开始日期，该日期指到期日<br>(ℹ️ 例如：“2017-08-01”) |
     | end | str | 结束日期（包括这一天），该日期指到期日<br>(ℹ️ 例如：“2017-08-30”) |
-    | option\_type | [OptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3713) | 期权看涨看跌类型<br>(ℹ️ 默认为全部) |
-    | option\_cond\_type | [OptionCondType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3227) | 期权价内外类型<br>(ℹ️ 默认为全部) |
+    | option\_type | [OptionType](./quote_quote.md#3713) | 期权看涨看跌类型<br>(ℹ️ 默认为全部) |
+    | option\_cond\_type | [OptionCondType](./quote_quote.md#3227) | 期权价内外类型<br>(ℹ️ 默认为全部) |
     | data\_filter | OptionDataFilter | 数据筛选条件<br>(ℹ️ 默认为不筛选) |
     
     *   start 和 end 的组合如下：
@@ -131,8 +41,8 @@
         
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
-        | implied\_volatility\_min | float | 隐含波动率过滤起点<br>(ℹ️ 精确到小数点后 0 位，超出部分会被舍弃  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
-        | implied\_volatility\_max | float | 隐含波动率过滤终点<br>(ℹ️ 精确到小数点后 0 位，超出部分会被舍弃  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+        | implied\_volatility\_min | float | 隐含波动率过滤起点<br>(ℹ️ 精确到小数点后 0 位，超出部分会被舍弃)  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+        | implied\_volatility\_max | float | 隐含波动率过滤终点<br>(ℹ️ 精确到小数点后 0 位，超出部分会被舍弃)  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
         | delta\_min | float | 希腊值 Delta 过滤起点<br>(ℹ️ 精确到小数点后 3 位，超出部分会被舍弃) |
         | delta\_max | float | 希腊值 Delta 过滤终点<br>(ℹ️ 精确到小数点后 3 位，超出部分会被舍弃) |
         | gamma\_min | float | 希腊值 Gamma 过滤起点<br>(ℹ️ 精确到小数点后 3 位，超出部分会被舍弃) |
@@ -155,7 +65,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | pd.DataFrame | 当 ret == RET\_OK，返回期权链数据 |
     | str | 当 ret != RET\_OK，返回错误描述 |
     
@@ -166,17 +76,17 @@
         | code | str | 股票代码 |
         | name | str | 名字  |
         | lot\_size | int | 每手股数，期权表示每份合约股数<br>(ℹ️ 指数期权无该字段) |
-        | stock\_type | [SecurityType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3325) | 股票类型 |
-        | option\_type | [OptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3713) | 期权类型 |
+        | stock\_type | [SecurityType](./quote_quote.md#3325) | 股票类型 |
+        | option\_type | [OptionType](./quote_quote.md#3713) | 期权类型 |
         | stock\_owner | str | 标的股 |
-        | strike\_time | str | 行权日<br>(ℹ️ 格式：yyyy-MM-dd  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间) |
+        | strike\_time | str | 行权日<br>(ℹ️ 格式：yyyy-MM-dd)  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间 |
         | strike\_price | float | 行权价 |
-        | suspension | bool | 是否停牌<br>(ℹ️ True：停牌  <br>False：未停牌) |
+        | suspension | bool | 是否停牌<br>(ℹ️ True：停牌)  <br>False：未停牌 |
         | stock\_id | int | 股票 ID |
-        | index\_option\_type | [IndexOptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5149) | 指数期权类型 |
-        | expiration\_cycle | [ExpirationCycle](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2235) | 交割周期 |
-        | option\_standard\_type | [OptionStandardType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8952) | 期权标准类型 |
-        | option\_settlement\_mode | [OptionSettlementMode](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1550) | 期权结算方式 |
+        | index\_option\_type | [IndexOptionType](./quote_quote.md#5149) | 指数期权类型 |
+        | expiration\_cycle | [ExpirationCycle](./quote_quote.md#2235) | 交割周期 |
+        | option\_standard\_type | [OptionStandardType](./quote_quote.md#8952) | 期权标准类型 |
+        | option\_settlement\_mode | [OptionSettlementMode](./quote_quote.md#1550) | 期权结算方式 |
         
 *   **Example**
     
@@ -273,13 +183,13 @@
 18  
 19  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-option-chain.html#1122)
+[#](./quote_get-option-chain.md#1122)
  Qot\_GetOptionChain.proto
 --------------------------------------------------------------------------------------------------------
 
 *   **介绍**
     
-    通过标的股票查询期权链。此接口仅返回期权链的静态信息，如需获取报价或摆盘等动态信息，请用此接口返回的股票代码，自行 [订阅](https://openapi.futunn.com/futu-api-doc/quote/sub.html)
+    通过标的股票查询期权链。此接口仅返回期权链的静态信息，如需获取报价或摆盘等动态信息，请用此接口返回的股票代码，自行 [订阅](./quote_sub.md)
      所需要的类型。
     
 *   **协议 ID**
@@ -398,11 +308,11 @@
 52  
 53  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   期权类型枚举参见 [OptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3713)
+> *   期权类型枚举参见 [OptionType](./quote_quote.md#3713)
 >     
-> *   指数期权类别枚举参见 [IndexOptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5149)
+> *   指数期权类别枚举参见 [IndexOptionType](./quote_quote.md#5149)
 >     
 
 *   **返回**
@@ -460,9 +370,9 @@
 24  
 25  
 
-> *   股票静态信息结构参见 [SecurityStaticInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#609)
+> *   股票静态信息结构参见 [SecurityStaticInfo](./quote_quote.md#609)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -475,7 +385,7 @@
 
 *   **介绍**
     
-    通过标的股票查询期权链。此接口仅返回期权链的静态信息，如需获取报价或摆盘等动态信息，请用此接口返回的股票代码，自行 [订阅](https://openapi.futunn.com/futu-api-doc/quote/sub.html)
+    通过标的股票查询期权链。此接口仅返回期权链的静态信息，如需获取报价或摆盘等动态信息，请用此接口返回的股票代码，自行 [订阅](./quote_sub.md)
      所需要的类型。
     
 *   **参数**
@@ -590,11 +500,11 @@
 52  
 53  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   期权类型枚举参见 [OptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3713)
+> *   期权类型枚举参见 [OptionType](./quote_quote.md#3713)
 >     
-> *   指数期权类别枚举参见 [IndexOptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5149)
+> *   指数期权类别枚举参见 [IndexOptionType](./quote_quote.md#5149)
 >     
 
 *   **返回**
@@ -652,9 +562,9 @@
 24  
 25  
 
-> *   股票静态信息结构参见 [SecurityStaticInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#609)
+> *   股票静态信息结构参见 [SecurityStaticInfo](./quote_quote.md#609)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -794,7 +704,7 @@
 
 *   **介绍**
     
-    通过标的股票查询期权链。此接口仅返回期权链的静态信息，如需获取报价或摆盘等动态信息，请用此接口返回的股票代码，自行 [订阅](https://openapi.futunn.com/futu-api-doc/quote/sub.html)
+    通过标的股票查询期权链。此接口仅返回期权链的静态信息，如需获取报价或摆盘等动态信息，请用此接口返回的股票代码，自行 [订阅](./quote_sub.md)
      所需要的类型。
     
 *   **参数**
@@ -909,11 +819,11 @@
 52  
 53  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   期权类型枚举参见 [OptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3713)
+> *   期权类型枚举参见 [OptionType](./quote_quote.md#3713)
 >     
-> *   指数期权类别枚举参见 [IndexOptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5149)
+> *   指数期权类别枚举参见 [IndexOptionType](./quote_quote.md#5149)
 >     
 
 *   **返回**
@@ -971,9 +881,9 @@
 24  
 25  
 
-> *   股票静态信息结构参见 [SecurityStaticInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#609)
+> *   股票静态信息结构参见 [SecurityStaticInfo](./quote_quote.md#609)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1389,7 +1299,7 @@
 
 *   **介绍**
     
-    通过标的股票查询期权链。此接口仅返回期权链的静态信息，如需获取报价或摆盘等动态信息，请用此接口返回的股票代码，自行 [订阅](https://openapi.futunn.com/futu-api-doc/quote/sub.html)
+    通过标的股票查询期权链。此接口仅返回期权链的静态信息，如需获取报价或摆盘等动态信息，请用此接口返回的股票代码，自行 [订阅](./quote_sub.md)
      所需要的类型。
     
 *   **参数**
@@ -1504,11 +1414,11 @@
 52  
 53  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   期权类型枚举参见 [OptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3713)
+> *   期权类型枚举参见 [OptionType](./quote_quote.md#3713)
 >     
-> *   指数期权类别枚举参见 [IndexOptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5149)
+> *   指数期权类别枚举参见 [IndexOptionType](./quote_quote.md#5149)
 >     
 
 *   **返回**
@@ -1566,9 +1476,9 @@
 24  
 25  
 
-> *   股票静态信息结构参见 [SecurityStaticInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#609)
+> *   股票静态信息结构参见 [SecurityStaticInfo](./quote_quote.md#609)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2011,7 +1921,7 @@
 
 *   **介绍**
     
-    通过标的股票查询期权链。此接口仅返回期权链的静态信息，如需获取报价或摆盘等动态信息，请用此接口返回的股票代码，自行 [订阅](https://openapi.futunn.com/futu-api-doc/quote/sub.html)
+    通过标的股票查询期权链。此接口仅返回期权链的静态信息，如需获取报价或摆盘等动态信息，请用此接口返回的股票代码，自行 [订阅](./quote_sub.md)
      所需要的类型。
     
 *   **参数**
@@ -2126,11 +2036,11 @@
 52  
 53  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   期权类型枚举参见 [OptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3713)
+> *   期权类型枚举参见 [OptionType](./quote_quote.md#3713)
 >     
-> *   指数期权类别枚举参见 [IndexOptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5149)
+> *   指数期权类别枚举参见 [IndexOptionType](./quote_quote.md#5149)
 >     
 
 *   **返回**
@@ -2188,9 +2098,9 @@
 24  
 25  
 
-> *   股票静态信息结构参见 [SecurityStaticInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#609)
+> *   股票静态信息结构参见 [SecurityStaticInfo](./quote_quote.md#609)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2588,7 +2498,7 @@
 
 *   **介绍**
     
-    通过标的股票查询期权链。此接口仅返回期权链的静态信息，如需获取报价或摆盘等动态信息，请用此接口返回的股票代码，自行 [订阅](https://openapi.futunn.com/futu-api-doc/quote/sub.html)
+    通过标的股票查询期权链。此接口仅返回期权链的静态信息，如需获取报价或摆盘等动态信息，请用此接口返回的股票代码，自行 [订阅](./quote_sub.md)
      所需要的类型。
     
 *   **参数**
@@ -2596,11 +2506,11 @@
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
     | code | str | 标的股票代码 |
-    | index\_option\_type | [IndexOptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5149) | 指数期权类型<br>(ℹ️ 仅对港股指数期权筛选有效，正股、ETFs、美股指数期权可忽略此参数) |
+    | index\_option\_type | [IndexOptionType](./quote_quote.md#5149) | 指数期权类型<br>(ℹ️ 仅对港股指数期权筛选有效，正股、ETFs、美股指数期权可忽略此参数) |
     | start | str | 开始日期，该日期指到期日<br>(ℹ️ 例如：“2017-08-01”) |
     | end | str | 结束日期（包括这一天），该日期指到期日<br>(ℹ️ 例如：“2017-08-30”) |
-    | option\_type | [OptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3713) | 期权看涨看跌类型<br>(ℹ️ 默认为全部) |
-    | option\_cond\_type | [OptionCondType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3227) | 期权价内外类型<br>(ℹ️ 默认为全部) |
+    | option\_type | [OptionType](./quote_quote.md#3713) | 期权看涨看跌类型<br>(ℹ️ 默认为全部) |
+    | option\_cond\_type | [OptionCondType](./quote_quote.md#3227) | 期权价内外类型<br>(ℹ️ 默认为全部) |
     | data\_filter | OptionDataFilter | 数据筛选条件<br>(ℹ️ 默认为不筛选) |
     
     *   start 和 end 的组合如下：
@@ -2616,8 +2526,8 @@
         
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
-        | implied\_volatility\_min | float | 隐含波动率过滤起点<br>(ℹ️ 精确到小数点后 0 位，超出部分会被舍弃  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
-        | implied\_volatility\_max | float | 隐含波动率过滤终点<br>(ℹ️ 精确到小数点后 0 位，超出部分会被舍弃  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+        | implied\_volatility\_min | float | 隐含波动率过滤起点<br>(ℹ️ 精确到小数点后 0 位，超出部分会被舍弃)  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+        | implied\_volatility\_max | float | 隐含波动率过滤终点<br>(ℹ️ 精确到小数点后 0 位，超出部分会被舍弃)  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
         | delta\_min | float | 希腊值 Delta 过滤起点<br>(ℹ️ 精确到小数点后 3 位，超出部分会被舍弃) |
         | delta\_max | float | 希腊值 Delta 过滤终点<br>(ℹ️ 精确到小数点后 3 位，超出部分会被舍弃) |
         | gamma\_min | float | 希腊值 Gamma 过滤起点<br>(ℹ️ 精确到小数点后 3 位，超出部分会被舍弃) |
@@ -2640,7 +2550,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | pd.DataFrame | 当 ret == RET\_OK，返回期权链数据 |
     | str | 当 ret != RET\_OK，返回错误描述 |
     
@@ -2651,17 +2561,17 @@
         | code | str | 股票代码 |
         | name | str | 名字  |
         | lot\_size | int | 每手股数，期权表示每份合约股数<br>(ℹ️ 指数期权无该字段) |
-        | stock\_type | [SecurityType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3325) | 股票类型 |
-        | option\_type | [OptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3713) | 期权类型 |
+        | stock\_type | [SecurityType](./quote_quote.md#3325) | 股票类型 |
+        | option\_type | [OptionType](./quote_quote.md#3713) | 期权类型 |
         | stock\_owner | str | 标的股 |
-        | strike\_time | str | 行权日<br>(ℹ️ 格式：yyyy-MM-dd  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间) |
+        | strike\_time | str | 行权日<br>(ℹ️ 格式：yyyy-MM-dd)  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间 |
         | strike\_price | float | 行权价 |
-        | suspension | bool | 是否停牌<br>(ℹ️ True：停牌  <br>False：未停牌) |
+        | suspension | bool | 是否停牌<br>(ℹ️ True：停牌)  <br>False：未停牌 |
         | stock\_id | int | 股票 ID |
-        | index\_option\_type | [IndexOptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5149) | 指数期权类型 |
-        | expiration\_cycle | [ExpirationCycle](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2235) | 交割周期 |
-        | option\_standard\_type | [OptionStandardType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8952) | 期权标准类型 |
-        | option\_settlement\_mode | [OptionSettlementMode](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1550) | 期权结算方式 |
+        | index\_option\_type | [IndexOptionType](./quote_quote.md#5149) | 指数期权类型 |
+        | expiration\_cycle | [ExpirationCycle](./quote_quote.md#2235) | 交割周期 |
+        | option\_standard\_type | [OptionStandardType](./quote_quote.md#8952) | 期权标准类型 |
+        | option\_settlement\_mode | [OptionSettlementMode](./quote_quote.md#1550) | 期权结算方式 |
         
 *   **Example**
     
@@ -2758,13 +2668,13 @@
 18  
 19  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-option-chain.html#1122-2)
+[#](./quote_get-option-chain.md#1122-2)
  Qot\_GetOptionChain.proto
 ----------------------------------------------------------------------------------------------------------
 
 *   **介绍**
     
-    通过标的股票查询期权链。此接口仅返回期权链的静态信息，如需获取报价或摆盘等动态信息，请用此接口返回的股票代码，自行 [订阅](https://openapi.futunn.com/futu-api-doc/quote/sub.html)
+    通过标的股票查询期权链。此接口仅返回期权链的静态信息，如需获取报价或摆盘等动态信息，请用此接口返回的股票代码，自行 [订阅](./quote_sub.md)
      所需要的类型。
     
 *   **协议 ID**
@@ -2883,11 +2793,11 @@
 52  
 53  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   期权类型枚举参见 [OptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3713)
+> *   期权类型枚举参见 [OptionType](./quote_quote.md#3713)
 >     
-> *   指数期权类别枚举参见 [IndexOptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5149)
+> *   指数期权类别枚举参见 [IndexOptionType](./quote_quote.md#5149)
 >     
 
 *   **返回**
@@ -2945,9 +2855,9 @@
 24  
 25  
 
-> *   股票静态信息结构参见 [SecurityStaticInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#609)
+> *   股票静态信息结构参见 [SecurityStaticInfo](./quote_quote.md#609)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -2960,7 +2870,7 @@
 
 *   **介绍**
     
-    通过标的股票查询期权链。此接口仅返回期权链的静态信息，如需获取报价或摆盘等动态信息，请用此接口返回的股票代码，自行 [订阅](https://openapi.futunn.com/futu-api-doc/quote/sub.html)
+    通过标的股票查询期权链。此接口仅返回期权链的静态信息，如需获取报价或摆盘等动态信息，请用此接口返回的股票代码，自行 [订阅](./quote_sub.md)
      所需要的类型。
     
 *   **参数**
@@ -3075,11 +2985,11 @@
 52  
 53  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   期权类型枚举参见 [OptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3713)
+> *   期权类型枚举参见 [OptionType](./quote_quote.md#3713)
 >     
-> *   指数期权类别枚举参见 [IndexOptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5149)
+> *   指数期权类别枚举参见 [IndexOptionType](./quote_quote.md#5149)
 >     
 
 *   **返回**
@@ -3137,9 +3047,9 @@
 24  
 25  
 
-> *   股票静态信息结构参见 [SecurityStaticInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#609)
+> *   股票静态信息结构参见 [SecurityStaticInfo](./quote_quote.md#609)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -3279,7 +3189,7 @@
 
 *   **介绍**
     
-    通过标的股票查询期权链。此接口仅返回期权链的静态信息，如需获取报价或摆盘等动态信息，请用此接口返回的股票代码，自行 [订阅](https://openapi.futunn.com/futu-api-doc/quote/sub.html)
+    通过标的股票查询期权链。此接口仅返回期权链的静态信息，如需获取报价或摆盘等动态信息，请用此接口返回的股票代码，自行 [订阅](./quote_sub.md)
      所需要的类型。
     
 *   **参数**
@@ -3394,11 +3304,11 @@
 52  
 53  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   期权类型枚举参见 [OptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3713)
+> *   期权类型枚举参见 [OptionType](./quote_quote.md#3713)
 >     
-> *   指数期权类别枚举参见 [IndexOptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5149)
+> *   指数期权类别枚举参见 [IndexOptionType](./quote_quote.md#5149)
 >     
 
 *   **返回**
@@ -3456,9 +3366,9 @@
 24  
 25  
 
-> *   股票静态信息结构参见 [SecurityStaticInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#609)
+> *   股票静态信息结构参见 [SecurityStaticInfo](./quote_quote.md#609)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -3874,7 +3784,7 @@
 
 *   **介绍**
     
-    通过标的股票查询期权链。此接口仅返回期权链的静态信息，如需获取报价或摆盘等动态信息，请用此接口返回的股票代码，自行 [订阅](https://openapi.futunn.com/futu-api-doc/quote/sub.html)
+    通过标的股票查询期权链。此接口仅返回期权链的静态信息，如需获取报价或摆盘等动态信息，请用此接口返回的股票代码，自行 [订阅](./quote_sub.md)
      所需要的类型。
     
 *   **参数**
@@ -3989,11 +3899,11 @@
 52  
 53  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   期权类型枚举参见 [OptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3713)
+> *   期权类型枚举参见 [OptionType](./quote_quote.md#3713)
 >     
-> *   指数期权类别枚举参见 [IndexOptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5149)
+> *   指数期权类别枚举参见 [IndexOptionType](./quote_quote.md#5149)
 >     
 
 *   **返回**
@@ -4051,9 +3961,9 @@
 24  
 25  
 
-> *   股票静态信息结构参见 [SecurityStaticInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#609)
+> *   股票静态信息结构参见 [SecurityStaticInfo](./quote_quote.md#609)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -4496,7 +4406,7 @@
 
 *   **介绍**
     
-    通过标的股票查询期权链。此接口仅返回期权链的静态信息，如需获取报价或摆盘等动态信息，请用此接口返回的股票代码，自行 [订阅](https://openapi.futunn.com/futu-api-doc/quote/sub.html)
+    通过标的股票查询期权链。此接口仅返回期权链的静态信息，如需获取报价或摆盘等动态信息，请用此接口返回的股票代码，自行 [订阅](./quote_sub.md)
      所需要的类型。
     
 *   **参数**
@@ -4611,11 +4521,11 @@
 52  
 53  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   期权类型枚举参见 [OptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3713)
+> *   期权类型枚举参见 [OptionType](./quote_quote.md#3713)
 >     
-> *   指数期权类别枚举参见 [IndexOptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5149)
+> *   指数期权类别枚举参见 [IndexOptionType](./quote_quote.md#5149)
 >     
 
 *   **返回**
@@ -4673,9 +4583,9 @@
 24  
 25  
 
-> *   股票静态信息结构参见 [SecurityStaticInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#609)
+> *   股票静态信息结构参见 [SecurityStaticInfo](./quote_quote.md#609)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -5062,7 +4972,7 @@
 *   此接口不支持查询已过期的期权链，**结束日期** 参数请输入今天或未来的日期
 *   Open interest (OI) 数据每日更新，更新时点取决于具体交易所。美股期权在盘前时段更新，港股期权在盘后更新。
 
-← [获取期权链到期日](https://openapi.futunn.com/futu-api-doc/quote/get-option-expiration-date.html) [筛选窝轮](https://openapi.futunn.com/futu-api-doc/quote/get-warrant.html)
+← [获取期权链到期日](./quote_get-option-expiration-date.md) [筛选窝轮](./quote_get-warrant.md)
  →
 
-[获取期权链](https://openapi.futunn.com/futu-api-doc/quote/get-option-chain.html)
+[获取期权链](./quote_get-option-chain.md)

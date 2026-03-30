@@ -1,8 +1,4 @@
-# 获取标的市场状态 | Futu API 文档 v10.2
-
-> 来源: https://openapi.futunn.com/futu-api-doc/quote/get-market-state.html
-
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-market-state.html#5008)
+[#](./quote_get-market-state.md#5008)
  获取标的市场状态
 =======================================================================================
 
@@ -30,7 +26,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | pd.DataFrame | 当 ret == RET\_OK，返回市场状态数据 |
     | str | 当 ret != RET\_OK，返回错误描述 |
     
@@ -40,7 +36,7 @@
         | --- | --- | --- |
         | code | str | 股票代码 |
         | stock\_name | str | 股票名称 |
-        | market\_state | [MarketState](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1252) | 市场状态 |
+        | market\_state | [MarketState](./quote_quote.md#1252) | 市场状态 |
         
 *   **Example**
     
@@ -77,7 +73,7 @@
 2  
 3  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-market-state.html#5873)
+[#](./quote_get-market-state.md#5873)
  Qot\_GetMarketState.proto
 --------------------------------------------------------------------------------------------------------
 
@@ -109,7 +105,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -157,11 +153,11 @@
 19  
 20  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   市场状态枚举参见 [QotMarketState](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1252)
+> *   市场状态枚举参见 [QotMarketState](./quote_quote.md#1252)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -199,7 +195,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -247,11 +243,11 @@
 19  
 20  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   市场状态枚举参见 [QotMarketState](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1252)
+> *   市场状态枚举参见 [QotMarketState](./quote_quote.md#1252)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -416,7 +412,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -464,11 +460,11 @@
 19  
 20  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   市场状态枚举参见 [QotMarketState](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1252)
+> *   市场状态枚举参见 [QotMarketState](./quote_quote.md#1252)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -676,7 +672,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -724,11 +720,11 @@
 19  
 20  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   市场状态枚举参见 [QotMarketState](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1252)
+> *   市场状态枚举参见 [QotMarketState](./quote_quote.md#1252)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -957,7 +953,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -1005,11 +1001,11 @@
 19  
 20  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   市场状态枚举参见 [QotMarketState](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1252)
+> *   市场状态枚举参见 [QotMarketState](./quote_quote.md#1252)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1183,7 +1179,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | pd.DataFrame | 当 ret == RET\_OK，返回市场状态数据 |
     | str | 当 ret != RET\_OK，返回错误描述 |
     
@@ -1193,7 +1189,7 @@
         | --- | --- | --- |
         | code | str | 股票代码 |
         | stock\_name | str | 股票名称 |
-        | market\_state | [MarketState](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1252) | 市场状态 |
+        | market\_state | [MarketState](./quote_quote.md#1252) | 市场状态 |
         
 *   **Example**
     
@@ -1230,7 +1226,7 @@
 2  
 3  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-market-state.html#5873-2)
+[#](./quote_get-market-state.md#5873-2)
  Qot\_GetMarketState.proto
 ----------------------------------------------------------------------------------------------------------
 
@@ -1262,7 +1258,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -1310,11 +1306,11 @@
 19  
 20  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   市场状态枚举参见 [QotMarketState](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1252)
+> *   市场状态枚举参见 [QotMarketState](./quote_quote.md#1252)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -1352,7 +1348,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -1400,11 +1396,11 @@
 19  
 20  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   市场状态枚举参见 [QotMarketState](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1252)
+> *   市场状态枚举参见 [QotMarketState](./quote_quote.md#1252)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1569,7 +1565,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -1617,11 +1613,11 @@
 19  
 20  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   市场状态枚举参见 [QotMarketState](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1252)
+> *   市场状态枚举参见 [QotMarketState](./quote_quote.md#1252)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1829,7 +1825,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -1877,11 +1873,11 @@
 19  
 20  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   市场状态枚举参见 [QotMarketState](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1252)
+> *   市场状态枚举参见 [QotMarketState](./quote_quote.md#1252)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2110,7 +2106,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -2158,11 +2154,11 @@
 19  
 20  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   市场状态枚举参见 [QotMarketState](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1252)
+> *   市场状态枚举参见 [QotMarketState](./quote_quote.md#1252)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2312,5 +2308,7 @@
 *   每 30 秒内最多请求 10 次获取标的市场状态接口。
 *   每次请求的股票代码个数上限为 400 个。
 
-← [获取实时经纪队列](https://openapi.futunn.com/futu-api-doc/quote/get-broker.html) [获取资金流向](https://openapi.futunn.com/futu-api-doc/quote/get-capital-flow.html)
+← [获取实时经纪队列](./quote_get-broker.md) [获取资金流向](./quote_get-capital-flow.md)
  →
+
+[获取标的市场状态](./quote_get-market-state.md)

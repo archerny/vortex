@@ -1,88 +1,4 @@
- [![Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/img/logo.png) Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/)
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/trade/update-order-fill.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/trade/update-order-fill.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/trade/update-order-fill.html)
-    
-
-下载
-
-*   [PDF](https://openapi.futunn.com/pdfs/Futu-API-Doc-zh-Python.pdf)
-    
-*   [Markdown](https://openapi.futunn.com/mds/Futu-API-Doc-zh-Python.md)
-    
-*   [Skills](https://openapi.futunn.com/skills/opend-skills.zip)
-    
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/trade/update-order-fill.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/trade/update-order-fill.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/trade/update-order-fill.html)
-    
-
-*   介绍
-    
-*   快速上手
-    
-*   OpenD
-    
-*   行情接口
-    
-*   交易接口
-    
-    *   [交易接口总览](https://openapi.futunn.com/futu-api-doc/trade/overview.html)
-        
-    *   [交易对象](https://openapi.futunn.com/futu-api-doc/trade/base.html)
-        
-    *   账户
-        
-    *   资产持仓
-        
-    *   订单
-        
-    *   成交
-        
-        *   [查询当日成交](https://openapi.futunn.com/futu-api-doc/trade/get-order-fill-list.html)
-            
-        *   [查询历史成交](https://openapi.futunn.com/futu-api-doc/trade/get-history-order-fill-list.html)
-            
-        *   [响应成交推送回调](https://openapi.futunn.com/futu-api-doc/trade/update-order-fill.html)
-            
-        
-    *   [交易定义](https://openapi.futunn.com/futu-api-doc/trade/trade.html)
-        
-    
-*   基础接口
-    
-*   Q&A
-    
-
-[#](https://openapi.futunn.com/futu-api-doc/trade/update-order-fill.html#210)
+[#](./trade_update-order-fill.md#210)
  响应成交推送回调
 =======================================================================================
 
@@ -111,7 +27,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | pd.DataFrame | 当 ret == RET\_OK 时，返回交易成交列表 |
     | str | 当 ret != RET\_OK 时，返回错误描述 |
     
@@ -119,17 +35,17 @@
         
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
-        | trd\_side | [TrdSide](https://openapi.futunn.com/futu-api-doc/trade/trade.html#5815) | 交易方向 |
+        | trd\_side | [TrdSide](./trade_trade.md#5815) | 交易方向 |
         | deal\_id | str | 成交号 |
         | order\_id | str | 订单号 |
         | code | str | 股票代码 |
         | stock\_name | str | 股票名称 |
         | qty | float | 成交数量<br>(ℹ️ 期权期货单位是"张") |
         | price | float | 成交价格 |
-        | create\_time | str | 创建时间<br>(ℹ️ 期货时区指定，请参见 [FutuOpenD 配置](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#6724)) |
+        | create\_time | str | 创建时间<br>(ℹ️ 期货时区指定，请参见 [FutuOpenD 配置](./quick_opend-base.md#6724)) |
         | counter\_broker\_id | int | 对手经纪号<br>(ℹ️ 仅港股有效) |
         | counter\_broker\_name | str | 对手经纪名称<br>(ℹ️ 仅港股有效) |
-        | status | [DealStatus](https://openapi.futunn.com/futu-api-doc/trade/trade.html#8317) | 成交状态 |
+        | status | [DealStatus](./trade_trade.md#8317) | 成交状态 |
         
 *   **Example**
     
@@ -178,7 +94,7 @@
 1  
 2  
 
-[#](https://openapi.futunn.com/futu-api-doc/trade/update-order-fill.html#5508)
+[#](./trade_update-order-fill.md#5508)
  Trd\_UpdateOrderFill.proto
 ----------------------------------------------------------------------------------------------------------
 
@@ -223,11 +139,11 @@
 14  
 15  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   成交结构参见 [OrderFill](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1253)
+> *   成交结构参见 [OrderFill](./trade_trade.md#1253)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -278,11 +194,11 @@
 14  
 15  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   成交结构参见 [OrderFill](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1253)
+> *   成交结构参见 [OrderFill](./trade_trade.md#1253)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -460,11 +376,11 @@
 14  
 15  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   成交结构参见 [OrderFill](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1253)
+> *   成交结构参见 [OrderFill](./trade_trade.md#1253)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -704,11 +620,11 @@
 14  
 15  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   成交结构参见 [OrderFill](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1253)
+> *   成交结构参见 [OrderFill](./trade_trade.md#1253)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -980,11 +896,11 @@
 14  
 15  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   成交结构参见 [OrderFill](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1253)
+> *   成交结构参见 [OrderFill](./trade_trade.md#1253)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1240,7 +1156,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | pd.DataFrame | 当 ret == RET\_OK 时，返回交易成交列表 |
     | str | 当 ret != RET\_OK 时，返回错误描述 |
     
@@ -1248,17 +1164,17 @@
         
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
-        | trd\_side | [TrdSide](https://openapi.futunn.com/futu-api-doc/trade/trade.html#5815) | 交易方向 |
+        | trd\_side | [TrdSide](./trade_trade.md#5815) | 交易方向 |
         | deal\_id | str | 成交号 |
         | order\_id | str | 订单号 |
         | code | str | 股票代码 |
         | stock\_name | str | 股票名称 |
         | qty | float | 成交数量<br>(ℹ️ 期权期货单位是"张") |
         | price | float | 成交价格 |
-        | create\_time | str | 创建时间<br>(ℹ️ 期货时区指定，请参见 [OpenD 配置](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#6724)) |
+        | create\_time | str | 创建时间<br>(ℹ️ 期货时区指定，请参见 [OpenD 配置](./quick_opend-base.md#6724)) |
         | counter\_broker\_id | int | 对手经纪号<br>(ℹ️ 仅港股有效) |
         | counter\_broker\_name | str | 对手经纪名称<br>(ℹ️ 仅港股有效) |
-        | status | [DealStatus](https://openapi.futunn.com/futu-api-doc/trade/trade.html#8317) | 成交状态 |
+        | status | [DealStatus](./trade_trade.md#8317) | 成交状态 |
         
 *   **Example**
     
@@ -1307,7 +1223,7 @@
 1  
 2  
 
-[#](https://openapi.futunn.com/futu-api-doc/trade/update-order-fill.html#5508-2)
+[#](./trade_update-order-fill.md#5508-2)
  Trd\_UpdateOrderFill.proto
 ------------------------------------------------------------------------------------------------------------
 
@@ -1352,11 +1268,11 @@
 14  
 15  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   成交结构参见 [OrderFill](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1253)
+> *   成交结构参见 [OrderFill](./trade_trade.md#1253)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -1407,11 +1323,11 @@
 14  
 15  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   成交结构参见 [OrderFill](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1253)
+> *   成交结构参见 [OrderFill](./trade_trade.md#1253)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1589,11 +1505,11 @@
 14  
 15  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   成交结构参见 [OrderFill](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1253)
+> *   成交结构参见 [OrderFill](./trade_trade.md#1253)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1833,11 +1749,11 @@
 14  
 15  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   成交结构参见 [OrderFill](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1253)
+> *   成交结构参见 [OrderFill](./trade_trade.md#1253)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2109,11 +2025,11 @@
 14  
 15  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   成交结构参见 [OrderFill](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1253)
+> *   成交结构参见 [OrderFill](./trade_trade.md#1253)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2344,7 +2260,7 @@
 28  
 29  
 
-← [查询历史成交](https://openapi.futunn.com/futu-api-doc/trade/get-history-order-fill-list.html) [交易定义](https://openapi.futunn.com/futu-api-doc/trade/trade.html)
+← [查询历史成交](./trade_get-history-order-fill-list.md) [交易定义](./trade_trade.md)
  →
 
-[响应成交推送回调](https://openapi.futunn.com/futu-api-doc/trade/update-order-fill.html)
+[响应成交推送回调](./trade_update-order-fill.md)

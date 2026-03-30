@@ -1,77 +1,8 @@
- [![Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/img/logo.png) Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/)
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/ftapi/common.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/ftapi/common.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/ftapi/common.html)
-    
-
-下载
-
-*   [PDF](https://openapi.futunn.com/pdfs/Futu-API-Doc-zh-Python.pdf)
-    
-*   [Markdown](https://openapi.futunn.com/mds/Futu-API-Doc-zh-Python.md)
-    
-*   [Skills](https://openapi.futunn.com/skills/opend-skills.zip)
-    
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/ftapi/common.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/ftapi/common.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/ftapi/common.html)
-    
-
-*   介绍
-    
-*   快速上手
-    
-*   OpenD
-    
-*   行情接口
-    
-*   交易接口
-    
-*   基础接口
-    
-    *   [基础功能](https://openapi.futunn.com/futu-api-doc/ftapi/init.html)
-        
-    *   [通用定义](https://openapi.futunn.com/futu-api-doc/ftapi/common.html)
-        
-    *   [底层协议介绍](https://openapi.futunn.com/futu-api-doc/ftapi/protocol.html)
-        
-    
-*   Q&A
-    
-
-[#](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#4712)
+[#](./ftapi_common.md#4712)
  通用定义
 =========================================================================
 
-[#](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+[#](./ftapi_common.md#7467)
  接口调用结果
 ---------------------------------------------------------------------------
 
@@ -188,7 +119,7 @@
 6  
 7  
 
-[#](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#1222)
+[#](./ftapi_common.md#1222)
  协议格式
 -------------------------------------------------------------------------
 
@@ -285,7 +216,7 @@
 4  
 5  
 
-[#](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#9178)
+[#](./ftapi_common.md#9178)
  包加密算法
 --------------------------------------------------------------------------
 
@@ -391,7 +322,7 @@
 6  
 7  
 
-[#](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#6427)
+[#](./ftapi_common.md#6427)
  程序状态类型
 ---------------------------------------------------------------------------
 
@@ -688,7 +619,7 @@
 20  
 21  
 
-[#](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7799)
+[#](./ftapi_common.md#7799)
  网关事件通知类型
 -----------------------------------------------------------------------------
 
@@ -981,7 +912,7 @@
 18  
 19  
 
-[#](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#5896)
+[#](./ftapi_common.md#5896)
  系统通知类型
 ---------------------------------------------------------------------------
 
@@ -1136,7 +1067,7 @@
 9  
 10  
 
-[#](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#4068)
+[#](./ftapi_common.md#4068)
  包唯一标识
 --------------------------------------------------------------------------
 
@@ -1155,7 +1086,7 @@
 4  
 5  
 
-[#](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#6783)
+[#](./ftapi_common.md#6783)
  程序状态
 -------------------------------------------------------------------------
 
@@ -1174,23 +1105,23 @@
 4  
 5  
 
-← [基础功能](https://openapi.futunn.com/futu-api-doc/ftapi/init.html) [底层协议介绍](https://openapi.futunn.com/futu-api-doc/ftapi/protocol.html)
+← [基础功能](./ftapi_init.md) [底层协议介绍](./ftapi_protocol.md)
  →
 
-[通用定义](https://openapi.futunn.com/futu-api-doc/ftapi/common.html)
+[通用定义](./ftapi_common.md)
 
-*   [接口调用结果](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+*   [接口调用结果](./ftapi_common.md#7467)
     
-*   [协议格式](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#1222)
+*   [协议格式](./ftapi_common.md#1222)
     
-*   [包加密算法](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#9178)
+*   [包加密算法](./ftapi_common.md#9178)
     
-*   [程序状态类型](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#6427)
+*   [程序状态类型](./ftapi_common.md#6427)
     
-*   [网关事件通知类型](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7799)
+*   [网关事件通知类型](./ftapi_common.md#7799)
     
-*   [系统通知类型](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#5896)
+*   [系统通知类型](./ftapi_common.md#5896)
     
-*   [包唯一标识](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#4068)
+*   [包唯一标识](./ftapi_common.md#4068)
     
-*   [程序状态](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#6783)
+*   [程序状态](./ftapi_common.md#6783)

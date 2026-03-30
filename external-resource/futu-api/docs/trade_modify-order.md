@@ -1,96 +1,4 @@
- [![Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/img/logo.png) Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/)
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/trade/modify-order.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/trade/modify-order.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/trade/modify-order.html)
-    
-
-下载
-
-*   [PDF](https://openapi.futunn.com/pdfs/Futu-API-Doc-zh-Python.pdf)
-    
-*   [Markdown](https://openapi.futunn.com/mds/Futu-API-Doc-zh-Python.md)
-    
-*   [Skills](https://openapi.futunn.com/skills/opend-skills.zip)
-    
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/trade/modify-order.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/trade/modify-order.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/trade/modify-order.html)
-    
-
-*   介绍
-    
-*   快速上手
-    
-*   OpenD
-    
-*   行情接口
-    
-*   交易接口
-    
-    *   [交易接口总览](https://openapi.futunn.com/futu-api-doc/trade/overview.html)
-        
-    *   [交易对象](https://openapi.futunn.com/futu-api-doc/trade/base.html)
-        
-    *   账户
-        
-    *   资产持仓
-        
-    *   订单
-        
-        *   [下单](https://openapi.futunn.com/futu-api-doc/trade/place-order.html)
-            
-        *   [改单撤单](https://openapi.futunn.com/futu-api-doc/trade/modify-order.html)
-            
-        *   [查询未完成订单](https://openapi.futunn.com/futu-api-doc/trade/get-order-list.html)
-            
-        *   [查询历史订单](https://openapi.futunn.com/futu-api-doc/trade/get-history-order-list.html)
-            
-        *   [响应订单推送回调](https://openapi.futunn.com/futu-api-doc/trade/update-order.html)
-            
-        *   [查询订单费用](https://openapi.futunn.com/futu-api-doc/trade/order-fee-query.html)
-            
-        *   [订阅交易推送](https://openapi.futunn.com/futu-api-doc/trade/sub-acc-push.html)
-            
-        
-    *   成交
-        
-    *   [交易定义](https://openapi.futunn.com/futu-api-doc/trade/trade.html)
-        
-    
-*   基础接口
-    
-*   Q&A
-    
-
-[#](https://openapi.futunn.com/futu-api-doc/trade/modify-order.html#7408)
+[#](./trade_modify-order.md#7408)
  改单撤单
 ===============================================================================
 
@@ -112,25 +20,25 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | modify\_order\_op | [ModifyOrderOp](https://openapi.futunn.com/futu-api-doc/trade/trade.html#2969) | 改单操作类型 |
+    | modify\_order\_op | [ModifyOrderOp](./trade_trade.md#2969) | 改单操作类型 |
     | order\_id | str | 订单号 |
-    | qty | float | 订单改单后的数量<br>(ℹ️ 期权和期货单位是“张”  <br>精确到小数点后 0 位，超出部分会被舍弃) |
-    | price | float | 订单改单后的价格<br>(ℹ️ 证券账户精确到小数点后 3 位，超出部分会被舍弃  <br>期货账户精确到小数点后 9 位，超出部分会被舍弃) |
-    | adjust\_limit | float | 价格微调幅度<br>(ℹ️ OpenD 会对传入价格自动调整到合法价位上（期货忽略此参数）<br><br>*   正数代表向上调整，负数代表向下调整<br>*   例如：0.015 代表向上调整且幅度不超过 1.5%；-0.01 代表向下调整且幅度不超过 1%。默认 0 表示不调整) |
-    | trd\_env | [TrdEnv](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6374) | 交易环境 |
-    | acc\_id | int | 交易业务账户 ID<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准) |
-    | acc\_index | int | 交易业务账户列表中的账户序号<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户) |
-    | aux\_price | float | 触发价格<br>(ℹ️ *   当订单是**止损市价单**、**止损限价单**、**触及限价单（止盈）**、**触及市价单（止盈）** 时，aux\_price 为必传参数<br>*   证券账户精确到小数点后 3 位，期货账户精确到小数点后 9 位，超过部分四舍五入) |
-    | trail\_type | [TrailType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#5644) | 跟踪类型<br>(ℹ️ 当订单是**跟踪止损市价单**、**跟踪止损限价单时**，trail\_type 为必传参数) |
-    | trail\_value | float | 跟踪金额/百分比<br>(ℹ️ *   当订单是**跟踪止损市价单**、**跟踪止损限价单**时，trail\_value 为必传参数<br>*   当跟踪类型为比例时，该字段为百分比字段，传入 20 实际对应 20%<br>*   当跟踪类型为金额时，证券账户精确到小数点后 3 位，期货账户精确到小数点后 9 位，超过部分四舍五入<br>*   当跟踪类型为比例时，精确到小数点后 2 位，超过部分四舍五入) |
-    | trail\_spread | float | 指定价差<br>(ℹ️ *   当订单是**跟踪止损限价单**时，trail\_spread 为必传参数<br>*   证券账户精确到小数点后 3 位，期货账户精确到小数点后 9 位，超过部分四舍五入) |
+    | qty | float | 订单改单后的数量<br>(ℹ️ 期权和期货单位是“张”)  <br>精确到小数点后 0 位，超出部分会被舍弃 |
+    | price | float | 订单改单后的价格<br>(ℹ️ 证券账户精确到小数点后 3 位，超出部分会被舍弃)  <br>期货账户精确到小数点后 9 位，超出部分会被舍弃 |
+    | adjust\_limit | float | 价格微调幅度<br>(ℹ️ OpenD 会对传入价格自动调整到合法价位上（期货忽略此参数）)<br><br>*   正数代表向上调整，负数代表向下调整<br>*   例如：0.015 代表向上调整且幅度不超过 1.5%；-0.01 代表向下调整且幅度不超过 1%。默认 0 表示不调整 |
+    | trd\_env | [TrdEnv](./trade_trade.md#6374) | 交易环境 |
+    | acc\_id | int | 交易业务账户 ID<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。)<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准 |
+    | acc\_index | int | 交易业务账户列表中的账户序号<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。)<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户 |
+    | aux\_price | float | 触发价格<br>(ℹ️ *   当订单是**止损市价单**、**止损限价单**、**触及限价单（止盈）**、**触及市价单（止盈）** 时，aux\_price 为必传参数)<br>*   证券账户精确到小数点后 3 位，期货账户精确到小数点后 9 位，超过部分四舍五入 |
+    | trail\_type | [TrailType](./trade_trade.md#5644) | 跟踪类型<br>(ℹ️ 当订单是**跟踪止损市价单**、**跟踪止损限价单时**，trail\_type 为必传参数) |
+    | trail\_value | float | 跟踪金额/百分比<br>(ℹ️ *   当订单是**跟踪止损市价单**、**跟踪止损限价单**时，trail\_value 为必传参数)<br>*   当跟踪类型为比例时，该字段为百分比字段，传入 20 实际对应 20%<br>*   当跟踪类型为金额时，证券账户精确到小数点后 3 位，期货账户精确到小数点后 9 位，超过部分四舍五入<br>*   当跟踪类型为比例时，精确到小数点后 2 位，超过部分四舍五入 |
+    | trail\_spread | float | 指定价差<br>(ℹ️ *   当订单是**跟踪止损限价单**时，trail\_spread 为必传参数)<br>*   证券账户精确到小数点后 3 位，期货账户精确到小数点后 9 位，超过部分四舍五入 |
     
 
 *   **返回**
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | pd.DataFrame | 当 ret == RET\_OK 时，返回改单信息 |
     | str | 当 ret != RET\_OK 时，返回错误描述 |
     
@@ -138,7 +46,7 @@
         
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
-        | trd\_env | [TrdEnv](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6374) | 交易环境 |
+        | trd\_env | [TrdEnv](./trade_trade.md#6374) | 交易环境 |
         | order\_id | str | 订单号 |
         
 *   **Example**
@@ -202,10 +110,10 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | trd\_env | [TrdEnv](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6374) | 交易环境 |
-    | acc\_id | int | 交易业务账户 ID<br>(ℹ️ 当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准  <br>当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准) |
-    | acc\_index | int | 交易业务账户列表中的账户序号<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户) |
-    | trdmarket | [TrdMarket](https://openapi.futunn.com/futu-api-doc/trade/trade.html#719) | 指定交易市场<br>(ℹ️ 撤销指定账户指定市场的订单  <br>默认状态时，撤销指定账户全部市场的订单) |
+    | trd\_env | [TrdEnv](./trade_trade.md#6374) | 交易环境 |
+    | acc\_id | int | 交易业务账户 ID<br>(ℹ️ 当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准)  <br>当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准 |
+    | acc\_index | int | 交易业务账户列表中的账户序号<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。)<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户 |
+    | trdmarket | [TrdMarket](./trade_trade.md#719) | 指定交易市场<br>(ℹ️ 撤销指定账户指定市场的订单)  <br>默认状态时，撤销指定账户全部市场的订单 |
     
 
 *   **返回**
@@ -220,7 +128,7 @@
         
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
-        | trd\_env | [TrdEnv](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6374) | 交易环境 |
+        | trd\_env | [TrdEnv](./trade_trade.md#6374) | 交易环境 |
         | order\_id | str | 订单号 |
         
 *   **Example**
@@ -262,7 +170,7 @@
 
 1  
 
-[#](https://openapi.futunn.com/futu-api-doc/trade/modify-order.html#5781)
+[#](./trade_modify-order.md#5781)
  Trd\_ModifyOrder.proto
 -------------------------------------------------------------------------------------------------
 
@@ -327,13 +235,13 @@
 24  
 25  
 
-> *   请求包标识结构参见 [PacketID](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#4068)
+> *   请求包标识结构参见 [PacketID](./ftapi_common.md#4068)
 >     
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   修改操作枚举参见 [ModifyOrderOp](https://openapi.futunn.com/futu-api-doc/trade/trade.html#2969)
+> *   修改操作枚举参见 [ModifyOrderOp](./trade_trade.md#2969)
 >     
-> *   跟踪类型参见 [TrailType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#5644)
+> *   跟踪类型参见 [TrailType](./trade_trade.md#5644)
 >     
 
 *   **返回**
@@ -373,9 +281,9 @@
 15  
 16  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -447,13 +355,13 @@
 24  
 25  
 
-> *   请求包标识结构参见 [PacketID](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#4068)
+> *   请求包标识结构参见 [PacketID](./ftapi_common.md#4068)
 >     
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   修改操作枚举参见 [ModifyOrderOp](https://openapi.futunn.com/futu-api-doc/trade/trade.html#2969)
+> *   修改操作枚举参见 [ModifyOrderOp](./trade_trade.md#2969)
 >     
-> *   跟踪类型参见 [TrailType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#5644)
+> *   跟踪类型参见 [TrailType](./trade_trade.md#5644)
 >     
 
 *   **回调**
@@ -493,9 +401,9 @@
 15  
 16  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -692,13 +600,13 @@
 24  
 25  
 
-> *   请求包标识结构参见 [PacketID](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#4068)
+> *   请求包标识结构参见 [PacketID](./ftapi_common.md#4068)
 >     
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   修改操作枚举参见 [ModifyOrderOp](https://openapi.futunn.com/futu-api-doc/trade/trade.html#2969)
+> *   修改操作枚举参见 [ModifyOrderOp](./trade_trade.md#2969)
 >     
-> *   跟踪类型参见 [TrailType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#5644)
+> *   跟踪类型参见 [TrailType](./trade_trade.md#5644)
 >     
 
 *   **回调**
@@ -738,9 +646,9 @@
 15  
 16  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -987,13 +895,13 @@
 24  
 25  
 
-> *   请求包标识结构参见 [PacketID](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#4068)
+> *   请求包标识结构参见 [PacketID](./ftapi_common.md#4068)
 >     
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   修改操作枚举参见 [ModifyOrderOp](https://openapi.futunn.com/futu-api-doc/trade/trade.html#2969)
+> *   修改操作枚举参见 [ModifyOrderOp](./trade_trade.md#2969)
 >     
-> *   跟踪类型参见 [TrailType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#5644)
+> *   跟踪类型参见 [TrailType](./trade_trade.md#5644)
 >     
 
 *   **回调**
@@ -1033,9 +941,9 @@
 15  
 16  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1293,13 +1201,13 @@
 24  
 25  
 
-> *   请求包标识结构参见 [PacketID](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#4068)
+> *   请求包标识结构参见 [PacketID](./ftapi_common.md#4068)
 >     
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   修改操作枚举参见 [ModifyOrderOp](https://openapi.futunn.com/futu-api-doc/trade/trade.html#2969)
+> *   修改操作枚举参见 [ModifyOrderOp](./trade_trade.md#2969)
 >     
-> *   跟踪类型参见 [TrailType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#5644)
+> *   跟踪类型参见 [TrailType](./trade_trade.md#5644)
 >     
 
 *   **返回**
@@ -1339,9 +1247,9 @@
 15  
 16  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1573,12 +1481,12 @@
 接口限制
 
 *   同一账户ID(acc\_id) 每 30 秒内最多请求 20 次改单撤单接口，且连续两次请求的间隔不可小于 0.04 秒。
-*   真实账户调用改单撤单接口前，需要先进行 [解锁](https://openapi.futunn.com/futu-api-doc/trade/unlock.html)
+*   真实账户调用改单撤单接口前，需要先进行 [解锁](./trade_unlock.md)
     ；模拟账户无需解锁。
 
 提示
 
-*   若执行 **修改订单** 操作，各类订单类型对应的必传参数，可 [点击这里](https://openapi.futunn.com/futu-api-doc/qa/trade.html#689)
+*   若执行 **修改订单** 操作，各类订单类型对应的必传参数，可 [点击这里](./qa_trade.md#689)
      了解更多。
 *   如果希望执行 **改单操作** 去 **修改订单数量**，此接口入参的订单数量 **qty**，应该等于期望成交的总数量。  
     举例： 一笔订单数量是 N 股，已部分成交 n 股。对于暂未成交的 (N-n) 股，如果您希望撤掉其中的 x 股，**modify\_order\_op** 应选择 NORMAL，**qty** 应传 (N-x)。 ![order_quantity](https://openapi.futunn.com/futu-api-doc/assets/img/order_quantity_cn.ef6e3011.png)
@@ -1603,25 +1511,25 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | modify\_order\_op | [ModifyOrderOp](https://openapi.futunn.com/futu-api-doc/trade/trade.html#2969) | 改单操作类型 |
+    | modify\_order\_op | [ModifyOrderOp](./trade_trade.md#2969) | 改单操作类型 |
     | order\_id | str | 订单号 |
-    | qty | float | 订单改单后的数量<br>(ℹ️ 期权和期货单位是“张”  <br>精确到小数点后 0 位，超出部分会被舍弃) |
-    | price | float | 订单改单后的价格<br>(ℹ️ 证券账户精确到小数点后 3 位，超出部分会被舍弃  <br>期货账户精确到小数点后 9 位，超出部分会被舍弃) |
-    | adjust\_limit | float | 价格微调幅度<br>(ℹ️ OpenD 会对传入价格自动调整到合法价位上（期货忽略此参数）<br><br>*   正数代表向上调整，负数代表向下调整<br>*   例如：0.015 代表向上调整且幅度不超过 1.5%；-0.01 代表向下调整且幅度不超过 1%。默认 0 表示不调整) |
-    | trd\_env | [TrdEnv](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6374) | 交易环境 |
-    | acc\_id | int | 交易业务账户 ID<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准) |
-    | acc\_index | int | 交易业务账户列表中的账户序号<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户) |
-    | aux\_price | float | 触发价格<br>(ℹ️ *   当订单是**止损市价单**、**止损限价单**、**触及限价单（止盈）**、**触及市价单（止盈）** 时，aux\_price 为必传参数<br>*   证券账户精确到小数点后 3 位，期货账户精确到小数点后 9 位，超过部分四舍五入) |
-    | trail\_type | [TrailType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#5644) | 跟踪类型<br>(ℹ️ 当订单是**跟踪止损市价单**、**跟踪止损限价单时**，trail\_type 为必传参数) |
-    | trail\_value | float | 跟踪金额/百分比<br>(ℹ️ *   当订单是**跟踪止损市价单**、**跟踪止损限价单**时，trail\_value 为必传参数<br>*   当跟踪类型为比例时，该字段为百分比字段，传入 20 实际对应 20%<br>*   当跟踪类型为金额时，证券账户精确到小数点后 3 位，期货账户精确到小数点后 9 位，超过部分四舍五入<br>*   当跟踪类型为比例时，精确到小数点后 2 位，超过部分四舍五入) |
-    | trail\_spread | float | 指定价差<br>(ℹ️ *   当订单是**跟踪止损限价单**时，trail\_spread 为必传参数<br>*   证券账户精确到小数点后 3 位，期货账户精确到小数点后 9 位，超过部分四舍五入) |
+    | qty | float | 订单改单后的数量<br>(ℹ️ 期权和期货单位是“张”)  <br>精确到小数点后 0 位，超出部分会被舍弃 |
+    | price | float | 订单改单后的价格<br>(ℹ️ 证券账户精确到小数点后 3 位，超出部分会被舍弃)  <br>期货账户精确到小数点后 9 位，超出部分会被舍弃 |
+    | adjust\_limit | float | 价格微调幅度<br>(ℹ️ OpenD 会对传入价格自动调整到合法价位上（期货忽略此参数）)<br><br>*   正数代表向上调整，负数代表向下调整<br>*   例如：0.015 代表向上调整且幅度不超过 1.5%；-0.01 代表向下调整且幅度不超过 1%。默认 0 表示不调整 |
+    | trd\_env | [TrdEnv](./trade_trade.md#6374) | 交易环境 |
+    | acc\_id | int | 交易业务账户 ID<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。)<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准 |
+    | acc\_index | int | 交易业务账户列表中的账户序号<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。)<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户 |
+    | aux\_price | float | 触发价格<br>(ℹ️ *   当订单是**止损市价单**、**止损限价单**、**触及限价单（止盈）**、**触及市价单（止盈）** 时，aux\_price 为必传参数)<br>*   证券账户精确到小数点后 3 位，期货账户精确到小数点后 9 位，超过部分四舍五入 |
+    | trail\_type | [TrailType](./trade_trade.md#5644) | 跟踪类型<br>(ℹ️ 当订单是**跟踪止损市价单**、**跟踪止损限价单时**，trail\_type 为必传参数) |
+    | trail\_value | float | 跟踪金额/百分比<br>(ℹ️ *   当订单是**跟踪止损市价单**、**跟踪止损限价单**时，trail\_value 为必传参数)<br>*   当跟踪类型为比例时，该字段为百分比字段，传入 20 实际对应 20%<br>*   当跟踪类型为金额时，证券账户精确到小数点后 3 位，期货账户精确到小数点后 9 位，超过部分四舍五入<br>*   当跟踪类型为比例时，精确到小数点后 2 位，超过部分四舍五入 |
+    | trail\_spread | float | 指定价差<br>(ℹ️ *   当订单是**跟踪止损限价单**时，trail\_spread 为必传参数)<br>*   证券账户精确到小数点后 3 位，期货账户精确到小数点后 9 位，超过部分四舍五入 |
     
 
 *   **返回**
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | pd.DataFrame | 当 ret == RET\_OK 时，返回改单信息 |
     | str | 当 ret != RET\_OK 时，返回错误描述 |
     
@@ -1629,7 +1537,7 @@
         
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
-        | trd\_env | [TrdEnv](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6374) | 交易环境 |
+        | trd\_env | [TrdEnv](./trade_trade.md#6374) | 交易环境 |
         | order\_id | str | 订单号 |
         
 *   **Example**
@@ -1693,10 +1601,10 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | trd\_env | [TrdEnv](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6374) | 交易环境 |
-    | acc\_id | int | 交易业务账户 ID<br>(ℹ️ 当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准  <br>当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准) |
-    | acc\_index | int | 交易业务账户列表中的账户序号<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户) |
-    | trdmarket | [TrdMarket](https://openapi.futunn.com/futu-api-doc/trade/trade.html#719) | 指定交易市场<br>(ℹ️ 撤销指定账户指定市场的订单  <br>默认状态时，撤销指定账户全部市场的订单) |
+    | trd\_env | [TrdEnv](./trade_trade.md#6374) | 交易环境 |
+    | acc\_id | int | 交易业务账户 ID<br>(ℹ️ 当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准)  <br>当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准 |
+    | acc\_index | int | 交易业务账户列表中的账户序号<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。)<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户 |
+    | trdmarket | [TrdMarket](./trade_trade.md#719) | 指定交易市场<br>(ℹ️ 撤销指定账户指定市场的订单)  <br>默认状态时，撤销指定账户全部市场的订单 |
     
 
 *   **返回**
@@ -1711,7 +1619,7 @@
         
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
-        | trd\_env | [TrdEnv](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6374) | 交易环境 |
+        | trd\_env | [TrdEnv](./trade_trade.md#6374) | 交易环境 |
         | order\_id | str | 订单号 |
         
 *   **Example**
@@ -1753,7 +1661,7 @@
 
 1  
 
-[#](https://openapi.futunn.com/futu-api-doc/trade/modify-order.html#5781-2)
+[#](./trade_modify-order.md#5781-2)
  Trd\_ModifyOrder.proto
 ---------------------------------------------------------------------------------------------------
 
@@ -1818,13 +1726,13 @@
 24  
 25  
 
-> *   请求包标识结构参见 [PacketID](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#4068)
+> *   请求包标识结构参见 [PacketID](./ftapi_common.md#4068)
 >     
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   修改操作枚举参见 [ModifyOrderOp](https://openapi.futunn.com/futu-api-doc/trade/trade.html#2969)
+> *   修改操作枚举参见 [ModifyOrderOp](./trade_trade.md#2969)
 >     
-> *   跟踪类型参见 [TrailType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#5644)
+> *   跟踪类型参见 [TrailType](./trade_trade.md#5644)
 >     
 
 *   **返回**
@@ -1864,9 +1772,9 @@
 15  
 16  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -1938,13 +1846,13 @@
 24  
 25  
 
-> *   请求包标识结构参见 [PacketID](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#4068)
+> *   请求包标识结构参见 [PacketID](./ftapi_common.md#4068)
 >     
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   修改操作枚举参见 [ModifyOrderOp](https://openapi.futunn.com/futu-api-doc/trade/trade.html#2969)
+> *   修改操作枚举参见 [ModifyOrderOp](./trade_trade.md#2969)
 >     
-> *   跟踪类型参见 [TrailType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#5644)
+> *   跟踪类型参见 [TrailType](./trade_trade.md#5644)
 >     
 
 *   **回调**
@@ -1984,9 +1892,9 @@
 15  
 16  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2183,13 +2091,13 @@
 24  
 25  
 
-> *   请求包标识结构参见 [PacketID](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#4068)
+> *   请求包标识结构参见 [PacketID](./ftapi_common.md#4068)
 >     
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   修改操作枚举参见 [ModifyOrderOp](https://openapi.futunn.com/futu-api-doc/trade/trade.html#2969)
+> *   修改操作枚举参见 [ModifyOrderOp](./trade_trade.md#2969)
 >     
-> *   跟踪类型参见 [TrailType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#5644)
+> *   跟踪类型参见 [TrailType](./trade_trade.md#5644)
 >     
 
 *   **回调**
@@ -2229,9 +2137,9 @@
 15  
 16  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2478,13 +2386,13 @@
 24  
 25  
 
-> *   请求包标识结构参见 [PacketID](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#4068)
+> *   请求包标识结构参见 [PacketID](./ftapi_common.md#4068)
 >     
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   修改操作枚举参见 [ModifyOrderOp](https://openapi.futunn.com/futu-api-doc/trade/trade.html#2969)
+> *   修改操作枚举参见 [ModifyOrderOp](./trade_trade.md#2969)
 >     
-> *   跟踪类型参见 [TrailType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#5644)
+> *   跟踪类型参见 [TrailType](./trade_trade.md#5644)
 >     
 
 *   **回调**
@@ -2524,9 +2432,9 @@
 15  
 16  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2784,13 +2692,13 @@
 24  
 25  
 
-> *   请求包标识结构参见 [PacketID](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#4068)
+> *   请求包标识结构参见 [PacketID](./ftapi_common.md#4068)
 >     
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   修改操作枚举参见 [ModifyOrderOp](https://openapi.futunn.com/futu-api-doc/trade/trade.html#2969)
+> *   修改操作枚举参见 [ModifyOrderOp](./trade_trade.md#2969)
 >     
-> *   跟踪类型参见 [TrailType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#5644)
+> *   跟踪类型参见 [TrailType](./trade_trade.md#5644)
 >     
 
 *   **返回**
@@ -2830,9 +2738,9 @@
 15  
 16  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -3064,19 +2972,19 @@
 接口限制
 
 *   同一账户ID(acc\_id) 每 30 秒内最多请求 20 次改单撤单接口，且连续两次请求的间隔不可小于 0.04 秒。
-*   真实账户调用改单撤单接口前，需要先进行 [解锁](https://openapi.futunn.com/futu-api-doc/trade/unlock.html)
+*   真实账户调用改单撤单接口前，需要先进行 [解锁](./trade_unlock.md)
     ；模拟账户无需解锁。
 
 提示
 
-*   若执行 **修改订单** 操作，各类订单类型对应的必传参数，可 [点击这里](https://openapi.futunn.com/futu-api-doc/qa/trade.html#689)
+*   若执行 **修改订单** 操作，各类订单类型对应的必传参数，可 [点击这里](./qa_trade.md#689)
      了解更多。
 *   如果希望执行 **改单操作** 去 **修改订单数量**，此接口入参的订单数量 **qty**，应该等于期望成交的总数量。  
     举例： 一笔订单数量是 N 股，已部分成交 n 股。对于暂未成交的 (N-n) 股，如果您希望撤掉其中的 x 股，**modify\_order\_op** 应选择 NORMAL，**qty** 应传 (N-x)。 ![order_quantity](https://openapi.futunn.com/futu-api-doc/assets/img/order_quantity_cn.ef6e3011.png)
 *   如果希望执行 **撤单操作**，此接口入参的 **modify\_order\_op** 应该选择 CANCEL。  
     举例： 一笔订单数量是 N 股，已部分成交 n 股。如果希望将未成交的 (N-n) 股全部撤掉，modify\_order\_op 应选择 CANCEL，此时 qty 和 price 的入参会被忽略。
 
-← [下单](https://openapi.futunn.com/futu-api-doc/trade/place-order.html) [查询未完成订单](https://openapi.futunn.com/futu-api-doc/trade/get-order-list.html)
+← [下单](./trade_place-order.md) [查询未完成订单](./trade_get-order-list.md)
  →
 
-[改单撤单](https://openapi.futunn.com/futu-api-doc/trade/modify-order.html)
+[改单撤单](./trade_modify-order.md)

@@ -1,92 +1,4 @@
- [![Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/img/logo.png) Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/)
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/trade/get-acc-cash-flow.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/trade/get-acc-cash-flow.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/trade/get-acc-cash-flow.html)
-    
-
-下载
-
-*   [PDF](https://openapi.futunn.com/pdfs/Futu-API-Doc-zh-Python.pdf)
-    
-*   [Markdown](https://openapi.futunn.com/mds/Futu-API-Doc-zh-Python.md)
-    
-*   [Skills](https://openapi.futunn.com/skills/opend-skills.zip)
-    
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/trade/get-acc-cash-flow.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/trade/get-acc-cash-flow.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/trade/get-acc-cash-flow.html)
-    
-
-*   介绍
-    
-*   快速上手
-    
-*   OpenD
-    
-*   行情接口
-    
-*   交易接口
-    
-    *   [交易接口总览](https://openapi.futunn.com/futu-api-doc/trade/overview.html)
-        
-    *   [交易对象](https://openapi.futunn.com/futu-api-doc/trade/base.html)
-        
-    *   账户
-        
-    *   资产持仓
-        
-        *   [查询账户资金](https://openapi.futunn.com/futu-api-doc/trade/get-funds.html)
-            
-        *   [查询最大可买可卖](https://openapi.futunn.com/futu-api-doc/trade/get-max-trd-qtys.html)
-            
-        *   [查询持仓](https://openapi.futunn.com/futu-api-doc/trade/get-position-list.html)
-            
-        *   [获取融资融券数据](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html)
-            
-        *   [查询账户现金流水](https://openapi.futunn.com/futu-api-doc/trade/get-acc-cash-flow.html)
-            
-        
-    *   订单
-        
-    *   成交
-        
-    *   [交易定义](https://openapi.futunn.com/futu-api-doc/trade/trade.html)
-        
-    
-*   基础接口
-    
-*   Q&A
-    
-
-[#](https://openapi.futunn.com/futu-api-doc/trade/get-acc-cash-flow.html#2416)
+[#](./trade_get-acc-cash-flow.md#2416)
  查询账户现金流水
 ========================================================================================
 
@@ -107,17 +19,17 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | clearing\_date | str | 清算日期<br>(ℹ️ *   如需查询多日，需逐日请求<br>*   格式：yyyy-MM-dd，例如：“2017-06-20”) |
+    | clearing\_date | str | 清算日期<br>(ℹ️ *   如需查询多日，需逐日请求)<br>*   格式：yyyy-MM-dd，例如：“2017-06-20” |
     | trd\_env | TrdEnv | 交易环境 |
-    | acc\_id | int | 交易业务账户 ID<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0），以 acc\_id 指定的账户为准) |
+    | acc\_id | int | 交易业务账户 ID<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。)<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0），以 acc\_id 指定的账户为准 |
     | acc\_index | int | 交易业务账户列表中的账户序号 |
-    | cashflow\_direction | [CashFlowDirection](https://openapi.futunn.com/futu-api-doc/trade/trade.html#7573) | 筛选现金流方向 |
+    | cashflow\_direction | [CashFlowDirection](./trade_trade.md#7573) | 筛选现金流方向 |
     
 *   **返回**
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | pd.DataFrame | 当 ret == RET\_OK 时，返回交易业务账户现金流水列表格式 |
     | str | 当 ret != RET\_OK 时，返回错误描述 |
     
@@ -128,9 +40,9 @@
         | cashflow\_id | int | 现金流ID |
         | clearing\_date | str | 清算日期 |
         | settlement\_date | str | 交收日期 |
-        | currency | [Currency](https://openapi.futunn.com/futu-api-doc/trade/trade.html#3974) | 币种  |
+        | currency | [Currency](./trade_trade.md#3974) | 币种  |
         | cashflow\_type | str | 现金流类型 |
-        | cashflow\_direction | [CashFlowDirection](https://openapi.futunn.com/futu-api-doc/trade/trade.html#7573) | 现金流方向 |
+        | cashflow\_direction | [CashFlowDirection](./trade_trade.md#7573) | 现金流方向 |
         | cashflow\_amount | float | 金额（正数表示流入，负数表示流出） |
         | cashflow\_remark | str | 备注  |
         
@@ -183,7 +95,7 @@
 6  
 7  
 
-[#](https://openapi.futunn.com/futu-api-doc/trade/get-acc-cash-flow.html#5786)
+[#](./trade_get-acc-cash-flow.md#5786)
  Trd\_FlowSummary.proto
 ------------------------------------------------------------------------------------------------------
 
@@ -219,7 +131,7 @@
 10  
 11  
 
-> *   现金流方向 [TrdCashFlowDirection](https://openapi.futunn.com/futu-api-doc/trade/trade.html#7573)
+> *   现金流方向 [TrdCashFlowDirection](./trade_trade.md#7573)
 >     
 
 *   **返回**
@@ -257,9 +169,9 @@
 14  
 15  
 
-> *   现金流水数据 [FlowSummaryInfo](https://openapi.futunn.com/futu-api-doc/trade/trade.html#9378)
+> *   现金流水数据 [FlowSummaryInfo](./trade_trade.md#9378)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -302,7 +214,7 @@
 10  
 11  
 
-> *   现金流方向 [TrdCashFlowDirection](https://openapi.futunn.com/futu-api-doc/trade/trade.html#7573)
+> *   现金流方向 [TrdCashFlowDirection](./trade_trade.md#7573)
 >     
 
 *   **回调**
@@ -340,9 +252,9 @@
 14  
 15  
 
-> *   现金流水数据 [FlowSummaryInfo](https://openapi.futunn.com/futu-api-doc/trade/trade.html#9378)
+> *   现金流水数据 [FlowSummaryInfo](./trade_trade.md#9378)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -508,7 +420,7 @@
 10  
 11  
 
-> *   现金流方向 [TrdCashFlowDirection](https://openapi.futunn.com/futu-api-doc/trade/trade.html#7573)
+> *   现金流方向 [TrdCashFlowDirection](./trade_trade.md#7573)
 >     
 
 *   **回调**
@@ -546,9 +458,9 @@
 14  
 15  
 
-> *   现金流水数据 [FlowSummaryInfo](https://openapi.futunn.com/futu-api-doc/trade/trade.html#9378)
+> *   现金流水数据 [FlowSummaryInfo](./trade_trade.md#9378)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -776,7 +688,7 @@
 10  
 11  
 
-> *   现金流方向 [TrdCashFlowDirection](https://openapi.futunn.com/futu-api-doc/trade/trade.html#7573)
+> *   现金流方向 [TrdCashFlowDirection](./trade_trade.md#7573)
 >     
 
 *   **回调**
@@ -814,9 +726,9 @@
 14  
 15  
 
-> *   现金流水数据 [FlowSummaryInfo](https://openapi.futunn.com/futu-api-doc/trade/trade.html#9378)
+> *   现金流水数据 [FlowSummaryInfo](./trade_trade.md#9378)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1059,7 +971,7 @@
 10  
 11  
 
-> *   现金流方向 [TrdCashFlowDirection](https://openapi.futunn.com/futu-api-doc/trade/trade.html#7573)
+> *   现金流方向 [TrdCashFlowDirection](./trade_trade.md#7573)
 >     
 
 *   **返回**
@@ -1097,9 +1009,9 @@
 14  
 15  
 
-> *   现金流水数据 [FlowSummaryInfo](https://openapi.futunn.com/futu-api-doc/trade/trade.html#9378)
+> *   现金流水数据 [FlowSummaryInfo](./trade_trade.md#9378)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1315,17 +1227,17 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | clearing\_date | str | 清算日期<br>(ℹ️ *   如需查询多日，需逐日请求<br>*   格式：yyyy-MM-dd，例如：“2017-06-20”) |
+    | clearing\_date | str | 清算日期<br>(ℹ️ *   如需查询多日，需逐日请求)<br>*   格式：yyyy-MM-dd，例如：“2017-06-20” |
     | trd\_env | TrdEnv | 交易环境 |
-    | acc\_id | int | 交易业务账户 ID<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0），以 acc\_id 指定的账户为准) |
+    | acc\_id | int | 交易业务账户 ID<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。)<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0），以 acc\_id 指定的账户为准 |
     | acc\_index | int | 交易业务账户列表中的账户序号 |
-    | cashflow\_direction | [CashFlowDirection](https://openapi.futunn.com/futu-api-doc/trade/trade.html#7573) | 筛选现金流方向 |
+    | cashflow\_direction | [CashFlowDirection](./trade_trade.md#7573) | 筛选现金流方向 |
     
 *   **返回**
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | pd.DataFrame | 当 ret == RET\_OK 时，返回交易业务账户现金流水列表格式 |
     | str | 当 ret != RET\_OK 时，返回错误描述 |
     
@@ -1336,9 +1248,9 @@
         | cashflow\_id | int | 现金流唯一标识 |
         | clearing\_date | str | 清算日期 |
         | settlement\_date | str | 交收日期 |
-        | currency | [Currency](https://openapi.futunn.com/futu-api-doc/trade/trade.html#3974) | 币种  |
+        | currency | [Currency](./trade_trade.md#3974) | 币种  |
         | cashflow\_type | str | 现金流类型 |
-        | cashflow\_direction | [CashFlowDirection](https://openapi.futunn.com/futu-api-doc/trade/trade.html#7573) | 现金流方向 |
+        | cashflow\_direction | [CashFlowDirection](./trade_trade.md#7573) | 现金流方向 |
         | cashflow\_amount | float | 金额（正数表示流入，负数表示流出） |
         | cashflow\_remark | str | 备注  |
         
@@ -1391,7 +1303,7 @@
 6  
 7  
 
-[#](https://openapi.futunn.com/futu-api-doc/trade/get-acc-cash-flow.html#5786-2)
+[#](./trade_get-acc-cash-flow.md#5786-2)
  Trd\_FlowSummary.proto
 --------------------------------------------------------------------------------------------------------
 
@@ -1427,7 +1339,7 @@
 10  
 11  
 
-> *   现金流方向 [TrdCashFlowDirection](https://openapi.futunn.com/futu-api-doc/trade/trade.html#7573)
+> *   现金流方向 [TrdCashFlowDirection](./trade_trade.md#7573)
 >     
 
 *   **返回**
@@ -1465,9 +1377,9 @@
 14  
 15  
 
-> *   现金流水数据 [FlowSummaryInfo](https://openapi.futunn.com/futu-api-doc/trade/trade.html#9378)
+> *   现金流水数据 [FlowSummaryInfo](./trade_trade.md#9378)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -1510,7 +1422,7 @@
 10  
 11  
 
-> *   现金流方向 [TrdCashFlowDirection](https://openapi.futunn.com/futu-api-doc/trade/trade.html#7573)
+> *   现金流方向 [TrdCashFlowDirection](./trade_trade.md#7573)
 >     
 
 *   **回调**
@@ -1548,9 +1460,9 @@
 14  
 15  
 
-> *   现金流水数据 [FlowSummaryInfo](https://openapi.futunn.com/futu-api-doc/trade/trade.html#9378)
+> *   现金流水数据 [FlowSummaryInfo](./trade_trade.md#9378)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1716,7 +1628,7 @@
 10  
 11  
 
-> *   现金流方向 [TrdCashFlowDirection](https://openapi.futunn.com/futu-api-doc/trade/trade.html#7573)
+> *   现金流方向 [TrdCashFlowDirection](./trade_trade.md#7573)
 >     
 
 *   **回调**
@@ -1754,9 +1666,9 @@
 14  
 15  
 
-> *   现金流水数据 [FlowSummaryInfo](https://openapi.futunn.com/futu-api-doc/trade/trade.html#9378)
+> *   现金流水数据 [FlowSummaryInfo](./trade_trade.md#9378)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1984,7 +1896,7 @@
 10  
 11  
 
-> *   现金流方向 [TrdCashFlowDirection](https://openapi.futunn.com/futu-api-doc/trade/trade.html#7573)
+> *   现金流方向 [TrdCashFlowDirection](./trade_trade.md#7573)
 >     
 
 *   **回调**
@@ -2022,9 +1934,9 @@
 14  
 15  
 
-> *   现金流水数据 [FlowSummaryInfo](https://openapi.futunn.com/futu-api-doc/trade/trade.html#9378)
+> *   现金流水数据 [FlowSummaryInfo](./trade_trade.md#9378)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2267,7 +2179,7 @@
 10  
 11  
 
-> *   现金流方向 [TrdCashFlowDirection](https://openapi.futunn.com/futu-api-doc/trade/trade.html#7573)
+> *   现金流方向 [TrdCashFlowDirection](./trade_trade.md#7573)
 >     
 
 *   **返回**
@@ -2305,9 +2217,9 @@
 14  
 15  
 
-> *   现金流水数据 [FlowSummaryInfo](https://openapi.futunn.com/futu-api-doc/trade/trade.html#9378)
+> *   现金流水数据 [FlowSummaryInfo](./trade_trade.md#9378)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2506,7 +2418,7 @@
 *   现金流水，按照时间的“顺序”进行排列。
 *   模拟交易和 moomoo US 账户暂不支持查询现金流水。
 
-← [获取融资融券数据](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html) [下单](https://openapi.futunn.com/futu-api-doc/trade/place-order.html)
+← [获取融资融券数据](./trade_get-margin-ratio.md) [下单](./trade_place-order.md)
  →
 
-[查询账户现金流水](https://openapi.futunn.com/futu-api-doc/trade/get-acc-cash-flow.html)
+[查询账户现金流水](./trade_get-acc-cash-flow.md)

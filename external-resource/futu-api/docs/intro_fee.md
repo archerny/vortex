@@ -1,20 +1,16 @@
-# 费用 | Futu API 文档 v10.2
-
-> 来源: https://openapi.futunn.com/futu-api-doc/intro/fee.html
-
-[#](https://openapi.futunn.com/futu-api-doc/intro/fee.html#8515)
+[#](./intro_fee.md#8515)
  费用
 ====================================================================
 
-[#](https://openapi.futunn.com/futu-api-doc/intro/fee.html#5770)
+[#](./intro_fee.md#5770)
  行情
 --------------------------------------------------------------------
 
 中国内地 IP 个人客户，免费获取港股市场 LV2 行情及 A 股市场 LV1 行情。  
-部分品种行情，需要购买行情卡后方可获取。您可以在 [行情权限](https://openapi.futunn.com/futu-api-doc/intro/authority.html#2867)
+部分品种行情，需要购买行情卡后方可获取。您可以在 [行情权限](./intro_authority.md#2867)
  一节，进入具体的行情卡购买页面查看价格。
 
-[#](https://openapi.futunn.com/futu-api-doc/intro/fee.html#4046)
+[#](./intro_fee.md#4046)
  交易
 --------------------------------------------------------------------
 
@@ -32,5 +28,11 @@
 | moomoo证券(加拿大) | [收费方案](https://www.moomoo.com/ca/support/topic10_122) |
 | moomoo证券(日本) | [收费方案](https://www.moomoo.com/jp/pricing) |
 
-← [权限和限制](https://openapi.futunn.com/futu-api-doc/intro/authority.html) [接入 AI 与 OpenClaw](https://openapi.futunn.com/futu-api-doc/intro/ai.html)
+← [权限和限制](./intro_authority.md) [接入 AI 与 OpenClaw](./intro_ai.md)
  →
+
+[费用](./intro_fee.md)
+
+*   [行情](./intro_fee.md#5770)
+    
+*   [交易](./intro_fee.md#4046)

@@ -1,8 +1,4 @@
-# 获取订阅状态 | Futu API 文档 v10.2
-
-> 来源: https://openapi.futunn.com/futu-api-doc/quote/query-subscription.html
-
-[#](https://openapi.futunn.com/futu-api-doc/quote/query-subscription.html#8593)
+[#](./quote_query-subscription.md#8593)
  获取订阅状态
 =======================================================================================
 
@@ -23,14 +19,14 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | is\_all\_conn | bool | 是否返回所有连接的订阅状态<br>(ℹ️ True：返回所有连接的订阅状态  <br>False：只返回当前连接的订阅状态) |
+    | is\_all\_conn | bool | 是否返回所有连接的订阅状态<br>(ℹ️ True：返回所有连接的订阅状态)  <br>False：只返回当前连接的订阅状态 |
     
 
 *   **返回**
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | dict | 当 ret == RET\_OK，返回订阅信息数据 |
     | str | 当 ret != RET\_OK，返回错误描述 |
     
@@ -81,7 +77,7 @@
 
 1  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/query-subscription.html#3734)
+[#](./quote_query-subscription.md#3734)
  Qot\_GetSubInfo.proto
 ------------------------------------------------------------------------------------------------------
 
@@ -152,9 +148,9 @@
 16  
 17  
 
-> *   订阅信息结构参见 [ConnSubInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6578)
+> *   订阅信息结构参见 [ConnSubInfo](./quote_quote.md#6578)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -231,9 +227,9 @@
 16  
 17  
 
-> *   订阅信息结构参见 [ConnSubInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6578)
+> *   订阅信息结构参见 [ConnSubInfo](./quote_quote.md#6578)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -435,9 +431,9 @@
 16  
 17  
 
-> *   订阅信息结构参见 [ConnSubInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6578)
+> *   订阅信息结构参见 [ConnSubInfo](./quote_quote.md#6578)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -670,9 +666,9 @@
 16  
 17  
 
-> *   订阅信息结构参见 [ConnSubInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6578)
+> *   订阅信息结构参见 [ConnSubInfo](./quote_quote.md#6578)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -997,9 +993,9 @@
 16  
 17  
 
-> *   订阅信息结构参见 [ConnSubInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6578)
+> *   订阅信息结构参见 [ConnSubInfo](./quote_quote.md#6578)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1157,14 +1153,14 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | is\_all\_conn | bool | 是否返回所有连接的订阅状态<br>(ℹ️ True：返回所有连接的订阅状态  <br>False：只返回当前连接的订阅状态) |
+    | is\_all\_conn | bool | 是否返回所有连接的订阅状态<br>(ℹ️ True：返回所有连接的订阅状态)  <br>False：只返回当前连接的订阅状态 |
     
 
 *   **返回**
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | dict | 当 ret == RET\_OK，返回订阅信息数据 |
     | str | 当 ret != RET\_OK，返回错误描述 |
     
@@ -1215,7 +1211,7 @@
 
 1  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/query-subscription.html#3734-2)
+[#](./quote_query-subscription.md#3734-2)
  Qot\_GetSubInfo.proto
 --------------------------------------------------------------------------------------------------------
 
@@ -1286,9 +1282,9 @@
 16  
 17  
 
-> *   订阅信息结构参见 [ConnSubInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6578)
+> *   订阅信息结构参见 [ConnSubInfo](./quote_quote.md#6578)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -1365,9 +1361,9 @@
 16  
 17  
 
-> *   订阅信息结构参见 [ConnSubInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6578)
+> *   订阅信息结构参见 [ConnSubInfo](./quote_quote.md#6578)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1569,9 +1565,9 @@
 16  
 17  
 
-> *   订阅信息结构参见 [ConnSubInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6578)
+> *   订阅信息结构参见 [ConnSubInfo](./quote_quote.md#6578)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1804,9 +1800,9 @@
 16  
 17  
 
-> *   订阅信息结构参见 [ConnSubInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6578)
+> *   订阅信息结构参见 [ConnSubInfo](./quote_quote.md#6578)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2131,9 +2127,9 @@
 16  
 17  
 
-> *   订阅信息结构参见 [ConnSubInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6578)
+> *   订阅信息结构参见 [ConnSubInfo](./quote_quote.md#6578)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2274,5 +2270,7 @@
 2  
 3  
 
-← [订阅反订阅](https://openapi.futunn.com/futu-api-doc/quote/sub.html) [实时报价回调](https://openapi.futunn.com/futu-api-doc/quote/update-stock-quote.html)
+← [订阅反订阅](./quote_sub.md) [实时报价回调](./quote_update-stock-quote.md)
  →
+
+[获取订阅状态](./quote_query-subscription.md)

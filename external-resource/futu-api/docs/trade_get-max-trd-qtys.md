@@ -1,92 +1,4 @@
- [![Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/img/logo.png) Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/)
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/trade/get-max-trd-qtys.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/trade/get-max-trd-qtys.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/trade/get-max-trd-qtys.html)
-    
-
-下载
-
-*   [PDF](https://openapi.futunn.com/pdfs/Futu-API-Doc-zh-Python.pdf)
-    
-*   [Markdown](https://openapi.futunn.com/mds/Futu-API-Doc-zh-Python.md)
-    
-*   [Skills](https://openapi.futunn.com/skills/opend-skills.zip)
-    
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/trade/get-max-trd-qtys.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/trade/get-max-trd-qtys.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/trade/get-max-trd-qtys.html)
-    
-
-*   介绍
-    
-*   快速上手
-    
-*   OpenD
-    
-*   行情接口
-    
-*   交易接口
-    
-    *   [交易接口总览](https://openapi.futunn.com/futu-api-doc/trade/overview.html)
-        
-    *   [交易对象](https://openapi.futunn.com/futu-api-doc/trade/base.html)
-        
-    *   账户
-        
-    *   资产持仓
-        
-        *   [查询账户资金](https://openapi.futunn.com/futu-api-doc/trade/get-funds.html)
-            
-        *   [查询最大可买可卖](https://openapi.futunn.com/futu-api-doc/trade/get-max-trd-qtys.html)
-            
-        *   [查询持仓](https://openapi.futunn.com/futu-api-doc/trade/get-position-list.html)
-            
-        *   [获取融资融券数据](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html)
-            
-        *   [查询账户现金流水](https://openapi.futunn.com/futu-api-doc/trade/get-acc-cash-flow.html)
-            
-        
-    *   订单
-        
-    *   成交
-        
-    *   [交易定义](https://openapi.futunn.com/futu-api-doc/trade/trade.html)
-        
-    
-*   基础接口
-    
-*   Q&A
-    
-
-[#](https://openapi.futunn.com/futu-api-doc/trade/get-max-trd-qtys.html#2713)
+[#](./trade_get-max-trd-qtys.md#2713)
  查询最大可买可卖
 =======================================================================================
 
@@ -109,24 +21,24 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | order\_type | [OrderType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4181) | 订单类型 |
+    | order\_type | [OrderType](./trade_trade.md#4181) | 订单类型 |
     | code | str | 证券代码<br>(ℹ️ 如果是期货交易，且 code 为期货主连代码，则会自动转为对应的实际合约代码) |
-    | price | float | 报价<br>(ℹ️ 证券账户精确到小数点后 3 位，超出部分会被舍弃  <br>期货账户精确到小数点后 9 位，超出部分会被舍弃) |
-    | order\_id | str | 订单号<br>(ℹ️ *   默认传 None，查询的是新下单的最大可买可卖数量<br>*   如果是改单则要传订单号，此时计算最大可买可卖时，会返回此订单可改成的最大数量<br>*   如果通过此参数，查询某笔订单最大可改成的数量，需要在下单之后，间隔 0.5 秒以上再调用此接口) |
-    | adjust\_limit | float | 价格微调幅度<br>(ℹ️ OpenD 会对传入价格自动调整到合法价位上（期货会忽略此参数）<br><br>*   正数代表向上调整，负数代表向下调整<br>*   例如：0.015 代表向上调整且幅度不超过 1.5%；-0.01 代表向下调整且幅度不超过 1%。默认 0 表示不调整) |
-    | trd\_env | [TrdEnv](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6374) | 交易环境 |
-    | acc\_id | int | 交易业务账户 ID<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准) |
-    | acc\_index | int | 交易业务账户列表中的账户序号<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户) |
-    | session | [Session](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9152) | 美股交易时段<br>(ℹ️ 仅对美股生效，支持传入**RTH**、**ETH**、**OVERNIGHT**、**ALL**) |
-    | jp\_acc\_type | [SubAccType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6112) | 日本账户类型<br>(ℹ️ 仅日本券商适用) |
-    | position\_id | int | 持仓ID<br>(ℹ️ *   适用于日本衍生品账户查询**持仓可卖**和**平仓需买回**<br>*   可通过[查询持仓](https://openapi.futunn.com/futu-api-doc/trade/get-position-list.html)<br>    接口获取) |
+    | price | float | 报价<br>(ℹ️ 证券账户精确到小数点后 3 位，超出部分会被舍弃)  <br>期货账户精确到小数点后 9 位，超出部分会被舍弃 |
+    | order\_id | str | 订单号<br>(ℹ️ *   默认传 None，查询的是新下单的最大可买可卖数量)<br>*   如果是改单则要传订单号，此时计算最大可买可卖时，会返回此订单可改成的最大数量<br>*   如果通过此参数，查询某笔订单最大可改成的数量，需要在下单之后，间隔 0.5 秒以上再调用此接口 |
+    | adjust\_limit | float | 价格微调幅度<br>(ℹ️ OpenD 会对传入价格自动调整到合法价位上（期货会忽略此参数）)<br><br>*   正数代表向上调整，负数代表向下调整<br>*   例如：0.015 代表向上调整且幅度不超过 1.5%；-0.01 代表向下调整且幅度不超过 1%。默认 0 表示不调整 |
+    | trd\_env | [TrdEnv](./trade_trade.md#6374) | 交易环境 |
+    | acc\_id | int | 交易业务账户 ID<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。)<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准 |
+    | acc\_index | int | 交易业务账户列表中的账户序号<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。)<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户 |
+    | session | [Session](./quote_quote.md#9152) | 美股交易时段<br>(ℹ️ 仅对美股生效，支持传入**RTH**、**ETH**、**OVERNIGHT**、**ALL**) |
+    | jp\_acc\_type | [SubAccType](./trade_trade.md#6112) | 日本账户类型<br>(ℹ️ 仅日本券商适用) |
+    | position\_id | int | 持仓ID<br>(ℹ️ *   适用于日本衍生品账户查询**持仓可卖**和**平仓需买回**)<br>*   可通过[查询持仓](./trade_get-position-list.md)<br>    接口获取 |
     
 
 *   **返回**
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | pd.DataFrame | 当 ret == RET\_OK 时，返回账号列表 |
     | str | 当 ret != RET\_OK 时，返回错误描述 |
     
@@ -134,14 +46,14 @@
         
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
-        | max\_cash\_buy | float | 现金可买<br>(ℹ️ *   期权的单位是“张”<br>*   期货账户不适用) |
-        | max\_cash\_and\_margin\_buy | float | 最大可买<br>(ℹ️ *   期权的单位是“张”<br>*   期货账户不适用) |
+        | max\_cash\_buy | float | 现金可买<br>(ℹ️ *   期权的单位是“张”)<br>*   期货账户不适用 |
+        | max\_cash\_and\_margin\_buy | float | 最大可买<br>(ℹ️ *   期权的单位是“张”)<br>*   期货账户不适用 |
         | max\_position\_sell | float | 持仓可卖<br>(ℹ️ 期权的单位是"张") |
-        | max\_sell\_short | float | 可卖空<br>(ℹ️ *   期权的单位是“张”<br>*   期货账户不适用) |
-        | max\_buy\_back | float | 平仓需买入<br>(ℹ️ *   当持有净空仓时，必须先买回空头持仓的股数，才能再继续买多<br>*   期货、期权的单位是“张”) |
-        | long\_required\_im | float | 买 1 张合约所带来的初始保证金变动<br>(ℹ️ *   当前仅期货和期权适用。<br>*   无持仓时，返回 **买入** 1 张的初始保证金占用（正数）。<br>*   有多仓时，返回 **买入** 1 张的初始保证金占用（正数）。<br>*   有空仓时，返回 **买回** 1 张的初始保证金释放（负数）。) |
-        | short\_required\_im | float | 卖 1 张合约所带来的初始保证金变动<br>(ℹ️ *   当前仅期货和期权适用。<br>*   无持仓时，返回 **卖空** 1 张的初始保证金占用（正数）。<br>*   有多仓时，返回 **卖出** 1 张的初始保证金释放（负数）。<br>*   有空仓时，返回 **卖空** 1 张的初始保证金释放（正数）。) |
-        | session | [Session](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9152) | 交易订单时段（仅用于美股） |
+        | max\_sell\_short | float | 可卖空<br>(ℹ️ *   期权的单位是“张”)<br>*   期货账户不适用 |
+        | max\_buy\_back | float | 平仓需买入<br>(ℹ️ *   当持有净空仓时，必须先买回空头持仓的股数，才能再继续买多)<br>*   期货、期权的单位是“张” |
+        | long\_required\_im | float | 买 1 张合约所带来的初始保证金变动<br>(ℹ️ *   当前仅期货和期权适用。)<br>*   无持仓时，返回 **买入** 1 张的初始保证金占用（正数）。<br>*   有多仓时，返回 **买入** 1 张的初始保证金占用（正数）。<br>*   有空仓时，返回 **买回** 1 张的初始保证金释放（负数）。 |
+        | short\_required\_im | float | 卖 1 张合约所带来的初始保证金变动<br>(ℹ️ *   当前仅期货和期权适用。)<br>*   无持仓时，返回 **卖空** 1 张的初始保证金占用（正数）。<br>*   有多仓时，返回 **卖出** 1 张的初始保证金释放（负数）。<br>*   有空仓时，返回 **卖空** 1 张的初始保证金释放（正数）。 |
+        | session | [Session](./quote_quote.md#9152) | 交易订单时段（仅用于美股） |
         
 *   **Example**
     
@@ -178,7 +90,7 @@
 2  
 3  
 
-[#](https://openapi.futunn.com/futu-api-doc/trade/get-max-trd-qtys.html#5308)
+[#](./trade_get-max-trd-qtys.md#5308)
  Trd\_GetMaxTrdQtys.proto
 -------------------------------------------------------------------------------------------------------
 
@@ -232,11 +144,11 @@
 19  
 20  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   订单类型结构参见 [OrderType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4181)
+> *   订单类型结构参见 [OrderType](./trade_trade.md#4181)
 >     
-> *   交易证券市场结构参见 [TrdSecMarket](https://openapi.futunn.com/futu-api-doc/trade/trade.html#5084)
+> *   交易证券市场结构参见 [TrdSecMarket](./trade_trade.md#5084)
 >     
 
 *   **返回**
@@ -274,11 +186,11 @@
 14  
 15  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   最大可交易数量结构参见 [MaxTrdQtys](https://openapi.futunn.com/futu-api-doc/trade/trade.html#8065)
+> *   最大可交易数量结构参见 [MaxTrdQtys](./trade_trade.md#8065)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -339,11 +251,11 @@
 19  
 20  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   订单类型结构参见 [OrderType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4181)
+> *   订单类型结构参见 [OrderType](./trade_trade.md#4181)
 >     
-> *   交易证券市场结构参见 [TrdSecMarket](https://openapi.futunn.com/futu-api-doc/trade/trade.html#5084)
+> *   交易证券市场结构参见 [TrdSecMarket](./trade_trade.md#5084)
 >     
 
 *   **回调**
@@ -381,11 +293,11 @@
 14  
 15  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   最大可交易数量结构参见 [MaxTrdQtys](https://openapi.futunn.com/futu-api-doc/trade/trade.html#8065)
+> *   最大可交易数量结构参见 [MaxTrdQtys](./trade_trade.md#8065)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -577,11 +489,11 @@
 19  
 20  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   订单类型结构参见 [OrderType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4181)
+> *   订单类型结构参见 [OrderType](./trade_trade.md#4181)
 >     
-> *   交易证券市场结构参见 [TrdSecMarket](https://openapi.futunn.com/futu-api-doc/trade/trade.html#5084)
+> *   交易证券市场结构参见 [TrdSecMarket](./trade_trade.md#5084)
 >     
 
 *   **回调**
@@ -619,11 +531,11 @@
 14  
 15  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   最大可交易数量结构参见 [MaxTrdQtys](https://openapi.futunn.com/futu-api-doc/trade/trade.html#8065)
+> *   最大可交易数量结构参见 [MaxTrdQtys](./trade_trade.md#8065)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -871,11 +783,11 @@
 19  
 20  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   订单类型结构参见 [OrderType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4181)
+> *   订单类型结构参见 [OrderType](./trade_trade.md#4181)
 >     
-> *   交易证券市场结构参见 [TrdSecMarket](https://openapi.futunn.com/futu-api-doc/trade/trade.html#5084)
+> *   交易证券市场结构参见 [TrdSecMarket](./trade_trade.md#5084)
 >     
 
 *   **回调**
@@ -913,11 +825,11 @@
 14  
 15  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   最大可交易数量结构参见 [MaxTrdQtys](https://openapi.futunn.com/futu-api-doc/trade/trade.html#8065)
+> *   最大可交易数量结构参见 [MaxTrdQtys](./trade_trade.md#8065)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1176,11 +1088,11 @@
 19  
 20  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   订单类型结构参见 [OrderType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4181)
+> *   订单类型结构参见 [OrderType](./trade_trade.md#4181)
 >     
-> *   交易证券市场结构参见 [TrdSecMarket](https://openapi.futunn.com/futu-api-doc/trade/trade.html#5084)
+> *   交易证券市场结构参见 [TrdSecMarket](./trade_trade.md#5084)
 >     
 
 *   **返回**
@@ -1218,11 +1130,11 @@
 14  
 15  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   最大可交易数量结构参见 [MaxTrdQtys](https://openapi.futunn.com/futu-api-doc/trade/trade.html#8065)
+> *   最大可交易数量结构参见 [MaxTrdQtys](./trade_trade.md#8065)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1438,24 +1350,24 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | order\_type | [OrderType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4181) | 订单类型 |
+    | order\_type | [OrderType](./trade_trade.md#4181) | 订单类型 |
     | code | str | 证券代码<br>(ℹ️ 如果是期货交易，且 code 为期货主连代码，则会自动转为对应的实际合约代码) |
-    | price | float | 报价<br>(ℹ️ 证券账户精确到小数点后 3 位，超出部分会被舍弃  <br>期货账户精确到小数点后 9 位，超出部分会被舍弃) |
-    | order\_id | str | 订单号<br>(ℹ️ *   默认传 None，查询的是新下单的最大可买可卖数量<br>*   如果是改单则要传订单号，此时计算最大可买可卖时，会返回此订单可改成的最大数量<br>*   如果通过此参数，查询某笔订单最大可改成的数量，需要在下单之后，间隔 0.5 秒以上再调用此接口) |
-    | adjust\_limit | float | 价格微调幅度<br>(ℹ️ OpenD 会对传入价格自动调整到合法价位上（期货会忽略此参数）<br><br>*   正数代表向上调整，负数代表向下调整<br>*   例如：0.015 代表向上调整且幅度不超过 1.5%；-0.01 代表向下调整且幅度不超过 1%。默认 0 表示不调整) |
-    | trd\_env | [TrdEnv](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6374) | 交易环境 |
-    | acc\_id | int | 交易业务账户 ID<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准) |
-    | acc\_index | int | 交易业务账户列表中的账户序号<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户) |
-    | session | [Session](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9152) | 美股交易时段<br>(ℹ️ 仅对美股生效，支持传入**RTH**、**ETH**、**OVERNIGHT**、**ALL**) |
-    | jp\_acc\_type | [SubAccType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6112) | 日本账户类型<br>(ℹ️ 仅日本券商适用) |
-    | position\_id | int | 持仓ID<br>(ℹ️ *   适用于日本衍生品账户查询**持仓可卖**和**平仓需买回**<br>*   可通过[查询持仓](https://openapi.futunn.com/futu-api-doc/trade/get-position-list.html)<br>    接口获取) |
+    | price | float | 报价<br>(ℹ️ 证券账户精确到小数点后 3 位，超出部分会被舍弃)  <br>期货账户精确到小数点后 9 位，超出部分会被舍弃 |
+    | order\_id | str | 订单号<br>(ℹ️ *   默认传 None，查询的是新下单的最大可买可卖数量)<br>*   如果是改单则要传订单号，此时计算最大可买可卖时，会返回此订单可改成的最大数量<br>*   如果通过此参数，查询某笔订单最大可改成的数量，需要在下单之后，间隔 0.5 秒以上再调用此接口 |
+    | adjust\_limit | float | 价格微调幅度<br>(ℹ️ OpenD 会对传入价格自动调整到合法价位上（期货会忽略此参数）)<br><br>*   正数代表向上调整，负数代表向下调整<br>*   例如：0.015 代表向上调整且幅度不超过 1.5%；-0.01 代表向下调整且幅度不超过 1%。默认 0 表示不调整 |
+    | trd\_env | [TrdEnv](./trade_trade.md#6374) | 交易环境 |
+    | acc\_id | int | 交易业务账户 ID<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。)<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准 |
+    | acc\_index | int | 交易业务账户列表中的账户序号<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。)<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户 |
+    | session | [Session](./quote_quote.md#9152) | 美股交易时段<br>(ℹ️ 仅对美股生效，支持传入**RTH**、**ETH**、**OVERNIGHT**、**ALL**) |
+    | jp\_acc\_type | [SubAccType](./trade_trade.md#6112) | 日本账户类型<br>(ℹ️ 仅日本券商适用) |
+    | position\_id | int | 持仓ID<br>(ℹ️ *   适用于日本衍生品账户查询**持仓可卖**和**平仓需买回**)<br>*   可通过[查询持仓](./trade_get-position-list.md)<br>    接口获取 |
     
 
 *   **返回**
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | pd.DataFrame | 当 ret == RET\_OK 时，返回账号列表 |
     | str | 当 ret != RET\_OK 时，返回错误描述 |
     
@@ -1463,14 +1375,14 @@
         
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
-        | max\_cash\_buy | float | 现金可买<br>(ℹ️ *   期权的单位是“张”<br>*   期货账户不适用) |
-        | max\_cash\_and\_margin\_buy | float | 最大可买<br>(ℹ️ *   期权的单位是“张”<br>*   期货账户不适用) |
+        | max\_cash\_buy | float | 现金可买<br>(ℹ️ *   期权的单位是“张”)<br>*   期货账户不适用 |
+        | max\_cash\_and\_margin\_buy | float | 最大可买<br>(ℹ️ *   期权的单位是“张”)<br>*   期货账户不适用 |
         | max\_position\_sell | float | 持仓可卖<br>(ℹ️ 期权的单位是"张") |
-        | max\_sell\_short | float | 可卖空<br>(ℹ️ *   期权的单位是“张”<br>*   期货账户不适用) |
-        | max\_buy\_back | float | 平仓需买入<br>(ℹ️ *   当持有净空仓时，必须先买回空头持仓的股数，才能再继续买多<br>*   期货、期权的单位是“张”) |
-        | long\_required\_im | float | 买 1 张合约所带来的初始保证金变动。<br>(ℹ️ *   当前仅期货和期权适用。<br>*   无持仓时，返回 **买入** 1 张的初始保证金占用（正数）。<br>*   有多仓时，返回 **买入** 1 张的初始保证金占用（正数）。<br>*   有空仓时，返回 **买回** 1 张的初始保证金释放（负数）。) |
-        | short\_required\_im | float | 卖 1 张合约所带来的初始保证金变动。<br>(ℹ️ *   当前仅期货和期权适用。<br>*   无持仓时，返回 **卖空** 1 张的初始保证金占用（正数）。<br>*   有多仓时，返回 **卖出** 1 张的初始保证金释放（负数）。<br>*   有空仓时，返回 **卖空** 1 张的初始保证金释放（正数）。) |
-        | session | [Session](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9152) | 交易订单时段（仅用于美股） |
+        | max\_sell\_short | float | 可卖空<br>(ℹ️ *   期权的单位是“张”)<br>*   期货账户不适用 |
+        | max\_buy\_back | float | 平仓需买入<br>(ℹ️ *   当持有净空仓时，必须先买回空头持仓的股数，才能再继续买多)<br>*   期货、期权的单位是“张” |
+        | long\_required\_im | float | 买 1 张合约所带来的初始保证金变动。<br>(ℹ️ *   当前仅期货和期权适用。)<br>*   无持仓时，返回 **买入** 1 张的初始保证金占用（正数）。<br>*   有多仓时，返回 **买入** 1 张的初始保证金占用（正数）。<br>*   有空仓时，返回 **买回** 1 张的初始保证金释放（负数）。 |
+        | short\_required\_im | float | 卖 1 张合约所带来的初始保证金变动。<br>(ℹ️ *   当前仅期货和期权适用。)<br>*   无持仓时，返回 **卖空** 1 张的初始保证金占用（正数）。<br>*   有多仓时，返回 **卖出** 1 张的初始保证金释放（负数）。<br>*   有空仓时，返回 **卖空** 1 张的初始保证金释放（正数）。 |
+        | session | [Session](./quote_quote.md#9152) | 交易订单时段（仅用于美股） |
         
 *   **Example**
     
@@ -1507,7 +1419,7 @@
 2  
 3  
 
-[#](https://openapi.futunn.com/futu-api-doc/trade/get-max-trd-qtys.html#5308-2)
+[#](./trade_get-max-trd-qtys.md#5308-2)
  Trd\_GetMaxTrdQtys.proto
 ---------------------------------------------------------------------------------------------------------
 
@@ -1561,11 +1473,11 @@
 19  
 20  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   订单类型结构参见 [OrderType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4181)
+> *   订单类型结构参见 [OrderType](./trade_trade.md#4181)
 >     
-> *   交易证券市场结构参见 [TrdSecMarket](https://openapi.futunn.com/futu-api-doc/trade/trade.html#5084)
+> *   交易证券市场结构参见 [TrdSecMarket](./trade_trade.md#5084)
 >     
 
 *   **返回**
@@ -1603,11 +1515,11 @@
 14  
 15  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   最大可交易数量结构参见 [MaxTrdQtys](https://openapi.futunn.com/futu-api-doc/trade/trade.html#8065)
+> *   最大可交易数量结构参见 [MaxTrdQtys](./trade_trade.md#8065)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -1668,11 +1580,11 @@
 19  
 20  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   订单类型结构参见 [OrderType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4181)
+> *   订单类型结构参见 [OrderType](./trade_trade.md#4181)
 >     
-> *   交易证券市场结构参见 [TrdSecMarket](https://openapi.futunn.com/futu-api-doc/trade/trade.html#5084)
+> *   交易证券市场结构参见 [TrdSecMarket](./trade_trade.md#5084)
 >     
 
 *   **回调**
@@ -1710,11 +1622,11 @@
 14  
 15  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   最大可交易数量结构参见 [MaxTrdQtys](https://openapi.futunn.com/futu-api-doc/trade/trade.html#8065)
+> *   最大可交易数量结构参见 [MaxTrdQtys](./trade_trade.md#8065)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1906,11 +1818,11 @@
 19  
 20  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   订单类型结构参见 [OrderType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4181)
+> *   订单类型结构参见 [OrderType](./trade_trade.md#4181)
 >     
-> *   交易证券市场结构参见 [TrdSecMarket](https://openapi.futunn.com/futu-api-doc/trade/trade.html#5084)
+> *   交易证券市场结构参见 [TrdSecMarket](./trade_trade.md#5084)
 >     
 
 *   **回调**
@@ -1948,11 +1860,11 @@
 14  
 15  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   最大可交易数量结构参见 [MaxTrdQtys](https://openapi.futunn.com/futu-api-doc/trade/trade.html#8065)
+> *   最大可交易数量结构参见 [MaxTrdQtys](./trade_trade.md#8065)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2200,11 +2112,11 @@
 19  
 20  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   订单类型结构参见 [OrderType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4181)
+> *   订单类型结构参见 [OrderType](./trade_trade.md#4181)
 >     
-> *   交易证券市场结构参见 [TrdSecMarket](https://openapi.futunn.com/futu-api-doc/trade/trade.html#5084)
+> *   交易证券市场结构参见 [TrdSecMarket](./trade_trade.md#5084)
 >     
 
 *   **回调**
@@ -2242,11 +2154,11 @@
 14  
 15  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   最大可交易数量结构参见 [MaxTrdQtys](https://openapi.futunn.com/futu-api-doc/trade/trade.html#8065)
+> *   最大可交易数量结构参见 [MaxTrdQtys](./trade_trade.md#8065)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2505,11 +2417,11 @@
 19  
 20  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   订单类型结构参见 [OrderType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4181)
+> *   订单类型结构参见 [OrderType](./trade_trade.md#4181)
 >     
-> *   交易证券市场结构参见 [TrdSecMarket](https://openapi.futunn.com/futu-api-doc/trade/trade.html#5084)
+> *   交易证券市场结构参见 [TrdSecMarket](./trade_trade.md#5084)
 >     
 
 *   **返回**
@@ -2547,11 +2459,11 @@
 14  
 15  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   最大可交易数量结构参见 [MaxTrdQtys](https://openapi.futunn.com/futu-api-doc/trade/trade.html#8065)
+> *   最大可交易数量结构参见 [MaxTrdQtys](./trade_trade.md#8065)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2747,10 +2659,10 @@
 提示
 
 *   现金业务账户不支持交易衍生品，因此不支持通过现金业务账户查询期权的最大可买可卖。
-*   期货的最大可买，需自行计算，公式：floor(最大购买力/买 1 张合约所带来的初始保证金变动)。其中，最大购买力来自[查询账户资金](https://openapi.futunn.com/futu-api-doc/trade/get-funds.html)
+*   期货的最大可买，需自行计算，公式：floor(最大购买力/买 1 张合约所带来的初始保证金变动)。其中，最大购买力来自[查询账户资金](./trade_get-funds.md)
     ，买 1 张合约所带来的初始保证金变动来自本接口。
 
-← [查询账户资金](https://openapi.futunn.com/futu-api-doc/trade/get-funds.html) [查询持仓](https://openapi.futunn.com/futu-api-doc/trade/get-position-list.html)
+← [查询账户资金](./trade_get-funds.md) [查询持仓](./trade_get-position-list.md)
  →
 
-[查询最大可买可卖](https://openapi.futunn.com/futu-api-doc/trade/get-max-trd-qtys.html)
+[查询最大可买可卖](./trade_get-max-trd-qtys.md)

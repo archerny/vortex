@@ -1,98 +1,4 @@
- [![Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/img/logo.png) Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/)
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/quote/modify-user-security.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/quote/modify-user-security.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/quote/modify-user-security.html)
-    
-
-下载
-
-*   [PDF](https://openapi.futunn.com/pdfs/Futu-API-Doc-zh-Python.pdf)
-    
-*   [Markdown](https://openapi.futunn.com/mds/Futu-API-Doc-zh-Python.md)
-    
-*   [Skills](https://openapi.futunn.com/skills/opend-skills.zip)
-    
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/quote/modify-user-security.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/quote/modify-user-security.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/quote/modify-user-security.html)
-    
-
-*   介绍
-    
-*   快速上手
-    
-*   OpenD
-    
-*   行情接口
-    
-    *   [行情接口总览](https://openapi.futunn.com/futu-api-doc/quote/overview.html)
-        
-    *   [行情对象](https://openapi.futunn.com/futu-api-doc/quote/base.html)
-        
-    *   实时行情
-        
-    *   基本数据
-        
-    *   相关衍生品
-        
-    *   全市场筛选
-        
-    *   个性化
-        
-        *   [获取历史 K 线额度使用明细](https://openapi.futunn.com/futu-api-doc/quote/get-history-kl-quota.html)
-            
-        *   [设置到价提醒](https://openapi.futunn.com/futu-api-doc/quote/set-price-reminder.html)
-            
-        *   [获取到价提醒列表](https://openapi.futunn.com/futu-api-doc/quote/get-price-reminder.html)
-            
-        *   [获取自选股列表](https://openapi.futunn.com/futu-api-doc/quote/get-user-security.html)
-            
-        *   [获取自选股分组](https://openapi.futunn.com/futu-api-doc/quote/get-user-security-group.html)
-            
-        *   [修改自选股列表](https://openapi.futunn.com/futu-api-doc/quote/modify-user-security.html)
-            
-        *   [到价提醒回调](https://openapi.futunn.com/futu-api-doc/quote/update-price-reminder.html)
-            
-        
-    *   [行情定义](https://openapi.futunn.com/futu-api-doc/quote/quote.html)
-        
-    
-*   交易接口
-    
-*   基础接口
-    
-*   Q&A
-    
-
-[#](https://openapi.futunn.com/futu-api-doc/quote/modify-user-security.html#8208)
+[#](./quote_modify-user-security.md#8208)
  修改自选股列表
 ==========================================================================================
 
@@ -114,7 +20,7 @@
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
     | group\_name | str | 需要修改的自选股分组名称 |
-    | op  | [ModifyUserSecurityOp](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3838) | 操作类型 |
+    | op  | [ModifyUserSecurityOp](./quote_quote.md#3838) | 操作类型 |
     | code\_list | list | 股票列表<br>(ℹ️ list 中元素类型是 str) |
     
 
@@ -122,7 +28,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | msg | str | 当 ret == RET\_OK，返回“success” |
     | 当 ret != RET\_OK，msg 返回错误描述 |
     
@@ -157,7 +63,7 @@
 
 1  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/modify-user-security.html#118)
+[#](./quote_modify-user-security.md#118)
  Qot\_ModifyUserSecurity.proto
 ---------------------------------------------------------------------------------------------------------------
 
@@ -209,7 +115,7 @@
 18  
 19  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -243,7 +149,7 @@
 12  
 13  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -302,7 +208,7 @@
 18  
 19  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -336,7 +242,7 @@
 12  
 13  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -522,7 +428,7 @@
 18  
 19  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -556,7 +462,7 @@
 12  
 13  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -768,7 +674,7 @@
 18  
 19  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -802,7 +708,7 @@
 12  
 13  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1031,7 +937,7 @@
 18  
 19  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -1065,7 +971,7 @@
 12  
 13  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1221,7 +1127,7 @@
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
     | group\_name | str | 需要修改的自选股分组名称 |
-    | op  | [ModifyUserSecurityOp](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3838) | 操作类型 |
+    | op  | [ModifyUserSecurityOp](./quote_quote.md#3838) | 操作类型 |
     | code\_list | list | 股票列表<br>(ℹ️ list 中元素类型是 str) |
     
 
@@ -1229,7 +1135,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | msg | str | 当 ret == RET\_OK，返回“success” |
     | 当 ret != RET\_OK，msg 返回错误描述 |
     
@@ -1264,7 +1170,7 @@
 
 1  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/modify-user-security.html#118-2)
+[#](./quote_modify-user-security.md#118-2)
  Qot\_ModifyUserSecurity.proto
 -----------------------------------------------------------------------------------------------------------------
 
@@ -1316,7 +1222,7 @@
 18  
 19  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -1350,7 +1256,7 @@
 12  
 13  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -1409,7 +1315,7 @@
 18  
 19  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -1443,7 +1349,7 @@
 12  
 13  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1629,7 +1535,7 @@
 18  
 19  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -1663,7 +1569,7 @@
 12  
 13  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1875,7 +1781,7 @@
 18  
 19  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -1909,7 +1815,7 @@
 12  
 13  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2138,7 +2044,7 @@
 18  
 19  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -2172,7 +2078,7 @@
 12  
 13  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2310,7 +2216,7 @@
 *   “全部”自选股列表的数量存在上限：无交易客户 500 个，有交易客户 2000 个（向其他分组增加自选股时，“全部”列表中也会同步增加）
 *   如果有同名的分组，会操作排序在第一个的分组
 
-← [获取自选股分组](https://openapi.futunn.com/futu-api-doc/quote/get-user-security-group.html) [到价提醒回调](https://openapi.futunn.com/futu-api-doc/quote/update-price-reminder.html)
+← [获取自选股分组](./quote_get-user-security-group.md) [到价提醒回调](./quote_update-price-reminder.md)
  →
 
-[修改自选股列表](https://openapi.futunn.com/futu-api-doc/quote/modify-user-security.html)
+[修改自选股列表](./quote_modify-user-security.md)

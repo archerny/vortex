@@ -1,21 +1,17 @@
-# 可视化 OpenD | Futu API 文档 v10.2
-
-> 来源: https://openapi.futunn.com/futu-api-doc/quick/opend-base.html
-
-[#](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#4147)
+[#](./quick_opend-base.md#4147)
  可视化 OpenD
 ==================================================================================
 
 OpenD 提供可视化和命令行两种运行方式，这里介绍操作比较简单的可视化 OpenD。
 
-如果想要了解命令行的方式请参考 [命令行 OpenD](https://openapi.futunn.com/futu-api-doc/opend/opend-cmd.html)
+如果想要了解命令行的方式请参考 [命令行 OpenD](./opend_opend-cmd.md)
  。
 
-[#](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#4147-2)
+[#](./quick_opend-base.md#4147-2)
  可视化 OpenD
 ------------------------------------------------------------------------------------
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#495)
+### [#](./quick_opend-base.md#495)
  第一步 下载
 
 可视化 OpenD 支持 Windows、MacOS、CentOS、Ubuntu 四种系统（点击完成下载）。
@@ -26,13 +22,13 @@ OpenD 提供可视化和命令行两种运行方式，这里介绍操作比较�
      、[Ubuntu](https://www.futunn.com/download/fetch-lasted-link?name=opend-ubuntu)
     
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#9666)
+### [#](./quick_opend-base.md#9666)
  第二步 安装运行
 
 *   解压文件，找到对应的安装文件可一键安装运行。
 *   Windows 系统默认安装在 `%appdata%` 目录下。
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#6724)
+### [#](./quick_opend-base.md#6724)
  第三步 配置
 
 *   可视化 OpenD 启动配置在图形界面的右侧，如下图所示：
@@ -43,16 +39,16 @@ OpenD 提供可视化和命令行两种运行方式，这里介绍操作比较�
 
 | 配置项 | 说明  |
 | --- | --- |
-| 监听地址 | API 协议监听地址<br>(ℹ️ 可选：  <br>*   127.0.0.1（监听来自本地的连接）<br>*   0.0.0.0（监听来自所有网卡的连接）<br>或填入本机某个网卡地址) |
+| 监听地址 | API 协议监听地址<br>(ℹ️ 可选：)  <br>*   127.0.0.1（监听来自本地的连接）<br>*   0.0.0.0（监听来自所有网卡的连接）<br>或填入本机某个网卡地址 |
 | 监听端口 | API 协议监听端口 |
-| 日志级别 | OpenD 日志级别<br>(ℹ️ 可选：  <br>*   no（无日志）<br>*   debug（最详细）<br>*   info（次详细）) |
-| 语言  | 中英语言<br>(ℹ️ 可选：  <br>*   简体中文<br>*   English) |
+| 日志级别 | OpenD 日志级别<br>(ℹ️ 可选：)  <br>*   no（无日志）<br>*   debug（最详细）<br>*   info（次详细） |
+| 语言  | 中英语言<br>(ℹ️ 可选：)  <br>*   简体中文<br>*   English |
 | 期货交易 API 时区 | 期货交易 API 时区<br>(ℹ️ 使用期货账户调用 **交易 API** 时，涉及的时间按照此时区规则) |
-| API 推送频率 | API 订阅数据推送频率控制<br>(ℹ️ *   单位：毫秒<br>*   目前不包括 K 线和分时) |
+| API 推送频率 | API 订阅数据推送频率控制<br>(ℹ️ *   单位：毫秒)<br>*   目前不包括 K 线和分时 |
 | Telnet 地址 | 远程操作命令监听地址 |
 | Telnet 端口 | 远程操作命令监听端口 |
-| 加密私钥路径 | API 协议 [RSA](https://openapi.futunn.com/futu-api-doc/qa/other.html#4601)<br> 加密私钥（PKCS#1）文件绝对路径 |
-| WebSocket 监听地址 | WebSocket 服务监听地址<br>(ℹ️ 可选：  <br>*   127.0.0.1（监听来自本地的连接）<br>*   0.0.0.0（监听来自所有网卡的连接）) |
+| 加密私钥路径 | API 协议 [RSA](./qa_other.md#4601)<br> 加密私钥（PKCS#1）文件绝对路径 |
+| WebSocket 监听地址 | WebSocket 服务监听地址<br>(ℹ️ 可选：)  <br>*   127.0.0.1（监听来自本地的连接）<br>*   0.0.0.0（监听来自所有网卡的连接） |
 | WebSocket 端口 | WebSocket 服务监听端口 |
 | WebSocket 证书 | WebSocket 证书文件路径<br>(ℹ️ 不配置则不启用，需要和私钥同时配置) |
 | WebSocket 私钥 | WebSocket 证书私钥文件路径<br>(ℹ️ 私钥不可设置密码，不配置则不启用，需要和证书同时配置) |
@@ -75,37 +71,37 @@ OpenD 提供可视化和命令行两种运行方式，这里介绍操作比较�
 *   日志级别默认 info 级别，在系统开发阶段，不建议关闭日志或者将日志修改到 warning，error，fatal 级别，防止出现问题时无法定位。
     
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#9454)
+### [#](./quick_opend-base.md#9454)
  第四步 登录
 
 *   输入账号密码，点击登录。  
     首次登录，您需要先完成问卷评估与协议确认，完成后重新登录即可。  
-    登录成功后，您可以看到自己的账号信息和 [行情权限](https://openapi.futunn.com/futu-api-doc/intro/authority.html#2867)
+    登录成功后，您可以看到自己的账号信息和 [行情权限](./intro_authority.md#2867)
     。
 
 OpenD 提供可视化和命令行两种运行方式，这里介绍操作比较简单的可视化 OpenD。
 
-如果想要了解命令行的方式请参考 [命令行 OpenD](https://openapi.futunn.com/futu-api-doc/opend/opend-cmd.html)
+如果想要了解命令行的方式请参考 [命令行 OpenD](./opend_opend-cmd.md)
  。
 
-[#](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#4147-3)
+[#](./quick_opend-base.md#4147-3)
  可视化 OpenD
 ------------------------------------------------------------------------------------
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#495-2)
+### [#](./quick_opend-base.md#495-2)
  第一步 下载
 
 *   可视化 OpenD 支持 Windows、MacOS、CentOS、Ubuntu 四种系统。
 *   您可以通过 [moomoo 官网](https://www.moomoo.com/download/OpenAPI)
      下载。
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#9666-2)
+### [#](./quick_opend-base.md#9666-2)
  第二步 安装运行
 
 *   解压文件，找到对应的安装文件可一键安装运行。
 *   Windows 系统默认安装在 `%appdata%` 目录下。
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#6724-2)
+### [#](./quick_opend-base.md#6724-2)
  第三步 配置
 
 *   可视化 OpenD 启动配置在图形界面的右侧，如下图所示：
@@ -116,16 +112,16 @@ OpenD 提供可视化和命令行两种运行方式，这里介绍操作比较�
 
 | 配置项 | 说明  |
 | --- | --- |
-| 监听地址 | API 协议监听地址<br>(ℹ️ 可选：  <br>*   127.0.0.1（监听来自本地的连接）<br>*   0.0.0.0（监听来自所有网卡的连接）<br>或填入本机某个网卡地址) |
+| 监听地址 | API 协议监听地址<br>(ℹ️ 可选：)  <br>*   127.0.0.1（监听来自本地的连接）<br>*   0.0.0.0（监听来自所有网卡的连接）<br>或填入本机某个网卡地址 |
 | 监听端口 | API 协议监听端口 |
-| 日志级别 | OpenD 日志级别<br>(ℹ️ 可选：  <br>*   no（无日志）<br>*   debug（最详细）<br>*   info（次详细）) |
-| 语言  | 中英语言<br>(ℹ️ 可选：  <br>*   简体中文<br>*   English) |
+| 日志级别 | OpenD 日志级别<br>(ℹ️ 可选：)  <br>*   no（无日志）<br>*   debug（最详细）<br>*   info（次详细） |
+| 语言  | 中英语言<br>(ℹ️ 可选：)  <br>*   简体中文<br>*   English |
 | 期货交易 API 时区 | 期货交易 API 时区<br>(ℹ️ 使用期货账户调用 **交易 API** 时，涉及的时间按照此时区规则) |
-| API 推送频率 | API 订阅数据推送频率控制<br>(ℹ️ *   单位：毫秒<br>*   目前不包括 K 线和分时) |
+| API 推送频率 | API 订阅数据推送频率控制<br>(ℹ️ *   单位：毫秒)<br>*   目前不包括 K 线和分时 |
 | Telnet 地址 | 远程操作命令监听地址 |
 | Telnet 端口 | 远程操作命令监听端口 |
-| 加密私钥路径 | API 协议 [RSA](https://openapi.futunn.com/futu-api-doc/qa/other.html#4601)<br> 加密私钥（PKCS#1）文件绝对路径 |
-| WebSocket 监听地址 | WebSocket 服务监听地址<br>(ℹ️ 可选：  <br>*   127.0.0.1（监听来自本地的连接）<br>*   0.0.0.0（监听来自所有网卡的连接）) |
+| 加密私钥路径 | API 协议 [RSA](./qa_other.md#4601)<br> 加密私钥（PKCS#1）文件绝对路径 |
+| WebSocket 监听地址 | WebSocket 服务监听地址<br>(ℹ️ 可选：)  <br>*   127.0.0.1（监听来自本地的连接）<br>*   0.0.0.0（监听来自所有网卡的连接） |
 | WebSocket 端口 | WebSocket 服务监听端口 |
 | WebSocket 证书 | WebSocket 证书文件路径<br>(ℹ️ 不配置则不启用，需要和私钥同时配置) |
 | WebSocket 私钥 | WebSocket 证书私钥文件路径<br>(ℹ️ 私钥不可设置密码，不配置则不启用，需要和证书同时配置) |
@@ -148,13 +144,15 @@ OpenD 提供可视化和命令行两种运行方式，这里介绍操作比较�
 *   日志级别默认 info 级别，在系统开发阶段，不建议关闭日志或者将日志修改到 warning，error，fatal 级别，防止出现问题时无法定位。
     
 
-### [#](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#9454-2)
+### [#](./quick_opend-base.md#9454-2)
  第四步 登录
 
 *   输入账号密码，点击登录。  
     首次登录，您需要先完成问卷评估与协议确认，完成后重新登录即可。  
-    登录成功后，您可以看到自己的账号信息和 [行情权限](https://openapi.futunn.com/futu-api-doc/intro/authority.html#2867)
+    登录成功后，您可以看到自己的账号信息和 [行情权限](./intro_authority.md#2867)
     。
 
-← [接入 AI 与 OpenClaw](https://openapi.futunn.com/futu-api-doc/intro/ai.html) [编程环境搭建](https://openapi.futunn.com/futu-api-doc/quick/env.html)
+← [接入 AI 与 OpenClaw](./intro_ai.md) [编程环境搭建](./quick_env.md)
  →
+
+[可视化 OpenD](./quick_opend-base.md)

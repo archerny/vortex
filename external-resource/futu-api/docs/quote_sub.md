@@ -1,8 +1,4 @@
-# 订阅反订阅 | Futu API 文档 v10.2
-
-> 来源: https://openapi.futunn.com/futu-api-doc/quote/sub.html
-
-[#](https://openapi.futunn.com/futu-api-doc/quote/sub.html#8723)
+[#](./quote_sub.md#8723)
  订阅反订阅
 =======================================================================
 
@@ -13,7 +9,7 @@
 *   C++
 *   JavaScript
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/sub.html#2263)
+[#](./quote_sub.md#2263)
  **订阅**
 ------------------------------------------------------------------------
 
@@ -30,19 +26,19 @@
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
     | code\_list | list | 需要订阅的股票代码列表<br>(ℹ️ list 中元素类型是 str) |
-    | subtype\_list | list | 需要订阅的数据类型列表<br>(ℹ️ list 中元素类型是 [SubType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5878)) |
-    | is\_first\_push | bool | 订阅成功之后是否立即推送一次缓存数据<br>(ℹ️ *   True：推送缓存  <br>    当脚本和 OpenD 之间出现断线重连，重新订阅时若设置为 True，会再次推送断线前的最后一条数据<br>*   False：不推送缓存。等待服务器的最新推送) |
-    | subscribe\_push | bool | 订阅后是否推送<br>(ℹ️ 订阅后，OpenD 提供了[两种取数据的方式](https://openapi.futunn.com/futu-api-doc/qa/quote.html#2692)<br>，如果您仅使用 **获取实时数据** 的方式，选择 False 可以节省一部分性能消耗<br><br>*   True：推送。如果使用 **实时数据回调** 的方式，则必须设置为 True<br>*   False：不推送。如果**仅**使用 **获取实时数据** 的方式，则建议设置为 False) |
-    | is\_detailed\_orderbook | bool | 是否订阅详细的摆盘订单明细<br>(ℹ️ *   仅用于港股 SF 行情权限下订阅港股 ORDER\_BOOK 类型<br>*   美股美期 LV2 权限下不提供详细摆盘订单明细) |
+    | subtype\_list | list | 需要订阅的数据类型列表<br>(ℹ️ list 中元素类型是 [SubType](./quote_quote.md#5878)) |
+    | is\_first\_push | bool | 订阅成功之后是否立即推送一次缓存数据<br>(ℹ️ *   True：推送缓存)  <br>    当脚本和 OpenD 之间出现断线重连，重新订阅时若设置为 True，会再次推送断线前的最后一条数据<br>*   False：不推送缓存。等待服务器的最新推送 |
+    | subscribe\_push | bool | 订阅后是否推送<br>(ℹ️ 订阅后，OpenD 提供了[两种取数据的方式](./qa_quote.md#2692))<br>，如果您仅使用 **获取实时数据** 的方式，选择 False 可以节省一部分性能消耗<br><br>*   True：推送。如果使用 **实时数据回调** 的方式，则必须设置为 True<br>*   False：不推送。如果**仅**使用 **获取实时数据** 的方式，则建议设置为 False |
+    | is\_detailed\_orderbook | bool | 是否订阅详细的摆盘订单明细<br>(ℹ️ *   仅用于港股 SF 行情权限下订阅港股 ORDER\_BOOK 类型)<br>*   美股美期 LV2 权限下不提供详细摆盘订单明细 |
     | extended\_time | bool | 是否允许美股盘前盘后数据<br>(ℹ️ 仅用于订阅美股实时 K 线、实时分时、实时逐笔) |
-    | session | [Session](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9152) | 美股订阅时段<br>(ℹ️ *   仅用于订阅美股实时 K 线、实时分时、实时逐笔<br>*   订阅美股行情不支持入参OVERNIGHT<br>*   最低OpenD版本：9.2.4207) |
+    | session | [Session](./quote_quote.md#9152) | 美股订阅时段<br>(ℹ️ *   仅用于订阅美股实时 K 线、实时分时、实时逐笔)<br>*   订阅美股行情不支持入参OVERNIGHT<br>*   最低OpenD版本：9.2.4207 |
     
 
 *   **返回**
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | err\_message | NoneType | 当 ret == RET\_OK 时，返回 None |
     | str | 当 ret != RET\_OK 时，返回错误描述 |
     
@@ -93,7 +89,7 @@
 1  
 2  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/sub.html#4908)
+[#](./quote_sub.md#4908)
  **取消订阅**
 --------------------------------------------------------------------------
 
@@ -108,7 +104,7 @@
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
     | code\_list | list | 取消订阅的股票代码列表<br>(ℹ️ list 中元素类型是 str) |
-    | subtype\_list | list | 需要订阅的数据类型列表<br>(ℹ️ list 中元素类型是 [SubType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5878)) |
+    | subtype\_list | list | 需要订阅的数据类型列表<br>(ℹ️ list 中元素类型是 [SubType](./quote_quote.md#5878)) |
     | unsubscribe\_all | bool | 取消所有订阅<br>(ℹ️ 为 True 时忽略其他参数) |
     
 
@@ -116,7 +112,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | err\_message | NoneType | 当 ret == RET\_OK, 返回 None |
     | str | 当 ret != RET\_OK, 返回错误描述 |
     
@@ -173,7 +169,7 @@
 2  
 3  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/sub.html#2489)
+[#](./quote_sub.md#2489)
  **取消所有订阅**
 ----------------------------------------------------------------------------
 
@@ -187,7 +183,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | err\_message | NoneType | 当 ret == RET\_OK, 返回 None |
     | str | 当 ret != RET\_OK, 返回错误描述 |
     
@@ -244,7 +240,7 @@
 2  
 3  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/sub.html#3789)
+[#](./quote_sub.md#3789)
  Qot\_Sub.proto
 --------------------------------------------------------------------------------
 
@@ -300,11 +296,11 @@
 19  
 20  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   订阅数据类型参见 [SubType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5878)
+> *   订阅数据类型参见 [SubType](./quote_quote.md#5878)
 >     
-> *   复权类型参见 [RehabType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6907)
+> *   复权类型参见 [RehabType](./quote_quote.md#6907)
 >     
 
 *   **返回**
@@ -338,7 +334,7 @@
 12  
 13  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -346,7 +342,7 @@
     3001
     
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/sub.html#4159)
+[#](./quote_sub.md#4159)
  Sub
 ---------------------------------------------------------------------
 
@@ -401,11 +397,11 @@
 18  
 19  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   订阅数据类型参见 [SubType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5878)
+> *   订阅数据类型参见 [SubType](./quote_quote.md#5878)
 >     
-> *   复权类型参见 [RehabType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6907)
+> *   复权类型参见 [RehabType](./quote_quote.md#6907)
 >     
 
 *   **返回**
@@ -439,7 +435,7 @@
 12  
 13  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -570,7 +566,7 @@
 4  
 5  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/sub.html#4159-2)
+[#](./quote_sub.md#4159-2)
  sub
 -----------------------------------------------------------------------
 
@@ -627,11 +623,11 @@
 19  
 20  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   订阅数据类型参见 [SubType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5878)
+> *   订阅数据类型参见 [SubType](./quote_quote.md#5878)
 >     
-> *   复权类型参见 [RehabType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6907)
+> *   复权类型参见 [RehabType](./quote_quote.md#6907)
 >     
 
 *   **返回**
@@ -665,7 +661,7 @@
 12  
 13  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -826,7 +822,7 @@
 5  
 6  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/sub.html#4159-3)
+[#](./quote_sub.md#4159-3)
  Sub
 -----------------------------------------------------------------------
 
@@ -885,11 +881,11 @@
 19  
 20  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   订阅数据类型参见 [SubType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5878)
+> *   订阅数据类型参见 [SubType](./quote_quote.md#5878)
 >     
-> *   复权类型参见 [RehabType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6907)
+> *   复权类型参见 [RehabType](./quote_quote.md#6907)
 >     
 
 *   **返回**
@@ -923,7 +919,7 @@
 12  
 13  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1210,7 +1206,7 @@
 36  
 37  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/sub.html#4159-4)
+[#](./quote_sub.md#4159-4)
  Sub
 -----------------------------------------------------------------------
 
@@ -1268,11 +1264,11 @@
 19  
 20  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   订阅数据类型参见 [SubType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5878)
+> *   订阅数据类型参见 [SubType](./quote_quote.md#5878)
 >     
-> *   复权类型参见 [RehabType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6907)
+> *   复权类型参见 [RehabType](./quote_quote.md#6907)
 >     
 
 *   **返回**
@@ -1306,7 +1302,7 @@
 12  
 13  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1453,9 +1449,9 @@
 
 接口限制
 
-*   支持多种实时数据类型的订阅，参见 [SubType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5878)
+*   支持多种实时数据类型的订阅，参见 [SubType](./quote_quote.md#5878)
      ，每支股票订阅一个类型占用一个额度。
-*   订阅额度规则请参见 [订阅额度 & 历史 K 线额度](https://openapi.futunn.com/futu-api-doc/intro/authority.html#1314)
+*   订阅额度规则请参见 [订阅额度 & 历史 K 线额度](./intro_authority.md#1314)
     。
 *   至少订阅一分钟才可以反订阅。
 *   由于港股 SF 行情摆盘数据量较大，为保证 SF 行情的速度和 OpenD 的处理性能，目前 SF 权限用户仅限同时订阅 50 只证券类产品（含 hkex 的正股、窝轮、牛熊）的摆盘，剩余订阅额度仍可用于订阅其他类型，如：逐笔，买卖经纪等。
@@ -1468,7 +1464,7 @@
 *   C++
 *   JavaScript
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/sub.html#2263-2)
+[#](./quote_sub.md#2263-2)
  **订阅**
 --------------------------------------------------------------------------
 
@@ -1483,19 +1479,19 @@
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
     | code\_list | list | 需要订阅的股票代码列表<br>(ℹ️ list 中元素类型是 str) |
-    | subtype\_list | list | 需要订阅的数据类型列表<br>(ℹ️ list 中元素类型是 [SubType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5878)) |
-    | is\_first\_push | bool | 订阅成功之后是否立即推送一次缓存数据<br>(ℹ️ *   True：推送缓存  <br>    当脚本和 OpenD 之间出现断线重连，重新订阅时若设置为 True，会再次推送断线前的最后一条数据<br>*   False：不推送缓存。等待服务器的最新推送) |
-    | subscribe\_push | bool | 订阅后是否推送<br>(ℹ️ 订阅后，OpenD 提供了[两种取数据的方式](https://openapi.futunn.com/futu-api-doc/qa/quote.html#2692)<br>，如果您仅使用 **获取实时数据** 的方式，选择 False 可以节省一部分性能消耗<br><br>*   True：推送。如果使用 **实时数据回调** 的方式，则必须设置为 True<br>*   False：不推送。如果**仅**使用 **获取实时数据** 的方式，则建议设置为 False) |
-    | is\_detailed\_orderbook | bool | 是否订阅详细的摆盘订单明细<br>(ℹ️ *   仅用于港股 SF 行情权限下订阅港股 ORDER\_BOOK 类型<br>*   美股美期 LV2 权限下不提供详细摆盘订单明细) |
+    | subtype\_list | list | 需要订阅的数据类型列表<br>(ℹ️ list 中元素类型是 [SubType](./quote_quote.md#5878)) |
+    | is\_first\_push | bool | 订阅成功之后是否立即推送一次缓存数据<br>(ℹ️ *   True：推送缓存)  <br>    当脚本和 OpenD 之间出现断线重连，重新订阅时若设置为 True，会再次推送断线前的最后一条数据<br>*   False：不推送缓存。等待服务器的最新推送 |
+    | subscribe\_push | bool | 订阅后是否推送<br>(ℹ️ 订阅后，OpenD 提供了[两种取数据的方式](./qa_quote.md#2692))<br>，如果您仅使用 **获取实时数据** 的方式，选择 False 可以节省一部分性能消耗<br><br>*   True：推送。如果使用 **实时数据回调** 的方式，则必须设置为 True<br>*   False：不推送。如果**仅**使用 **获取实时数据** 的方式，则建议设置为 False |
+    | is\_detailed\_orderbook | bool | 是否订阅详细的摆盘订单明细<br>(ℹ️ *   仅用于港股 SF 行情权限下订阅港股 ORDER\_BOOK 类型)<br>*   美股美期 LV2 权限下不提供详细摆盘订单明细 |
     | extended\_time | bool | 是否允许美股盘前盘后数据<br>(ℹ️ 仅用于订阅美股实时 K 线、实时分时、实时逐笔) |
-    | session | [Session](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9152) | 美股订阅时段<br>(ℹ️ *   仅用于订阅美股实时 K 线、实时分时、实时逐笔<br>*   订阅美股行情不支持入参OVERNIGHT<br>*   最低OpenD版本：9.2.4207) |
+    | session | [Session](./quote_quote.md#9152) | 美股订阅时段<br>(ℹ️ *   仅用于订阅美股实时 K 线、实时分时、实时逐笔)<br>*   订阅美股行情不支持入参OVERNIGHT<br>*   最低OpenD版本：9.2.4207 |
     
 
 *   **返回**
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | err\_message | NoneType | 当 ret == RET\_OK 时，返回 None |
     | str | 当 ret != RET\_OK 时，返回错误描述 |
     
@@ -1544,7 +1540,7 @@
 
 1  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/sub.html#4908-2)
+[#](./quote_sub.md#4908-2)
  **取消订阅**
 ----------------------------------------------------------------------------
 
@@ -1559,7 +1555,7 @@
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
     | code\_list | list | 取消订阅的股票代码列表<br>(ℹ️ list 中元素类型是 str) |
-    | subtype\_list | list | 需要订阅的数据类型列表<br>(ℹ️ list 中元素类型是 [SubType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5878)) |
+    | subtype\_list | list | 需要订阅的数据类型列表<br>(ℹ️ list 中元素类型是 [SubType](./quote_quote.md#5878)) |
     | unsubscribe\_all | bool | 取消所有订阅<br>(ℹ️ 为 True 时忽略其他参数) |
     
 
@@ -1567,7 +1563,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | err\_message | NoneType | 当 ret == RET\_OK, 返回 None |
     | str | 当 ret != RET\_OK, 返回错误描述 |
     
@@ -1624,7 +1620,7 @@
 2  
 3  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/sub.html#2489-2)
+[#](./quote_sub.md#2489-2)
  **取消所有订阅**
 ------------------------------------------------------------------------------
 
@@ -1638,7 +1634,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | err\_message | NoneType | 当 ret == RET\_OK, 返回 None |
     | str | 当 ret != RET\_OK, 返回错误描述 |
     
@@ -1695,7 +1691,7 @@
 2  
 3  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/sub.html#3789-2)
+[#](./quote_sub.md#3789-2)
  Qot\_Sub.proto
 ----------------------------------------------------------------------------------
 
@@ -1749,11 +1745,11 @@
 19  
 20  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   订阅数据类型参见 [SubType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5878)
+> *   订阅数据类型参见 [SubType](./quote_quote.md#5878)
 >     
-> *   复权类型参见 [RehabType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6907)
+> *   复权类型参见 [RehabType](./quote_quote.md#6907)
 >     
 
 *   **返回**
@@ -1787,7 +1783,7 @@
 12  
 13  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -1795,7 +1791,7 @@
     3001
     
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/sub.html#4159-5)
+[#](./quote_sub.md#4159-5)
  Sub
 -----------------------------------------------------------------------
 
@@ -1851,11 +1847,11 @@
 19  
 20  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   订阅数据类型参见 [SubType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5878)
+> *   订阅数据类型参见 [SubType](./quote_quote.md#5878)
 >     
-> *   复权类型参见 [RehabType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6907)
+> *   复权类型参见 [RehabType](./quote_quote.md#6907)
 >     
 
 *   **返回**
@@ -1889,7 +1885,7 @@
 12  
 13  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2020,7 +2016,7 @@
 4  
 5  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/sub.html#4159-6)
+[#](./quote_sub.md#4159-6)
  sub
 -----------------------------------------------------------------------
 
@@ -2076,11 +2072,11 @@
 19  
 20  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   订阅数据类型参见 [SubType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5878)
+> *   订阅数据类型参见 [SubType](./quote_quote.md#5878)
 >     
-> *   复权类型参见 [RehabType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6907)
+> *   复权类型参见 [RehabType](./quote_quote.md#6907)
 >     
 
 *   **返回**
@@ -2114,7 +2110,7 @@
 12  
 13  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2275,7 +2271,7 @@
 5  
 6  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/sub.html#4159-7)
+[#](./quote_sub.md#4159-7)
  Sub
 -----------------------------------------------------------------------
 
@@ -2332,11 +2328,11 @@
 19  
 20  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   订阅数据类型参见 [SubType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5878)
+> *   订阅数据类型参见 [SubType](./quote_quote.md#5878)
 >     
-> *   复权类型参见 [RehabType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6907)
+> *   复权类型参见 [RehabType](./quote_quote.md#6907)
 >     
 
 *   **返回**
@@ -2370,7 +2366,7 @@
 12  
 13  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2657,7 +2653,7 @@
 36  
 37  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/sub.html#4159-8)
+[#](./quote_sub.md#4159-8)
  Sub
 -----------------------------------------------------------------------
 
@@ -2713,11 +2709,11 @@
 19  
 20  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   订阅数据类型参见 [SubType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5878)
+> *   订阅数据类型参见 [SubType](./quote_quote.md#5878)
 >     
-> *   复权类型参见 [RehabType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6907)
+> *   复权类型参见 [RehabType](./quote_quote.md#6907)
 >     
 
 *   **返回**
@@ -2751,7 +2747,7 @@
 12  
 13  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2898,13 +2894,15 @@
 
 接口限制
 
-*   支持多种实时数据类型的订阅，参见 [SubType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5878)
+*   支持多种实时数据类型的订阅，参见 [SubType](./quote_quote.md#5878)
      ，每支股票订阅一个类型占用一个额度。
-*   订阅额度规则请参见 [订阅额度 & 历史 K 线额度](https://openapi.futunn.com/futu-api-doc/intro/authority.html#1314)
+*   订阅额度规则请参见 [订阅额度 & 历史 K 线额度](./intro_authority.md#1314)
     。
 *   至少订阅一分钟才可以反订阅。
 *   由于港股 SF 行情摆盘数据量较大，为保证 SF 行情的速度和 OpenD 的处理性能，目前 SF 权限用户仅限同时订阅 50 只证券类产品（含 hkex 的正股、窝轮、牛熊）的摆盘、经纪队列，剩余订阅额度仍可用于订阅其他类型，如：逐笔，买卖经纪等。
 *   港股期权期货在 LV1 权限下，不支持订阅逐笔类型。
 
-← [行情对象](https://openapi.futunn.com/futu-api-doc/quote/base.html) [获取订阅状态](https://openapi.futunn.com/futu-api-doc/quote/query-subscription.html)
+← [行情对象](./quote_base.md) [获取订阅状态](./quote_query-subscription.md)
  →
+
+[订阅反订阅](./quote_sub.md)

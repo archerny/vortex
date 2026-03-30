@@ -1,8 +1,4 @@
-# 交易策略搭建示例 | Futu API 文档 v10.2
-
-> 来源: https://openapi.futunn.com/futu-api-doc/quick/strategy-sample.html
-
-[#](https://openapi.futunn.com/futu-api-doc/quick/strategy-sample.html#4008)
+[#](./quick_strategy-sample.md#4008)
  交易策略搭建示例
 ======================================================================================
 
@@ -17,7 +13,7 @@
 
 *   以下交易策略不构成投资建议，仅供学习参考。
 
-[#](https://openapi.futunn.com/futu-api-doc/quick/strategy-sample.html#7871)
+[#](./quick_strategy-sample.md#7871)
  策略概述
 ----------------------------------------------------------------------------------
 
@@ -28,13 +24,13 @@
 当 MA1 >= MA3 时，判断该标的为强势状态，市场属于多头市场，采取开仓的操作；  
 当 MA1 < MA3 时，判断该标的为弱势状态，市场属于空头市场，采取平仓的操作。
 
-[#](https://openapi.futunn.com/futu-api-doc/quick/strategy-sample.html#5114)
+[#](./quick_strategy-sample.md#5114)
  流程图
 ---------------------------------------------------------------------------------
 
 ![strategy-flow-chart](https://openapi.futunn.com/futu-api-doc/assets/img/strategy-flow-chart.cd179467.png)
 
-[#](https://openapi.futunn.com/futu-api-doc/quick/strategy-sample.html#6730)
+[#](./quick_strategy-sample.md#6730)
  代码示例
 ----------------------------------------------------------------------------------
 
@@ -653,7 +649,7 @@
 
 *   以下交易策略不构成投资建议，仅供学习参考。
 
-[#](https://openapi.futunn.com/futu-api-doc/quick/strategy-sample.html#7871-2)
+[#](./quick_strategy-sample.md#7871-2)
  策略概述
 ------------------------------------------------------------------------------------
 
@@ -664,13 +660,13 @@
 当 MA1 >= MA3 时，判断该标的为强势状态，市场属于多头市场，采取开仓的操作；  
 当 MA1 < MA3 时，判断该标的为弱势状态，市场属于空头市场，采取平仓的操作。
 
-[#](https://openapi.futunn.com/futu-api-doc/quick/strategy-sample.html#5114-2)
+[#](./quick_strategy-sample.md#5114-2)
  流程图
 -----------------------------------------------------------------------------------
 
 ![strategy-flow-chart](https://openapi.futunn.com/futu-api-doc/assets/img/strategy-flow-chart.cd179467.png)
 
-[#](https://openapi.futunn.com/futu-api-doc/quick/strategy-sample.html#6730-2)
+[#](./quick_strategy-sample.md#6730-2)
  代码示例
 ------------------------------------------------------------------------------------
 
@@ -1278,5 +1274,7 @@
 12  
 13  
 
-← [简易程序运行](https://openapi.futunn.com/futu-api-doc/quick/demo.html) [概述](https://openapi.futunn.com/futu-api-doc/opend/opend-intro.html)
+← [简易程序运行](./quick_demo.md) [概述](./opend_opend-intro.md)
  →
+
+[交易策略搭建示例](./quick_strategy-sample.md)

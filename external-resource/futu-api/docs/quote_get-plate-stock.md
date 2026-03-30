@@ -1,98 +1,4 @@
- [![Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/img/logo.png) Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/)
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/quote/get-plate-stock.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/quote/get-plate-stock.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/quote/get-plate-stock.html)
-    
-
-下载
-
-*   [PDF](https://openapi.futunn.com/pdfs/Futu-API-Doc-zh-Python.pdf)
-    
-*   [Markdown](https://openapi.futunn.com/mds/Futu-API-Doc-zh-Python.md)
-    
-*   [Skills](https://openapi.futunn.com/skills/opend-skills.zip)
-    
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/quote/get-plate-stock.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/quote/get-plate-stock.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/quote/get-plate-stock.html)
-    
-
-*   介绍
-    
-*   快速上手
-    
-*   OpenD
-    
-*   行情接口
-    
-    *   [行情接口总览](https://openapi.futunn.com/futu-api-doc/quote/overview.html)
-        
-    *   [行情对象](https://openapi.futunn.com/futu-api-doc/quote/base.html)
-        
-    *   实时行情
-        
-    *   基本数据
-        
-    *   相关衍生品
-        
-    *   全市场筛选
-        
-        *   [条件选股](https://openapi.futunn.com/futu-api-doc/quote/get-stock-filter.html)
-            
-        *   [获取板块内股票列表](https://openapi.futunn.com/futu-api-doc/quote/get-plate-stock.html)
-            
-        *   [获取板块列表](https://openapi.futunn.com/futu-api-doc/quote/get-plate-list.html)
-            
-        *   [获取静态数据](https://openapi.futunn.com/futu-api-doc/quote/get-static-info.html)
-            
-        *   [获取 IPO 信息](https://openapi.futunn.com/futu-api-doc/quote/get-ipo-list.html)
-            
-        *   [获取全局市场状态](https://openapi.futunn.com/futu-api-doc/quote/get-global-state.html)
-            
-        *   [获取交易日历](https://openapi.futunn.com/futu-api-doc/quote/request-trading-days.html)
-            
-        
-    *   个性化
-        
-    *   [行情定义](https://openapi.futunn.com/futu-api-doc/quote/quote.html)
-        
-    
-*   交易接口
-    
-*   基础接口
-    
-*   Q&A
-    
-
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-plate-stock.html#9146)
+[#](./quote_get-plate-stock.md#9146)
  获取板块内股票列表
 =======================================================================================
 
@@ -113,16 +19,16 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | plate\_code | str | 板块代码<br>(ℹ️ 先利用 [获取板块列表](https://openapi.futunn.com/futu-api-doc/quote/get-plate-list.html)<br> 获取板块代码  <br>例如：“SH.BK0001”，“SH.BK0002”) |
-    | sort\_field | [SortField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2930) | 排序字段 |
-    | ascend | bool | 排序方向<br>(ℹ️ True：升序  <br>False：降序) |
+    | plate\_code | str | 板块代码<br>(ℹ️ 先利用 [获取板块列表](./quote_get-plate-list.md))<br> 获取板块代码  <br>例如：“SH.BK0001”，“SH.BK0002” |
+    | sort\_field | [SortField](./quote_quote.md#2930) | 排序字段 |
+    | ascend | bool | 排序方向<br>(ℹ️ True：升序)  <br>False：降序 |
     
 
 *   **返回**
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | pd.DataFrame | 当 ret == RET\_OK，返回板块股票数据 |
     | str | 当 ret != RET\_OK，返回错误描述 |
     
@@ -133,11 +39,11 @@
         | code | str | 股票代码 |
         | lot\_size | int | 每手股数，期货表示合约乘数 |
         | stock\_name | str | 股票名称 |
-        | stock\_type | [SecurityType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3325) | 股票类型 |
-        | list\_time | str | 上市时间<br>(ℹ️ 格式：yyyy-MM-dd  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间) |
+        | stock\_type | [SecurityType](./quote_quote.md#3325) | 股票类型 |
+        | list\_time | str | 上市时间<br>(ℹ️ 格式：yyyy-MM-dd)  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间 |
         | stock\_id | int | 股票 ID |
         | main\_contract | bool | 是否主连合约<br>(ℹ️ 期货特有字段) |
-        | last\_trade\_time | str | 最后交易时间<br>(ℹ️ 期货特有字段  <br>主连，当月，下月等期货没有该字段) |
+        | last\_trade\_time | str | 最后交易时间<br>(ℹ️ 期货特有字段)  <br>主连，当月，下月等期货没有该字段 |
         
 *   **Example**
     
@@ -188,7 +94,7 @@
 7  
 8  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-plate-stock.html#5662)
+[#](./quote_get-plate-stock.md#5662)
  Qot\_GetPlateSecurity.proto
 ---------------------------------------------------------------------------------------------------------
 
@@ -226,9 +132,9 @@
 11  
 12  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   排序字段参见 [SortField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2930)
+> *   排序字段参见 [SortField](./quote_quote.md#2930)
 >     
 
 *   **返回**
@@ -262,9 +168,9 @@
 12  
 13  
 
-> *   股票静态信息结构参见 [SecurityStaticInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#609)
+> *   股票静态信息结构参见 [SecurityStaticInfo](./quote_quote.md#609)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -309,9 +215,9 @@
 11  
 12  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   排序字段参见 [SortField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2930)
+> *   排序字段参见 [SortField](./quote_quote.md#2930)
 >     
 
 *   **返回**
@@ -345,9 +251,9 @@
 12  
 13  
 
-> *   股票静态信息结构参见 [SecurityStaticInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#609)
+> *   股票静态信息结构参见 [SecurityStaticInfo](./quote_quote.md#609)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -511,9 +417,9 @@
 11  
 12  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   排序字段参见 [SortField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2930)
+> *   排序字段参见 [SortField](./quote_quote.md#2930)
 >     
 
 *   **返回**
@@ -547,9 +453,9 @@
 12  
 13  
 
-> *   股票静态信息结构参见 [SecurityStaticInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#609)
+> *   股票静态信息结构参见 [SecurityStaticInfo](./quote_quote.md#609)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -805,9 +711,9 @@
 11  
 12  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   排序字段参见 [SortField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2930)
+> *   排序字段参见 [SortField](./quote_quote.md#2930)
 >     
 
 *   **返回**
@@ -841,9 +747,9 @@
 12  
 13  
 
-> *   股票静态信息结构参见 [SecurityStaticInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#609)
+> *   股票静态信息结构参见 [SecurityStaticInfo](./quote_quote.md#609)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1122,9 +1028,9 @@
 11  
 12  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   排序字段参见 [SortField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2930)
+> *   排序字段参见 [SortField](./quote_quote.md#2930)
 >     
 
 *   **返回**
@@ -1158,9 +1064,9 @@
 12  
 13  
 
-> *   股票静态信息结构参见 [SecurityStaticInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#609)
+> *   股票静态信息结构参见 [SecurityStaticInfo](./quote_quote.md#609)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1421,16 +1327,16 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | plate\_code | str | 板块代码<br>(ℹ️ 先利用 [获取板块列表](https://openapi.futunn.com/futu-api-doc/quote/get-plate-list.html)<br> 获取板块代码  <br>例如：“SH.BK0001”，“SH.BK0002”) |
-    | sort\_field | [SortField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2930) | 排序字段 |
-    | ascend | bool | 排序方向<br>(ℹ️ True：升序  <br>False：降序) |
+    | plate\_code | str | 板块代码<br>(ℹ️ 先利用 [获取板块列表](./quote_get-plate-list.md))<br> 获取板块代码  <br>例如：“SH.BK0001”，“SH.BK0002” |
+    | sort\_field | [SortField](./quote_quote.md#2930) | 排序字段 |
+    | ascend | bool | 排序方向<br>(ℹ️ True：升序)  <br>False：降序 |
     
 
 *   **返回**
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | pd.DataFrame | 当 ret == RET\_OK，返回板块股票数据 |
     | str | 当 ret != RET\_OK，返回错误描述 |
     
@@ -1441,11 +1347,11 @@
         | code | str | 股票代码 |
         | lot\_size | int | 每手股数，期货表示合约乘数 |
         | stock\_name | str | 股票名称 |
-        | stock\_type | [SecurityType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3325) | 股票类型 |
-        | list\_time | str | 上市时间<br>(ℹ️ 格式：yyyy-MM-dd  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间) |
+        | stock\_type | [SecurityType](./quote_quote.md#3325) | 股票类型 |
+        | list\_time | str | 上市时间<br>(ℹ️ 格式：yyyy-MM-dd)  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间 |
         | stock\_id | int | 股票 ID |
         | main\_contract | bool | 是否主连合约<br>(ℹ️ 期货特有字段) |
-        | last\_trade\_time | str | 最后交易时间<br>(ℹ️ 期货特有字段  <br>主连，当月，下月等期货没有该字段) |
+        | last\_trade\_time | str | 最后交易时间<br>(ℹ️ 期货特有字段)  <br>主连，当月，下月等期货没有该字段 |
         
 *   **Example**
     
@@ -1496,7 +1402,7 @@
 7  
 8  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-plate-stock.html#5662-2)
+[#](./quote_get-plate-stock.md#5662-2)
  Qot\_GetPlateSecurity.proto
 -----------------------------------------------------------------------------------------------------------
 
@@ -1534,9 +1440,9 @@
 11  
 12  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   排序字段参见 [SortField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2930)
+> *   排序字段参见 [SortField](./quote_quote.md#2930)
 >     
 
 *   **返回**
@@ -1570,9 +1476,9 @@
 12  
 13  
 
-> *   股票静态信息结构参见 [SecurityStaticInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#609)
+> *   股票静态信息结构参见 [SecurityStaticInfo](./quote_quote.md#609)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -1617,9 +1523,9 @@
 11  
 12  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   排序字段参见 [SortField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2930)
+> *   排序字段参见 [SortField](./quote_quote.md#2930)
 >     
 
 *   **返回**
@@ -1653,9 +1559,9 @@
 12  
 13  
 
-> *   股票静态信息结构参见 [SecurityStaticInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#609)
+> *   股票静态信息结构参见 [SecurityStaticInfo](./quote_quote.md#609)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1819,9 +1725,9 @@
 11  
 12  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   排序字段参见 [SortField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2930)
+> *   排序字段参见 [SortField](./quote_quote.md#2930)
 >     
 
 *   **返回**
@@ -1855,9 +1761,9 @@
 12  
 13  
 
-> *   股票静态信息结构参见 [SecurityStaticInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#609)
+> *   股票静态信息结构参见 [SecurityStaticInfo](./quote_quote.md#609)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2113,9 +2019,9 @@
 11  
 12  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   排序字段参见 [SortField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2930)
+> *   排序字段参见 [SortField](./quote_quote.md#2930)
 >     
 
 *   **返回**
@@ -2149,9 +2055,9 @@
 12  
 13  
 
-> *   股票静态信息结构参见 [SecurityStaticInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#609)
+> *   股票静态信息结构参见 [SecurityStaticInfo](./quote_quote.md#609)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2430,9 +2336,9 @@
 11  
 12  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   排序字段参见 [SortField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2930)
+> *   排序字段参见 [SortField](./quote_quote.md#2930)
 >     
 
 *   **返回**
@@ -2466,9 +2372,9 @@
 12  
 13  
 
-> *   股票静态信息结构参见 [SecurityStaticInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#609)
+> *   股票静态信息结构参见 [SecurityStaticInfo](./quote_quote.md#609)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2712,7 +2618,7 @@
 | SZ.LIST3000004 | 创业板（深） |
 | US.USAALL | 全部美股 |
 
-← [条件选股](https://openapi.futunn.com/futu-api-doc/quote/get-stock-filter.html) [获取板块列表](https://openapi.futunn.com/futu-api-doc/quote/get-plate-list.html)
+← [条件选股](./quote_get-stock-filter.md) [获取板块列表](./quote_get-plate-list.md)
  →
 
-[获取板块内股票列表](https://openapi.futunn.com/futu-api-doc/quote/get-plate-stock.html)
+[获取板块内股票列表](./quote_get-plate-stock.md)

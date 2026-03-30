@@ -1,92 +1,4 @@
- [![Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/img/logo.png) Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/)
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/trade/get-funds.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/trade/get-funds.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/trade/get-funds.html)
-    
-
-下载
-
-*   [PDF](https://openapi.futunn.com/pdfs/Futu-API-Doc-zh-Python.pdf)
-    
-*   [Markdown](https://openapi.futunn.com/mds/Futu-API-Doc-zh-Python.md)
-    
-*   [Skills](https://openapi.futunn.com/skills/opend-skills.zip)
-    
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/trade/get-funds.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/trade/get-funds.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/trade/get-funds.html)
-    
-
-*   介绍
-    
-*   快速上手
-    
-*   OpenD
-    
-*   行情接口
-    
-*   交易接口
-    
-    *   [交易接口总览](https://openapi.futunn.com/futu-api-doc/trade/overview.html)
-        
-    *   [交易对象](https://openapi.futunn.com/futu-api-doc/trade/base.html)
-        
-    *   账户
-        
-    *   资产持仓
-        
-        *   [查询账户资金](https://openapi.futunn.com/futu-api-doc/trade/get-funds.html)
-            
-        *   [查询最大可买可卖](https://openapi.futunn.com/futu-api-doc/trade/get-max-trd-qtys.html)
-            
-        *   [查询持仓](https://openapi.futunn.com/futu-api-doc/trade/get-position-list.html)
-            
-        *   [获取融资融券数据](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html)
-            
-        *   [查询账户现金流水](https://openapi.futunn.com/futu-api-doc/trade/get-acc-cash-flow.html)
-            
-        
-    *   订单
-        
-    *   成交
-        
-    *   [交易定义](https://openapi.futunn.com/futu-api-doc/trade/trade.html)
-        
-    
-*   基础接口
-    
-*   Q&A
-    
-
-[#](https://openapi.futunn.com/futu-api-doc/trade/get-funds.html#4346)
+[#](./trade_get-funds.md#4346)
  查询账户资金
 ==============================================================================
 
@@ -107,19 +19,19 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | trd\_env | [TrdEnv](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6374) | 交易环境 |
-    | acc\_id | int | 交易业务账户 ID<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准) |
-    | acc\_index | int | 交易业务账户列表中的账户序号<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户) |
-    | refresh\_cache | bool | 是否刷新缓存<br>(ℹ️ *   True：立即向富途服务器重新请求数据，不使用 OpenD 的缓存，此时会受到接口限频的限制<br>*   False：使用 OpenD 的缓存（特殊情况导致缓存没有及时更新才需要刷新）) |
-    | currency | [Currency](https://openapi.futunn.com/futu-api-doc/trade/trade.html#8019) | 计价货币<br>(ℹ️ *   仅期货账户、综合证券账户适用，其它账户类型会忽略此参数<br>*   返回的 DataFrame 中，除了明确指明了货币的字段，其它资金相关字段都以此参数换算) |
-    | asset\_category | [AssetCategory](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4752) | 资产类别<br>(ℹ️ 仅对日本券商生效) |
+    | trd\_env | [TrdEnv](./trade_trade.md#6374) | 交易环境 |
+    | acc\_id | int | 交易业务账户 ID<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。)<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准 |
+    | acc\_index | int | 交易业务账户列表中的账户序号<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。)<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户 |
+    | refresh\_cache | bool | 是否刷新缓存<br>(ℹ️ *   True：立即向富途服务器重新请求数据，不使用 OpenD 的缓存，此时会受到接口限频的限制)<br>*   False：使用 OpenD 的缓存（特殊情况导致缓存没有及时更新才需要刷新） |
+    | currency | [Currency](./trade_trade.md#8019) | 计价货币<br>(ℹ️ *   仅期货账户、综合证券账户适用，其它账户类型会忽略此参数)<br>*   返回的 DataFrame 中，除了明确指明了货币的字段，其它资金相关字段都以此参数换算 |
+    | asset\_category | [AssetCategory](./trade_trade.md#4752) | 资产类别<br>(ℹ️ 仅对日本券商生效) |
     
 
 *   **返回**
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | pd.DataFrame | 当 ret == RET\_OK 时，返回资金数据 |
     | str | 当 ret != RET\_OK 时，返回错误描述 |
     
@@ -127,12 +39,12 @@
         
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
-        | power | float | 最大购买力<br>(ℹ️ *   此字段是按照 50% 的融资初始保证金率计算得到的 **近似值**。但事实上，每个标的的融资初始保证金率并不相同。我们建议您使用 [查询最大可买可卖](https://openapi.futunn.com/futu-api-doc/trade/get-max-trd-qtys.html)<br>     接口返回的 **最大可买** 字段，来判断实际可买入的最大数量。) |
-        | max\_power\_short | float | 卖空购买力<br>(ℹ️ *   此字段是按照 60% 的融券保证金率计算得到的 **近似值**。但事实上，每个标的的融券保证金率并不相同。我们建议您使用 [查询最大可买可卖](https://openapi.futunn.com/futu-api-doc/trade/get-max-trd-qtys.html)<br>     接口返回的 **可卖空** 字段，来判断实际可卖空的最大数量。) |
+        | power | float | 最大购买力<br>(ℹ️ *   此字段是按照 50% 的融资初始保证金率计算得到的 **近似值**。但事实上，每个标的的融资初始保证金率并不相同。我们建议您使用 [查询最大可买可卖](./trade_get-max-trd-qtys.md))<br>     接口返回的 **最大可买** 字段，来判断实际可买入的最大数量。 |
+        | max\_power\_short | float | 卖空购买力<br>(ℹ️ *   此字段是按照 60% 的融券保证金率计算得到的 **近似值**。但事实上，每个标的的融券保证金率并不相同。我们建议您使用 [查询最大可买可卖](./trade_get-max-trd-qtys.md))<br>     接口返回的 **可卖空** 字段，来判断实际可卖空的最大数量。 |
         | net\_cash\_power | float | 现金购买力<br>(ℹ️ 已废弃，请使用usd\_net\_cash\_power等字段获取分币种的现金购买力) |
         | total\_assets | float | 总资产净值<br>(ℹ️ 总资产净值 = 证券资产净值 + 基金资产净值 + 债券资产净值) |
         | securities\_assets | float | 证券资产净值<br>(ℹ️ 最低 OpenD 版本要求：8.2.4218) |
-        | fund\_assets | float | 基金资产净值<br>(ℹ️ *   综合账户返回结果为总基金资产净值，暂时不支持查询港元基金资产和美元基金资产<br>*   最低 OpenD 版本要求：8.2.4218) |
+        | fund\_assets | float | 基金资产净值<br>(ℹ️ *   综合账户返回结果为总基金资产净值，暂时不支持查询港元基金资产和美元基金资产)<br>*   最低 OpenD 版本要求：8.2.4218 |
         | bond\_assets | float | 债券资产净值<br>(ℹ️ 最低 OpenD 版本要求：8.2.4218) |
         | cash | float | 现金<br>(ℹ️ 已废弃，请使用us\_cash等字段获取分币种的现金) |
         | market\_val | float | 证券市值<br>(ℹ️ 仅证券账户适用) |
@@ -143,53 +55,53 @@
         | frozen\_cash | float | 冻结资金 |
         | avl\_withdrawal\_cash | float | 现金可提<br>(ℹ️ 仅证券账户适用) |
         | max\_withdrawal | float | 最大可提<br>(ℹ️ 仅富途证券（香港）的证券账户适用) |
-        | currency | [Currency](https://openapi.futunn.com/futu-api-doc/trade/trade.html#8019) | 计价货币<br>(ℹ️ 仅综合证券账户、期货账户适用) |
+        | currency | [Currency](./trade_trade.md#8019) | 计价货币<br>(ℹ️ 仅综合证券账户、期货账户适用) |
         | available\_funds | float | 可用资金<br>(ℹ️ 仅期货账户适用) |
         | unrealized\_pl | float | 未实现盈亏<br>(ℹ️ 仅期货账户适用) |
         | realized\_pl | float | 已实现盈亏<br>(ℹ️ 仅期货账户适用) |
-        | risk\_level | [CltRiskLevel](https://openapi.futunn.com/futu-api-doc/trade/trade.html#9239) | 风控状态<br>(ℹ️ 仅期货账户适用。建议统一使用 risk\_status 字段获取证券、期货账户的风险状态) |
-        | risk\_status | [CltRiskStatus](https://openapi.futunn.com/futu-api-doc/trade/trade.html#3989) | 风险状态<br>(ℹ️ *   证券账户和期货账户均适用<br>*   共分 9 个等级， `LEVEL1`是最安全，`LEVEL9`是最危险) |
+        | risk\_level | [CltRiskLevel](./trade_trade.md#9239) | 风控状态<br>(ℹ️ 仅期货账户适用。建议统一使用 risk\_status 字段获取证券、期货账户的风险状态) |
+        | risk\_status | [CltRiskStatus](./trade_trade.md#3989) | 风险状态<br>(ℹ️ *   证券账户和期货账户均适用)<br>*   共分 9 个等级， `LEVEL1`是最安全，`LEVEL9`是最危险 |
         | initial\_margin | float | 初始保证金 |
         | margin\_call\_margin | float | Margin Call 保证金 |
         | maintenance\_margin | float | 维持保证金 |
         | hk\_cash | float | 港元现金<br>(ℹ️ 此字段表示该币种实际的值，而不是以该币种计价的值) |
         | hk\_avl\_withdrawal\_cash | float | 港元可提<br>(ℹ️ 此字段表示该币种实际的值，而不是以该币种计价的值) |
-        | hkd\_net\_cash\_power | float | 港元现金购买力<br>(ℹ️ *   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：8.7) |
-        | hkd\_assets | float | 港股资产净值<br>(ℹ️ *   仅综合证券账户适用<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：9.0.5008) |
+        | hkd\_net\_cash\_power | float | 港元现金购买力<br>(ℹ️ *   此字段表示该币种实际的值，而不是以该币种计价的值)<br>*   最低版本要求：8.7 |
+        | hkd\_assets | float | 港股资产净值<br>(ℹ️ *   仅综合证券账户适用)<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：9.0.5008 |
         | us\_cash | float | 美元现金<br>(ℹ️ 此字段表示该币种实际的值，而不是以该币种计价的值) |
         | us\_avl\_withdrawal\_cash | float | 美元可提<br>(ℹ️ 此字段表示该币种实际的值，而不是以该币种计价的值) |
-        | usd\_net\_cash\_power | float | 美元现金购买力<br>(ℹ️ *   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：8.7) |
-        | usd\_assets | float | 美股资产净值<br>(ℹ️ *   仅综合证券账户适用<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：9.0.5008) |
+        | usd\_net\_cash\_power | float | 美元现金购买力<br>(ℹ️ *   此字段表示该币种实际的值，而不是以该币种计价的值)<br>*   最低版本要求：8.7 |
+        | usd\_assets | float | 美股资产净值<br>(ℹ️ *   仅综合证券账户适用)<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：9.0.5008 |
         | cn\_cash | float | 人民币现金<br>(ℹ️ 此字段表示该币种实际的值，而不是以该币种计价的值) |
         | cn\_avl\_withdrawal\_cash | float | 人民币可提<br>(ℹ️ 此字段表示该币种实际的值，而不是以该币种计价的值) |
-        | cnh\_net\_cash\_power | float | 人民币现金购买力<br>(ℹ️ *   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：8.7) |
-        | cnh\_assets | float | A股资产净值<br>(ℹ️ *   仅综合证券账户适用<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：9.0.5008) |
-        | jp\_cash | float | 日元现金<br>(ℹ️ *   仅期货账户适用<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低 Futu API 版本要求：5.8.2008) |
-        | jp\_avl\_withdrawal\_cash | float | 日元可提<br>(ℹ️ *   仅期货账户适用<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低 Futu API 版本要求：5.8.2008) |
-        | jpy\_net\_cash\_power | float | 日元现金购买力<br>(ℹ️ *   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：8.7) |
-        | jpy\_assets | float | 日股资产净值<br>(ℹ️ *   仅综合证券账户适用<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：9.0.5008) |
-        | sg\_cash | float | 新元现金<br>(ℹ️ *   仅期货账户适用<br>*   此字段表示该币种实际的值，而不是以该币种计价的值) |
-        | sg\_avl\_withdrawal\_cash | float | 新元可提<br>(ℹ️ *   仅期货账户适用<br>*   此字段表示该币种实际的值，而不是以该币种计价的值) |
-        | sgd\_net\_cash\_power | float | 新元现金购买力<br>(ℹ️ *   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：8.7) |
-        | sgd\_assets | float | 新股资产净值<br>(ℹ️ *   仅综合证券账户适用<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：9.0.5008) |
-        | au\_cash | float | 澳元现金<br>(ℹ️ *   仅综合证券账户适用<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低 Futu API 版本要求：5.8.2008) |
-        | au\_avl\_withdrawal\_cash | float | 澳元可提<br>(ℹ️ *   仅综合证券账户适用<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低 Futu API 版本要求：5.8.2008) |
-        | aud\_net\_cash\_power | float | 澳元现金购买力<br>(ℹ️ *   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：8.7) |
-        | aud\_assets | float | 澳股资产净值<br>(ℹ️ *   仅综合证券账户适用<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：9.0.5008) |
-        | ca\_cash | float | 加元现金<br>(ℹ️ *   仅综合证券账户适用<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：10.0.6008) |
-        | ca\_avl\_withdrawal\_cash | float | 加元可提<br>(ℹ️ *   仅综合证券账户适用<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：10.0.6008) |
-        | cad\_net\_cash\_power | float | 加元现金购买力<br>(ℹ️ *   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：10.0.6008) |
-        | cad\_assets | float | 加元资产净值<br>(ℹ️ *   仅综合证券账户适用<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：10.0.6008) |
-        | my\_cash | float | 令吉现金<br>(ℹ️ *   仅综合证券账户适用<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：10.0.6008) |
-        | my\_avl\_withdrawal\_cash | float | 令吉可提<br>(ℹ️ *   仅综合证券账户适用<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：10.0.6008) |
-        | myr\_net\_cash\_power | float | 令吉现金购买力<br>(ℹ️ *   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：10.0.6008) |
-        | myr\_assets | float | 令吉资产净值<br>(ℹ️ *   仅综合证券账户适用<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：10.0.6008) |
-        | is\_pdt | bool | 是否为 PDT 账户<br>(ℹ️ True：是 PDT 账户，False：不是 PDT 账户  <br>仅moomoo证券(美国)账户适用  <br>最低 OpenD 版本要求：5.8.2008) |
-        | pdt\_seq | string | 剩余日内交易次数<br>(ℹ️ 仅moomoo证券(美国)账户适用  <br>最低 OpenD 版本要求：5.8.2008) |
-        | beginning\_dtbp | float | 初始日内交易购买力<br>(ℹ️ 仅被标记为 PDT 的moomoo证券(美国)账户适用  <br>最低 OpenD 版本要求：5.8.2008) |
-        | remaining\_dtbp | float | 剩余日内交易购买力<br>(ℹ️ 仅被标记为 PDT 的moomoo证券(美国)账户适用  <br>最低 OpenD 版本要求：5.8.2008) |
-        | dt\_call\_amount | float | 日内交易待缴金额<br>(ℹ️ 仅被标记为 PDT 的moomoo证券(美国)账户适用  <br>最低 OpenD 版本要求：5.8.2008) |
-        | dt\_status | [DtStatus](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1860) | 日内交易限制情况<br>(ℹ️ 仅被标记为 PDT 的moomoo证券(美国)账户适用  <br>最低 OpenD 版本要求：5.8.2008) |
+        | cnh\_net\_cash\_power | float | 人民币现金购买力<br>(ℹ️ *   此字段表示该币种实际的值，而不是以该币种计价的值)<br>*   最低版本要求：8.7 |
+        | cnh\_assets | float | A股资产净值<br>(ℹ️ *   仅综合证券账户适用)<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：9.0.5008 |
+        | jp\_cash | float | 日元现金<br>(ℹ️ *   仅期货账户适用)<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低 Futu API 版本要求：5.8.2008 |
+        | jp\_avl\_withdrawal\_cash | float | 日元可提<br>(ℹ️ *   仅期货账户适用)<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低 Futu API 版本要求：5.8.2008 |
+        | jpy\_net\_cash\_power | float | 日元现金购买力<br>(ℹ️ *   此字段表示该币种实际的值，而不是以该币种计价的值)<br>*   最低版本要求：8.7 |
+        | jpy\_assets | float | 日股资产净值<br>(ℹ️ *   仅综合证券账户适用)<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：9.0.5008 |
+        | sg\_cash | float | 新元现金<br>(ℹ️ *   仅期货账户适用)<br>*   此字段表示该币种实际的值，而不是以该币种计价的值 |
+        | sg\_avl\_withdrawal\_cash | float | 新元可提<br>(ℹ️ *   仅期货账户适用)<br>*   此字段表示该币种实际的值，而不是以该币种计价的值 |
+        | sgd\_net\_cash\_power | float | 新元现金购买力<br>(ℹ️ *   此字段表示该币种实际的值，而不是以该币种计价的值)<br>*   最低版本要求：8.7 |
+        | sgd\_assets | float | 新股资产净值<br>(ℹ️ *   仅综合证券账户适用)<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：9.0.5008 |
+        | au\_cash | float | 澳元现金<br>(ℹ️ *   仅综合证券账户适用)<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低 Futu API 版本要求：5.8.2008 |
+        | au\_avl\_withdrawal\_cash | float | 澳元可提<br>(ℹ️ *   仅综合证券账户适用)<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低 Futu API 版本要求：5.8.2008 |
+        | aud\_net\_cash\_power | float | 澳元现金购买力<br>(ℹ️ *   此字段表示该币种实际的值，而不是以该币种计价的值)<br>*   最低版本要求：8.7 |
+        | aud\_assets | float | 澳股资产净值<br>(ℹ️ *   仅综合证券账户适用)<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：9.0.5008 |
+        | ca\_cash | float | 加元现金<br>(ℹ️ *   仅综合证券账户适用)<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：10.0.6008 |
+        | ca\_avl\_withdrawal\_cash | float | 加元可提<br>(ℹ️ *   仅综合证券账户适用)<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：10.0.6008 |
+        | cad\_net\_cash\_power | float | 加元现金购买力<br>(ℹ️ *   此字段表示该币种实际的值，而不是以该币种计价的值)<br>*   最低版本要求：10.0.6008 |
+        | cad\_assets | float | 加元资产净值<br>(ℹ️ *   仅综合证券账户适用)<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：10.0.6008 |
+        | my\_cash | float | 令吉现金<br>(ℹ️ *   仅综合证券账户适用)<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：10.0.6008 |
+        | my\_avl\_withdrawal\_cash | float | 令吉可提<br>(ℹ️ *   仅综合证券账户适用)<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：10.0.6008 |
+        | myr\_net\_cash\_power | float | 令吉现金购买力<br>(ℹ️ *   此字段表示该币种实际的值，而不是以该币种计价的值)<br>*   最低版本要求：10.0.6008 |
+        | myr\_assets | float | 令吉资产净值<br>(ℹ️ *   仅综合证券账户适用)<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：10.0.6008 |
+        | is\_pdt | bool | 是否为 PDT 账户<br>(ℹ️ True：是 PDT 账户，False：不是 PDT 账户)  <br>仅moomoo证券(美国)账户适用  <br>最低 OpenD 版本要求：5.8.2008 |
+        | pdt\_seq | string | 剩余日内交易次数<br>(ℹ️ 仅moomoo证券(美国)账户适用)  <br>最低 OpenD 版本要求：5.8.2008 |
+        | beginning\_dtbp | float | 初始日内交易购买力<br>(ℹ️ 仅被标记为 PDT 的moomoo证券(美国)账户适用)  <br>最低 OpenD 版本要求：5.8.2008 |
+        | remaining\_dtbp | float | 剩余日内交易购买力<br>(ℹ️ 仅被标记为 PDT 的moomoo证券(美国)账户适用)  <br>最低 OpenD 版本要求：5.8.2008 |
+        | dt\_call\_amount | float | 日内交易待缴金额<br>(ℹ️ 仅被标记为 PDT 的moomoo证券(美国)账户适用)  <br>最低 OpenD 版本要求：5.8.2008 |
+        | dt\_status | [DtStatus](./trade_trade.md#1860) | 日内交易限制情况<br>(ℹ️ 仅被标记为 PDT 的moomoo证券(美国)账户适用)  <br>最低 OpenD 版本要求：5.8.2008 |
         
 *   **Example**
     
@@ -230,7 +142,7 @@
 3  
 4  
 
-[#](https://openapi.futunn.com/futu-api-doc/trade/get-funds.html#5465)
+[#](./trade_get-funds.md#5465)
  Trd\_GetFunds.proto
 -------------------------------------------------------------------------------------------
 
@@ -272,11 +184,11 @@
 13  
 14  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   货币类型结构参见 [Currency](https://openapi.futunn.com/futu-api-doc/trade/trade.html#8019)
+> *   货币类型结构参见 [Currency](./trade_trade.md#8019)
 >     
-> *   账户资产类型结构参见 [TrdAssetCategory](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4752)
+> *   账户资产类型结构参见 [TrdAssetCategory](./trade_trade.md#4752)
 >     
 
 *   **返回**
@@ -314,11 +226,11 @@
 14  
 15  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   账户资金结构参见 [Funds](https://openapi.futunn.com/futu-api-doc/trade/trade.html#3175)
+> *   账户资金结构参见 [Funds](./trade_trade.md#3175)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -367,11 +279,11 @@
 13  
 14  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   货币类型结构参见 [Currency](https://openapi.futunn.com/futu-api-doc/trade/trade.html#8019)
+> *   货币类型结构参见 [Currency](./trade_trade.md#8019)
 >     
-> *   账户资产类型结构参见 [TrdAssetCategory](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4752)
+> *   账户资产类型结构参见 [TrdAssetCategory](./trade_trade.md#4752)
 >     
 
 *   **回调**
@@ -409,11 +321,11 @@
 14  
 15  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   账户资金结构参见 [Funds](https://openapi.futunn.com/futu-api-doc/trade/trade.html#3175)
+> *   账户资金结构参见 [Funds](./trade_trade.md#3175)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -705,11 +617,11 @@
 13  
 14  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   货币类型结构参见 [Currency](https://openapi.futunn.com/futu-api-doc/trade/trade.html#8019)
+> *   货币类型结构参见 [Currency](./trade_trade.md#8019)
 >     
-> *   账户资产类型结构参见 [TrdAssetCategory](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4752)
+> *   账户资产类型结构参见 [TrdAssetCategory](./trade_trade.md#4752)
 >     
 
 *   **回调**
@@ -747,11 +659,11 @@
 14  
 15  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   账户资金结构参见 [Funds](https://openapi.futunn.com/futu-api-doc/trade/trade.html#3175)
+> *   账户资金结构参见 [Funds](./trade_trade.md#3175)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1083,11 +995,11 @@
 13  
 14  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   货币类型结构参见 [Currency](https://openapi.futunn.com/futu-api-doc/trade/trade.html#8019)
+> *   货币类型结构参见 [Currency](./trade_trade.md#8019)
 >     
-> *   账户资产类型结构参见 [TrdAssetCategory](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4752)
+> *   账户资产类型结构参见 [TrdAssetCategory](./trade_trade.md#4752)
 >     
 
 *   **回调**
@@ -1125,11 +1037,11 @@
 14  
 15  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   账户资金结构参见 [Funds](https://openapi.futunn.com/futu-api-doc/trade/trade.html#3175)
+> *   账户资金结构参见 [Funds](./trade_trade.md#3175)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1474,11 +1386,11 @@
 13  
 14  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   货币类型结构参见 [Currency](https://openapi.futunn.com/futu-api-doc/trade/trade.html#8019)
+> *   货币类型结构参见 [Currency](./trade_trade.md#8019)
 >     
-> *   账户资产类型结构参见 [TrdAssetCategory](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4752)
+> *   账户资产类型结构参见 [TrdAssetCategory](./trade_trade.md#4752)
 >     
 
 *   **返回**
@@ -1516,11 +1428,11 @@
 14  
 15  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   账户资金结构参见 [Funds](https://openapi.futunn.com/futu-api-doc/trade/trade.html#3175)
+> *   账户资金结构参见 [Funds](./trade_trade.md#3175)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1829,19 +1741,19 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | trd\_env | [TrdEnv](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6374) | 交易环境 |
-    | acc\_id | int | 交易业务账户 ID<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准) |
-    | acc\_index | int | 交易业务账户列表中的账户序号<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户) |
-    | refresh\_cache | bool | 是否刷新缓存<br>(ℹ️ *   True：立即向moomoo 服务器重新请求数据，不使用 OpenD 的缓存，此时会受到接口限频的限制<br>*   False：使用 OpenD 的缓存（特殊情况导致缓存没有及时更新才需要刷新）) |
-    | currency | [Currency](https://openapi.futunn.com/futu-api-doc/trade/trade.html#8019) | 资金的展示货币<br>(ℹ️ *   仅期货账户、综合证券账户适用，其它账户类型会忽略此参数<br>*   返回的 DataFrame 中，除了明确指明了货币的字段，其它资金相关字段都以此参数换算) |
-    | asset\_category | [AssetCategory](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4752) | 资产类别<br>(ℹ️ 仅对日本券商生效) |
+    | trd\_env | [TrdEnv](./trade_trade.md#6374) | 交易环境 |
+    | acc\_id | int | 交易业务账户 ID<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。)<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准 |
+    | acc\_index | int | 交易业务账户列表中的账户序号<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。)<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户 |
+    | refresh\_cache | bool | 是否刷新缓存<br>(ℹ️ *   True：立即向moomoo 服务器重新请求数据，不使用 OpenD 的缓存，此时会受到接口限频的限制)<br>*   False：使用 OpenD 的缓存（特殊情况导致缓存没有及时更新才需要刷新） |
+    | currency | [Currency](./trade_trade.md#8019) | 资金的展示货币<br>(ℹ️ *   仅期货账户、综合证券账户适用，其它账户类型会忽略此参数)<br>*   返回的 DataFrame 中，除了明确指明了货币的字段，其它资金相关字段都以此参数换算 |
+    | asset\_category | [AssetCategory](./trade_trade.md#4752) | 资产类别<br>(ℹ️ 仅对日本券商生效) |
     
 
 *   **返回**
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | pd.DataFrame | 当 ret == RET\_OK 时，返回资金数据 |
     | str | 当 ret != RET\_OK 时，返回错误描述 |
     
@@ -1849,12 +1761,12 @@
         
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
-        | power | float | 最大购买力<br>(ℹ️ *   此字段是按照 50% 的融资初始保证金率计算得到的 **近似值**。但事实上，每个标的的融资初始保证金率并不相同。我们建议您使用 [查询最大可买可卖](https://openapi.futunn.com/futu-api-doc/trade/get-max-trd-qtys.html)<br>     接口返回的 **最大可买** 字段，来判断实际可买入的最大数量。) |
-        | max\_power\_short | float | 卖空购买力<br>(ℹ️ *   此字段是按照 60% 的融券保证金率计算得到的 **近似值**。但事实上，每个标的的融券保证金率并不相同。我们建议您使用 [查询最大可买可卖](https://openapi.futunn.com/futu-api-doc/trade/get-max-trd-qtys.html)<br>     接口返回的 **可卖空** 字段，来判断实际可卖空的最大数量。) |
+        | power | float | 最大购买力<br>(ℹ️ *   此字段是按照 50% 的融资初始保证金率计算得到的 **近似值**。但事实上，每个标的的融资初始保证金率并不相同。我们建议您使用 [查询最大可买可卖](./trade_get-max-trd-qtys.md))<br>     接口返回的 **最大可买** 字段，来判断实际可买入的最大数量。 |
+        | max\_power\_short | float | 卖空购买力<br>(ℹ️ *   此字段是按照 60% 的融券保证金率计算得到的 **近似值**。但事实上，每个标的的融券保证金率并不相同。我们建议您使用 [查询最大可买可卖](./trade_get-max-trd-qtys.md))<br>     接口返回的 **可卖空** 字段，来判断实际可卖空的最大数量。 |
         | net\_cash\_power | float | 现金购买力<br>(ℹ️ 已废弃，请使用usd\_net\_cash\_power等字段获取分币种的现金购买力) |
         | total\_assets | float | 总资产净值<br>(ℹ️ 总资产净值 = 证券资产净值 + 基金资产净值 + 债券资产净值) |
         | securities\_assets | float | 证券资产净值<br>(ℹ️ 最低 OpenD 版本要求：8.2.4218) |
-        | fund\_assets | float | 基金资产净值<br>(ℹ️ *   综合账户返回结果为总基金资产净值，暂时不支持查询港元基金资产和美元基金资产<br>*   最低 OpenD 版本要求：8.2.4218) |
+        | fund\_assets | float | 基金资产净值<br>(ℹ️ *   综合账户返回结果为总基金资产净值，暂时不支持查询港元基金资产和美元基金资产)<br>*   最低 OpenD 版本要求：8.2.4218 |
         | bond\_assets | float | 债券资产净值<br>(ℹ️ 最低 OpenD 版本要求：8.2.4218) |
         | cash | float | 现金<br>(ℹ️ 已废弃，请使用us\_cash等字段获取分币种的现金) |
         | market\_val | float | 证券市值<br>(ℹ️ 仅证券账户适用) |
@@ -1865,53 +1777,53 @@
         | frozen\_cash | float | 冻结资金 |
         | avl\_withdrawal\_cash | float | 现金可提<br>(ℹ️ 仅证券账户适用) |
         | max\_withdrawal | float | 最大可提<br>(ℹ️ 仅富途证券（香港）的证券账户适用) |
-        | currency | [Currency](https://openapi.futunn.com/futu-api-doc/trade/trade.html#8019) | 计价货币<br>(ℹ️ 仅综合证券账户、期货账户适用) |
+        | currency | [Currency](./trade_trade.md#8019) | 计价货币<br>(ℹ️ 仅综合证券账户、期货账户适用) |
         | available\_funds | float | 可用资金<br>(ℹ️ 仅期货账户适用) |
         | unrealized\_pl | float | 未实现盈亏<br>(ℹ️ 仅期货账户适用) |
         | realized\_pl | float | 已实现盈亏<br>(ℹ️ 仅期货账户适用) |
-        | risk\_level | [CltRiskLevel](https://openapi.futunn.com/futu-api-doc/trade/trade.html#9239) | 风控状态<br>(ℹ️ 仅期货账户适用。建议统一使用 risk\_status 字段获取证券、期货账户的风险状态) |
-        | risk\_status | [CltRiskStatus](https://openapi.futunn.com/futu-api-doc/trade/trade.html#3989) | 风险状态<br>(ℹ️ *   证券账户和期货账户均适用<br>*   共分 9 个等级， `LEVEL1`是最安全，`LEVEL9`是最危险) |
+        | risk\_level | [CltRiskLevel](./trade_trade.md#9239) | 风控状态<br>(ℹ️ 仅期货账户适用。建议统一使用 risk\_status 字段获取证券、期货账户的风险状态) |
+        | risk\_status | [CltRiskStatus](./trade_trade.md#3989) | 风险状态<br>(ℹ️ *   证券账户和期货账户均适用)<br>*   共分 9 个等级， `LEVEL1`是最安全，`LEVEL9`是最危险 |
         | initial\_margin | float | 初始保证金 |
         | margin\_call\_margin | float | Margin Call 保证金 |
         | maintenance\_margin | float | 维持保证金 |
         | hk\_cash | float | 港元现金<br>(ℹ️ 此字段表示该币种实际的值，而不是以该币种计价的值) |
         | hk\_avl\_withdrawal\_cash | float | 港元可提<br>(ℹ️ 此字段表示该币种实际的值，而不是以该币种计价的值) |
-        | hkd\_net\_cash\_power | float | 港元现金购买力<br>(ℹ️ *   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：8.7) |
-        | hkd\_assets | float | 港股资产净值<br>(ℹ️ *   仅综合证券账户适用<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：9.0.5008) |
+        | hkd\_net\_cash\_power | float | 港元现金购买力<br>(ℹ️ *   此字段表示该币种实际的值，而不是以该币种计价的值)<br>*   最低版本要求：8.7 |
+        | hkd\_assets | float | 港股资产净值<br>(ℹ️ *   仅综合证券账户适用)<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：9.0.5008 |
         | us\_cash | float | 美元现金<br>(ℹ️ 此字段表示该币种实际的值，而不是以该币种计价的值) |
         | us\_avl\_withdrawal\_cash | float | 美元可提<br>(ℹ️ 此字段表示该币种实际的值，而不是以该币种计价的值) |
-        | usd\_net\_cash\_power | float | 美元现金购买力<br>(ℹ️ *   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：8.7) |
-        | usd\_assets | float | 美股资产净值<br>(ℹ️ *   仅综合证券账户适用<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：9.0.5008) |
+        | usd\_net\_cash\_power | float | 美元现金购买力<br>(ℹ️ *   此字段表示该币种实际的值，而不是以该币种计价的值)<br>*   最低版本要求：8.7 |
+        | usd\_assets | float | 美股资产净值<br>(ℹ️ *   仅综合证券账户适用)<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：9.0.5008 |
         | cn\_cash | float | 人民币现金<br>(ℹ️ 此字段表示该币种实际的值，而不是以该币种计价的值) |
         | cn\_avl\_withdrawal\_cash | float | 人民币可提<br>(ℹ️ 此字段表示该币种实际的值，而不是以该币种计价的值) |
-        | cnh\_net\_cash\_power | float | 人民币现金购买力<br>(ℹ️ *   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：8.7) |
-        | cnh\_assets | float | A股资产净值<br>(ℹ️ *   仅综合证券账户适用<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：9.0.5008) |
-        | jp\_cash | float | 日元现金<br>(ℹ️ *   仅期货账户适用<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低 Futu API 版本要求：5.8.2008) |
-        | jp\_avl\_withdrawal\_cash | float | 日元可提<br>(ℹ️ *   仅期货账户适用<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低 Futu API 版本要求：5.8.2008) |
-        | jpy\_net\_cash\_power | float | 日元现金购买力<br>(ℹ️ *   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：8.7) |
-        | jpy\_assets | float | 日股资产净值<br>(ℹ️ *   仅综合证券账户适用<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：9.0.5008) |
-        | sg\_cash | float | 新元现金<br>(ℹ️ *   仅期货账户适用<br>*   此字段表示该币种实际的值，而不是以该币种计价的值) |
-        | sg\_avl\_withdrawal\_cash | float | 新元可提<br>(ℹ️ *   仅期货账户适用<br>*   此字段表示该币种实际的值，而不是以该币种计价的值) |
-        | sgd\_net\_cash\_power | float | 新元现金购买力<br>(ℹ️ *   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：8.7) |
-        | sgd\_assets | float | 新股资产净值<br>(ℹ️ *   仅综合证券账户适用<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：9.0.5008) |
-        | au\_cash | float | 澳元现金<br>(ℹ️ *   仅综合证券账户适用<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低 Futu API 版本要求：5.8.2008) |
-        | au\_avl\_withdrawal\_cash | float | 澳元可提<br>(ℹ️ *   仅综合证券账户适用<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低 Futu API 版本要求：5.8.2008) |
-        | aud\_net\_cash\_power | float | 澳元现金购买力<br>(ℹ️ *   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：8.7) |
-        | aud\_assets | float | 澳股资产净值<br>(ℹ️ *   仅综合证券账户适用<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：9.0.5008) |
-        | ca\_cash | float | 加元现金<br>(ℹ️ *   仅综合证券账户适用<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：10.0.6008) |
-        | ca\_avl\_withdrawal\_cash | float | 加元可提<br>(ℹ️ *   仅综合证券账户适用<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：10.0.6008) |
-        | cad\_net\_cash\_power | float | 加元现金购买力<br>(ℹ️ *   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：10.0.6008) |
-        | cad\_assets | float | 加元资产净值<br>(ℹ️ *   仅综合证券账户适用<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：10.0.6008) |
-        | my\_cash | float | 令吉现金<br>(ℹ️ *   仅综合证券账户适用<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：10.0.6008) |
-        | my\_avl\_withdrawal\_cash | float | 令吉可提<br>(ℹ️ *   仅综合证券账户适用<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：10.0.6008) |
-        | myr\_net\_cash\_power | float | 令吉现金购买力<br>(ℹ️ *   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：10.0.6008) |
-        | myr\_assets | float | 令吉资产净值<br>(ℹ️ *   仅综合证券账户适用<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：10.0.6008) |
-        | is\_pdt | bool | 是否为 PDT 账户<br>(ℹ️ True：是 PDT 账户，False：不是 PDT 账户  <br>仅moomoo证券(美国)账户适用  <br>最低 OpenD 版本要求：5.8.2008) |
-        | pdt\_seq | string | 剩余日内交易次数<br>(ℹ️ 仅moomoo证券(美国)账户适用  <br>最低 OpenD 版本要求：5.8.2008) |
-        | beginning\_dtbp | float | 初始日内交易购买力<br>(ℹ️ 仅被标记为 PDT 的moomoo证券(美国)账户适用  <br>最低 OpenD 版本要求：5.8.2008) |
-        | remaining\_dtbp | float | 剩余日内交易购买力<br>(ℹ️ 仅被标记为 PDT 的moomoo证券(美国)账户适用  <br>最低 OpenD 版本要求：5.8.2008) |
-        | dt\_call\_amount | float | 日内交易待缴金额<br>(ℹ️ 仅被标记为 PDT 的moomoo证券(美国)账户适用  <br>最低 OpenD 版本要求：5.8.2008) |
-        | dt\_status | [DtStatus](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1860) | 日内交易限制情况<br>(ℹ️ 仅被标记为 PDT 的moomoo证券(美国)账户适用  <br>最低 OpenD 版本要求：5.8.2008) |
+        | cnh\_net\_cash\_power | float | 人民币现金购买力<br>(ℹ️ *   此字段表示该币种实际的值，而不是以该币种计价的值)<br>*   最低版本要求：8.7 |
+        | cnh\_assets | float | A股资产净值<br>(ℹ️ *   仅综合证券账户适用)<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：9.0.5008 |
+        | jp\_cash | float | 日元现金<br>(ℹ️ *   仅期货账户适用)<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低 Futu API 版本要求：5.8.2008 |
+        | jp\_avl\_withdrawal\_cash | float | 日元可提<br>(ℹ️ *   仅期货账户适用)<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低 Futu API 版本要求：5.8.2008 |
+        | jpy\_net\_cash\_power | float | 日元现金购买力<br>(ℹ️ *   此字段表示该币种实际的值，而不是以该币种计价的值)<br>*   最低版本要求：8.7 |
+        | jpy\_assets | float | 日股资产净值<br>(ℹ️ *   仅综合证券账户适用)<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：9.0.5008 |
+        | sg\_cash | float | 新元现金<br>(ℹ️ *   仅期货账户适用)<br>*   此字段表示该币种实际的值，而不是以该币种计价的值 |
+        | sg\_avl\_withdrawal\_cash | float | 新元可提<br>(ℹ️ *   仅期货账户适用)<br>*   此字段表示该币种实际的值，而不是以该币种计价的值 |
+        | sgd\_net\_cash\_power | float | 新元现金购买力<br>(ℹ️ *   此字段表示该币种实际的值，而不是以该币种计价的值)<br>*   最低版本要求：8.7 |
+        | sgd\_assets | float | 新股资产净值<br>(ℹ️ *   仅综合证券账户适用)<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：9.0.5008 |
+        | au\_cash | float | 澳元现金<br>(ℹ️ *   仅综合证券账户适用)<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低 Futu API 版本要求：5.8.2008 |
+        | au\_avl\_withdrawal\_cash | float | 澳元可提<br>(ℹ️ *   仅综合证券账户适用)<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低 Futu API 版本要求：5.8.2008 |
+        | aud\_net\_cash\_power | float | 澳元现金购买力<br>(ℹ️ *   此字段表示该币种实际的值，而不是以该币种计价的值)<br>*   最低版本要求：8.7 |
+        | aud\_assets | float | 澳股资产净值<br>(ℹ️ *   仅综合证券账户适用)<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：9.0.5008 |
+        | ca\_cash | float | 加元现金<br>(ℹ️ *   仅综合证券账户适用)<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：10.0.6008 |
+        | ca\_avl\_withdrawal\_cash | float | 加元可提<br>(ℹ️ *   仅综合证券账户适用)<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：10.0.6008 |
+        | cad\_net\_cash\_power | float | 加元现金购买力<br>(ℹ️ *   此字段表示该币种实际的值，而不是以该币种计价的值)<br>*   最低版本要求：10.0.6008 |
+        | cad\_assets | float | 加元资产净值<br>(ℹ️ *   仅综合证券账户适用)<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：10.0.6008 |
+        | my\_cash | float | 令吉现金<br>(ℹ️ *   仅综合证券账户适用)<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：10.0.6008 |
+        | my\_avl\_withdrawal\_cash | float | 令吉可提<br>(ℹ️ *   仅综合证券账户适用)<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：10.0.6008 |
+        | myr\_net\_cash\_power | float | 令吉现金购买力<br>(ℹ️ *   此字段表示该币种实际的值，而不是以该币种计价的值)<br>*   最低版本要求：10.0.6008 |
+        | myr\_assets | float | 令吉资产净值<br>(ℹ️ *   仅综合证券账户适用)<br>*   此字段表示该币种实际的值，而不是以该币种计价的值<br>*   最低版本要求：10.0.6008 |
+        | is\_pdt | bool | 是否为 PDT 账户<br>(ℹ️ True：是 PDT 账户，False：不是 PDT 账户)  <br>仅moomoo证券(美国)账户适用  <br>最低 OpenD 版本要求：5.8.2008 |
+        | pdt\_seq | string | 剩余日内交易次数<br>(ℹ️ 仅moomoo证券(美国)账户适用)  <br>最低 OpenD 版本要求：5.8.2008 |
+        | beginning\_dtbp | float | 初始日内交易购买力<br>(ℹ️ 仅被标记为 PDT 的moomoo证券(美国)账户适用)  <br>最低 OpenD 版本要求：5.8.2008 |
+        | remaining\_dtbp | float | 剩余日内交易购买力<br>(ℹ️ 仅被标记为 PDT 的moomoo证券(美国)账户适用)  <br>最低 OpenD 版本要求：5.8.2008 |
+        | dt\_call\_amount | float | 日内交易待缴金额<br>(ℹ️ 仅被标记为 PDT 的moomoo证券(美国)账户适用)  <br>最低 OpenD 版本要求：5.8.2008 |
+        | dt\_status | [DtStatus](./trade_trade.md#1860) | 日内交易限制情况<br>(ℹ️ 仅被标记为 PDT 的moomoo证券(美国)账户适用)  <br>最低 OpenD 版本要求：5.8.2008 |
         
 *   **Example**
     
@@ -1952,7 +1864,7 @@
 3  
 4  
 
-[#](https://openapi.futunn.com/futu-api-doc/trade/get-funds.html#5465-2)
+[#](./trade_get-funds.md#5465-2)
  Trd\_GetFunds.proto
 ---------------------------------------------------------------------------------------------
 
@@ -1994,11 +1906,11 @@
 13  
 14  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   货币类型结构参见 [Currency](https://openapi.futunn.com/futu-api-doc/trade/trade.html#8019)
+> *   货币类型结构参见 [Currency](./trade_trade.md#8019)
 >     
-> *   账户资产类型结构参见 [TrdAssetCategory](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4752)
+> *   账户资产类型结构参见 [TrdAssetCategory](./trade_trade.md#4752)
 >     
 
 *   **返回**
@@ -2036,11 +1948,11 @@
 14  
 15  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   账户资金结构参见 [Funds](https://openapi.futunn.com/futu-api-doc/trade/trade.html#3175)
+> *   账户资金结构参见 [Funds](./trade_trade.md#3175)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -2089,11 +2001,11 @@
 13  
 14  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   货币类型结构参见 [Currency](https://openapi.futunn.com/futu-api-doc/trade/trade.html#8019)
+> *   货币类型结构参见 [Currency](./trade_trade.md#8019)
 >     
-> *   账户资产类型结构参见 [TrdAssetCategory](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4752)
+> *   账户资产类型结构参见 [TrdAssetCategory](./trade_trade.md#4752)
 >     
 
 *   **回调**
@@ -2131,11 +2043,11 @@
 14  
 15  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   账户资金结构参见 [Funds](https://openapi.futunn.com/futu-api-doc/trade/trade.html#3175)
+> *   账户资金结构参见 [Funds](./trade_trade.md#3175)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2427,11 +2339,11 @@
 13  
 14  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   货币类型结构参见 [Currency](https://openapi.futunn.com/futu-api-doc/trade/trade.html#8019)
+> *   货币类型结构参见 [Currency](./trade_trade.md#8019)
 >     
-> *   账户资产类型结构参见 [TrdAssetCategory](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4752)
+> *   账户资产类型结构参见 [TrdAssetCategory](./trade_trade.md#4752)
 >     
 
 *   **回调**
@@ -2469,11 +2381,11 @@
 14  
 15  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   账户资金结构参见 [Funds](https://openapi.futunn.com/futu-api-doc/trade/trade.html#3175)
+> *   账户资金结构参见 [Funds](./trade_trade.md#3175)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2805,11 +2717,11 @@
 13  
 14  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   货币类型结构参见 [Currency](https://openapi.futunn.com/futu-api-doc/trade/trade.html#8019)
+> *   货币类型结构参见 [Currency](./trade_trade.md#8019)
 >     
-> *   账户资产类型结构参见 [TrdAssetCategory](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4752)
+> *   账户资产类型结构参见 [TrdAssetCategory](./trade_trade.md#4752)
 >     
 
 *   **回调**
@@ -2847,11 +2759,11 @@
 14  
 15  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   账户资金结构参见 [Funds](https://openapi.futunn.com/futu-api-doc/trade/trade.html#3175)
+> *   账户资金结构参见 [Funds](./trade_trade.md#3175)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -3196,11 +3108,11 @@
 13  
 14  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   货币类型结构参见 [Currency](https://openapi.futunn.com/futu-api-doc/trade/trade.html#8019)
+> *   货币类型结构参见 [Currency](./trade_trade.md#8019)
 >     
-> *   账户资产类型结构参见 [TrdAssetCategory](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4752)
+> *   账户资产类型结构参见 [TrdAssetCategory](./trade_trade.md#4752)
 >     
 
 *   **返回**
@@ -3238,11 +3150,11 @@
 14  
 15  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   账户资金结构参见 [Funds](https://openapi.futunn.com/futu-api-doc/trade/trade.html#3175)
+> *   账户资金结构参见 [Funds](./trade_trade.md#3175)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -3534,7 +3446,7 @@
 *   同一账户ID(acc\_id) 每 30 秒内最多请求 10 次查询账户资金接口
 *   调用此接口，只有在刷新缓存时，才受到限频限制
 
-← [解锁交易](https://openapi.futunn.com/futu-api-doc/trade/unlock.html) [查询最大可买可卖](https://openapi.futunn.com/futu-api-doc/trade/get-max-trd-qtys.html)
+← [解锁交易](./trade_unlock.md) [查询最大可买可卖](./trade_get-max-trd-qtys.md)
  →
 
-[查询账户资金](https://openapi.futunn.com/futu-api-doc/trade/get-funds.html)
+[查询账户资金](./trade_get-funds.md)

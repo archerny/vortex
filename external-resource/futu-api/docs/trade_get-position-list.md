@@ -1,92 +1,4 @@
- [![Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/img/logo.png) Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/)
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/trade/get-position-list.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/trade/get-position-list.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/trade/get-position-list.html)
-    
-
-下载
-
-*   [PDF](https://openapi.futunn.com/pdfs/Futu-API-Doc-zh-Python.pdf)
-    
-*   [Markdown](https://openapi.futunn.com/mds/Futu-API-Doc-zh-Python.md)
-    
-*   [Skills](https://openapi.futunn.com/skills/opend-skills.zip)
-    
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/trade/get-position-list.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/trade/get-position-list.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/trade/get-position-list.html)
-    
-
-*   介绍
-    
-*   快速上手
-    
-*   OpenD
-    
-*   行情接口
-    
-*   交易接口
-    
-    *   [交易接口总览](https://openapi.futunn.com/futu-api-doc/trade/overview.html)
-        
-    *   [交易对象](https://openapi.futunn.com/futu-api-doc/trade/base.html)
-        
-    *   账户
-        
-    *   资产持仓
-        
-        *   [查询账户资金](https://openapi.futunn.com/futu-api-doc/trade/get-funds.html)
-            
-        *   [查询最大可买可卖](https://openapi.futunn.com/futu-api-doc/trade/get-max-trd-qtys.html)
-            
-        *   [查询持仓](https://openapi.futunn.com/futu-api-doc/trade/get-position-list.html)
-            
-        *   [获取融资融券数据](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html)
-            
-        *   [查询账户现金流水](https://openapi.futunn.com/futu-api-doc/trade/get-acc-cash-flow.html)
-            
-        
-    *   订单
-        
-    *   成交
-        
-    *   [交易定义](https://openapi.futunn.com/futu-api-doc/trade/trade.html)
-        
-    
-*   基础接口
-    
-*   Q&A
-    
-
-[#](https://openapi.futunn.com/futu-api-doc/trade/get-position-list.html#4697)
+[#](./trade_get-position-list.md#4697)
  查询持仓
 ====================================================================================
 
@@ -107,22 +19,22 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | code | str | 代码过滤<br>(ℹ️ *   只返回此代码对应的持仓数据。不传则返回所有<br>*   注意：期货持仓的代码过滤，需要传入含具体月份的合约代码，无法通过主连合约代码进行过滤) |
-    | position\_market | [TrdMarket](https://openapi.futunn.com/futu-api-doc/trade/trade.html#719) | 持仓所属市场过滤<br>(ℹ️ *   返回指定市场的持仓数据<br>*   默认状态时，返回所有市场持仓数据) |
-    | pl\_ratio\_min | float | 当前盈亏比例下限过滤，仅返回高于此比例的持仓<br>(ℹ️ 证券账户使用摊薄成本价的盈亏比例，期货账户使用平均成本价的盈亏比例  <br>例如：传入 10，则返回盈亏比例大于 +10% 的持仓) |
-    | pl\_ratio\_max | float | 当前盈亏比例上限过滤，低于此比例的会返回<br>(ℹ️ 证券账户使用摊薄成本价的盈亏比例，期货账户使用平均成本价的盈亏比例  <br>例如：传入 10，返回盈亏比例小于 +10% 的持仓) |
-    | trd\_env | [TrdEnv](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6374) | 交易环境 |
-    | acc\_id | int | 交易业务账户 ID<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准) |
-    | acc\_index | int | 交易业务账户列表中的账户序号<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户) |
-    | refresh\_cache | bool | 是否刷新缓存<br>(ℹ️ *   True：立即向富途服务器重新请求数据，不使用 OpenD 的缓存，此时会受到接口限频的限制<br>*   False：使用 OpenD 的缓存（特殊情况导致缓存没有及时更新才需要刷新）) |
-    | asset\_category | [AssetCategory](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4752) | 资产类别<br>(ℹ️ 仅对日本券商生效) |
+    | code | str | 代码过滤<br>(ℹ️ *   只返回此代码对应的持仓数据。不传则返回所有)<br>*   注意：期货持仓的代码过滤，需要传入含具体月份的合约代码，无法通过主连合约代码进行过滤 |
+    | position\_market | [TrdMarket](./trade_trade.md#719) | 持仓所属市场过滤<br>(ℹ️ *   返回指定市场的持仓数据)<br>*   默认状态时，返回所有市场持仓数据 |
+    | pl\_ratio\_min | float | 当前盈亏比例下限过滤，仅返回高于此比例的持仓<br>(ℹ️ 证券账户使用摊薄成本价的盈亏比例，期货账户使用平均成本价的盈亏比例)  <br>例如：传入 10，则返回盈亏比例大于 +10% 的持仓 |
+    | pl\_ratio\_max | float | 当前盈亏比例上限过滤，低于此比例的会返回<br>(ℹ️ 证券账户使用摊薄成本价的盈亏比例，期货账户使用平均成本价的盈亏比例)  <br>例如：传入 10，返回盈亏比例小于 +10% 的持仓 |
+    | trd\_env | [TrdEnv](./trade_trade.md#6374) | 交易环境 |
+    | acc\_id | int | 交易业务账户 ID<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。)<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准 |
+    | acc\_index | int | 交易业务账户列表中的账户序号<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。)<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户 |
+    | refresh\_cache | bool | 是否刷新缓存<br>(ℹ️ *   True：立即向富途服务器重新请求数据，不使用 OpenD 的缓存，此时会受到接口限频的限制)<br>*   False：使用 OpenD 的缓存（特殊情况导致缓存没有及时更新才需要刷新） |
+    | asset\_category | [AssetCategory](./trade_trade.md#4752) | 资产类别<br>(ℹ️ 仅对日本券商生效) |
     
 
 *   **返回**
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | pd.DataFrame | 当 ret == RET\_OK 时，返回持仓列表 |
     | str | 当 ret != RET\_OK 时，返回错误描述 |
     
@@ -130,32 +42,32 @@
         
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
-        | position\_side | [PositionSide](https://openapi.futunn.com/futu-api-doc/trade/trade.html#2972) | 持仓方向 |
+        | position\_side | [PositionSide](./trade_trade.md#2972) | 持仓方向 |
         | code | str | 股票代码 |
         | stock\_name | str | 股票名称 |
-        | position\_market | [TrdMarket](https://openapi.futunn.com/futu-api-doc/trade/trade.html#719) | 持仓所属市场 |
+        | position\_market | [TrdMarket](./trade_trade.md#719) | 持仓所属市场 |
         | qty | float | 持有数量<br>(ℹ️ 期权和期货的单位是“张”) |
-        | can\_sell\_qty | float | 可用数量<br>(ℹ️ 可用数量，是指持有的可平仓的数量。  <br>可用数量=持有数量-冻结数量  <br>期权和期货的单位是“张”。) |
-        | currency | [Currency](https://openapi.futunn.com/futu-api-doc/trade/trade.html#8019) | 交易货币 |
+        | can\_sell\_qty | float | 可用数量<br>(ℹ️ 可用数量，是指持有的可平仓的数量。)  <br>可用数量=持有数量-冻结数量  <br>期权和期货的单位是“张”。 |
+        | currency | [Currency](./trade_trade.md#8019) | 交易货币 |
         | nominal\_price | float | 市价<br>(ℹ️ 精确到小数点后 3 位，超出部分四舍五入) |
         | cost\_price | float | 摊薄成本价（证券账户），平均开仓价（期货账户）<br>(ℹ️ 建议使用 average\_cost，diluted\_cost 字段获取持仓成本价) |
-        | cost\_price\_valid | bool | 成本价是否有效<br>(ℹ️ True：有效  <br>False：无效) |
-        | average\_cost | float | 平均成本价<br>(ℹ️ 模拟证券账户不适用  <br>最低OpenD版本要求：9.2.5208) |
-        | diluted\_cost | float | 摊薄成本价<br>(ℹ️ 期货账户不适用  <br>最低OpenD版本要求：9.2.5208) |
+        | cost\_price\_valid | bool | 成本价是否有效<br>(ℹ️ True：有效)  <br>False：无效 |
+        | average\_cost | float | 平均成本价<br>(ℹ️ 模拟证券账户不适用)  <br>最低OpenD版本要求：9.2.5208 |
+        | diluted\_cost | float | 摊薄成本价<br>(ℹ️ 期货账户不适用)  <br>最低OpenD版本要求：9.2.5208 |
         | market\_val | float | 市值<br>(ℹ️ 精度：3 位小数（A 股 2 位小数，期货 0 位小数）) |
-        | pl\_ratio | float | 盈亏比例（摊薄成本价模式）<br>(ℹ️ 期货不适用  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
-        | pl\_ratio\_valid | bool | 盈亏比例是否有效<br>(ℹ️ True：有效  <br>False：无效) |
-        | pl\_ratio\_avg\_cost | float | 盈亏比例（平均成本价模式）<br>(ℹ️ 模拟证券账户不适用  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%  <br>最低OpenD版本要求：9.2.5208) |
+        | pl\_ratio | float | 盈亏比例（摊薄成本价模式）<br>(ℹ️ 期货不适用)  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+        | pl\_ratio\_valid | bool | 盈亏比例是否有效<br>(ℹ️ True：有效)  <br>False：无效 |
+        | pl\_ratio\_avg\_cost | float | 盈亏比例（平均成本价模式）<br>(ℹ️ 模拟证券账户不适用)  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%  <br>最低OpenD版本要求：9.2.5208 |
         | pl\_val | float | 盈亏金额<br>(ℹ️ 精度：3 位小数（A 股 2 位小数）) |
-        | pl\_val\_valid | bool | 盈亏金额是否有效<br>(ℹ️ True：有效  <br>False：无效) |
-        | today\_pl\_val | float | 今日盈亏金额<br>(ℹ️ 只在真实交易环境下有效  <br>精度：3 位小数（A 股 2 位小数，期货 2 位小数）) |
-        | today\_trd\_val | float | 今日交易金额<br>(ℹ️ 只在真实交易环境下有效  <br>精度：3 位小数（A 股 2 位小数）  <br>期货不适用) |
-        | today\_buy\_qty | float | 今日买入总量<br>(ℹ️ 只在真实交易环境下有效  <br>精度：3 位小数（A 股 2 位小数）  <br>期货不适用) |
-        | today\_buy\_val | float | 今日买入总额<br>(ℹ️ 只在真实交易环境下有效  <br>精度：3 位小数（A 股 2 位小数）  <br>期货不适用) |
-        | today\_sell\_qty | float | 今日卖出总量<br>(ℹ️ 只在真实交易环境下有效  <br>精度：3 位小数（A 股 2 位小数）  <br>期货不适用) |
-        | today\_sell\_val | float | 今日卖出总额<br>(ℹ️ 只在真实交易环境下有效  <br>精度：3 位小数（A 股 2 位小数）  <br>期货不适用) |
-        | unrealized\_pl | float | 未实现盈亏<br>(ℹ️ 模拟证券账户不适用  <br>综合证券账户，返回平均成本价模式下的未实现盈亏金额) |
-        | realized\_pl | float | 已实现盈亏<br>(ℹ️ 模拟证券账户不适用  <br>综合证券账户，返回平均成本价模式下的已实现盈亏金额) |
+        | pl\_val\_valid | bool | 盈亏金额是否有效<br>(ℹ️ True：有效)  <br>False：无效 |
+        | today\_pl\_val | float | 今日盈亏金额<br>(ℹ️ 只在真实交易环境下有效)  <br>精度：3 位小数（A 股 2 位小数，期货 2 位小数） |
+        | today\_trd\_val | float | 今日交易金额<br>(ℹ️ 只在真实交易环境下有效)  <br>精度：3 位小数（A 股 2 位小数）  <br>期货不适用 |
+        | today\_buy\_qty | float | 今日买入总量<br>(ℹ️ 只在真实交易环境下有效)  <br>精度：3 位小数（A 股 2 位小数）  <br>期货不适用 |
+        | today\_buy\_val | float | 今日买入总额<br>(ℹ️ 只在真实交易环境下有效)  <br>精度：3 位小数（A 股 2 位小数）  <br>期货不适用 |
+        | today\_sell\_qty | float | 今日卖出总量<br>(ℹ️ 只在真实交易环境下有效)  <br>精度：3 位小数（A 股 2 位小数）  <br>期货不适用 |
+        | today\_sell\_val | float | 今日卖出总额<br>(ℹ️ 只在真实交易环境下有效)  <br>精度：3 位小数（A 股 2 位小数）  <br>期货不适用 |
+        | unrealized\_pl | float | 未实现盈亏<br>(ℹ️ 模拟证券账户不适用)  <br>综合证券账户，返回平均成本价模式下的未实现盈亏金额 |
+        | realized\_pl | float | 已实现盈亏<br>(ℹ️ 模拟证券账户不适用)  <br>综合证券账户，返回平均成本价模式下的已实现盈亏金额 |
         | position\_id | int | 持仓ID |
         
 *   **Example**
@@ -199,7 +111,7 @@
 3  
 4  
 
-[#](https://openapi.futunn.com/futu-api-doc/trade/get-position-list.html#3557)
+[#](./trade_get-position-list.md#3557)
  Trd\_GetPositionList.proto
 ----------------------------------------------------------------------------------------------------------
 
@@ -245,11 +157,11 @@
 15  
 16  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   过滤条件结构参见 [TrdFilterConditions](https://openapi.futunn.com/futu-api-doc/trade/trade.html#3894)
+> *   过滤条件结构参见 [TrdFilterConditions](./trade_trade.md#3894)
 >     
-> *   账户资产类型结构参见 [TrdAssetCategory](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4752)
+> *   账户资产类型结构参见 [TrdAssetCategory](./trade_trade.md#4752)
 >     
 
 *   **返回**
@@ -287,11 +199,11 @@
 14  
 15  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   持仓结构参见 [Position](https://openapi.futunn.com/futu-api-doc/trade/trade.html#3117)
+> *   持仓结构参见 [Position](./trade_trade.md#3117)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -344,11 +256,11 @@
 15  
 16  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   过滤条件结构参见 [TrdFilterConditions](https://openapi.futunn.com/futu-api-doc/trade/trade.html#3894)
+> *   过滤条件结构参见 [TrdFilterConditions](./trade_trade.md#3894)
 >     
-> *   账户资产类型结构参见 [TrdAssetCategory](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4752)
+> *   账户资产类型结构参见 [TrdAssetCategory](./trade_trade.md#4752)
 >     
 
 *   **回调**
@@ -386,11 +298,11 @@
 14  
 15  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   持仓结构参见 [Position](https://openapi.futunn.com/futu-api-doc/trade/trade.html#3117)
+> *   持仓结构参见 [Position](./trade_trade.md#3117)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -564,11 +476,11 @@
 15  
 16  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   过滤条件结构参见 [TrdFilterConditions](https://openapi.futunn.com/futu-api-doc/trade/trade.html#3894)
+> *   过滤条件结构参见 [TrdFilterConditions](./trade_trade.md#3894)
 >     
-> *   账户资产类型结构参见 [TrdAssetCategory](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4752)
+> *   账户资产类型结构参见 [TrdAssetCategory](./trade_trade.md#4752)
 >     
 
 *   **回调**
@@ -606,11 +518,11 @@
 14  
 15  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   持仓结构参见 [Position](https://openapi.futunn.com/futu-api-doc/trade/trade.html#3117)
+> *   持仓结构参见 [Position](./trade_trade.md#3117)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -862,11 +774,11 @@
 15  
 16  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   过滤条件结构参见 [TrdFilterConditions](https://openapi.futunn.com/futu-api-doc/trade/trade.html#3894)
+> *   过滤条件结构参见 [TrdFilterConditions](./trade_trade.md#3894)
 >     
-> *   账户资产类型结构参见 [TrdAssetCategory](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4752)
+> *   账户资产类型结构参见 [TrdAssetCategory](./trade_trade.md#4752)
 >     
 
 *   **回调**
@@ -904,11 +816,11 @@
 14  
 15  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   持仓结构参见 [Position](https://openapi.futunn.com/futu-api-doc/trade/trade.html#3117)
+> *   持仓结构参见 [Position](./trade_trade.md#3117)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1179,11 +1091,11 @@
 15  
 16  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   过滤条件结构参见 [TrdFilterConditions](https://openapi.futunn.com/futu-api-doc/trade/trade.html#3894)
+> *   过滤条件结构参见 [TrdFilterConditions](./trade_trade.md#3894)
 >     
-> *   账户资产类型结构参见 [TrdAssetCategory](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4752)
+> *   账户资产类型结构参见 [TrdAssetCategory](./trade_trade.md#4752)
 >     
 
 *   **返回**
@@ -1221,11 +1133,11 @@
 14  
 15  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   持仓结构参见 [Position](https://openapi.futunn.com/futu-api-doc/trade/trade.html#3117)
+> *   持仓结构参见 [Position](./trade_trade.md#3117)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1452,22 +1364,22 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | code | str | 代码过滤<br>(ℹ️ *   只返回此代码对应的持仓数据。不传则返回所有<br>*   注意：期货持仓的代码过滤，需要传入含具体月份的合约代码，无法通过主连合约代码进行过滤) |
-    | position\_market | [TrdMarket](https://openapi.futunn.com/futu-api-doc/trade/trade.html#719) | 持仓所属市场过滤<br>(ℹ️ *   返回指定市场的持仓数据<br>*   默认状态时，返回所有市场持仓数据) |
-    | pl\_ratio\_min | float | 当前盈亏比例下限过滤，仅返回高于此比例的持仓<br>(ℹ️ 证券账户使用摊薄成本价的盈亏比例，期货账户使用平均成本价的盈亏比例  <br>例如：传入 10，则返回盈亏比例大于 +10% 的持仓) |
-    | pl\_ratio\_max | float | 当前盈亏比例上限过滤，低于此比例的会返回<br>(ℹ️ 证券账户使用摊薄成本价的盈亏比例，期货账户使用平均成本价的盈亏比例  <br>例如：传入 20，返回盈亏比例小于 +20% 的持仓) |
-    | trd\_env | [TrdEnv](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6374) | 交易环境 |
-    | acc\_id | int | 交易业务账户 ID<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准) |
-    | acc\_index | int | 交易业务账户列表中的账户序号<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户) |
-    | refresh\_cache | bool | 是否刷新缓存<br>(ℹ️ *   True：立即向富途服务器重新请求数据，不使用 OpenD 的缓存，此时会受到接口限频的限制<br>*   False：使用 OpenD 的缓存（特殊情况导致缓存没有及时更新才需要刷新）) |
-    | asset\_category | [AssetCategory](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4752) | 资产类别<br>(ℹ️ 仅对日本券商生效) |
+    | code | str | 代码过滤<br>(ℹ️ *   只返回此代码对应的持仓数据。不传则返回所有)<br>*   注意：期货持仓的代码过滤，需要传入含具体月份的合约代码，无法通过主连合约代码进行过滤 |
+    | position\_market | [TrdMarket](./trade_trade.md#719) | 持仓所属市场过滤<br>(ℹ️ *   返回指定市场的持仓数据)<br>*   默认状态时，返回所有市场持仓数据 |
+    | pl\_ratio\_min | float | 当前盈亏比例下限过滤，仅返回高于此比例的持仓<br>(ℹ️ 证券账户使用摊薄成本价的盈亏比例，期货账户使用平均成本价的盈亏比例)  <br>例如：传入 10，则返回盈亏比例大于 +10% 的持仓 |
+    | pl\_ratio\_max | float | 当前盈亏比例上限过滤，低于此比例的会返回<br>(ℹ️ 证券账户使用摊薄成本价的盈亏比例，期货账户使用平均成本价的盈亏比例)  <br>例如：传入 20，返回盈亏比例小于 +20% 的持仓 |
+    | trd\_env | [TrdEnv](./trade_trade.md#6374) | 交易环境 |
+    | acc\_id | int | 交易业务账户 ID<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。)<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准 |
+    | acc\_index | int | 交易业务账户列表中的账户序号<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。)<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户 |
+    | refresh\_cache | bool | 是否刷新缓存<br>(ℹ️ *   True：立即向富途服务器重新请求数据，不使用 OpenD 的缓存，此时会受到接口限频的限制)<br>*   False：使用 OpenD 的缓存（特殊情况导致缓存没有及时更新才需要刷新） |
+    | asset\_category | [AssetCategory](./trade_trade.md#4752) | 资产类别<br>(ℹ️ 仅对日本券商生效) |
     
 
 *   **返回**
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | pd.DataFrame | 当 ret == RET\_OK 时，返回持仓列表 |
     | str | 当 ret != RET\_OK 时，返回错误描述 |
     
@@ -1475,32 +1387,32 @@
         
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
-        | position\_side | [PositionSide](https://openapi.futunn.com/futu-api-doc/trade/trade.html#2972) | 持仓方向 |
+        | position\_side | [PositionSide](./trade_trade.md#2972) | 持仓方向 |
         | code | str | 股票代码 |
         | stock\_name | str | 股票名称 |
-        | position\_market | [TrdMarket](https://openapi.futunn.com/futu-api-doc/trade/trade.html#719) | 持仓所属市场 |
+        | position\_market | [TrdMarket](./trade_trade.md#719) | 持仓所属市场 |
         | qty | float | 持有数量<br>(ℹ️ 期权和期货的单位是“张”) |
-        | can\_sell\_qty | float | 可用数量<br>(ℹ️ 可用数量，是指持有的可平仓的数量。  <br>可用数量=持有数量-冻结数量  <br>期权和期货的单位是“张”。) |
-        | currency | [Currency](https://openapi.futunn.com/futu-api-doc/trade/trade.html#8019) | 交易货币 |
+        | can\_sell\_qty | float | 可用数量<br>(ℹ️ 可用数量，是指持有的可平仓的数量。)  <br>可用数量=持有数量-冻结数量  <br>期权和期货的单位是“张”。 |
+        | currency | [Currency](./trade_trade.md#8019) | 交易货币 |
         | nominal\_price | float | 市价<br>(ℹ️ 精确到小数点后 3 位，超出部分四舍五入) |
         | cost\_price | float | 摊薄成本价（证券账户），平均开仓价（期货账户）<br>(ℹ️ 建议使用 average\_cost，diluted\_cost 字段获取持仓成本价) |
-        | cost\_price\_valid | bool | 成本价是否有效<br>(ℹ️ True：有效  <br>False：无效) |
-        | average\_cost | float | 平均成本价<br>(ℹ️ 模拟证券账户不适用  <br>最低OpenD版本要求：9.2.5208) |
-        | diluted\_cost | float | 摊薄成本价<br>(ℹ️ 期货账户不适用  <br>最低OpenD版本要求：9.2.5208) |
+        | cost\_price\_valid | bool | 成本价是否有效<br>(ℹ️ True：有效)  <br>False：无效 |
+        | average\_cost | float | 平均成本价<br>(ℹ️ 模拟证券账户不适用)  <br>最低OpenD版本要求：9.2.5208 |
+        | diluted\_cost | float | 摊薄成本价<br>(ℹ️ 期货账户不适用)  <br>最低OpenD版本要求：9.2.5208 |
         | market\_val | float | 市值<br>(ℹ️ 精度：3 位小数（A 股 2 位小数，期货 0 位小数）) |
-        | pl\_ratio | float | 盈亏比例（摊薄成本价模式）<br>(ℹ️ 期货不适用  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
-        | pl\_ratio\_valid | bool | 盈亏比例是否有效<br>(ℹ️ True：有效  <br>False：无效) |
-        | pl\_ratio\_avg\_cost | float | 盈亏比例（平均成本价模式）<br>(ℹ️ 模拟证券账户不适用  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%  <br>最低OpenD版本要求：9.2.5208) |
+        | pl\_ratio | float | 盈亏比例（摊薄成本价模式）<br>(ℹ️ 期货不适用)  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+        | pl\_ratio\_valid | bool | 盈亏比例是否有效<br>(ℹ️ True：有效)  <br>False：无效 |
+        | pl\_ratio\_avg\_cost | float | 盈亏比例（平均成本价模式）<br>(ℹ️ 模拟证券账户不适用)  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%  <br>最低OpenD版本要求：9.2.5208 |
         | pl\_val | float | 盈亏金额<br>(ℹ️ 精度：3 位小数（A 股 2 位小数）) |
-        | pl\_val\_valid | bool | 盈亏金额是否有效<br>(ℹ️ True：有效  <br>False：无效) |
-        | today\_pl\_val | float | 今日盈亏金额<br>(ℹ️ 只在真实交易环境下有效  <br>精度：3 位小数（A 股 2 位小数，期货 2 位小数）) |
-        | today\_trd\_val | float | 今日交易金额<br>(ℹ️ 只在真实交易环境下有效  <br>精度：3 位小数（A 股 2 位小数）  <br>期货不适用) |
-        | today\_buy\_qty | float | 今日买入总量<br>(ℹ️ 只在真实交易环境下有效  <br>精度：3 位小数（A 股 2 位小数）  <br>期货不适用) |
-        | today\_buy\_val | float | 今日买入总额<br>(ℹ️ 只在真实交易环境下有效  <br>精度：3 位小数（A 股 2 位小数）  <br>期货不适用) |
-        | today\_sell\_qty | float | 今日卖出总量<br>(ℹ️ 只在真实交易环境下有效  <br>精度：3 位小数（A 股 2 位小数）  <br>期货不适用) |
-        | today\_sell\_val | float | 今日卖出总额<br>(ℹ️ 只在真实交易环境下有效  <br>精度：3 位小数（A 股 2 位小数）  <br>期货不适用) |
-        | unrealized\_pl | float | 未实现盈亏<br>(ℹ️ 模拟证券账户不适用  <br>综合证券账户，返回平均成本价模式下的未实现盈亏金额) |
-        | realized\_pl | float | 已实现盈亏<br>(ℹ️ 模拟证券账户不适用  <br>综合证券账户，返回平均成本价模式下的已实现盈亏金额) |
+        | pl\_val\_valid | bool | 盈亏金额是否有效<br>(ℹ️ True：有效)  <br>False：无效 |
+        | today\_pl\_val | float | 今日盈亏金额<br>(ℹ️ 只在真实交易环境下有效)  <br>精度：3 位小数（A 股 2 位小数，期货 2 位小数） |
+        | today\_trd\_val | float | 今日交易金额<br>(ℹ️ 只在真实交易环境下有效)  <br>精度：3 位小数（A 股 2 位小数）  <br>期货不适用 |
+        | today\_buy\_qty | float | 今日买入总量<br>(ℹ️ 只在真实交易环境下有效)  <br>精度：3 位小数（A 股 2 位小数）  <br>期货不适用 |
+        | today\_buy\_val | float | 今日买入总额<br>(ℹ️ 只在真实交易环境下有效)  <br>精度：3 位小数（A 股 2 位小数）  <br>期货不适用 |
+        | today\_sell\_qty | float | 今日卖出总量<br>(ℹ️ 只在真实交易环境下有效)  <br>精度：3 位小数（A 股 2 位小数）  <br>期货不适用 |
+        | today\_sell\_val | float | 今日卖出总额<br>(ℹ️ 只在真实交易环境下有效)  <br>精度：3 位小数（A 股 2 位小数）  <br>期货不适用 |
+        | unrealized\_pl | float | 未实现盈亏<br>(ℹ️ 模拟证券账户不适用)  <br>综合证券账户，返回平均成本价模式下的未实现盈亏金额 |
+        | realized\_pl | float | 已实现盈亏<br>(ℹ️ 模拟证券账户不适用)  <br>综合证券账户，返回平均成本价模式下的已实现盈亏金额 |
         | position\_id | int | 持仓ID |
         
 *   **Example**
@@ -1544,7 +1456,7 @@
 3  
 4  
 
-[#](https://openapi.futunn.com/futu-api-doc/trade/get-position-list.html#3557-2)
+[#](./trade_get-position-list.md#3557-2)
  Trd\_GetPositionList.proto
 ------------------------------------------------------------------------------------------------------------
 
@@ -1590,11 +1502,11 @@
 15  
 16  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   过滤条件结构参见 [TrdFilterConditions](https://openapi.futunn.com/futu-api-doc/trade/trade.html#3894)
+> *   过滤条件结构参见 [TrdFilterConditions](./trade_trade.md#3894)
 >     
-> *   账户资产类型结构参见 [TrdAssetCategory](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4752)
+> *   账户资产类型结构参见 [TrdAssetCategory](./trade_trade.md#4752)
 >     
 
 *   **返回**
@@ -1632,11 +1544,11 @@
 14  
 15  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   持仓结构参见 [Position](https://openapi.futunn.com/futu-api-doc/trade/trade.html#3117)
+> *   持仓结构参见 [Position](./trade_trade.md#3117)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -1689,11 +1601,11 @@
 15  
 16  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   过滤条件结构参见 [TrdFilterConditions](https://openapi.futunn.com/futu-api-doc/trade/trade.html#3894)
+> *   过滤条件结构参见 [TrdFilterConditions](./trade_trade.md#3894)
 >     
-> *   账户资产类型结构参见 [TrdAssetCategory](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4752)
+> *   账户资产类型结构参见 [TrdAssetCategory](./trade_trade.md#4752)
 >     
 
 *   **回调**
@@ -1731,11 +1643,11 @@
 14  
 15  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   持仓结构参见 [Position](https://openapi.futunn.com/futu-api-doc/trade/trade.html#3117)
+> *   持仓结构参见 [Position](./trade_trade.md#3117)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1909,11 +1821,11 @@
 15  
 16  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   过滤条件结构参见 [TrdFilterConditions](https://openapi.futunn.com/futu-api-doc/trade/trade.html#3894)
+> *   过滤条件结构参见 [TrdFilterConditions](./trade_trade.md#3894)
 >     
-> *   账户资产类型结构参见 [TrdAssetCategory](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4752)
+> *   账户资产类型结构参见 [TrdAssetCategory](./trade_trade.md#4752)
 >     
 
 *   **回调**
@@ -1951,11 +1863,11 @@
 14  
 15  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   持仓结构参见 [Position](https://openapi.futunn.com/futu-api-doc/trade/trade.html#3117)
+> *   持仓结构参见 [Position](./trade_trade.md#3117)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2207,11 +2119,11 @@
 15  
 16  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   过滤条件结构参见 [TrdFilterConditions](https://openapi.futunn.com/futu-api-doc/trade/trade.html#3894)
+> *   过滤条件结构参见 [TrdFilterConditions](./trade_trade.md#3894)
 >     
-> *   账户资产类型结构参见 [TrdAssetCategory](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4752)
+> *   账户资产类型结构参见 [TrdAssetCategory](./trade_trade.md#4752)
 >     
 
 *   **回调**
@@ -2249,11 +2161,11 @@
 14  
 15  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   持仓结构参见 [Position](https://openapi.futunn.com/futu-api-doc/trade/trade.html#3117)
+> *   持仓结构参见 [Position](./trade_trade.md#3117)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2524,11 +2436,11 @@
 15  
 16  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   过滤条件结构参见 [TrdFilterConditions](https://openapi.futunn.com/futu-api-doc/trade/trade.html#3894)
+> *   过滤条件结构参见 [TrdFilterConditions](./trade_trade.md#3894)
 >     
-> *   账户资产类型结构参见 [TrdAssetCategory](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4752)
+> *   账户资产类型结构参见 [TrdAssetCategory](./trade_trade.md#4752)
 >     
 
 *   **返回**
@@ -2566,11 +2478,11 @@
 14  
 15  
 
-> *   交易公共参数头结构参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)
+> *   交易公共参数头结构参见 [TrdHeader](./trade_trade.md#1138)
 >     
-> *   持仓结构参见 [Position](https://openapi.futunn.com/futu-api-doc/trade/trade.html#3117)
+> *   持仓结构参见 [Position](./trade_trade.md#3117)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2780,7 +2692,7 @@
 *   同一账户ID(acc\_id) 每 30 秒内最多请求 10 次查询持仓接口
 *   调用此接口，只有在刷新缓存时，才受到限频限制
 
-← [查询最大可买可卖](https://openapi.futunn.com/futu-api-doc/trade/get-max-trd-qtys.html) [获取融资融券数据](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html)
+← [查询最大可买可卖](./trade_get-max-trd-qtys.md) [获取融资融券数据](./trade_get-margin-ratio.md)
  →
 
-[查询持仓](https://openapi.futunn.com/futu-api-doc/trade/get-position-list.html)
+[查询持仓](./trade_get-position-list.md)

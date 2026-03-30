@@ -1,94 +1,4 @@
- [![Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/img/logo.png) Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/)
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/quote/get-option-expiration-date.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/quote/get-option-expiration-date.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/quote/get-option-expiration-date.html)
-    
-
-下载
-
-*   [PDF](https://openapi.futunn.com/pdfs/Futu-API-Doc-zh-Python.pdf)
-    
-*   [Markdown](https://openapi.futunn.com/mds/Futu-API-Doc-zh-Python.md)
-    
-*   [Skills](https://openapi.futunn.com/skills/opend-skills.zip)
-    
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/quote/get-option-expiration-date.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/quote/get-option-expiration-date.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/quote/get-option-expiration-date.html)
-    
-
-*   介绍
-    
-*   快速上手
-    
-*   OpenD
-    
-*   行情接口
-    
-    *   [行情接口总览](https://openapi.futunn.com/futu-api-doc/quote/overview.html)
-        
-    *   [行情对象](https://openapi.futunn.com/futu-api-doc/quote/base.html)
-        
-    *   实时行情
-        
-    *   基本数据
-        
-    *   相关衍生品
-        
-        *   [获取期权链到期日](https://openapi.futunn.com/futu-api-doc/quote/get-option-expiration-date.html)
-            
-        *   [获取期权链](https://openapi.futunn.com/futu-api-doc/quote/get-option-chain.html)
-            
-        *   [筛选窝轮](https://openapi.futunn.com/futu-api-doc/quote/get-warrant.html)
-            
-        *   [获取窝轮和期货列表](https://openapi.futunn.com/futu-api-doc/quote/get-referencestock-list.html)
-            
-        *   [获取期货合约资料](https://openapi.futunn.com/futu-api-doc/quote/get-future-info.html)
-            
-        
-    *   全市场筛选
-        
-    *   个性化
-        
-    *   [行情定义](https://openapi.futunn.com/futu-api-doc/quote/quote.html)
-        
-    
-*   交易接口
-    
-*   基础接口
-    
-*   Q&A
-    
-
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-option-expiration-date.html#7390)
+[#](./quote_get-option-expiration-date.md#7390)
  获取期权链到期日
 =================================================================================================
 
@@ -103,7 +13,7 @@
 
 *   **介绍**
     
-    通过标的股票，查询期权链的所有到期日。如需获取完整期权链，请配合 [获取期权链](https://openapi.futunn.com/futu-api-doc/quote/get-option-chain.html)
+    通过标的股票，查询期权链的所有到期日。如需获取完整期权链，请配合 [获取期权链](./quote_get-option-chain.md)
      接口使用。
     
 *   **参数**
@@ -111,14 +21,14 @@
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
     | code | str | 标的股票代码 |
-    | index\_option\_type | [IndexOptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5149) | 指数期权类型<br>(ℹ️ 仅对港股指数期权筛选有效，正股、ETFs、美股指数期权可忽略此参数) |
+    | index\_option\_type | [IndexOptionType](./quote_quote.md#5149) | 指数期权类型<br>(ℹ️ 仅对港股指数期权筛选有效，正股、ETFs、美股指数期权可忽略此参数) |
     
 
 *   **返回**
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | pd.DataFrame | 当 ret == RET\_OK，返回期权链到期日相关数据 |
     | str | 当 ret != RET\_OK，返回错误描述 |
     
@@ -126,9 +36,9 @@
         
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
-        | strike\_time | str | 期权链行权日<br>(ℹ️ 格式：yyyy-MM-dd  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间) |
+        | strike\_time | str | 期权链行权日<br>(ℹ️ 格式：yyyy-MM-dd)  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间 |
         | option\_expiry\_date\_distance | int | 距离到期日天数<br>(ℹ️ 负数表示已过期) |
-        | expiration\_cycle | [ExpirationCycle](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2235) | 交割周期<br>(ℹ️ 支持香港指数期权、美股指数期权) |
+        | expiration\_cycle | [ExpirationCycle](./quote_quote.md#2235) | 交割周期<br>(ℹ️ 支持香港指数期权、美股指数期权) |
         
 *   **Example**
     
@@ -177,13 +87,13 @@
 8  
 9  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-option-expiration-date.html#4915)
+[#](./quote_get-option-expiration-date.md#4915)
  Qot\_GetOptionExpirationDate.proto
 ---------------------------------------------------------------------------------------------------------------------------
 
 *   **介绍**
     
-    通过标的股票，查询期权链的所有到期日。如需获取完整期权链，请配合 [获取期权链](https://openapi.futunn.com/futu-api-doc/quote/get-option-chain.html)
+    通过标的股票，查询期权链的所有到期日。如需获取完整期权链，请配合 [获取期权链](./quote_get-option-chain.md)
      接口使用。
     
 *   **参数**
@@ -212,9 +122,9 @@
 9  
 10  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   指数期权类别枚举参见 [IndexOptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5149)
+> *   指数期权类别枚举参见 [IndexOptionType](./quote_quote.md#5149)
 >     
 
 *   **返回**
@@ -264,9 +174,9 @@
 20  
 21  
 
-> *   期权交割周期枚举参见 [ExpirationCycle](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2235)
+> *   期权交割周期枚举参见 [ExpirationCycle](./quote_quote.md#2235)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -275,11 +185,11 @@
     
 *   **数据类型**
     
-    *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+    *   股票结构参见 [Security](./quote_quote.md#1377)
         
-    *   指数期权类别枚举参见 [IndexOptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5149)
+    *   指数期权类别枚举参见 [IndexOptionType](./quote_quote.md#5149)
         
-    *   期权交割周期枚举参见 [ExpirationCycle](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2235)
+    *   期权交割周期枚举参见 [ExpirationCycle](./quote_quote.md#2235)
         
 
 `uint GetOptionExpirationDate(GetOptionExpirationDate.Request req);`  
@@ -287,7 +197,7 @@
 
 *   **介绍**
     
-    通过标的股票，查询期权链的所有到期日。如需获取完整期权链，请配合 [获取期权链](https://openapi.futunn.com/futu-api-doc/quote/get-option-chain.html)
+    通过标的股票，查询期权链的所有到期日。如需获取完整期权链，请配合 [获取期权链](./quote_get-option-chain.md)
      接口使用。
     
 *   **参数**
@@ -316,9 +226,9 @@
 9  
 10  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   指数期权类别枚举参见 [IndexOptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5149)
+> *   指数期权类别枚举参见 [IndexOptionType](./quote_quote.md#5149)
 >     
 
 *   **返回**
@@ -368,9 +278,9 @@
 20  
 21  
 
-> *   期权交割周期枚举参见 [ExpirationCycle](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2235)
+> *   期权交割周期枚举参见 [ExpirationCycle](./quote_quote.md#2235)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -528,7 +438,7 @@
 
 *   **介绍**
     
-    通过标的股票，查询期权链的所有到期日。如需获取完整期权链，请配合 [获取期权链](https://openapi.futunn.com/futu-api-doc/quote/get-option-chain.html)
+    通过标的股票，查询期权链的所有到期日。如需获取完整期权链，请配合 [获取期权链](./quote_get-option-chain.md)
      接口使用。
     
 *   **参数**
@@ -557,9 +467,9 @@
 9  
 10  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   指数期权类别枚举参见 [IndexOptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5149)
+> *   指数期权类别枚举参见 [IndexOptionType](./quote_quote.md#5149)
 >     
 
 *   **返回**
@@ -609,9 +519,9 @@
 20  
 21  
 
-> *   期权交割周期枚举参见 [ExpirationCycle](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2235)
+> *   期权交割周期枚举参见 [ExpirationCycle](./quote_quote.md#2235)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -795,7 +705,7 @@
 
 *   **介绍**
     
-    通过标的股票，查询期权链的所有到期日。如需获取完整期权链，请配合 [获取期权链](https://openapi.futunn.com/futu-api-doc/quote/get-option-chain.html)
+    通过标的股票，查询期权链的所有到期日。如需获取完整期权链，请配合 [获取期权链](./quote_get-option-chain.md)
      接口使用。
     
 *   **参数**
@@ -824,9 +734,9 @@
 9  
 10  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   指数期权类别枚举参见 [IndexOptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5149)
+> *   指数期权类别枚举参见 [IndexOptionType](./quote_quote.md#5149)
 >     
 
 *   **返回**
@@ -876,9 +786,9 @@
 20  
 21  
 
-> *   期权交割周期枚举参见 [ExpirationCycle](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2235)
+> *   期权交割周期枚举参见 [ExpirationCycle](./quote_quote.md#2235)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1085,7 +995,7 @@
 
 *   **介绍**
     
-    通通过标的股票，查询期权链的所有到期日。如需获取完整期权链，请配合 [获取期权链](https://openapi.futunn.com/futu-api-doc/quote/get-option-chain.html)
+    通通过标的股票，查询期权链的所有到期日。如需获取完整期权链，请配合 [获取期权链](./quote_get-option-chain.md)
      接口使用。
     
 *   **参数**
@@ -1114,9 +1024,9 @@
 9  
 10  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   指数期权类别枚举参见 [IndexOptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5149)
+> *   指数期权类别枚举参见 [IndexOptionType](./quote_quote.md#5149)
 >     
 
 *   **返回**
@@ -1166,9 +1076,9 @@
 20  
 21  
 
-> *   期权交割周期枚举参见 [ExpirationCycle](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2235)
+> *   期权交割周期枚举参见 [ExpirationCycle](./quote_quote.md#2235)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1338,7 +1248,7 @@
 
 *   **介绍**
     
-    通过标的股票，查询期权链的所有到期日。如需获取完整期权链，请配合 [获取期权链](https://openapi.futunn.com/futu-api-doc/quote/get-option-chain.html)
+    通过标的股票，查询期权链的所有到期日。如需获取完整期权链，请配合 [获取期权链](./quote_get-option-chain.md)
      接口使用。
     
 *   **参数**
@@ -1346,14 +1256,14 @@
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
     | code | str | 标的股票代码 |
-    | index\_option\_type | [IndexOptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5149) | 指数期权类型<br>(ℹ️ 仅对港股指数期权筛选有效，正股、ETFs、美股指数期权可忽略此参数) |
+    | index\_option\_type | [IndexOptionType](./quote_quote.md#5149) | 指数期权类型<br>(ℹ️ 仅对港股指数期权筛选有效，正股、ETFs、美股指数期权可忽略此参数) |
     
 
 *   **返回**
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | pd.DataFrame | 当 ret == RET\_OK，返回期权链到期日相关数据 |
     | str | 当 ret != RET\_OK，返回错误描述 |
     
@@ -1361,9 +1271,9 @@
         
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
-        | strike\_time | str | 期权链行权日<br>(ℹ️ 格式：yyyy-MM-dd  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间) |
+        | strike\_time | str | 期权链行权日<br>(ℹ️ 格式：yyyy-MM-dd)  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间 |
         | option\_expiry\_date\_distance | int | 距离到期日天数<br>(ℹ️ 负数表示已过期) |
-        | expiration\_cycle | [ExpirationCycle](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2235) | 交割周期<br>(ℹ️ 支持香港指数期权、美股指数期权) |
+        | expiration\_cycle | [ExpirationCycle](./quote_quote.md#2235) | 交割周期<br>(ℹ️ 支持香港指数期权、美股指数期权) |
         
 *   **Example**
     
@@ -1412,13 +1322,13 @@
 8  
 9  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-option-expiration-date.html#4915-2)
+[#](./quote_get-option-expiration-date.md#4915-2)
  Qot\_GetOptionExpirationDate.proto
 -----------------------------------------------------------------------------------------------------------------------------
 
 *   **介绍**
     
-    通过标的股票，查询期权链的所有到期日。如需获取完整期权链，请配合 [获取期权链](https://openapi.futunn.com/futu-api-doc/quote/get-option-chain.html)
+    通过标的股票，查询期权链的所有到期日。如需获取完整期权链，请配合 [获取期权链](./quote_get-option-chain.md)
      接口使用。
     
 *   **参数**
@@ -1447,9 +1357,9 @@
 9  
 10  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   指数期权类别枚举参见 [IndexOptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5149)
+> *   指数期权类别枚举参见 [IndexOptionType](./quote_quote.md#5149)
 >     
 
 *   **返回**
@@ -1499,9 +1409,9 @@
 20  
 21  
 
-> *   期权交割周期枚举参见 [ExpirationCycle](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2235)
+> *   期权交割周期枚举参见 [ExpirationCycle](./quote_quote.md#2235)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -1510,11 +1420,11 @@
     
 *   **数据类型**
     
-    *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+    *   股票结构参见 [Security](./quote_quote.md#1377)
         
-    *   指数期权类别枚举参见 [IndexOptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5149)
+    *   指数期权类别枚举参见 [IndexOptionType](./quote_quote.md#5149)
         
-    *   期权交割周期枚举参见 [ExpirationCycle](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2235)
+    *   期权交割周期枚举参见 [ExpirationCycle](./quote_quote.md#2235)
         
 
 `uint GetOptionExpirationDate(GetOptionExpirationDate.Request req);`  
@@ -1522,7 +1432,7 @@
 
 *   **介绍**
     
-    通过标的股票，查询期权链的所有到期日。如需获取完整期权链，请配合 [获取期权链](https://openapi.futunn.com/futu-api-doc/quote/get-option-chain.html)
+    通过标的股票，查询期权链的所有到期日。如需获取完整期权链，请配合 [获取期权链](./quote_get-option-chain.md)
      接口使用。
     
 *   **参数**
@@ -1551,9 +1461,9 @@
 9  
 10  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   指数期权类别枚举参见 [IndexOptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5149)
+> *   指数期权类别枚举参见 [IndexOptionType](./quote_quote.md#5149)
 >     
 
 *   **返回**
@@ -1603,9 +1513,9 @@
 20  
 21  
 
-> *   期权交割周期枚举参见 [ExpirationCycle](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2235)
+> *   期权交割周期枚举参见 [ExpirationCycle](./quote_quote.md#2235)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1763,7 +1673,7 @@
 
 *   **介绍**
     
-    通过标的股票，查询期权链的所有到期日。如需获取完整期权链，请配合 [获取期权链](https://openapi.futunn.com/futu-api-doc/quote/get-option-chain.html)
+    通过标的股票，查询期权链的所有到期日。如需获取完整期权链，请配合 [获取期权链](./quote_get-option-chain.md)
      接口使用。
     
 *   **参数**
@@ -1792,9 +1702,9 @@
 9  
 10  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   指数期权类别枚举参见 [IndexOptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5149)
+> *   指数期权类别枚举参见 [IndexOptionType](./quote_quote.md#5149)
 >     
 
 *   **返回**
@@ -1844,9 +1754,9 @@
 20  
 21  
 
-> *   期权交割周期枚举参见 [ExpirationCycle](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2235)
+> *   期权交割周期枚举参见 [ExpirationCycle](./quote_quote.md#2235)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2030,7 +1940,7 @@
 
 *   **介绍**
     
-    通过标的股票，查询期权链的所有到期日。如需获取完整期权链，请配合 [获取期权链](https://openapi.futunn.com/futu-api-doc/quote/get-option-chain.html)
+    通过标的股票，查询期权链的所有到期日。如需获取完整期权链，请配合 [获取期权链](./quote_get-option-chain.md)
      接口使用。
     
 *   **参数**
@@ -2059,9 +1969,9 @@
 9  
 10  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   指数期权类别枚举参见 [IndexOptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5149)
+> *   指数期权类别枚举参见 [IndexOptionType](./quote_quote.md#5149)
 >     
 
 *   **返回**
@@ -2111,9 +2021,9 @@
 20  
 21  
 
-> *   期权交割周期枚举参见 [ExpirationCycle](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2235)
+> *   期权交割周期枚举参见 [ExpirationCycle](./quote_quote.md#2235)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2320,7 +2230,7 @@
 
 *   **介绍**
     
-    通通过标的股票，查询期权链的所有到期日。如需获取完整期权链，请配合 [获取期权链](https://openapi.futunn.com/futu-api-doc/quote/get-option-chain.html)
+    通通过标的股票，查询期权链的所有到期日。如需获取完整期权链，请配合 [获取期权链](./quote_get-option-chain.md)
      接口使用。
     
 *   **参数**
@@ -2349,9 +2259,9 @@
 9  
 10  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   指数期权类别枚举参见 [IndexOptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5149)
+> *   指数期权类别枚举参见 [IndexOptionType](./quote_quote.md#5149)
 >     
 
 *   **返回**
@@ -2401,9 +2311,9 @@
 20  
 21  
 
-> *   期权交割周期枚举参见 [ExpirationCycle](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2235)
+> *   期权交割周期枚举参见 [ExpirationCycle](./quote_quote.md#2235)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2562,7 +2472,7 @@
 
 *   每 30 秒内最多请求 60 次获取期权链到期日接口
 
-← [获取复权因子](https://openapi.futunn.com/futu-api-doc/quote/get-rehab.html) [获取期权链](https://openapi.futunn.com/futu-api-doc/quote/get-option-chain.html)
+← [获取复权因子](./quote_get-rehab.md) [获取期权链](./quote_get-option-chain.md)
  →
 
-[获取期权链到期日](https://openapi.futunn.com/futu-api-doc/quote/get-option-expiration-date.html)
+[获取期权链到期日](./quote_get-option-expiration-date.md)

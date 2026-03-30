@@ -1,96 +1,4 @@
- [![Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/img/logo.png) Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/)
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/trade/order-fee-query.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/trade/order-fee-query.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/trade/order-fee-query.html)
-    
-
-下载
-
-*   [PDF](https://openapi.futunn.com/pdfs/Futu-API-Doc-zh-Python.pdf)
-    
-*   [Markdown](https://openapi.futunn.com/mds/Futu-API-Doc-zh-Python.md)
-    
-*   [Skills](https://openapi.futunn.com/skills/opend-skills.zip)
-    
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/trade/order-fee-query.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/trade/order-fee-query.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/trade/order-fee-query.html)
-    
-
-*   介绍
-    
-*   快速上手
-    
-*   OpenD
-    
-*   行情接口
-    
-*   交易接口
-    
-    *   [交易接口总览](https://openapi.futunn.com/futu-api-doc/trade/overview.html)
-        
-    *   [交易对象](https://openapi.futunn.com/futu-api-doc/trade/base.html)
-        
-    *   账户
-        
-    *   资产持仓
-        
-    *   订单
-        
-        *   [下单](https://openapi.futunn.com/futu-api-doc/trade/place-order.html)
-            
-        *   [改单撤单](https://openapi.futunn.com/futu-api-doc/trade/modify-order.html)
-            
-        *   [查询未完成订单](https://openapi.futunn.com/futu-api-doc/trade/get-order-list.html)
-            
-        *   [查询历史订单](https://openapi.futunn.com/futu-api-doc/trade/get-history-order-list.html)
-            
-        *   [响应订单推送回调](https://openapi.futunn.com/futu-api-doc/trade/update-order.html)
-            
-        *   [查询订单费用](https://openapi.futunn.com/futu-api-doc/trade/order-fee-query.html)
-            
-        *   [订阅交易推送](https://openapi.futunn.com/futu-api-doc/trade/sub-acc-push.html)
-            
-        
-    *   成交
-        
-    *   [交易定义](https://openapi.futunn.com/futu-api-doc/trade/trade.html)
-        
-    
-*   基础接口
-    
-*   Q&A
-    
-
-[#](https://openapi.futunn.com/futu-api-doc/trade/order-fee-query.html#5647)
+[#](./trade_order-fee-query.md#5647)
  查询订单费用
 ====================================================================================
 
@@ -111,17 +19,17 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | order\_id\_list | list | 订单号列表<br>(ℹ️ *   每次请求最多查询 400 笔订单<br>*   list 内元素类型为 str) |
-    | trd\_env | [TrdEnv](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6374) | 交易环境 |
-    | acc\_id | int | 交易业务账户 ID<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准) |
-    | acc\_index | int | 交易业务账户列表中的账户序号<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户) |
+    | order\_id\_list | list | 订单号列表<br>(ℹ️ *   每次请求最多查询 400 笔订单)<br>*   list 内元素类型为 str |
+    | trd\_env | [TrdEnv](./trade_trade.md#6374) | 交易环境 |
+    | acc\_id | int | 交易业务账户 ID<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。)<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准 |
+    | acc\_index | int | 交易业务账户列表中的账户序号<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。)<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户 |
     
 
 *   **返回**
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | pd.DataFrame | 当 ret == RET\_OK 时，返回订单费用列表 |
     | str | 当 ret != RET\_OK 时，返回错误描述 |
     
@@ -131,7 +39,7 @@
         | --- | --- | --- |
         | order\_id | str | 订单号 |
         | fee\_amount | float | 总费用 |
-        | fee\_details | list | 收费明细<br>(ℹ️ *   格式：\[('收费项1', 收费项1的金额), ('收费项2', 收费项2的金额), ('收费项3', 收费项3的金额)……\]<br>*   常见的收费项包括：佣金、平台使用费、期权监管费、期权清算费、期权交收费、交收费、证监会规费、交易活动费) |
+        | fee\_details | list | 收费明细<br>(ℹ️ *   格式：\[('收费项1', 收费项1的金额), ('收费项2', 收费项2的金额), ('收费项3', 收费项3的金额)……\])<br>*   常见的收费项包括：佣金、平台使用费、期权监管费、期权清算费、期权交收费、交收费、证监会规费、交易活动费 |
         
 *   **Example**
     
@@ -180,7 +88,7 @@
 3  \
 4  \
 \
-[#](https://openapi.futunn.com/futu-api-doc/trade/order-fee-query.html#7662)\
+[#](./trade_order-fee-query.md#7662)\
  Trd\_GetOrderFee.proto\
 ----------------------------------------------------------------------------------------------------\
 \
@@ -214,7 +122,7 @@
 9  \
 10  \
 \
-> *   交易公共参数头结构，参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)\
+> *   交易公共参数头结构，参见 [TrdHeader](./trade_trade.md#1138)\
 >     \
 \
 *   **返回**\
@@ -252,11 +160,11 @@
 14  \
 15  \
 \
-> *   交易公共参数头结构，参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)\
+> *   交易公共参数头结构，参见 [TrdHeader](./trade_trade.md#1138)\
 >     \
-> *   订单费用结构，参见 [OrderFee](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1085)\
+> *   订单费用结构，参见 [OrderFee](./trade_trade.md#1085)\
 >     \
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)\
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)\
 >     \
 \
 *   **协议 ID**\
@@ -296,7 +204,7 @@
 9  \
 10  \
 \
-> *   交易公共参数头结构，参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)\
+> *   交易公共参数头结构，参见 [TrdHeader](./trade_trade.md#1138)\
 >     \
 \
 *   **回调**\
@@ -334,11 +242,11 @@
 14  \
 15  \
 \
-> *   交易公共参数头结构，参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)\
+> *   交易公共参数头结构，参见 [TrdHeader](./trade_trade.md#1138)\
 >     \
-> *   订单费用结构，参见 [OrderFee](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1085)\
+> *   订单费用结构，参见 [OrderFee](./trade_trade.md#1085)\
 >     \
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)\
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)\
 >     \
 \
 *   **Example**\
@@ -591,7 +499,7 @@
 9  \
 10  \
 \
-> *   交易公共参数头结构，参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)\
+> *   交易公共参数头结构，参见 [TrdHeader](./trade_trade.md#1138)\
 >     \
 \
 *   **回调**\
@@ -629,11 +537,11 @@
 14  \
 15  \
 \
-> *   交易公共参数头结构，参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)\
+> *   交易公共参数头结构，参见 [TrdHeader](./trade_trade.md#1138)\
 >     \
-> *   订单结构，参见 [OrderFee](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1085)\
+> *   订单结构，参见 [OrderFee](./trade_trade.md#1085)\
 >     \
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)\
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)\
 >     \
 \
 *   **Example**\
@@ -905,7 +813,7 @@
 9  \
 10  \
 \
-> *   交易公共参数头结构，参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)\
+> *   交易公共参数头结构，参见 [TrdHeader](./trade_trade.md#1138)\
 >     \
 \
 *   **回调**\
@@ -943,11 +851,11 @@
 14  \
 15  \
 \
-> *   交易公共参数头结构，参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)\
+> *   交易公共参数头结构，参见 [TrdHeader](./trade_trade.md#1138)\
 >     \
-> *   订单结构，参见 [OrderFee](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1085)\
+> *   订单结构，参见 [OrderFee](./trade_trade.md#1085)\
 >     \
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)\
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)\
 >     \
 \
 *   **Example**\
@@ -1248,7 +1156,7 @@
 9  \
 10  \
 \
-> *   交易公共参数头结构，参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)\
+> *   交易公共参数头结构，参见 [TrdHeader](./trade_trade.md#1138)\
 >     \
 \
 *   **返回**\
@@ -1286,11 +1194,11 @@
 14  \
 15  \
 \
-> *   交易公共参数头结构，参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)\
+> *   交易公共参数头结构，参见 [TrdHeader](./trade_trade.md#1138)\
 >     \
-> *   订单结构，参见 [OrderFee](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1085)\
+> *   订单结构，参见 [OrderFee](./trade_trade.md#1085)\
 >     \
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)\
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)\
 >     \
 \
 *   **Example**\
@@ -1537,17 +1445,17 @@
     \
     | 参数  | 类型  | 说明  |\
     | --- | --- | --- |\
-    | order\_id\_list | list | 订单号列表<br>(ℹ️ *   每次请求最多查询 400 笔订单<br>*   list 内元素类型为 str) |\
-    | trd\_env | [TrdEnv](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6374) | 交易环境 |\
-    | acc\_id | int | 交易业务账户 ID<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准) |\
-    | acc\_index | int | 交易业务账户列表中的账户序号<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户) |\
+    | order\_id\_list | list | 订单号列表<br>(ℹ️ *   每次请求最多查询 400 笔订单)<br>*   list 内元素类型为 str |\
+    | trd\_env | [TrdEnv](./trade_trade.md#6374) | 交易环境 |\
+    | acc\_id | int | 交易业务账户 ID<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。)<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准 |\
+    | acc\_index | int | 交易业务账户列表中的账户序号<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。)<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户 |\
     \
 \
 *   **返回**\
     \
     | 参数  | 类型  | 说明  |\
     | --- | --- | --- |\
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |\
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |\
     | data | pd.DataFrame | 当 ret == RET\_OK 时，返回订单费用列表 |\
     | str | 当 ret != RET\_OK 时，返回错误描述 |\
     \
@@ -1557,7 +1465,7 @@
         | --- | --- | --- |\
         | order\_id | str | 订单号 |\
         | fee\_amount | float | 总费用 |\
-        | fee\_details | list | 收费明细<br>(ℹ️ *   格式：\[('收费项1', 收费项1的金额), ('收费项2', 收费项2的金额), ('收费项3', 收费项3的金额)……\]<br>*   常见的收费项包括：佣金、平台使用费、期权监管费、期权清算费、期权交收费、交收费、证监会规费、交易活动费) |\
+        | fee\_details | list | 收费明细<br>(ℹ️ *   格式：\[('收费项1', 收费项1的金额), ('收费项2', 收费项2的金额), ('收费项3', 收费项3的金额)……\])<br>*   常见的收费项包括：佣金、平台使用费、期权监管费、期权清算费、期权交收费、交收费、证监会规费、交易活动费 |\
         \
 *   **Example**\
     \
@@ -1606,7 +1514,7 @@
 3  \
 4  \
 \
-[#](https://openapi.futunn.com/futu-api-doc/trade/order-fee-query.html#7662-2)\
+[#](./trade_order-fee-query.md#7662-2)\
  Trd\_GetOrderFee.proto\
 ------------------------------------------------------------------------------------------------------\
 \
@@ -1640,7 +1548,7 @@
 9  \
 10  \
 \
-> *   交易公共参数头结构，参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)\
+> *   交易公共参数头结构，参见 [TrdHeader](./trade_trade.md#1138)\
 >     \
 \
 *   **返回**\
@@ -1678,11 +1586,11 @@
 14  \
 15  \
 \
-> *   交易公共参数头结构，参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)\
+> *   交易公共参数头结构，参见 [TrdHeader](./trade_trade.md#1138)\
 >     \
-> *   订单结构，参见 [OrderFee](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1085)\
+> *   订单结构，参见 [OrderFee](./trade_trade.md#1085)\
 >     \
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)\
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)\
 >     \
 \
 *   **协议 ID**\
@@ -1722,7 +1630,7 @@
 9  \
 10  \
 \
-> *   交易公共参数头结构，参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)\
+> *   交易公共参数头结构，参见 [TrdHeader](./trade_trade.md#1138)\
 >     \
 \
 *   **回调**\
@@ -1760,11 +1668,11 @@
 14  \
 15  \
 \
-> *   交易公共参数头结构，参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)\
+> *   交易公共参数头结构，参见 [TrdHeader](./trade_trade.md#1138)\
 >     \
-> *   订单结构，参见 [OrderFee](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1085)\
+> *   订单结构，参见 [OrderFee](./trade_trade.md#1085)\
 >     \
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)\
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)\
 >     \
 \
 *   **Example**\
@@ -2023,7 +1931,7 @@
 9  \
 10  \
 \
-> *   交易公共参数头结构，参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)\
+> *   交易公共参数头结构，参见 [TrdHeader](./trade_trade.md#1138)\
 >     \
 \
 *   **回调**\
@@ -2061,11 +1969,11 @@
 14  \
 15  \
 \
-> *   交易公共参数头结构，参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)\
+> *   交易公共参数头结构，参见 [TrdHeader](./trade_trade.md#1138)\
 >     \
-> *   订单结构，参见 [OrderFee](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1085)\
+> *   订单结构，参见 [OrderFee](./trade_trade.md#1085)\
 >     \
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)\
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)\
 >     \
 \
 *   **Example**\
@@ -2337,7 +2245,7 @@
 9  \
 10  \
 \
-> *   交易公共参数头结构，参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)\
+> *   交易公共参数头结构，参见 [TrdHeader](./trade_trade.md#1138)\
 >     \
 \
 *   **回调**\
@@ -2375,11 +2283,11 @@
 14  \
 15  \
 \
-> *   交易公共参数头结构，参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)\
+> *   交易公共参数头结构，参见 [TrdHeader](./trade_trade.md#1138)\
 >     \
-> *   订单结构，参见 [OrderFee](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1085)\
+> *   订单结构，参见 [OrderFee](./trade_trade.md#1085)\
 >     \
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)\
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)\
 >     \
 \
 *   **Example**\
@@ -2672,7 +2580,7 @@
 9  \
 10  \
 \
-> *   交易公共参数头结构，参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)\
+> *   交易公共参数头结构，参见 [TrdHeader](./trade_trade.md#1138)\
 >     \
 \
 *   **返回**\
@@ -2710,11 +2618,11 @@
 14  \
 15  \
 \
-> *   交易公共参数头结构，参见 [TrdHeader](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1138)\
+> *   交易公共参数头结构，参见 [TrdHeader](./trade_trade.md#1138)\
 >     \
-> *   订单结构，参见 [OrderFee](https://openapi.futunn.com/futu-api-doc/trade/trade.html#1085)\
+> *   订单结构，参见 [OrderFee](./trade_trade.md#1085)\
 >     \
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)\
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)\
 >     \
 \
 *   **Example**\
@@ -2944,7 +2852,7 @@
 *   模拟账户不支持查询订单费用。\
 *   加拿大券商账户不支持查询订单费用。\
 \
-← [响应订单推送回调](https://openapi.futunn.com/futu-api-doc/trade/update-order.html) [订阅交易推送](https://openapi.futunn.com/futu-api-doc/trade/sub-acc-push.html)\
+← [响应订单推送回调](./trade_update-order.md) [订阅交易推送](./trade_sub-acc-push.md)\
  →\
 \
-[查询订单费用](https://openapi.futunn.com/futu-api-doc/trade/order-fee-query.html)
+[查询订单费用](./trade_order-fee-query.md)

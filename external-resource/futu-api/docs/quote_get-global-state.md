@@ -1,98 +1,4 @@
- [![Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/img/logo.png) Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/)
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/quote/get-global-state.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/quote/get-global-state.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/quote/get-global-state.html)
-    
-
-下载
-
-*   [PDF](https://openapi.futunn.com/pdfs/Futu-API-Doc-zh-Python.pdf)
-    
-*   [Markdown](https://openapi.futunn.com/mds/Futu-API-Doc-zh-Python.md)
-    
-*   [Skills](https://openapi.futunn.com/skills/opend-skills.zip)
-    
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/quote/get-global-state.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/quote/get-global-state.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/quote/get-global-state.html)
-    
-
-*   介绍
-    
-*   快速上手
-    
-*   OpenD
-    
-*   行情接口
-    
-    *   [行情接口总览](https://openapi.futunn.com/futu-api-doc/quote/overview.html)
-        
-    *   [行情对象](https://openapi.futunn.com/futu-api-doc/quote/base.html)
-        
-    *   实时行情
-        
-    *   基本数据
-        
-    *   相关衍生品
-        
-    *   全市场筛选
-        
-        *   [条件选股](https://openapi.futunn.com/futu-api-doc/quote/get-stock-filter.html)
-            
-        *   [获取板块内股票列表](https://openapi.futunn.com/futu-api-doc/quote/get-plate-stock.html)
-            
-        *   [获取板块列表](https://openapi.futunn.com/futu-api-doc/quote/get-plate-list.html)
-            
-        *   [获取静态数据](https://openapi.futunn.com/futu-api-doc/quote/get-static-info.html)
-            
-        *   [获取 IPO 信息](https://openapi.futunn.com/futu-api-doc/quote/get-ipo-list.html)
-            
-        *   [获取全局市场状态](https://openapi.futunn.com/futu-api-doc/quote/get-global-state.html)
-            
-        *   [获取交易日历](https://openapi.futunn.com/futu-api-doc/quote/request-trading-days.html)
-            
-        
-    *   个性化
-        
-    *   [行情定义](https://openapi.futunn.com/futu-api-doc/quote/quote.html)
-        
-    
-*   交易接口
-    
-*   基础接口
-    
-*   Q&A
-    
-
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-global-state.html#5035)
+[#](./quote_get-global-state.md#5035)
  获取全局市场状态
 =======================================================================================
 
@@ -114,7 +20,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | dict | 当 ret == RET\_OK 时，返回全局状态 |
     | str | 当 ret != RET\_OK，返回错误描述 |
     
@@ -122,20 +28,20 @@
         
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
-        | market\_sz | [MarketState](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1252) | 深圳市场状态 |
-        | market\_sh | [MarketState](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1252) | 上海市场状态 |
-        | market\_hk | [MarketState](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1252) | 香港市场状态 |
-        | market\_hkfuture | [MarketState](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1252) | 香港期货市场状态<br>(ℹ️ 不同品种的交易时间存在差异，建议使用 [get\_market\_state](https://openapi.futunn.com/futu-api-doc/quote/get-market-state.html)<br> 接口获取指定品种的市场状态) |
-        | market\_usfuture | [MarketState](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1252) | 美国期货市场状态<br>(ℹ️ 不同品种的交易时间存在差异，建议使用 [get\_market\_state](https://openapi.futunn.com/futu-api-doc/quote/get-market-state.html)<br> 接口获取指定品种的市场状态) |
-        | market\_us | [MarketState](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1252) | 美国市场状态<br>(ℹ️ 不同品种的交易时间存在差异，建议使用 [get\_market\_state](https://openapi.futunn.com/futu-api-doc/quote/get-market-state.html)<br> 接口获取指定品种的市场状态) |
-        | market\_sgfuture | [MarketState](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1252) | 新加坡期货市场状态<br>(ℹ️ 不同品种的交易时间存在差异，建议使用 [get\_market\_state](https://openapi.futunn.com/futu-api-doc/quote/get-market-state.html)<br> 接口获取指定品种的市场状态) |
-        | market\_jpfuture | [MarketState](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1252) | 日本期货市场状态 |
+        | market\_sz | [MarketState](./quote_quote.md#1252) | 深圳市场状态 |
+        | market\_sh | [MarketState](./quote_quote.md#1252) | 上海市场状态 |
+        | market\_hk | [MarketState](./quote_quote.md#1252) | 香港市场状态 |
+        | market\_hkfuture | [MarketState](./quote_quote.md#1252) | 香港期货市场状态<br>(ℹ️ 不同品种的交易时间存在差异，建议使用 [get\_market\_state](./quote_get-market-state.md))<br> 接口获取指定品种的市场状态 |
+        | market\_usfuture | [MarketState](./quote_quote.md#1252) | 美国期货市场状态<br>(ℹ️ 不同品种的交易时间存在差异，建议使用 [get\_market\_state](./quote_get-market-state.md))<br> 接口获取指定品种的市场状态 |
+        | market\_us | [MarketState](./quote_quote.md#1252) | 美国市场状态<br>(ℹ️ 不同品种的交易时间存在差异，建议使用 [get\_market\_state](./quote_get-market-state.md))<br> 接口获取指定品种的市场状态 |
+        | market\_sgfuture | [MarketState](./quote_quote.md#1252) | 新加坡期货市场状态<br>(ℹ️ 不同品种的交易时间存在差异，建议使用 [get\_market\_state](./quote_get-market-state.md))<br> 接口获取指定品种的市场状态 |
+        | market\_jpfuture | [MarketState](./quote_quote.md#1252) | 日本期货市场状态 |
         | server\_ver | str | OpenD 版本号 |
         | trd\_logined | bool | True：已登录交易服务器，False：未登录交易服务器 |
         | qot\_logined | bool | True：已登录行情服务器，False：未登录行情服务器 |
         | timestamp | str | 当前格林威治时间戳<br>(ℹ️ 单位：秒) |
         | local\_timestamp | float | OpenD 运行机器的当前时间戳<br>(ℹ️ 单位：秒) |
-        | program\_status\_type | [ProgramStatusType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#6427) | 当前状态 |
+        | program\_status\_type | [ProgramStatusType](./ftapi_common.md#6427) | 当前状态 |
         | program\_status\_desc | str | 额外描述 |
         
 *   **Example**
@@ -159,7 +65,7 @@
 
 1  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-global-state.html#4500)
+[#](./quote_get-global-state.md#4500)
  GetGlobalState.proto
 ---------------------------------------------------------------------------------------------------
 
@@ -256,9 +162,9 @@
 29  
 30  
 
-> *   市场状态枚举参见 [QotMarketState](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1252)
+> *   市场状态枚举参见 [QotMarketState](./quote_quote.md#1252)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -362,9 +268,9 @@
 29  
 30  
 
-> *   市场状态枚举参见 [QotMarketState](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1252)
+> *   市场状态枚举参见 [QotMarketState](./quote_quote.md#1252)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -591,9 +497,9 @@
 29  
 30  
 
-> *   市场状态枚举参见 [QotMarketState](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1252)
+> *   市场状态枚举参见 [QotMarketState](./quote_quote.md#1252)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -882,9 +788,9 @@
 29  
 30  
 
-> *   市场状态枚举参见 [QotMarketState](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1252)
+> *   市场状态枚举参见 [QotMarketState](./quote_quote.md#1252)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1192,9 +1098,9 @@
 29  
 30  
 
-> *   市场状态枚举参见 [QotMarketState](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1252)
+> *   市场状态枚举参见 [QotMarketState](./quote_quote.md#1252)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1373,7 +1279,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | dict | 当 ret == RET\_OK 时，返回全局状态 |
     | str | 当 ret != RET\_OK，返回错误描述 |
     
@@ -1381,20 +1287,20 @@
         
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
-        | market\_sz | [MarketState](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1252) | 深圳市场状态 |
-        | market\_sh | [MarketState](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1252) | 上海市场状态 |
-        | market\_hk | [MarketState](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1252) | 香港市场状态 |
-        | market\_hkfuture | [MarketState](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1252) | 香港期货市场状态<br>(ℹ️ 不同品种的交易时间存在差异，建议使用 [get\_market\_state](https://openapi.futunn.com/futu-api-doc/quote/get-market-state.html)<br> 接口获取指定品种的市场状态) |
-        | market\_usfuture | [MarketState](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1252) | 美国期货市场状态<br>(ℹ️ 不同品种的交易时间存在差异，建议使用 [get\_market\_state](https://openapi.futunn.com/futu-api-doc/quote/get-market-state.html)<br> 接口获取指定品种的市场状态) |
-        | market\_us | [MarketState](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1252) | 美国市场状态<br>(ℹ️ 不同品种的交易时间存在差异，建议使用 [get\_market\_state](https://openapi.futunn.com/futu-api-doc/quote/get-market-state.html)<br> 接口获取指定品种的市场状态) |
-        | market\_sgfuture | [MarketState](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1252) | 新加坡期货市场状态<br>(ℹ️ 不同品种的交易时间存在差异，建议使用 [get\_market\_state](https://openapi.futunn.com/futu-api-doc/quote/get-market-state.html)<br> 接口获取指定品种的市场状态) |
-        | market\_jpfuture | [MarketState](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1252) | 日本期货市场状态 |
+        | market\_sz | [MarketState](./quote_quote.md#1252) | 深圳市场状态 |
+        | market\_sh | [MarketState](./quote_quote.md#1252) | 上海市场状态 |
+        | market\_hk | [MarketState](./quote_quote.md#1252) | 香港市场状态 |
+        | market\_hkfuture | [MarketState](./quote_quote.md#1252) | 香港期货市场状态<br>(ℹ️ 不同品种的交易时间存在差异，建议使用 [get\_market\_state](./quote_get-market-state.md))<br> 接口获取指定品种的市场状态 |
+        | market\_usfuture | [MarketState](./quote_quote.md#1252) | 美国期货市场状态<br>(ℹ️ 不同品种的交易时间存在差异，建议使用 [get\_market\_state](./quote_get-market-state.md))<br> 接口获取指定品种的市场状态 |
+        | market\_us | [MarketState](./quote_quote.md#1252) | 美国市场状态<br>(ℹ️ 不同品种的交易时间存在差异，建议使用 [get\_market\_state](./quote_get-market-state.md))<br> 接口获取指定品种的市场状态 |
+        | market\_sgfuture | [MarketState](./quote_quote.md#1252) | 新加坡期货市场状态<br>(ℹ️ 不同品种的交易时间存在差异，建议使用 [get\_market\_state](./quote_get-market-state.md))<br> 接口获取指定品种的市场状态 |
+        | market\_jpfuture | [MarketState](./quote_quote.md#1252) | 日本期货市场状态 |
         | server\_ver | str | OpenD 版本号 |
         | trd\_logined | bool | True：已登录交易服务器，False：未登录交易服务器 |
         | qot\_logined | bool | True：已登录行情服务器，False：未登录行情服务器 |
         | timestamp | str | 当前格林威治时间戳<br>(ℹ️ 单位：秒) |
         | local\_timestamp | float | OpenD 运行机器的当前时间戳<br>(ℹ️ 单位：秒) |
-        | program\_status\_type | [ProgramStatusType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#6427) | 当前状态 |
+        | program\_status\_type | [ProgramStatusType](./ftapi_common.md#6427) | 当前状态 |
         | program\_status\_desc | str | 额外描述 |
         
 *   **Example**
@@ -1418,7 +1324,7 @@
 
 1  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-global-state.html#4500-2)
+[#](./quote_get-global-state.md#4500-2)
  GetGlobalState.proto
 -----------------------------------------------------------------------------------------------------
 
@@ -1515,9 +1421,9 @@
 29  
 30  
 
-> *   市场状态枚举参见 [QotMarketState](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1252)
+> *   市场状态枚举参见 [QotMarketState](./quote_quote.md#1252)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -1621,9 +1527,9 @@
 29  
 30  
 
-> *   市场状态枚举参见 [QotMarketState](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1252)
+> *   市场状态枚举参见 [QotMarketState](./quote_quote.md#1252)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1850,9 +1756,9 @@
 29  
 30  
 
-> *   市场状态枚举参见 [QotMarketState](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1252)
+> *   市场状态枚举参见 [QotMarketState](./quote_quote.md#1252)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2141,9 +2047,9 @@
 29  
 30  
 
-> *   市场状态枚举参见 [QotMarketState](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1252)
+> *   市场状态枚举参见 [QotMarketState](./quote_quote.md#1252)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2451,9 +2357,9 @@
 29  
 30  
 
-> *   市场状态枚举参见 [QotMarketState](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1252)
+> *   市场状态枚举参见 [QotMarketState](./quote_quote.md#1252)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2614,7 +2520,7 @@
 23  
 24  
 
-← [获取 IPO 信息](https://openapi.futunn.com/futu-api-doc/quote/get-ipo-list.html) [获取交易日历](https://openapi.futunn.com/futu-api-doc/quote/request-trading-days.html)
+← [获取 IPO 信息](./quote_get-ipo-list.md) [获取交易日历](./quote_request-trading-days.md)
  →
 
-[获取全局市场状态](https://openapi.futunn.com/futu-api-doc/quote/get-global-state.html)
+[获取全局市场状态](./quote_get-global-state.md)

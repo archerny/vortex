@@ -1,103 +1,4 @@
- [![Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/img/logo.png) Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/)
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/quote/update-rt.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/quote/update-rt.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/quote/update-rt.html)
-    
-
-下载
-
-*   [PDF](https://openapi.futunn.com/pdfs/Futu-API-Doc-zh-Python.pdf)
-    
-*   [Markdown](https://openapi.futunn.com/mds/Futu-API-Doc-zh-Python.md)
-    
-*   [Skills](https://openapi.futunn.com/skills/opend-skills.zip)
-    
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/quote/update-rt.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/quote/update-rt.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/quote/update-rt.html)
-    
-
-*   介绍
-    
-*   快速上手
-    
-*   OpenD
-    
-*   行情接口
-    
-    *   [行情接口总览](https://openapi.futunn.com/futu-api-doc/quote/overview.html)
-        
-    *   [行情对象](https://openapi.futunn.com/futu-api-doc/quote/base.html)
-        
-    *   实时行情
-        
-        *   订阅
-            
-        *   推送回调
-            
-            *   [实时报价回调](https://openapi.futunn.com/futu-api-doc/quote/update-stock-quote.html)
-                
-            *   [实时摆盘回调](https://openapi.futunn.com/futu-api-doc/quote/update-order-book.html)
-                
-            *   [实时 K 线回调](https://openapi.futunn.com/futu-api-doc/quote/update-kl.html)
-                
-            *   [实时分时回调](https://openapi.futunn.com/futu-api-doc/quote/update-rt.html)
-                
-            *   [实时逐笔回调](https://openapi.futunn.com/futu-api-doc/quote/update-ticker.html)
-                
-            *   [实时经纪队列回调](https://openapi.futunn.com/futu-api-doc/quote/update-broker.html)
-                
-            
-        *   拉取
-            
-        
-    *   基本数据
-        
-    *   相关衍生品
-        
-    *   全市场筛选
-        
-    *   个性化
-        
-    *   [行情定义](https://openapi.futunn.com/futu-api-doc/quote/quote.html)
-        
-    
-*   交易接口
-    
-*   基础接口
-    
-*   Q&A
-    
-
-[#](https://openapi.futunn.com/futu-api-doc/quote/update-rt.html#6549)
+[#](./quote_update-rt.md#6549)
  实时分时回调
 ==============================================================================
 
@@ -125,7 +26,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | pd.DataFrame | 当 ret == RET\_OK，返回分时数据 |
     | str | 当 ret != RET\_OK，返回错误描述 |
     
@@ -135,8 +36,8 @@
         | --- | --- | --- |
         | code | str | 股票代码 |
         | name | str | 股票名称 |
-        | time | str | 时间<br>(ℹ️ 格式：yyyy-MM-dd HH:mm:ss  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间) |
-        | is\_blank | bool | 数据状态<br>(ℹ️ False：正常数据  <br>True：伪造数据) |
+        | time | str | 时间<br>(ℹ️ 格式：yyyy-MM-dd HH:mm:ss)  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间 |
+        | is\_blank | bool | 数据状态<br>(ℹ️ False：正常数据)  <br>True：伪造数据 |
         | opened\_mins | int | 零点到当前多少分钟 |
         | cur\_price | float | 当前价格 |
         | last\_close | float | 昨天收盘的价格 |
@@ -201,7 +102,7 @@
 1  
 2  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/update-rt.html#7747)
+[#](./quote_update-rt.md#7747)
  Qot\_UpdateRT.proto
 -------------------------------------------------------------------------------------------
 
@@ -247,11 +148,11 @@
 15  
 16  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   分时结构参见 [TimeShare](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9906)
+> *   分时结构参见 [TimeShare](./quote_quote.md#9906)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -302,11 +203,11 @@
 15  
 16  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   分时结构参见 [TimeShare](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9906)
+> *   分时结构参见 [TimeShare](./quote_quote.md#9906)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -502,11 +403,11 @@
 15  
 16  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   分时结构参见 [TimeShare](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9906)
+> *   分时结构参见 [TimeShare](./quote_quote.md#9906)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -811,11 +712,11 @@
 15  
 16  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   分时结构参见 [TimeShare](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9906)
+> *   分时结构参见 [TimeShare](./quote_quote.md#9906)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1144,11 +1045,11 @@
 15  
 16  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   分时结构参见 [TimeShare](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9906)
+> *   分时结构参见 [TimeShare](./quote_quote.md#9906)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1285,9 +1186,9 @@
 
 提示
 
-*   此接口提供了持续获取推送数据的功能，如需一次性获取实时数据，请参考 [获取实时分时](https://openapi.futunn.com/futu-api-doc/quote/get-rt.html)
+*   此接口提供了持续获取推送数据的功能，如需一次性获取实时数据，请参考 [获取实时分时](./quote_get-rt.md)
      接口
-*   获取实时数据 和 实时数据回调 的差别，请参考 [如何通过订阅接口获取实时行情？](https://openapi.futunn.com/futu-api-doc/qa/quote.html#2692)
+*   获取实时数据 和 实时数据回调 的差别，请参考 [如何通过订阅接口获取实时行情？](./qa_quote.md#2692)
     
 
 *   Python
@@ -1314,7 +1215,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | pd.DataFrame | 当 ret == RET\_OK，返回分时数据 |
     | str | 当 ret != RET\_OK，返回错误描述 |
     
@@ -1324,8 +1225,8 @@
         | --- | --- | --- |
         | code | str | 股票代码 |
         | name | str | 股票名称 |
-        | time | str | 时间<br>(ℹ️ 格式：yyyy-MM-dd HH:mm:ss  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间) |
-        | is\_blank | bool | 数据状态<br>(ℹ️ False：正常数据  <br>True：伪造数据) |
+        | time | str | 时间<br>(ℹ️ 格式：yyyy-MM-dd HH:mm:ss)  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间 |
+        | is\_blank | bool | 数据状态<br>(ℹ️ False：正常数据)  <br>True：伪造数据 |
         | opened\_mins | int | 零点到当前多少分钟 |
         | cur\_price | float | 当前价格 |
         | last\_close | float | 昨天收盘的价格 |
@@ -1390,7 +1291,7 @@
 1  
 2  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/update-rt.html#7747-2)
+[#](./quote_update-rt.md#7747-2)
  Qot\_UpdateRT.proto
 ---------------------------------------------------------------------------------------------
 
@@ -1436,11 +1337,11 @@
 15  
 16  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   分时结构参见 [TimeShare](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9906)
+> *   分时结构参见 [TimeShare](./quote_quote.md#9906)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -1491,11 +1392,11 @@
 15  
 16  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   分时结构参见 [TimeShare](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9906)
+> *   分时结构参见 [TimeShare](./quote_quote.md#9906)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1691,11 +1592,11 @@
 15  
 16  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   分时结构参见 [TimeShare](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9906)
+> *   分时结构参见 [TimeShare](./quote_quote.md#9906)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2000,11 +1901,11 @@
 15  
 16  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   分时结构参见 [TimeShare](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9906)
+> *   分时结构参见 [TimeShare](./quote_quote.md#9906)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2333,11 +2234,11 @@
 15  
 16  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   分时结构参见 [TimeShare](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9906)
+> *   分时结构参见 [TimeShare](./quote_quote.md#9906)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2474,12 +2375,12 @@
 
 提示
 
-*   此接口提供了持续获取推送数据的功能，如需一次性获取实时数据，请参考 [获取实时分时](https://openapi.futunn.com/futu-api-doc/quote/get-rt.html)
+*   此接口提供了持续获取推送数据的功能，如需一次性获取实时数据，请参考 [获取实时分时](./quote_get-rt.md)
      接口
-*   获取实时数据 和 实时数据回调 的差别，请参考 [如何通过订阅接口获取实时行情？](https://openapi.futunn.com/futu-api-doc/qa/quote.html#2692)
+*   获取实时数据 和 实时数据回调 的差别，请参考 [如何通过订阅接口获取实时行情？](./qa_quote.md#2692)
     
 
-← [实时 K 线回调](https://openapi.futunn.com/futu-api-doc/quote/update-kl.html) [实时逐笔回调](https://openapi.futunn.com/futu-api-doc/quote/update-ticker.html)
+← [实时 K 线回调](./quote_update-kl.md) [实时逐笔回调](./quote_update-ticker.md)
  →
 
-[实时分时回调](https://openapi.futunn.com/futu-api-doc/quote/update-rt.html)
+[实时分时回调](./quote_update-rt.md)

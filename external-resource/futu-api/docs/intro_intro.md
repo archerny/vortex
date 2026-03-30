@@ -1,12 +1,8 @@
-# 介绍 | Futu API 文档 v10.2
-
-> 来源: https://openapi.futunn.com/futu-api-doc/intro/intro.html
-
-[#](https://openapi.futunn.com/futu-api-doc/intro/intro.html#342)
+[#](./intro_intro.md#342)
  介绍
 =====================================================================
 
-[#](https://openapi.futunn.com/futu-api-doc/intro/intro.html#8831)
+[#](./intro_intro.md#8831)
  概述
 ----------------------------------------------------------------------
 
@@ -28,12 +24,12 @@ Futu API 由 OpenD 和API SDK组成：
 
 初次接触 Futu API，您需要进行如下两步操作：
 
-第一步，在本地或云端安装并启动一个网关程序 [OpenD](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html)
+第一步，在本地或云端安装并启动一个网关程序 [OpenD](./quick_opend-base.md)
 。
 
 OpenD 以自定义 TCP 协议的方式对外暴露接口，负责中转协议请求到富途服务器，并将处理后的数据返回，该协议接口与编程语言无关。
 
-第二步，下载 Futu API，完成 [环境搭建](https://openapi.futunn.com/futu-api-doc/quick/env.html)
+第二步，下载 Futu API，完成 [环境搭建](./quick_env.md)
 ，以便快速调用。
 
 为方便您的使用，富途对主流的编程语言，封装了相应的 API SDK（以下简称 Futu API）。
@@ -54,17 +50,17 @@ Moomoo API 由 OpenD 和 API SDK 组成：
 
 初次接触 Moomoo API，您需要进行如下两步操作：
 
-第一步，在本地或云端安装并启动一个网关程序 [OpenD](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html)
+第一步，在本地或云端安装并启动一个网关程序 [OpenD](./quick_opend-base.md)
 。
 
 OpenD 以自定义 TCP 协议的方式对外暴露接口，负责中转协议请求到富途服务器，并将处理后的数据返回，该协议接口与编程语言无关。
 
-第二步，下载 Moomoo API，完成 [环境搭建](https://openapi.futunn.com/futu-api-doc/quick/env.html)
+第二步，下载 Moomoo API，完成 [环境搭建](./quick_env.md)
 ，以便快速调用。
 
 为方便您的使用，富途对主流的编程语言，封装了相应的 API SDK（以下简称 Moomoo API）。
 
-[#](https://openapi.futunn.com/futu-api-doc/intro/intro.html#7836)
+[#](./intro_intro.md#7836)
  账号
 ----------------------------------------------------------------------
 
@@ -72,14 +68,14 @@ Futu API 涉及 2 类账号，分别是 \*\*平台账号\*\* 和 \*\*综合账�
 
 Moomoo API 涉及 2 类账号，分别是 \*\*平台账号\*\* 和 \*\*综合账户\*\*。
 
-### [#](https://openapi.futunn.com/futu-api-doc/intro/intro.html#1200)
+### [#](./intro_intro.md#1200)
  平台账号
 
 平台账号是您在富途的用户 ID（牛牛号），此账号体系适用于富途牛牛 APP、Futu API。 您可以使用平台账号（牛牛号）和登录密码，登录 OpenD 并获取行情。
 
 平台账号是您在 moomoo 的用户 ID（moomoo 号），此账号体系适用于moomoo APP、Moomoo API。 您可以使用平台账号（moomoo 号）和登录密码，登录 OpenD 并获取行情。
 
-### [#](https://openapi.futunn.com/futu-api-doc/intro/intro.html#4459)
+### [#](./intro_intro.md#4459)
  综合账户
 
 综合账户支持以多种货币在同一个账户内交易不同市场品类（港股、美股、A股通、基金）。您可以通过一个账户进行全市场交易，不需要再管理多个账户。  
@@ -88,7 +84,7 @@ Moomoo API 涉及 2 类账号，分别是 \*\*平台账号\*\* 和 \*\*综合账
 *   综合账户 - 证券，用于交易全市场的股票、ETFs、期权等证券类产品。
 *   综合账户 - 期货，用于交易全市场的期货产品，目前支持香港市场期货、美国市场 CME Group 期货、新加坡市场期货、日本市场期货。
 
-[#](https://openapi.futunn.com/futu-api-doc/intro/intro.html#508)
+[#](./intro_intro.md#508)
  功能
 ---------------------------------------------------------------------
 
@@ -96,14 +92,14 @@ Futu API 的功能主要有两部分：行情和交易。
 
 Moomoo API 的功能主要有两部分：行情和交易。
 
-### [#](https://openapi.futunn.com/futu-api-doc/intro/intro.html#8846)
+### [#](./intro_intro.md#8846)
  行情功能
 
-#### [#](https://openapi.futunn.com/futu-api-doc/intro/intro.html#1935)
+#### [#](./intro_intro.md#1935)
  行情数据品类
 
 支持香港、美国、A 股市场的行情数据，涉及的品类包括股票、指数、期权、期货等，具体支持的品种见下表。  
-获取行情数据需要相关权限，如需了解行情权限的获取方式以及限制规则，请 [点击这里](https://openapi.futunn.com/futu-api-doc/intro/authority.html#2867)
+获取行情数据需要相关权限，如需了解行情权限的获取方式以及限制规则，请 [点击这里](./intro_authority.md#2867)
 。
 
 | 市场  | 品种  | 牛牛用户 |
@@ -130,7 +126,7 @@ Moomoo API 的功能主要有两部分：行情和交易。
 | 环球市场 | 外汇  | X   |
 
 支持香港、美国、A 股市场的行情数据，涉及的品类包括股票、指数、期权、期货等，具体支持的品种见下表。  
-获取行情数据需要相关权限，如需了解行情权限的获取方式以及限制规则，请 [点击这里](https://openapi.futunn.com/futu-api-doc/intro/authority.html#2867)
+获取行情数据需要相关权限，如需了解行情权限的获取方式以及限制规则，请 [点击这里](./intro_authority.md#2867)
 。
 
 | 市场  | 品种  | moomoo 用户 |
@@ -156,16 +152,16 @@ Moomoo API 的功能主要有两部分：行情和交易。
 | 澳大利亚市场 | 股票、ETFs | X   |
 | 环球市场 | 外汇  | X   |
 
-#### [#](https://openapi.futunn.com/futu-api-doc/intro/intro.html#144)
+#### [#](./intro_intro.md#144)
  行情数据获取方式
 
 *   订阅并接收实时报价、实时 K 线、实时逐笔、实时摆盘等数据推送
 *   拉取最新市场快照，历史 K 线等
 
-### [#](https://openapi.futunn.com/futu-api-doc/intro/intro.html#1396)
+### [#](./intro_intro.md#1396)
  交易功能
 
-#### [#](https://openapi.futunn.com/futu-api-doc/intro/intro.html#5796)
+#### [#](./intro_intro.md#5796)
  交易能力
 
 支持香港、美国、A 股、新加坡、日本 5 个市场的交易能力，涉及的品类包括股票、期权、期货等，具体见下表：
@@ -188,12 +184,12 @@ Moomoo API 的功能主要有两部分：行情和交易。
 | 澳大利亚市场 | 股票、ETFs | X   | X   | X   | X   | X   | X   | X   | X   |
 | 加拿大市场 | 股票  | X   | X   | X   | X   | X   | X   | X   | X   |
 
-#### [#](https://openapi.futunn.com/futu-api-doc/intro/intro.html#3230)
+#### [#](./intro_intro.md#3230)
  交易方式
 
 真实交易和模拟交易使用同一套交易接口。
 
-[#](https://openapi.futunn.com/futu-api-doc/intro/intro.html#6435)
+[#](./intro_intro.md#6435)
  特点
 ----------------------------------------------------------------------
 
@@ -235,5 +231,15 @@ Moomoo API 的功能主要有两部分：行情和交易。
 
 *   定制化的行情交易解决方案
 
-[权限和限制](https://openapi.futunn.com/futu-api-doc/intro/authority.html)
+[权限和限制](./intro_authority.md)
  →
+
+[介绍](./intro_intro.md)
+
+*   [概述](./intro_intro.md#8831)
+    
+*   [账号](./intro_intro.md#7836)
+    
+*   [功能](./intro_intro.md#508)
+    
+*   [特点](./intro_intro.md#6435)

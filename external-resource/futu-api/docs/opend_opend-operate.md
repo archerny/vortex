@@ -1,8 +1,4 @@
-# 运维命令 | Futu API 文档 v10.2
-
-> 来源: https://openapi.futunn.com/futu-api-doc/opend/opend-operate.html
-
-[#](https://openapi.futunn.com/futu-api-doc/opend/opend-operate.html#9189)
+[#](./opend_opend-operate.md#9189)
  运维命令
 ================================================================================
 
@@ -41,7 +37,7 @@
 9  
 10  
 
-[#](https://openapi.futunn.com/futu-api-doc/opend/opend-operate.html#6520)
+[#](./opend_opend-operate.md#6520)
  命令帮助
 --------------------------------------------------------------------------------
 
@@ -52,7 +48,7 @@
 *   参数:
     *   cmd: 命令
 
-[#](https://openapi.futunn.com/futu-api-doc/opend/opend-operate.html#3261)
+[#](./opend_opend-operate.md#3261)
  退出程序
 --------------------------------------------------------------------------------
 
@@ -62,7 +58,7 @@
 
 退出 OpenD 程序
 
-[#](https://openapi.futunn.com/futu-api-doc/opend/opend-operate.html#2972)
+[#](./opend_opend-operate.md#2972)
  请求手机验证码
 -----------------------------------------------------------------------------------
 
@@ -73,7 +69,7 @@
 *   频率限制:
     *   每60秒内最多请求1次
 
-[#](https://openapi.futunn.com/futu-api-doc/opend/opend-operate.html#815)
+[#](./opend_opend-operate.md#815)
  输入手机验证码
 ----------------------------------------------------------------------------------
 
@@ -88,7 +84,7 @@
     
     *   每60秒内最多请求10次
 
-[#](https://openapi.futunn.com/futu-api-doc/opend/opend-operate.html#5593)
+[#](./opend_opend-operate.md#5593)
  请求图形验证码
 -----------------------------------------------------------------------------------
 
@@ -99,7 +95,7 @@
 *   频率限制:
     *   每60秒内最多请求10次
 
-[#](https://openapi.futunn.com/futu-api-doc/opend/opend-operate.html#3827)
+[#](./opend_opend-operate.md#3827)
  输入图形验证码
 -----------------------------------------------------------------------------------
 
@@ -114,7 +110,7 @@
     
     *   每60秒内最多请求10次
 
-[#](https://openapi.futunn.com/futu-api-doc/opend/opend-operate.html#10)
+[#](./opend_opend-operate.md#10)
  重登录
 -----------------------------------------------------------------------------
 
@@ -132,7 +128,7 @@
     
     *   每小时最多请求10次
 
-[#](https://openapi.futunn.com/futu-api-doc/opend/opend-operate.html#8474)
+[#](./opend_opend-operate.md#8474)
  检测与连接点之间的时延
 ---------------------------------------------------------------------------------------
 
@@ -143,7 +139,7 @@
 *   频率限制:
     *   每60秒内最多请求10次
 
-[#](https://openapi.futunn.com/futu-api-doc/opend/opend-operate.html#6956)
+[#](./opend_opend-operate.md#6956)
  展示延迟统计报告
 ------------------------------------------------------------------------------------
 
@@ -171,7 +167,7 @@
         *   cr 指 OpenD 接收时间
         *   cs 指 OpenD 发出时间
 
-[#](https://openapi.futunn.com/futu-api-doc/opend/opend-operate.html#4679)
+[#](./opend_opend-operate.md#4679)
  关闭 API 连接
 -------------------------------------------------------------------------------------
 
@@ -182,7 +178,7 @@
 *   参数:
     *   conn\_id: API 连接 ID
 
-[#](https://openapi.futunn.com/futu-api-doc/opend/opend-operate.html#3131)
+[#](./opend_opend-operate.md#3131)
  展示订阅状态
 ----------------------------------------------------------------------------------
 
@@ -196,7 +192,7 @@
     *   sub\_info\_path: 文件输出路径（MAC 系统仅支持绝对路径，不支持相对路径），可选参数，若不指定则输出到控制台
         
 
-[#](https://openapi.futunn.com/futu-api-doc/opend/opend-operate.html#2397)
+[#](./opend_opend-operate.md#2397)
  请求最高行情权限
 ------------------------------------------------------------------------------------
 
@@ -207,7 +203,7 @@
 *   频率限制:
     *   每60秒内最多请求10次
 
-[#](https://openapi.futunn.com/futu-api-doc/opend/opend-operate.html#479)
+[#](./opend_opend-operate.md#479)
  升级
 -----------------------------------------------------------------------------
 
@@ -217,5 +213,33 @@
 
 运行该命令，可以一键更新 OpenD
 
-← [命令行 OpenD](https://openapi.futunn.com/futu-api-doc/opend/opend-cmd.html) [行情接口总览](https://openapi.futunn.com/futu-api-doc/quote/overview.html)
+← [命令行 OpenD](./opend_opend-cmd.md) [行情接口总览](./quote_overview.md)
  →
+
+[运维命令](./opend_opend-operate.md)
+
+*   [命令帮助](./opend_opend-operate.md#6520)
+    
+*   [退出程序](./opend_opend-operate.md#3261)
+    
+*   [请求手机验证码](./opend_opend-operate.md#2972)
+    
+*   [输入手机验证码](./opend_opend-operate.md#815)
+    
+*   [请求图形验证码](./opend_opend-operate.md#5593)
+    
+*   [输入图形验证码](./opend_opend-operate.md#3827)
+    
+*   [重登录](./opend_opend-operate.md#10)
+    
+*   [检测与连接点之间的时延](./opend_opend-operate.md#8474)
+    
+*   [展示延迟统计报告](./opend_opend-operate.md#6956)
+    
+*   [关闭 API 连接](./opend_opend-operate.md#4679)
+    
+*   [展示订阅状态](./opend_opend-operate.md#3131)
+    
+*   [请求最高行情权限](./opend_opend-operate.md#2397)
+    
+*   [升级](./opend_opend-operate.md#479)

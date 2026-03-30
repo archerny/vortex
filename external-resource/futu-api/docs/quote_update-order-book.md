@@ -1,103 +1,4 @@
- [![Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/img/logo.png) Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/)
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/quote/update-order-book.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/quote/update-order-book.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/quote/update-order-book.html)
-    
-
-下载
-
-*   [PDF](https://openapi.futunn.com/pdfs/Futu-API-Doc-zh-Python.pdf)
-    
-*   [Markdown](https://openapi.futunn.com/mds/Futu-API-Doc-zh-Python.md)
-    
-*   [Skills](https://openapi.futunn.com/skills/opend-skills.zip)
-    
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/quote/update-order-book.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/quote/update-order-book.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/quote/update-order-book.html)
-    
-
-*   介绍
-    
-*   快速上手
-    
-*   OpenD
-    
-*   行情接口
-    
-    *   [行情接口总览](https://openapi.futunn.com/futu-api-doc/quote/overview.html)
-        
-    *   [行情对象](https://openapi.futunn.com/futu-api-doc/quote/base.html)
-        
-    *   实时行情
-        
-        *   订阅
-            
-        *   推送回调
-            
-            *   [实时报价回调](https://openapi.futunn.com/futu-api-doc/quote/update-stock-quote.html)
-                
-            *   [实时摆盘回调](https://openapi.futunn.com/futu-api-doc/quote/update-order-book.html)
-                
-            *   [实时 K 线回调](https://openapi.futunn.com/futu-api-doc/quote/update-kl.html)
-                
-            *   [实时分时回调](https://openapi.futunn.com/futu-api-doc/quote/update-rt.html)
-                
-            *   [实时逐笔回调](https://openapi.futunn.com/futu-api-doc/quote/update-ticker.html)
-                
-            *   [实时经纪队列回调](https://openapi.futunn.com/futu-api-doc/quote/update-broker.html)
-                
-            
-        *   拉取
-            
-        
-    *   基本数据
-        
-    *   相关衍生品
-        
-    *   全市场筛选
-        
-    *   个性化
-        
-    *   [行情定义](https://openapi.futunn.com/futu-api-doc/quote/quote.html)
-        
-    
-*   交易接口
-    
-*   基础接口
-    
-*   Q&A
-    
-
-[#](https://openapi.futunn.com/futu-api-doc/quote/update-order-book.html#878)
+[#](./quote_update-order-book.md#878)
  实时摆盘回调
 =====================================================================================
 
@@ -124,7 +25,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | dict | 当 ret == RET\_OK，返回摆盘数据 |
     | str | 当 ret != RET\_OK，返回错误描述 |
     
@@ -136,8 +37,8 @@
         | name | str | 股票名称 |
         | svr\_recv\_time\_bid | str | 富途服务器从交易所收到买盘数据的时间<br>(ℹ️ 部分数据的接收时间为零，例如服务器重启或第一次推送的缓存数据) |
         | svr\_recv\_time\_ask | str | 富途服务器从交易所收到卖盘数据的时间<br>(ℹ️ 部分数据的接收时间为零，例如服务器重启或第一次推送的缓存数据) |
-        | Bid | list | 每个元祖包含如下信息：委托价格，委托数量，委托订单数，委托订单明细<br>(ℹ️ 委托订单明细<br><br>*   明细内容：交易所订单 ID，单笔委托数量<br>*   港股 SF 权限下最多支持 1000 笔委托订单明细；  <br>    其余行情权限不支持获取此类数据) |
-        | Ask | list | 每个元祖包含如下信息：委托价格，委托数量，委托订单数，委托订单明细<br>(ℹ️ 委托订单明细<br><br>*   明细内容：交易所订单 ID，单笔委托数量<br>*   港股 SF 权限下最多支持 1000 笔委托订单明细；  <br>    其余行情权限不支持获取此类数据) |
+        | Bid | list | 每个元祖包含如下信息：委托价格，委托数量，委托订单数，委托订单明细<br>(ℹ️ 委托订单明细)<br><br>*   明细内容：交易所订单 ID，单笔委托数量<br>*   港股 SF 权限下最多支持 1000 笔委托订单明细；  <br>    其余行情权限不支持获取此类数据 |
+        | Ask | list | 每个元祖包含如下信息：委托价格，委托数量，委托订单数，委托订单明细<br>(ℹ️ 委托订单明细)<br><br>*   明细内容：交易所订单 ID，单笔委托数量<br>*   港股 SF 权限下最多支持 1000 笔委托订单明细；  <br>    其余行情权限不支持获取此类数据 |
         
         其中，Bid 和 Ask 字段的结构如下：
         
@@ -198,7 +99,7 @@
 
 1  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/update-order-book.html#4825)
+[#](./quote_update-order-book.md#4825)
  Qot\_UpdateOrderBook.proto
 ----------------------------------------------------------------------------------------------------------
 
@@ -254,11 +155,11 @@
 20  
 21  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   买卖盘结构参见 [OrderBook](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6364)
+> *   买卖盘结构参见 [OrderBook](./quote_quote.md#6364)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -317,11 +218,11 @@
 19  
 20  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   买卖盘结构参见 [OrderBook](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6364)
+> *   买卖盘结构参见 [OrderBook](./quote_quote.md#6364)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -529,11 +430,11 @@
 20  
 21  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   买卖盘结构参见 [OrderBook](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6364)
+> *   买卖盘结构参见 [OrderBook](./quote_quote.md#6364)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -856,11 +757,11 @@
 20  
 21  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   买卖盘结构参见 [OrderBook](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6364)
+> *   买卖盘结构参见 [OrderBook](./quote_quote.md#6364)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1185,11 +1086,11 @@
 20  
 21  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   买卖盘结构参见 [OrderBook](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6364)
+> *   买卖盘结构参见 [OrderBook](./quote_quote.md#6364)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1326,9 +1227,9 @@
 
 提示
 
-*   此接口提供了持续获取推送数据的功能，如需一次性获取实时数据，请参考 [获取实时摆盘](https://openapi.futunn.com/futu-api-doc/quote/get-order-book.html)
+*   此接口提供了持续获取推送数据的功能，如需一次性获取实时数据，请参考 [获取实时摆盘](./quote_get-order-book.md)
      接口
-*   获取实时数据 和 实时数据回调 的差别，请参考 [如何通过订阅接口获取实时行情？](https://openapi.futunn.com/futu-api-doc/qa/quote.html#2692)
+*   获取实时数据 和 实时数据回调 的差别，请参考 [如何通过订阅接口获取实时行情？](./qa_quote.md#2692)
     
 *   美股市场实时摆盘回调，会持续推送当前交易时段的实时摆盘，无需设置时段。
 
@@ -1355,7 +1256,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | dict | 当 ret == RET\_OK，返回摆盘数据 |
     | str | 当 ret != RET\_OK，返回错误描述 |
     
@@ -1367,8 +1268,8 @@
         | name | str | 股票名称 |
         | svr\_recv\_time\_bid | str | moomoo 服务器从交易所收到买盘数据的时间<br>(ℹ️ 部分数据的接收时间为零，例如服务器重启或第一次推送的缓存数据) |
         | svr\_recv\_time\_ask | str | moomoo 服务器从交易所收到卖盘数据的时间<br>(ℹ️ 部分数据的接收时间为零，例如服务器重启或第一次推送的缓存数据) |
-        | Bid | list | 每个元祖包含如下信息：委托价格，委托数量，委托订单数，委托订单明细<br>(ℹ️ 委托订单明细<br><br>*   明细内容：交易所订单 ID，单笔委托数量<br>*   港股 SF 权限下最多支持 1000 笔委托订单明细；  <br>    其余行情权限不支持获取此类数据) |
-        | Ask | list | 每个元祖包含如下信息：委托价格，委托数量，委托订单数，委托订单明细<br>(ℹ️ 委托订单明细<br><br>*   明细内容：交易所订单 ID，单笔委托数量<br>*   港股 SF 权限下最多支持 1000 笔委托订单明细；  <br>    其余行情权限不支持获取此类数据) |
+        | Bid | list | 每个元祖包含如下信息：委托价格，委托数量，委托订单数，委托订单明细<br>(ℹ️ 委托订单明细)<br><br>*   明细内容：交易所订单 ID，单笔委托数量<br>*   港股 SF 权限下最多支持 1000 笔委托订单明细；  <br>    其余行情权限不支持获取此类数据 |
+        | Ask | list | 每个元祖包含如下信息：委托价格，委托数量，委托订单数，委托订单明细<br>(ℹ️ 委托订单明细)<br><br>*   明细内容：交易所订单 ID，单笔委托数量<br>*   港股 SF 权限下最多支持 1000 笔委托订单明细；  <br>    其余行情权限不支持获取此类数据 |
         
         其中，Bid 和 Ask 字段的结构如下：
         
@@ -1429,7 +1330,7 @@
 
 1  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/update-order-book.html#4825-2)
+[#](./quote_update-order-book.md#4825-2)
  Qot\_UpdateOrderBook.proto
 ------------------------------------------------------------------------------------------------------------
 
@@ -1485,11 +1386,11 @@
 20  
 21  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   买卖盘结构参见 [OrderBook](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6364)
+> *   买卖盘结构参见 [OrderBook](./quote_quote.md#6364)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -1548,11 +1449,11 @@
 19  
 20  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   买卖盘结构参见 [OrderBook](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6364)
+> *   买卖盘结构参见 [OrderBook](./quote_quote.md#6364)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1760,11 +1661,11 @@
 20  
 21  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   买卖盘结构参见 [OrderBook](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6364)
+> *   买卖盘结构参见 [OrderBook](./quote_quote.md#6364)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2087,11 +1988,11 @@
 20  
 21  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   买卖盘结构参见 [OrderBook](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6364)
+> *   买卖盘结构参见 [OrderBook](./quote_quote.md#6364)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2416,11 +2317,11 @@
 20  
 21  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   买卖盘结构参见 [OrderBook](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6364)
+> *   买卖盘结构参见 [OrderBook](./quote_quote.md#6364)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2557,13 +2458,13 @@
 
 提示
 
-*   此接口提供了持续获取推送数据的功能，如需一次性获取实时数据，请参考 [获取实时摆盘](https://openapi.futunn.com/futu-api-doc/quote/get-order-book.html)
+*   此接口提供了持续获取推送数据的功能，如需一次性获取实时数据，请参考 [获取实时摆盘](./quote_get-order-book.md)
      接口
-*   获取实时数据 和 实时数据回调 的差别，请参考 [如何通过订阅接口获取实时行情？](https://openapi.futunn.com/futu-api-doc/qa/quote.html#2692)
+*   获取实时数据 和 实时数据回调 的差别，请参考 [如何通过订阅接口获取实时行情？](./qa_quote.md#2692)
     
 *   美股市场实时摆盘回调，会持续推送当前交易时段的实时摆盘，无需设置时段。
 
-← [实时报价回调](https://openapi.futunn.com/futu-api-doc/quote/update-stock-quote.html) [实时 K 线回调](https://openapi.futunn.com/futu-api-doc/quote/update-kl.html)
+← [实时报价回调](./quote_update-stock-quote.md) [实时 K 线回调](./quote_update-kl.md)
  →
 
-[实时摆盘回调](https://openapi.futunn.com/futu-api-doc/quote/update-order-book.html)
+[实时摆盘回调](./quote_update-order-book.md)

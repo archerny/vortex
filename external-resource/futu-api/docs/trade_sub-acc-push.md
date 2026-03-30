@@ -1,96 +1,4 @@
- [![Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/img/logo.png) Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/)
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/trade/sub-acc-push.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/trade/sub-acc-push.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/trade/sub-acc-push.html)
-    
-
-下载
-
-*   [PDF](https://openapi.futunn.com/pdfs/Futu-API-Doc-zh-Python.pdf)
-    
-*   [Markdown](https://openapi.futunn.com/mds/Futu-API-Doc-zh-Python.md)
-    
-*   [Skills](https://openapi.futunn.com/skills/opend-skills.zip)
-    
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/trade/sub-acc-push.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/trade/sub-acc-push.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/trade/sub-acc-push.html)
-    
-
-*   介绍
-    
-*   快速上手
-    
-*   OpenD
-    
-*   行情接口
-    
-*   交易接口
-    
-    *   [交易接口总览](https://openapi.futunn.com/futu-api-doc/trade/overview.html)
-        
-    *   [交易对象](https://openapi.futunn.com/futu-api-doc/trade/base.html)
-        
-    *   账户
-        
-    *   资产持仓
-        
-    *   订单
-        
-        *   [下单](https://openapi.futunn.com/futu-api-doc/trade/place-order.html)
-            
-        *   [改单撤单](https://openapi.futunn.com/futu-api-doc/trade/modify-order.html)
-            
-        *   [查询未完成订单](https://openapi.futunn.com/futu-api-doc/trade/get-order-list.html)
-            
-        *   [查询历史订单](https://openapi.futunn.com/futu-api-doc/trade/get-history-order-list.html)
-            
-        *   [响应订单推送回调](https://openapi.futunn.com/futu-api-doc/trade/update-order.html)
-            
-        *   [查询订单费用](https://openapi.futunn.com/futu-api-doc/trade/order-fee-query.html)
-            
-        *   [订阅交易推送](https://openapi.futunn.com/futu-api-doc/trade/sub-acc-push.html)
-            
-        
-    *   成交
-        
-    *   [交易定义](https://openapi.futunn.com/futu-api-doc/trade/trade.html)
-        
-    
-*   基础接口
-    
-*   Q&A
-    
-
-[#](https://openapi.futunn.com/futu-api-doc/trade/sub-acc-push.html#7365)
+[#](./trade_sub-acc-push.md#7365)
  订阅交易推送
 =================================================================================
 
@@ -103,7 +11,7 @@
 
 Python 不需要订阅交易推送
 
-[#](https://openapi.futunn.com/futu-api-doc/trade/sub-acc-push.html#6589)
+[#](./trade_sub-acc-push.md#6589)
  Trd\_SubAccPush.proto
 ------------------------------------------------------------------------------------------------
 
@@ -169,7 +77,7 @@ Python 不需要订阅交易推送
 13  
 14  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -242,7 +150,7 @@ Python 不需要订阅交易推送
 13  
 14  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -426,7 +334,7 @@ Python 不需要订阅交易推送
 13  
 14  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1054,7 +962,7 @@ Python 不需要订阅交易推送
 13  
 14  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 `SubAccPush(req);`
@@ -1121,7 +1029,7 @@ Python 不需要订阅交易推送
 13  
 14  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1553,7 +1461,7 @@ Python 不需要订阅交易推送
 
 Python 不需要订阅交易推送
 
-[#](https://openapi.futunn.com/futu-api-doc/trade/sub-acc-push.html#6589-2)
+[#](./trade_sub-acc-push.md#6589-2)
  Trd\_SubAccPush.proto
 --------------------------------------------------------------------------------------------------
 
@@ -1619,7 +1527,7 @@ Python 不需要订阅交易推送
 13  
 14  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -1692,7 +1600,7 @@ Python 不需要订阅交易推送
 13  
 14  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1876,7 +1784,7 @@ Python 不需要订阅交易推送
 13  
 14  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2504,7 +2412,7 @@ Python 不需要订阅交易推送
 13  
 14  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 `SubAccPush(req);`
@@ -2571,7 +2479,7 @@ Python 不需要订阅交易推送
 13  
 14  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2994,7 +2902,7 @@ Python 不需要订阅交易推送
 112  
 113  
 
-← [查询订单费用](https://openapi.futunn.com/futu-api-doc/trade/order-fee-query.html) [查询当日成交](https://openapi.futunn.com/futu-api-doc/trade/get-order-fill-list.html)
+← [查询订单费用](./trade_order-fee-query.md) [查询当日成交](./trade_get-order-fill-list.md)
  →
 
-[订阅交易推送](https://openapi.futunn.com/futu-api-doc/trade/sub-acc-push.html)
+[订阅交易推送](./trade_sub-acc-push.md)

@@ -1,98 +1,4 @@
- [![Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/img/logo.png) Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/)
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/quote/update-price-reminder.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/quote/update-price-reminder.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/quote/update-price-reminder.html)
-    
-
-下载
-
-*   [PDF](https://openapi.futunn.com/pdfs/Futu-API-Doc-zh-Python.pdf)
-    
-*   [Markdown](https://openapi.futunn.com/mds/Futu-API-Doc-zh-Python.md)
-    
-*   [Skills](https://openapi.futunn.com/skills/opend-skills.zip)
-    
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/quote/update-price-reminder.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/quote/update-price-reminder.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/quote/update-price-reminder.html)
-    
-
-*   介绍
-    
-*   快速上手
-    
-*   OpenD
-    
-*   行情接口
-    
-    *   [行情接口总览](https://openapi.futunn.com/futu-api-doc/quote/overview.html)
-        
-    *   [行情对象](https://openapi.futunn.com/futu-api-doc/quote/base.html)
-        
-    *   实时行情
-        
-    *   基本数据
-        
-    *   相关衍生品
-        
-    *   全市场筛选
-        
-    *   个性化
-        
-        *   [获取历史 K 线额度使用明细](https://openapi.futunn.com/futu-api-doc/quote/get-history-kl-quota.html)
-            
-        *   [设置到价提醒](https://openapi.futunn.com/futu-api-doc/quote/set-price-reminder.html)
-            
-        *   [获取到价提醒列表](https://openapi.futunn.com/futu-api-doc/quote/get-price-reminder.html)
-            
-        *   [获取自选股列表](https://openapi.futunn.com/futu-api-doc/quote/get-user-security.html)
-            
-        *   [获取自选股分组](https://openapi.futunn.com/futu-api-doc/quote/get-user-security-group.html)
-            
-        *   [修改自选股列表](https://openapi.futunn.com/futu-api-doc/quote/modify-user-security.html)
-            
-        *   [到价提醒回调](https://openapi.futunn.com/futu-api-doc/quote/update-price-reminder.html)
-            
-        
-    *   [行情定义](https://openapi.futunn.com/futu-api-doc/quote/quote.html)
-        
-    
-*   交易接口
-    
-*   基础接口
-    
-*   Q&A
-    
-
-[#](https://openapi.futunn.com/futu-api-doc/quote/update-price-reminder.html#4884)
+[#](./quote_update-price-reminder.md#4884)
  到价提醒回调
 ==========================================================================================
 
@@ -121,7 +27,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | dict | 当 ret == RET\_OK，返回到价提醒 |
     | str | 当 ret != RET\_OK，返回错误描述 |
     
@@ -133,11 +39,11 @@
         | name | str | 股票名称 |
         | price | float | 当前价格 |
         | change\_rate | str | 当前涨跌幅 |
-        | market\_status | [PriceReminderMarketStatus](https://openapi.futunn.com/futu-api-doc/quote/quote.html#482) | 触发的时间段 |
+        | market\_status | [PriceReminderMarketStatus](./quote_quote.md#482) | 触发的时间段 |
         | content | str | 到价提醒文字内容 |
         | note | str | 备注<br>(ℹ️ 仅支持 20 个以内的中文字符) |
         | key | int | 到价提醒标识 |
-        | reminder\_type | [PriceReminderType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5160) | 到价提醒的类型 |
+        | reminder\_type | [PriceReminderType](./quote_quote.md#5160) | 到价提醒的类型 |
         | set\_value | float | 用户设置的提醒值 |
         | cur\_value | float | 提醒触发时的值 |
         
@@ -186,7 +92,7 @@
 
 1  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/update-price-reminder.html#3227)
+[#](./quote_update-price-reminder.md#3227)
  Qot\_UpdatePriceReminder.proto
 ------------------------------------------------------------------------------------------------------------------
 
@@ -264,11 +170,11 @@
 31  
 32  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   提醒类型枚举参见 [PriceReminderType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5160)
+> *   提醒类型枚举参见 [PriceReminderType](./quote_quote.md#5160)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -352,11 +258,11 @@
 31  
 32  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   提醒类型枚举参见 [PriceReminderType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5160)
+> *   提醒类型枚举参见 [PriceReminderType](./quote_quote.md#5160)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -535,11 +441,11 @@
 31  
 32  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   提醒类型枚举参见 [PriceReminderType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5160)
+> *   提醒类型枚举参见 [PriceReminderType](./quote_quote.md#5160)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -810,11 +716,11 @@
 31  
 32  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   提醒类型枚举参见 [PriceReminderType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5160)
+> *   提醒类型枚举参见 [PriceReminderType](./quote_quote.md#5160)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1097,13 +1003,13 @@
 31  
 32  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   提醒类型枚举参见 [PriceReminderType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5160)
+> *   提醒类型枚举参见 [PriceReminderType](./quote_quote.md#5160)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1222,9 +1128,9 @@
 
 提示
 
-*   此接口提供了持续获取推送数据的功能，如需一次性获取实时数据，请参考 [获取到价提醒](https://openapi.futunn.com/futu-api-doc/quote/get-price-reminder.html)
+*   此接口提供了持续获取推送数据的功能，如需一次性获取实时数据，请参考 [获取到价提醒](./quote_get-price-reminder.md)
      接口
-*   获取实时数据 和 实时数据回调 的差别，请参考 [如何通过订阅接口获取实时行情？](https://openapi.futunn.com/futu-api-doc/qa/quote.html#2692)
+*   获取实时数据 和 实时数据回调 的差别，请参考 [如何通过订阅接口获取实时行情？](./qa_quote.md#2692)
     
 
 *   Python
@@ -1252,7 +1158,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | dict | 当 ret == RET\_OK，返回到价提醒 |
     | str | 当 ret != RET\_OK，返回错误描述 |
     
@@ -1264,11 +1170,11 @@
         | name | str | 股票名称 |
         | price | float | 当前价格 |
         | change\_rate | str | 当前涨跌幅 |
-        | market\_status | [PriceReminderMarketStatus](https://openapi.futunn.com/futu-api-doc/quote/quote.html#482) | 触发的时间段 |
+        | market\_status | [PriceReminderMarketStatus](./quote_quote.md#482) | 触发的时间段 |
         | content | str | 到价提醒文字内容 |
         | note | str | 备注<br>(ℹ️ 仅支持 20 个以内的中文字符) |
         | key | int | 到价提醒标识 |
-        | reminder\_type | [PriceReminderType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5160) | 到价提醒的类型 |
+        | reminder\_type | [PriceReminderType](./quote_quote.md#5160) | 到价提醒的类型 |
         | set\_value | float | 用户设置的提醒值 |
         | cur\_value | float | 提醒触发时的值 |
         
@@ -1317,7 +1223,7 @@
 
 1  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/update-price-reminder.html#3227-2)
+[#](./quote_update-price-reminder.md#3227-2)
  Qot\_UpdatePriceReminder.proto
 --------------------------------------------------------------------------------------------------------------------
 
@@ -1395,11 +1301,11 @@
 31  
 32  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   提醒类型枚举参见 [PriceReminderType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5160)
+> *   提醒类型枚举参见 [PriceReminderType](./quote_quote.md#5160)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -1483,11 +1389,11 @@
 31  
 32  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   提醒类型枚举参见 [PriceReminderType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5160)
+> *   提醒类型枚举参见 [PriceReminderType](./quote_quote.md#5160)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1666,11 +1572,11 @@
 31  
 32  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   提醒类型枚举参见 [PriceReminderType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5160)
+> *   提醒类型枚举参见 [PriceReminderType](./quote_quote.md#5160)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1941,11 +1847,11 @@
 31  
 32  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   提醒类型枚举参见 [PriceReminderType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5160)
+> *   提醒类型枚举参见 [PriceReminderType](./quote_quote.md#5160)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2228,13 +2134,13 @@
 31  
 32  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   提醒类型枚举参见 [PriceReminderType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5160)
+> *   提醒类型枚举参见 [PriceReminderType](./quote_quote.md#5160)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2353,12 +2259,12 @@
 
 提示
 
-*   此接口提供了持续获取推送数据的功能，如需一次性获取实时数据，请参考 [获取到价提醒](https://openapi.futunn.com/futu-api-doc/quote/get-price-reminder.html)
+*   此接口提供了持续获取推送数据的功能，如需一次性获取实时数据，请参考 [获取到价提醒](./quote_get-price-reminder.md)
      接口
-*   获取实时数据 和 实时数据回调 的差别，请参考 [如何通过订阅接口获取实时行情？](https://openapi.futunn.com/futu-api-doc/qa/quote.html#2692)
+*   获取实时数据 和 实时数据回调 的差别，请参考 [如何通过订阅接口获取实时行情？](./qa_quote.md#2692)
     
 
-← [修改自选股列表](https://openapi.futunn.com/futu-api-doc/quote/modify-user-security.html) [行情定义](https://openapi.futunn.com/futu-api-doc/quote/quote.html)
+← [修改自选股列表](./quote_modify-user-security.md) [行情定义](./quote_quote.md)
  →
 
-[到价提醒回调](https://openapi.futunn.com/futu-api-doc/quote/update-price-reminder.html)
+[到价提醒回调](./quote_update-price-reminder.md)

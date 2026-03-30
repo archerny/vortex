@@ -1,98 +1,4 @@
- [![Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/img/logo.png) Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/)
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/quote/get-plate-list.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/quote/get-plate-list.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/quote/get-plate-list.html)
-    
-
-下载
-
-*   [PDF](https://openapi.futunn.com/pdfs/Futu-API-Doc-zh-Python.pdf)
-    
-*   [Markdown](https://openapi.futunn.com/mds/Futu-API-Doc-zh-Python.md)
-    
-*   [Skills](https://openapi.futunn.com/skills/opend-skills.zip)
-    
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/quote/get-plate-list.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/quote/get-plate-list.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/quote/get-plate-list.html)
-    
-
-*   介绍
-    
-*   快速上手
-    
-*   OpenD
-    
-*   行情接口
-    
-    *   [行情接口总览](https://openapi.futunn.com/futu-api-doc/quote/overview.html)
-        
-    *   [行情对象](https://openapi.futunn.com/futu-api-doc/quote/base.html)
-        
-    *   实时行情
-        
-    *   基本数据
-        
-    *   相关衍生品
-        
-    *   全市场筛选
-        
-        *   [条件选股](https://openapi.futunn.com/futu-api-doc/quote/get-stock-filter.html)
-            
-        *   [获取板块内股票列表](https://openapi.futunn.com/futu-api-doc/quote/get-plate-stock.html)
-            
-        *   [获取板块列表](https://openapi.futunn.com/futu-api-doc/quote/get-plate-list.html)
-            
-        *   [获取静态数据](https://openapi.futunn.com/futu-api-doc/quote/get-static-info.html)
-            
-        *   [获取 IPO 信息](https://openapi.futunn.com/futu-api-doc/quote/get-ipo-list.html)
-            
-        *   [获取全局市场状态](https://openapi.futunn.com/futu-api-doc/quote/get-global-state.html)
-            
-        *   [获取交易日历](https://openapi.futunn.com/futu-api-doc/quote/request-trading-days.html)
-            
-        
-    *   个性化
-        
-    *   [行情定义](https://openapi.futunn.com/futu-api-doc/quote/quote.html)
-        
-    
-*   交易接口
-    
-*   基础接口
-    
-*   Q&A
-    
-
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-plate-list.html#436)
+[#](./quote_get-plate-list.md#436)
  获取板块列表
 ==================================================================================
 
@@ -113,15 +19,15 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | market | [Market](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427) | 市场标识<br>(ℹ️ 注意：这里不区分沪和深，输入沪或者深都会返回沪深市场的子板块) |
-    | plate\_class | [Plate](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1362) | 板块分类 |
+    | market | [Market](./quote_quote.md#427) | 市场标识<br>(ℹ️ 注意：这里不区分沪和深，输入沪或者深都会返回沪深市场的子板块) |
+    | plate\_class | [Plate](./quote_quote.md#1362) | 板块分类 |
     
 
 *   **返回**
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | pd.DataFrame | 当 ret == RET\_OK，返回板块列表数据 |
     | str | 当 ret != RET\_OK，返回错误描述 |
     
@@ -182,7 +88,7 @@
 7  
 8  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-plate-list.html#5574)
+[#](./quote_get-plate-list.md#5574)
  Qot\_GetPlateSet.proto
 ---------------------------------------------------------------------------------------------------
 
@@ -216,9 +122,9 @@
 9  
 10  
 
-> *   市场类型参见 [QotMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427)
+> *   市场类型参见 [QotMarket](./quote_quote.md#427)
 >     
-> *   板块集合类型枚举参见 [PlateSetType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1362)
+> *   板块集合类型枚举参见 [PlateSetType](./quote_quote.md#1362)
 >     
 
 *   **返回**
@@ -252,9 +158,9 @@
 12  
 13  
 
-> *   板块信息结构参见 [PlateInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2571)
+> *   板块信息结构参见 [PlateInfo](./quote_quote.md#2571)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -295,9 +201,9 @@
 9  
 10  
 
-> *   市场类型参见 [QotMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427)
+> *   市场类型参见 [QotMarket](./quote_quote.md#427)
 >     
-> *   板块集合类型枚举参见 [PlateSetType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1362)
+> *   板块集合类型枚举参见 [PlateSetType](./quote_quote.md#1362)
 >     
 
 *   **返回**
@@ -331,9 +237,9 @@
 12  
 13  
 
-> *   板块信息结构参见 [PlateInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2571)
+> *   板块信息结构参见 [PlateInfo](./quote_quote.md#2571)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -487,9 +393,9 @@
 9  
 10  
 
-> *   市场类型参见 [QotMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427)
+> *   市场类型参见 [QotMarket](./quote_quote.md#427)
 >     
-> *   板块集合类型枚举参见 [PlateSetType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1362)
+> *   板块集合类型枚举参见 [PlateSetType](./quote_quote.md#1362)
 >     
 
 *   **返回**
@@ -523,9 +429,9 @@
 12  
 13  
 
-> *   板块信息结构参见 [PlateInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2571)
+> *   板块信息结构参见 [PlateInfo](./quote_quote.md#2571)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -739,9 +645,9 @@
 9  
 10  
 
-> *   市场类型参见 [QotMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427)
+> *   市场类型参见 [QotMarket](./quote_quote.md#427)
 >     
-> *   板块集合类型枚举参见 [PlateSetType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1362)
+> *   板块集合类型枚举参见 [PlateSetType](./quote_quote.md#1362)
 >     
 
 *   **返回**
@@ -775,9 +681,9 @@
 12  
 13  
 
-> *   板块信息结构参见 [PlateInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2571)
+> *   板块信息结构参见 [PlateInfo](./quote_quote.md#2571)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1018,9 +924,9 @@
 9  
 10  
 
-> *   市场类型参见 [QotMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427)
+> *   市场类型参见 [QotMarket](./quote_quote.md#427)
 >     
-> *   板块集合类型枚举参见 [PlateSetType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1362)
+> *   板块集合类型枚举参见 [PlateSetType](./quote_quote.md#1362)
 >     
 
 *   **返回**
@@ -1054,9 +960,9 @@
 12  
 13  
 
-> *   板块信息结构参见 [PlateInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2571)
+> *   板块信息结构参见 [PlateInfo](./quote_quote.md#2571)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1238,15 +1144,15 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | market | [Market](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427) | 市场标识<br>(ℹ️ 注意：这里不区分沪和深，输入沪或者深都会返回沪深市场的子板块) |
-    | plate\_class | [Plate](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1362) | 板块分类 |
+    | market | [Market](./quote_quote.md#427) | 市场标识<br>(ℹ️ 注意：这里不区分沪和深，输入沪或者深都会返回沪深市场的子板块) |
+    | plate\_class | [Plate](./quote_quote.md#1362) | 板块分类 |
     
 
 *   **返回**
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | pd.DataFrame | 当 ret == RET\_OK，返回板块列表数据 |
     | str | 当 ret != RET\_OK，返回错误描述 |
     
@@ -1307,7 +1213,7 @@
 7  
 8  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-plate-list.html#5574-2)
+[#](./quote_get-plate-list.md#5574-2)
  Qot\_GetPlateSet.proto
 -----------------------------------------------------------------------------------------------------
 
@@ -1341,9 +1247,9 @@
 9  
 10  
 
-> *   市场类型参见 [QotMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427)
+> *   市场类型参见 [QotMarket](./quote_quote.md#427)
 >     
-> *   板块集合类型枚举参见 [PlateSetType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1362)
+> *   板块集合类型枚举参见 [PlateSetType](./quote_quote.md#1362)
 >     
 
 *   **返回**
@@ -1377,9 +1283,9 @@
 12  
 13  
 
-> *   板块信息结构参见 [PlateInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2571)
+> *   板块信息结构参见 [PlateInfo](./quote_quote.md#2571)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -1420,9 +1326,9 @@
 9  
 10  
 
-> *   市场类型参见 [QotMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427)
+> *   市场类型参见 [QotMarket](./quote_quote.md#427)
 >     
-> *   板块集合类型枚举参见 [PlateSetType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1362)
+> *   板块集合类型枚举参见 [PlateSetType](./quote_quote.md#1362)
 >     
 
 *   **返回**
@@ -1456,9 +1362,9 @@
 12  
 13  
 
-> *   板块信息结构参见 [PlateInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2571)
+> *   板块信息结构参见 [PlateInfo](./quote_quote.md#2571)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1612,9 +1518,9 @@
 9  
 10  
 
-> *   市场类型参见 [QotMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427)
+> *   市场类型参见 [QotMarket](./quote_quote.md#427)
 >     
-> *   板块集合类型枚举参见 [PlateSetType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1362)
+> *   板块集合类型枚举参见 [PlateSetType](./quote_quote.md#1362)
 >     
 
 *   **返回**
@@ -1648,9 +1554,9 @@
 12  
 13  
 
-> *   板块信息结构参见 [PlateInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2571)
+> *   板块信息结构参见 [PlateInfo](./quote_quote.md#2571)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1864,9 +1770,9 @@
 9  
 10  
 
-> *   市场类型参见 [QotMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427)
+> *   市场类型参见 [QotMarket](./quote_quote.md#427)
 >     
-> *   板块集合类型枚举参见 [PlateSetType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1362)
+> *   板块集合类型枚举参见 [PlateSetType](./quote_quote.md#1362)
 >     
 
 *   **返回**
@@ -1900,9 +1806,9 @@
 12  
 13  
 
-> *   板块信息结构参见 [PlateInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2571)
+> *   板块信息结构参见 [PlateInfo](./quote_quote.md#2571)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2143,9 +2049,9 @@
 9  
 10  
 
-> *   市场类型参见 [QotMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427)
+> *   市场类型参见 [QotMarket](./quote_quote.md#427)
 >     
-> *   板块集合类型枚举参见 [PlateSetType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1362)
+> *   板块集合类型枚举参见 [PlateSetType](./quote_quote.md#1362)
 >     
 
 *   **返回**
@@ -2179,9 +2085,9 @@
 12  
 13  
 
-> *   板块信息结构参见 [PlateInfo](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2571)
+> *   板块信息结构参见 [PlateInfo](./quote_quote.md#2571)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2346,7 +2252,7 @@
 
 *   每 30 秒内最多请求 10 次获取板块列表接口
 
-← [获取板块内股票列表](https://openapi.futunn.com/futu-api-doc/quote/get-plate-stock.html) [获取静态数据](https://openapi.futunn.com/futu-api-doc/quote/get-static-info.html)
+← [获取板块内股票列表](./quote_get-plate-stock.md) [获取静态数据](./quote_get-static-info.md)
  →
 
-[获取板块列表](https://openapi.futunn.com/futu-api-doc/quote/get-plate-list.html)
+[获取板块列表](./quote_get-plate-list.md)

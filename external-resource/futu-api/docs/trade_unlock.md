@@ -1,86 +1,4 @@
- [![Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/img/logo.png) Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/)
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/trade/unlock.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/trade/unlock.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/trade/unlock.html)
-    
-
-下载
-
-*   [PDF](https://openapi.futunn.com/pdfs/Futu-API-Doc-zh-Python.pdf)
-    
-*   [Markdown](https://openapi.futunn.com/mds/Futu-API-Doc-zh-Python.md)
-    
-*   [Skills](https://openapi.futunn.com/skills/opend-skills.zip)
-    
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/trade/unlock.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/trade/unlock.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/trade/unlock.html)
-    
-
-*   介绍
-    
-*   快速上手
-    
-*   OpenD
-    
-*   行情接口
-    
-*   交易接口
-    
-    *   [交易接口总览](https://openapi.futunn.com/futu-api-doc/trade/overview.html)
-        
-    *   [交易对象](https://openapi.futunn.com/futu-api-doc/trade/base.html)
-        
-    *   账户
-        
-        *   [获取交易业务账户列表](https://openapi.futunn.com/futu-api-doc/trade/get-acc-list.html)
-            
-        *   [解锁交易](https://openapi.futunn.com/futu-api-doc/trade/unlock.html)
-            
-        
-    *   资产持仓
-        
-    *   订单
-        
-    *   成交
-        
-    *   [交易定义](https://openapi.futunn.com/futu-api-doc/trade/trade.html)
-        
-    
-*   基础接口
-    
-*   Q&A
-    
-
-[#](https://openapi.futunn.com/futu-api-doc/trade/unlock.html#5832)
+[#](./trade_unlock.md#5832)
  解锁交易
 =========================================================================
 
@@ -103,14 +21,14 @@
     | --- | --- | --- |
     | password | str | 交易密码<br>(ℹ️ 如果 password\_md5 不为空，就使用传入的 password\_md5 解锁；否则使用 password 转 MD5 得到 password\_md5 再解锁) |
     | password\_md5 | str | 交易密码的 32 位 MD5 加密（全小写）<br>(ℹ️ 解锁交易必须要填密码，锁定交易忽略) |
-    | is\_unlock | bool | 解锁或锁定<br>(ℹ️ True：解锁  <br>False：锁定) |
+    | is\_unlock | bool | 解锁或锁定<br>(ℹ️ True：解锁)  <br>False：锁定 |
     
 
 *   **返回**
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | msg | NoneType | 当 ret == RET\_OK 时，返回 None |
     | str | 当 ret != RET\_OK 时，返回错误描述 |
     
@@ -145,7 +63,7 @@
 
 1  
 
-[#](https://openapi.futunn.com/futu-api-doc/trade/unlock.html#661)
+[#](./trade_unlock.md#661)
  Trd\_UnlockTrade.proto
 ------------------------------------------------------------------------------------------
 
@@ -181,7 +99,7 @@
 10  
 11  
 
-> *   账户所属券商参见 [SecurityFirm](https://openapi.futunn.com/futu-api-doc/trade/trade.html#572)
+> *   账户所属券商参见 [SecurityFirm](./trade_trade.md#572)
 >     
 
 *   **返回**
@@ -217,7 +135,7 @@
 13  
 14  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -260,7 +178,7 @@
 10  
 11  
 
-> *   账户所属券商参见 [SecurityFirm](https://openapi.futunn.com/futu-api-doc/trade/trade.html#572)
+> *   账户所属券商参见 [SecurityFirm](./trade_trade.md#572)
 >     
 
 *   **返回**
@@ -296,7 +214,7 @@
 13  
 14  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -454,7 +372,7 @@
 10  
 11  
 
-> *   账户所属券商参见 [SecurityFirm](https://openapi.futunn.com/futu-api-doc/trade/trade.html#572)
+> *   账户所属券商参见 [SecurityFirm](./trade_trade.md#572)
 >     
 
 *   **返回**
@@ -490,7 +408,7 @@
 13  
 14  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -678,7 +596,7 @@
 10  
 11  
 
-> *   账户所属券商参见 [SecurityFirm](https://openapi.futunn.com/futu-api-doc/trade/trade.html#572)
+> *   账户所属券商参见 [SecurityFirm](./trade_trade.md#572)
 >     
 
 *   **返回**
@@ -714,7 +632,7 @@
 13  
 14  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -923,7 +841,7 @@
 10  
 11  
 
-> *   账户所属券商参见 [SecurityFirm](https://openapi.futunn.com/futu-api-doc/trade/trade.html#572)
+> *   账户所属券商参见 [SecurityFirm](./trade_trade.md#572)
 >     
 
 *   **返回**
@@ -959,7 +877,7 @@
 13  
 14  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1082,11 +1000,11 @@
 
 提示
 
-*   真实账户调用 [下单](https://openapi.futunn.com/futu-api-doc/trade/place-order.html)
-     或 [改单撤单](https://openapi.futunn.com/futu-api-doc/trade/modify-order.html)
+*   真实账户调用 [下单](./trade_place-order.md)
+     或 [改单撤单](./trade_modify-order.md)
      接口，需要先解锁交易；模拟账户无需解锁。
 *   解锁或锁定交易针是对 OpenD 的操作，只要有一个连接解锁，其他连接都可以调用交易接口。
-*   强烈建议，通过外网连接 OpenD 进行实盘交易的客户，使用加密通道，参见 [启用协议加密](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#319)
+*   强烈建议，通过外网连接 OpenD 进行实盘交易的客户，使用加密通道，参见 [启用协议加密](./ftapi_init.md#319)
     。
 *   Futu API 不支持富途令牌，如果开通了富途令牌，则会解锁失败，需要关闭令牌功能后再使用 Futu API 解锁。
 
@@ -1113,14 +1031,14 @@
     | --- | --- | --- |
     | password | str | 交易密码<br>(ℹ️ 如果 password\_md5 不为空，就使用传入的 password\_md5 解锁；否则使用 password 转 MD5 得到 password\_md5 再解锁) |
     | password\_md5 | str | 交易密码的 32 位 MD5 加密（全小写）<br>(ℹ️ 解锁交易必须要填密码，锁定交易忽略) |
-    | is\_unlock | bool | 解锁或锁定<br>(ℹ️ True：解锁  <br>False：锁定) |
+    | is\_unlock | bool | 解锁或锁定<br>(ℹ️ True：解锁)  <br>False：锁定 |
     
 
 *   **返回**
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | msg | NoneType | 当 ret == RET\_OK 时，返回 None |
     | str | 当 ret != RET\_OK 时，返回错误描述 |
     
@@ -1155,7 +1073,7 @@
 
 1  
 
-[#](https://openapi.futunn.com/futu-api-doc/trade/unlock.html#661-2)
+[#](./trade_unlock.md#661-2)
  Trd\_UnlockTrade.proto
 --------------------------------------------------------------------------------------------
 
@@ -1191,7 +1109,7 @@
 10  
 11  
 
-> *   账户所属券商参见 [SecurityFirm](https://openapi.futunn.com/futu-api-doc/trade/trade.html#572)
+> *   账户所属券商参见 [SecurityFirm](./trade_trade.md#572)
 >     
 
 *   **返回**
@@ -1227,7 +1145,7 @@
 13  
 14  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -1270,7 +1188,7 @@
 10  
 11  
 
-> *   账户所属券商参见 [SecurityFirm](https://openapi.futunn.com/futu-api-doc/trade/trade.html#572)
+> *   账户所属券商参见 [SecurityFirm](./trade_trade.md#572)
 >     
 
 *   **返回**
@@ -1306,7 +1224,7 @@
 13  
 14  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1464,7 +1382,7 @@
 10  
 11  
 
-> *   账户所属券商参见 [SecurityFirm](https://openapi.futunn.com/futu-api-doc/trade/trade.html#572)
+> *   账户所属券商参见 [SecurityFirm](./trade_trade.md#572)
 >     
 
 *   **返回**
@@ -1500,7 +1418,7 @@
 13  
 14  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1688,7 +1606,7 @@
 10  
 11  
 
-> *   账户所属券商参见 [SecurityFirm](https://openapi.futunn.com/futu-api-doc/trade/trade.html#572)
+> *   账户所属券商参见 [SecurityFirm](./trade_trade.md#572)
 >     
 
 *   **返回**
@@ -1724,7 +1642,7 @@
 13  
 14  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1933,7 +1851,7 @@
 10  
 11  
 
-> *   账户所属券商参见 [SecurityFirm](https://openapi.futunn.com/futu-api-doc/trade/trade.html#572)
+> *   账户所属券商参见 [SecurityFirm](./trade_trade.md#572)
 >     
 
 *   **返回**
@@ -1969,7 +1887,7 @@
 13  
 14  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2092,11 +2010,11 @@
 
 提示
 
-*   真实账户调用 [下单](https://openapi.futunn.com/futu-api-doc/trade/place-order.html)
-     或 [改单撤单](https://openapi.futunn.com/futu-api-doc/trade/modify-order.html)
+*   真实账户调用 [下单](./trade_place-order.md)
+     或 [改单撤单](./trade_modify-order.md)
      接口，需要先解锁交易；模拟账户无需解锁。
 *   解锁或锁定交易，是针对 OpenD 的操作，只要有一个连接解锁，其他连接都可以调用交易接口。
-*   强烈建议，通过外网连接 OpenD 进行实盘交易的客户，使用加密通道，参见 [启用协议加密](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#319)
+*   强烈建议，通过外网连接 OpenD 进行实盘交易的客户，使用加密通道，参见 [启用协议加密](./ftapi_init.md#319)
     。
 *   Moomoo API 不支持富途令牌，如果开通了富途令牌，则会解锁失败，需要关闭令牌功能后再使用 Moomoo API 解锁。
 
@@ -2104,7 +2022,7 @@
 
 *   单用户ID 每 30 秒内最多请求 10 次解锁交易接口
 
-← [获取交易业务账户列表](https://openapi.futunn.com/futu-api-doc/trade/get-acc-list.html) [查询账户资金](https://openapi.futunn.com/futu-api-doc/trade/get-funds.html)
+← [获取交易业务账户列表](./trade_get-acc-list.md) [查询账户资金](./trade_get-funds.md)
  →
 
-[解锁交易](https://openapi.futunn.com/futu-api-doc/trade/unlock.html)
+[解锁交易](./trade_unlock.md)

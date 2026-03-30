@@ -1,8 +1,4 @@
-# 获取复权因子 | Futu API 文档 v10.2
-
-> 来源: https://openapi.futunn.com/futu-api-doc/quote/get-rehab.html
-
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-rehab.html#770)
+[#](./quote_get-rehab.md#770)
  获取复权因子
 =============================================================================
 
@@ -30,7 +26,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | pd.DataFrame | 当 ret == RET\_OK，返回复权数据 |
     | str | 当 ret != RET\_OK，返回错误描述 |
     
@@ -43,7 +39,7 @@
         | split\_ert | float | 拆股分母 |
         | join\_base | float | 合股分子<br>(ℹ️ 合股比例=合股分子/合股分母) |
         | join\_ert | float | 合股分母 |
-        | split\_ratio | float | 拆合股比例<br>(ℹ️ \- 当公司出现合股，5股合1股时，合股分子=5，合股分母=1，拆合股比例=合股分子/合股分母=5/1  <br>\- 当公司出现拆股，1股拆5股时，拆股分子=1，拆股分母=5，拆合股比例=拆股分子/拆股分母=1/5) |
+        | split\_ratio | float | 拆合股比例<br>(ℹ️ \- 当公司出现合股，5股合1股时，合股分子=5，合股分母=1，拆合股比例=合股分子/合股分母=5/1)  <br>\- 当公司出现拆股，1股拆5股时，拆股分子=1，拆股分母=5，拆合股比例=拆股分子/拆股分母=1/5 |
         | per\_cash\_div | float | 每股派现 |
         | bonus\_base | float | 送股分子<br>(ℹ️ 送股比例=送股分子/送股分母) |
         | bonus\_ert | float | 送股分母 |
@@ -119,7 +115,7 @@
 7  
 8  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-rehab.html#6618)
+[#](./quote_get-rehab.md#6618)
  Qot\_RequestRehab.proto
 -----------------------------------------------------------------------------------------------
 
@@ -151,7 +147,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -185,9 +181,9 @@
 12  
 13  
 
-> *   复权结构参见 [Rehab](https://openapi.futunn.com/futu-api-doc/quote/quote.html#7370)
+> *   复权结构参见 [Rehab](./quote_quote.md#7370)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -226,7 +222,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -260,9 +256,9 @@
 12  
 13  
 
-> *   复权结构参见 [Rehab](https://openapi.futunn.com/futu-api-doc/quote/quote.html#7370)
+> *   复权结构参见 [Rehab](./quote_quote.md#7370)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -474,7 +470,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -508,9 +504,9 @@
 12  
 13  
 
-> *   复权结构参见 [Rehab](https://openapi.futunn.com/futu-api-doc/quote/quote.html#7370)
+> *   复权结构参见 [Rehab](./quote_quote.md#7370)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -740,7 +736,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -774,9 +770,9 @@
 12  
 13  
 
-> *   复权结构参见 [Rehab](https://openapi.futunn.com/futu-api-doc/quote/quote.html#7370)
+> *   复权结构参见 [Rehab](./quote_quote.md#7370)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1029,7 +1025,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -1063,9 +1059,9 @@
 12  
 13  
 
-> *   复权结构参见 [Rehab](https://openapi.futunn.com/futu-api-doc/quote/quote.html#7370)
+> *   复权结构参见 [Rehab](./quote_quote.md#7370)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1276,7 +1272,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | pd.DataFrame | 当 ret == RET\_OK，返回复权数据 |
     | str | 当 ret != RET\_OK，返回错误描述 |
     
@@ -1289,7 +1285,7 @@
         | split\_ert | float | 拆股分母 |
         | join\_base | float | 合股分子<br>(ℹ️ 合股比例=合股分子/合股分母) |
         | join\_ert | float | 合股分母 |
-        | split\_ratio | float | 拆合股比例<br>(ℹ️ \- 当公司出现合股，5股合1股时，合股分子=5，合股分母=1，拆合股比例=合股分子/合股分母=5/1  <br>\- 当公司出现拆股，1股拆5股时，拆股分子=1，拆股分母=5，拆合股比例=拆股分子/拆股分母=1/5) |
+        | split\_ratio | float | 拆合股比例<br>(ℹ️ \- 当公司出现合股，5股合1股时，合股分子=5，合股分母=1，拆合股比例=合股分子/合股分母=5/1)  <br>\- 当公司出现拆股，1股拆5股时，拆股分子=1，拆股分母=5，拆合股比例=拆股分子/拆股分母=1/5 |
         | per\_cash\_div | float | 每股派现 |
         | bonus\_base | float | 送股分子<br>(ℹ️ 送股比例=送股分子/送股分母) |
         | bonus\_ert | float | 送股分母 |
@@ -1365,7 +1361,7 @@
 7  
 8  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-rehab.html#6618-2)
+[#](./quote_get-rehab.md#6618-2)
  Qot\_RequestRehab.proto
 -------------------------------------------------------------------------------------------------
 
@@ -1397,7 +1393,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -1431,9 +1427,9 @@
 12  
 13  
 
-> *   复权结构参见 [Rehab](https://openapi.futunn.com/futu-api-doc/quote/quote.html#7370)
+> *   复权结构参见 [Rehab](./quote_quote.md#7370)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -1472,7 +1468,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -1506,9 +1502,9 @@
 12  
 13  
 
-> *   复权结构参见 [Rehab](https://openapi.futunn.com/futu-api-doc/quote/quote.html#7370)
+> *   复权结构参见 [Rehab](./quote_quote.md#7370)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1720,7 +1716,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -1754,9 +1750,9 @@
 12  
 13  
 
-> *   复权结构参见 [Rehab](https://openapi.futunn.com/futu-api-doc/quote/quote.html#7370)
+> *   复权结构参见 [Rehab](./quote_quote.md#7370)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1986,7 +1982,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -2020,9 +2016,9 @@
 12  
 13  
 
-> *   复权结构参见 [Rehab](https://openapi.futunn.com/futu-api-doc/quote/quote.html#7370)
+> *   复权结构参见 [Rehab](./quote_quote.md#7370)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2275,7 +2271,7 @@
 8  
 9  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
 
 *   **返回**
@@ -2309,9 +2305,9 @@
 12  
 13  
 
-> *   复权结构参见 [Rehab](https://openapi.futunn.com/futu-api-doc/quote/quote.html#7370)
+> *   复权结构参见 [Rehab](./quote_quote.md#7370)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2498,5 +2494,7 @@
 
 *   每 30 秒内最多请求 60 次获取复权因子接口。
 
-← [获取历史 K 线](https://openapi.futunn.com/futu-api-doc/quote/request-history-kline.html) [获取期权链到期日](https://openapi.futunn.com/futu-api-doc/quote/get-option-expiration-date.html)
+← [获取历史 K 线](./quote_request-history-kline.md) [获取期权链到期日](./quote_get-option-expiration-date.md)
  →
+
+[获取复权因子](./quote_get-rehab.md)

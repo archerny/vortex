@@ -1,81 +1,4 @@
- [![Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/img/logo.png) Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/)
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/trade/base.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/trade/base.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/trade/base.html)
-    
-
-下载
-
-*   [PDF](https://openapi.futunn.com/pdfs/Futu-API-Doc-zh-Python.pdf)
-    
-*   [Markdown](https://openapi.futunn.com/mds/Futu-API-Doc-zh-Python.md)
-    
-*   [Skills](https://openapi.futunn.com/skills/opend-skills.zip)
-    
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/trade/base.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/trade/base.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/trade/base.html)
-    
-
-*   介绍
-    
-*   快速上手
-    
-*   OpenD
-    
-*   行情接口
-    
-*   交易接口
-    
-    *   [交易接口总览](https://openapi.futunn.com/futu-api-doc/trade/overview.html)
-        
-    *   [交易对象](https://openapi.futunn.com/futu-api-doc/trade/base.html)
-        
-    *   账户
-        
-    *   资产持仓
-        
-    *   订单
-        
-    *   成交
-        
-    *   [交易定义](https://openapi.futunn.com/futu-api-doc/trade/trade.html)
-        
-    
-*   基础接口
-    
-*   Q&A
-    
-
-[#](https://openapi.futunn.com/futu-api-doc/trade/base.html#7823)
+[#](./trade_base.md#7823)
  交易对象
 =======================================================================
 
@@ -86,7 +9,7 @@
 *   C++
 *   JavaScript
 
-[#](https://openapi.futunn.com/futu-api-doc/trade/base.html#7902)
+[#](./trade_base.md#7902)
  创建连接
 -----------------------------------------------------------------------
 
@@ -107,11 +30,11 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | filter\_trdmarket | [TrdMarket](https://openapi.futunn.com/futu-api-doc/trade/trade.html#719) | 筛选对应交易市场权限的账户<br>(ℹ️ *   此参数仅对 OpenSecTradeContext 适用<br>*   此参数仅用于筛选账户，不影响交易连接) |
+    | filter\_trdmarket | [TrdMarket](./trade_trade.md#719) | 筛选对应交易市场权限的账户<br>(ℹ️ *   此参数仅对 OpenSecTradeContext 适用)<br>*   此参数仅用于筛选账户，不影响交易连接 |
     | host | str | OpenD 监听的 IP 地址 |
     | port | int | OpenD 监听的 IP 端口 |
-    | is\_encrypt | bool | 是否启用加密<br>(ℹ️ 默认 None 表示：使用 [enable\_proto\_encrypt](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#319)<br> 的设置) |
-    | security\_firm | [SecurityFirm](https://openapi.futunn.com/futu-api-doc/trade/trade.html#572) | 所属券商 |
+    | is\_encrypt | bool | 是否启用加密<br>(ℹ️ 默认 None 表示：使用 [enable\_proto\_encrypt](./ftapi_init.md#319))<br> 的设置 |
+    | security\_firm | [SecurityFirm](./trade_trade.md#572) | 所属券商 |
     
 *   **Example**
     
@@ -125,7 +48,7 @@
 2  
 3  
 
-[#](https://openapi.futunn.com/futu-api-doc/trade/base.html#1360)
+[#](./trade_base.md#1360)
  关闭连接
 -----------------------------------------------------------------------
 
@@ -133,7 +56,7 @@
 
 *   **介绍**
     
-    关闭交易对象。默认情况下，Futu API 内部创建的线程会阻止进程退出，只有当所有 Context 都 close 后，进程才能正常退出。但通过 [set\_all\_thread\_daemon](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#4570)
+    关闭交易对象。默认情况下，Futu API 内部创建的线程会阻止进程退出，只有当所有 Context 都 close 后，进程才能正常退出。但通过 [set\_all\_thread\_daemon](./ftapi_init.md#4570)
      可以设置所有内部线程为 daemon 线程，这时即使没有调用 Context 的 close，进程也可以正常退出。
     
 *   **Example**
@@ -148,7 +71,7 @@
 2  
 3  
 
-[#](https://openapi.futunn.com/futu-api-doc/trade/base.html#7902-2)
+[#](./trade_base.md#7902-2)
  创建连接
 -------------------------------------------------------------------------
 
@@ -237,7 +160,7 @@
 18  
 19  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -245,7 +168,7 @@
     1001
     
 
-[#](https://openapi.futunn.com/futu-api-doc/trade/base.html#7902-3)
+[#](./trade_base.md#7902-3)
  创建连接
 -------------------------------------------------------------------------
 
@@ -339,7 +262,7 @@
 
 1  
 
-[#](https://openapi.futunn.com/futu-api-doc/trade/base.html#8436)
+[#](./trade_base.md#8436)
  销毁连接
 -----------------------------------------------------------------------
 
@@ -361,7 +284,7 @@
 2  
 3  
 
-[#](https://openapi.futunn.com/futu-api-doc/trade/base.html#7902-4)
+[#](./trade_base.md#7902-4)
  创建连接
 -------------------------------------------------------------------------
 
@@ -462,7 +385,7 @@
 36  
 37  
 
-[#](https://openapi.futunn.com/futu-api-doc/trade/base.html#8436-2)
+[#](./trade_base.md#8436-2)
  销毁连接
 -------------------------------------------------------------------------
 
@@ -484,7 +407,7 @@
 2  
 3  
 
-[#](https://openapi.futunn.com/futu-api-doc/trade/base.html#7902-5)
+[#](./trade_base.md#7902-5)
  创建连接
 -------------------------------------------------------------------------
 
@@ -515,7 +438,7 @@
 2  
 3  
 
-[#](https://openapi.futunn.com/futu-api-doc/trade/base.html#8436-3)
+[#](./trade_base.md#8436-3)
  销毁连接
 -------------------------------------------------------------------------
 
@@ -540,7 +463,7 @@
 2  
 3  
 
-[#](https://openapi.futunn.com/futu-api-doc/trade/base.html#7902-6)
+[#](./trade_base.md#7902-6)
  创建连接
 -------------------------------------------------------------------------
 
@@ -556,7 +479,7 @@
     | --- | --- | --- |
     | ip  | str | OpenD 监听的 WebSocket 地址 |
     | port | int | OpenD 监听的 WebSocket 端口 |
-    | ssl | bool | 是否启用 SSL 加密，参见 [WebSocket 相关](https://openapi.futunn.com/futu-api-doc/qa/other.html#6319) |
+    | ssl | bool | 是否启用 SSL 加密，参见 [WebSocket 相关](./qa_other.md#6319) |
     | key | str | 连接的密钥（未传会出现连接超时），可以在 OpenD 的启动参数中配置。可视化 OpenD 在未配置 WebSocket 密钥的情况下会随机指定 |
     
 *   **Example**
@@ -579,7 +502,7 @@
 6  
 7  
 
-[#](https://openapi.futunn.com/futu-api-doc/trade/base.html#1360-2)
+[#](./trade_base.md#1360-2)
  关闭连接
 -------------------------------------------------------------------------
 
@@ -618,7 +541,7 @@
 *   C++
 *   JavaScript
 
-[#](https://openapi.futunn.com/futu-api-doc/trade/base.html#7902-7)
+[#](./trade_base.md#7902-7)
  创建连接
 -------------------------------------------------------------------------
 
@@ -639,11 +562,11 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | filter\_trdmarket | [TrdMarket](https://openapi.futunn.com/futu-api-doc/trade/trade.html#719) | 筛选对应交易市场权限的账户<br>(ℹ️ *   此参数仅对 OpenSecTradeContext 适用<br>*   此参数仅用于筛选账户，不影响交易连接) |
+    | filter\_trdmarket | [TrdMarket](./trade_trade.md#719) | 筛选对应交易市场权限的账户<br>(ℹ️ *   此参数仅对 OpenSecTradeContext 适用)<br>*   此参数仅用于筛选账户，不影响交易连接 |
     | host | str | OpenD 监听的 IP 地址 |
     | port | int | OpenD 监听的 IP 端口 |
-    | is\_encrypt | bool | 是否启用加密<br>(ℹ️ 默认 None 表示：使用 [enable\_proto\_encrypt](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#319)<br> 的设置) |
-    | security\_firm | [SecurityFirm](https://openapi.futunn.com/futu-api-doc/trade/trade.html#572) | 所属券商 |
+    | is\_encrypt | bool | 是否启用加密<br>(ℹ️ 默认 None 表示：使用 [enable\_proto\_encrypt](./ftapi_init.md#319))<br> 的设置 |
+    | security\_firm | [SecurityFirm](./trade_trade.md#572) | 所属券商 |
     
 *   **Example**
     
@@ -657,7 +580,7 @@
 2  
 3  
 
-[#](https://openapi.futunn.com/futu-api-doc/trade/base.html#1360-3)
+[#](./trade_base.md#1360-3)
  关闭连接
 -------------------------------------------------------------------------
 
@@ -665,7 +588,7 @@
 
 *   **介绍**
     
-    关闭交易对象。默认情况下，moomoo API 内部创建的线程会阻止进程退出，只有当所有 Context 都 close 后，进程才能正常退出。但通过 [set\_all\_thread\_daemon](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#4570)
+    关闭交易对象。默认情况下，moomoo API 内部创建的线程会阻止进程退出，只有当所有 Context 都 close 后，进程才能正常退出。但通过 [set\_all\_thread\_daemon](./ftapi_init.md#4570)
      可以设置所有内部线程为 daemon 线程，这时即使没有调用 Context 的 close，进程也可以正常退出。
     
 *   **Example**
@@ -680,7 +603,7 @@
 2  
 3  
 
-[#](https://openapi.futunn.com/futu-api-doc/trade/base.html#7902-8)
+[#](./trade_base.md#7902-8)
  创建连接
 -------------------------------------------------------------------------
 
@@ -769,7 +692,7 @@
 18  
 19  
 
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -777,7 +700,7 @@
     1001
     
 
-[#](https://openapi.futunn.com/futu-api-doc/trade/base.html#7902-9)
+[#](./trade_base.md#7902-9)
  创建连接
 -------------------------------------------------------------------------
 
@@ -871,7 +794,7 @@
 
 1  
 
-[#](https://openapi.futunn.com/futu-api-doc/trade/base.html#8436-4)
+[#](./trade_base.md#8436-4)
  销毁连接
 -------------------------------------------------------------------------
 
@@ -893,7 +816,7 @@
 2  
 3  
 
-[#](https://openapi.futunn.com/futu-api-doc/trade/base.html#7902-10)
+[#](./trade_base.md#7902-10)
  创建连接
 --------------------------------------------------------------------------
 
@@ -994,7 +917,7 @@
 36  
 37  
 
-[#](https://openapi.futunn.com/futu-api-doc/trade/base.html#8436-5)
+[#](./trade_base.md#8436-5)
  销毁连接
 -------------------------------------------------------------------------
 
@@ -1016,7 +939,7 @@
 2  
 3  
 
-[#](https://openapi.futunn.com/futu-api-doc/trade/base.html#7902-11)
+[#](./trade_base.md#7902-11)
  创建连接
 --------------------------------------------------------------------------
 
@@ -1047,7 +970,7 @@
 2  
 3  
 
-[#](https://openapi.futunn.com/futu-api-doc/trade/base.html#8436-6)
+[#](./trade_base.md#8436-6)
  销毁连接
 -------------------------------------------------------------------------
 
@@ -1072,7 +995,7 @@
 2  
 3  
 
-[#](https://openapi.futunn.com/futu-api-doc/trade/base.html#7902-12)
+[#](./trade_base.md#7902-12)
  创建连接
 --------------------------------------------------------------------------
 
@@ -1088,7 +1011,7 @@
     | --- | --- | --- |
     | ip  | str | OpenD 监听的 WebSocket 地址 |
     | port | int | OpenD 监听的 WebSocket 端口 |
-    | ssl | bool | 是否启用 SSL 加密，参见 [WebSocket 相关](https://openapi.futunn.com/futu-api-doc/qa/other.html#6319) |
+    | ssl | bool | 是否启用 SSL 加密，参见 [WebSocket 相关](./qa_other.md#6319) |
     | key | str | 连接的密钥（未传会出现连接超时），可以在 OpenD 的启动参数中配置。可视化 OpenD 在未配置 WebSocket 密钥的情况下会随机指定 |
     
 *   **Example**
@@ -1111,7 +1034,7 @@
 6  
 7  
 
-[#](https://openapi.futunn.com/futu-api-doc/trade/base.html#1360-4)
+[#](./trade_base.md#1360-4)
  关闭连接
 -------------------------------------------------------------------------
 
@@ -1143,7 +1066,7 @@
 7  
 8  
 
-← [交易接口总览](https://openapi.futunn.com/futu-api-doc/trade/overview.html) [获取交易业务账户列表](https://openapi.futunn.com/futu-api-doc/trade/get-acc-list.html)
+← [交易接口总览](./trade_overview.md) [获取交易业务账户列表](./trade_get-acc-list.md)
  →
 
-[交易对象](https://openapi.futunn.com/futu-api-doc/trade/base.html)
+[交易对象](./trade_base.md)

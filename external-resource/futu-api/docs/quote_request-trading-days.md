@@ -1,98 +1,4 @@
- [![Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/img/logo.png) Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/)
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/quote/request-trading-days.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/quote/request-trading-days.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/quote/request-trading-days.html)
-    
-
-下载
-
-*   [PDF](https://openapi.futunn.com/pdfs/Futu-API-Doc-zh-Python.pdf)
-    
-*   [Markdown](https://openapi.futunn.com/mds/Futu-API-Doc-zh-Python.md)
-    
-*   [Skills](https://openapi.futunn.com/skills/opend-skills.zip)
-    
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/quote/request-trading-days.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/quote/request-trading-days.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/quote/request-trading-days.html)
-    
-
-*   介绍
-    
-*   快速上手
-    
-*   OpenD
-    
-*   行情接口
-    
-    *   [行情接口总览](https://openapi.futunn.com/futu-api-doc/quote/overview.html)
-        
-    *   [行情对象](https://openapi.futunn.com/futu-api-doc/quote/base.html)
-        
-    *   实时行情
-        
-    *   基本数据
-        
-    *   相关衍生品
-        
-    *   全市场筛选
-        
-        *   [条件选股](https://openapi.futunn.com/futu-api-doc/quote/get-stock-filter.html)
-            
-        *   [获取板块内股票列表](https://openapi.futunn.com/futu-api-doc/quote/get-plate-stock.html)
-            
-        *   [获取板块列表](https://openapi.futunn.com/futu-api-doc/quote/get-plate-list.html)
-            
-        *   [获取静态数据](https://openapi.futunn.com/futu-api-doc/quote/get-static-info.html)
-            
-        *   [获取 IPO 信息](https://openapi.futunn.com/futu-api-doc/quote/get-ipo-list.html)
-            
-        *   [获取全局市场状态](https://openapi.futunn.com/futu-api-doc/quote/get-global-state.html)
-            
-        *   [获取交易日历](https://openapi.futunn.com/futu-api-doc/quote/request-trading-days.html)
-            
-        
-    *   个性化
-        
-    *   [行情定义](https://openapi.futunn.com/futu-api-doc/quote/quote.html)
-        
-    
-*   交易接口
-    
-*   基础接口
-    
-*   Q&A
-    
-
-[#](https://openapi.futunn.com/futu-api-doc/quote/request-trading-days.html#2298)
+[#](./quote_request-trading-days.md#2298)
  获取交易日历
 =========================================================================================
 
@@ -114,9 +20,9 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | market | [TradeDateMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#940) | 市场类型 |
-    | start | str | 起始日期<br>(ℹ️ 格式：yyyy-MM-dd  <br>例如：“2018-01-01”) |
-    | end | str | 结束日期<br>(ℹ️ 格式：yyyy-MM-dd  <br>例如：“2018-01-01”) |
+    | market | [TradeDateMarket](./quote_quote.md#940) | 市场类型 |
+    | start | str | 起始日期<br>(ℹ️ 格式：yyyy-MM-dd)  <br>例如：“2018-01-01” |
+    | end | str | 结束日期<br>(ℹ️ 格式：yyyy-MM-dd)  <br>例如：“2018-01-01” |
     | code | str | 股票代码 |
     
     注：当 market 和 code 同时存在时，会忽略 market，仅对 code 进行查询。
@@ -135,7 +41,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | list | 当 ret == RET\_OK 时，返回交易日数据。list 中元素类型为 dict |
     | str | 当 ret != RET\_OK 时，返回错误描述 |
     
@@ -144,7 +50,7 @@
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
         | time | str | 时间<br>(ℹ️ 格式：yyyy-MM-dd) |
-        | trade\_date\_type | [TradeDateType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6676) | 交易日类型 |
+        | trade\_date\_type | [TradeDateType](./quote_quote.md#6676) | 交易日类型 |
         
 *   **Example**
     
@@ -193,7 +99,7 @@
 2  
 3  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/request-trading-days.html#6520)
+[#](./quote_request-trading-days.md#6520)
  Qot\_RequestTradeDate.proto
 --------------------------------------------------------------------------------------------------------------
 
@@ -234,9 +140,9 @@
 12  
 13  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   交易日市场类型枚举参见 [TradeDateMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#940)
+> *   交易日市场类型枚举参见 [TradeDateMarket](./quote_quote.md#940)
 >     
 
 *   **返回**
@@ -284,9 +190,9 @@
 19  
 20  
 
-> *   交易日类型枚举参见 [TradeDateType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6676)
+> *   交易日类型枚举参见 [TradeDateType](./quote_quote.md#6676)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -334,9 +240,9 @@
 12  
 13  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   交易日市场类型枚举参见 [TradeDateMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#940)
+> *   交易日市场类型枚举参见 [TradeDateMarket](./quote_quote.md#940)
 >     
 
 *   **返回**
@@ -384,9 +290,9 @@
 19  
 20  
 
-> *   交易日类型枚举参见 [TradeDateType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6676)
+> *   交易日类型枚举参见 [TradeDateType](./quote_quote.md#6676)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -589,9 +495,9 @@
 12  
 13  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   交易日市场类型枚举参见 [TradeDateMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#940)
+> *   交易日市场类型枚举参见 [TradeDateMarket](./quote_quote.md#940)
 >     
 
 *   **返回**
@@ -639,9 +545,9 @@
 19  
 20  
 
-> *   交易日类型枚举参见 [TradeDateType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6676)
+> *   交易日类型枚举参见 [TradeDateType](./quote_quote.md#6676)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -866,9 +772,9 @@
 12  
 13  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   交易日市场类型枚举参见 [TradeDateMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#940)
+> *   交易日市场类型枚举参见 [TradeDateMarket](./quote_quote.md#940)
 >     
 
 *   **返回**
@@ -916,9 +822,9 @@
 19  
 20  
 
-> *   交易日类型枚举参见 [TradeDateType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6676)
+> *   交易日类型枚举参见 [TradeDateType](./quote_quote.md#6676)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1164,9 +1070,9 @@
 12  
 13  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   交易日市场类型枚举参见 [TradeDateMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#940)
+> *   交易日市场类型枚举参见 [TradeDateMarket](./quote_quote.md#940)
 >     
 
 *   **返回**
@@ -1214,9 +1120,9 @@
 19  
 20  
 
-> *   交易日类型枚举参见 [TradeDateType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6676)
+> *   交易日类型枚举参见 [TradeDateType](./quote_quote.md#6676)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1379,7 +1285,8 @@
 
 *   每 30 秒内最多请求 30 次获取交易日接口。
 *   历史交易日历提供过去 10 年的数据，未来交易日历提供到今年 12 月 31 日
-    (ℹ️ 举例：今天的日期是 2021 年 7 月 6 日，我们仅提供 2011-07-06 到 2021-12-31 期间的交易日历)
+    
+    举例：今天的日期是 2021 年 7 月 6 日，我们仅提供 2011-07-06 到 2021-12-31 期间的交易日历
     
     。
 
@@ -1401,9 +1308,9 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | market | [TradeDateMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#940) | 市场类型 |
-    | start | str | 起始日期<br>(ℹ️ 格式：yyyy-MM-dd  <br>例如：“2018-01-01”) |
-    | end | str | 结束日期<br>(ℹ️ 格式：yyyy-MM-dd  <br>例如：“2018-01-01”) |
+    | market | [TradeDateMarket](./quote_quote.md#940) | 市场类型 |
+    | start | str | 起始日期<br>(ℹ️ 格式：yyyy-MM-dd)  <br>例如：“2018-01-01” |
+    | end | str | 结束日期<br>(ℹ️ 格式：yyyy-MM-dd)  <br>例如：“2018-01-01” |
     | code | str | 股票代码 |
     
     注：当 market 和 code 同时存在时，会忽略 market，仅对 code 进行查询。
@@ -1422,7 +1329,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | list | 当 ret == RET\_OK 时，返回交易日数据。list 中元素类型为 dict |
     | str | 当 ret != RET\_OK 时，返回错误描述 |
     
@@ -1431,7 +1338,7 @@
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
         | time | str | 时间<br>(ℹ️ 格式：yyyy-MM-dd) |
-        | trade\_date\_type | [TradeDateType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6676) | 交易日类型 |
+        | trade\_date\_type | [TradeDateType](./quote_quote.md#6676) | 交易日类型 |
         
 *   **Example**
     
@@ -1480,7 +1387,7 @@
 2  
 3  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/request-trading-days.html#6520-2)
+[#](./quote_request-trading-days.md#6520-2)
  Qot\_RequestTradeDate.proto
 ----------------------------------------------------------------------------------------------------------------
 
@@ -1521,9 +1428,9 @@
 12  
 13  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   交易日市场类型枚举参见 [TradeDateMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#940)
+> *   交易日市场类型枚举参见 [TradeDateMarket](./quote_quote.md#940)
 >     
 
 *   **返回**
@@ -1571,9 +1478,9 @@
 19  
 20  
 
-> *   交易日类型枚举参见 [TradeDateType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6676)
+> *   交易日类型枚举参见 [TradeDateType](./quote_quote.md#6676)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -1621,9 +1528,9 @@
 12  
 13  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   交易日市场类型枚举参见 [TradeDateMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#940)
+> *   交易日市场类型枚举参见 [TradeDateMarket](./quote_quote.md#940)
 >     
 
 *   **返回**
@@ -1671,9 +1578,9 @@
 19  
 20  
 
-> *   交易日类型枚举参见 [TradeDateType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6676)
+> *   交易日类型枚举参见 [TradeDateType](./quote_quote.md#6676)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1876,9 +1783,9 @@
 12  
 13  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   交易日市场类型枚举参见 [TradeDateMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#940)
+> *   交易日市场类型枚举参见 [TradeDateMarket](./quote_quote.md#940)
 >     
 
 *   **返回**
@@ -1926,9 +1833,9 @@
 19  
 20  
 
-> *   交易日类型枚举参见 [TradeDateType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6676)
+> *   交易日类型枚举参见 [TradeDateType](./quote_quote.md#6676)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2153,9 +2060,9 @@
 12  
 13  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   交易日市场类型枚举参见 [TradeDateMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#940)
+> *   交易日市场类型枚举参见 [TradeDateMarket](./quote_quote.md#940)
 >     
 
 *   **返回**
@@ -2203,9 +2110,9 @@
 19  
 20  
 
-> *   交易日类型枚举参见 [TradeDateType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6676)
+> *   交易日类型枚举参见 [TradeDateType](./quote_quote.md#6676)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2451,9 +2358,9 @@
 12  
 13  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   交易日市场类型枚举参见 [TradeDateMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#940)
+> *   交易日市场类型枚举参见 [TradeDateMarket](./quote_quote.md#940)
 >     
 
 *   **返回**
@@ -2501,9 +2408,9 @@
 19  
 20  
 
-> *   交易日类型枚举参见 [TradeDateType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6676)
+> *   交易日类型枚举参见 [TradeDateType](./quote_quote.md#6676)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2666,11 +2573,12 @@
 
 *   每 30 秒内最多请求 30 次获取交易日接口。
 *   历史交易日历提供过去 10 年的数据，未来交易日历提供到今年 12 月 31 日
-    (ℹ️ 举例：今天的日期是 2021 年 7 月 6 日，我们仅提供 2011-07-06 到 2021-12-31 期间的交易日历)
+    
+    举例：今天的日期是 2021 年 7 月 6 日，我们仅提供 2011-07-06 到 2021-12-31 期间的交易日历
     
     。
 
-← [获取全局市场状态](https://openapi.futunn.com/futu-api-doc/quote/get-global-state.html) [获取历史 K 线额度使用明细](https://openapi.futunn.com/futu-api-doc/quote/get-history-kl-quota.html)
+← [获取全局市场状态](./quote_get-global-state.md) [获取历史 K 线额度使用明细](./quote_get-history-kl-quota.md)
  →
 
-[获取交易日历](https://openapi.futunn.com/futu-api-doc/quote/request-trading-days.html)
+[获取交易日历](./quote_request-trading-days.md)

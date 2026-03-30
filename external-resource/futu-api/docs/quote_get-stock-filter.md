@@ -1,98 +1,4 @@
- [![Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/img/logo.png) Futu API 文档 v10.2](https://openapi.futunn.com/futu-api-doc/)
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/quote/get-stock-filter.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/quote/get-stock-filter.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/quote/get-stock-filter.html)
-    
-
-下载
-
-*   [PDF](https://openapi.futunn.com/pdfs/Futu-API-Doc-zh-Python.pdf)
-    
-*   [Markdown](https://openapi.futunn.com/mds/Futu-API-Doc-zh-Python.md)
-    
-*   [Skills](https://openapi.futunn.com/skills/opend-skills.zip)
-    
-
-编程语言
-
-*   Python
-*   C#
-*   Java
-*   C++
-*   JavaScript
-*   proto
-
-简体中文
-
-*   [简体中文](https://openapi.futunn.com/futu-api-doc/quote/get-stock-filter.html)
-    
-*   [English](https://openapi.futunn.com/futu-api-doc/en/quote/get-stock-filter.html)
-    
-*   [繁體中文](https://openapi.futunn.com/futu-api-doc/hk/quote/get-stock-filter.html)
-    
-
-*   介绍
-    
-*   快速上手
-    
-*   OpenD
-    
-*   行情接口
-    
-    *   [行情接口总览](https://openapi.futunn.com/futu-api-doc/quote/overview.html)
-        
-    *   [行情对象](https://openapi.futunn.com/futu-api-doc/quote/base.html)
-        
-    *   实时行情
-        
-    *   基本数据
-        
-    *   相关衍生品
-        
-    *   全市场筛选
-        
-        *   [条件选股](https://openapi.futunn.com/futu-api-doc/quote/get-stock-filter.html)
-            
-        *   [获取板块内股票列表](https://openapi.futunn.com/futu-api-doc/quote/get-plate-stock.html)
-            
-        *   [获取板块列表](https://openapi.futunn.com/futu-api-doc/quote/get-plate-list.html)
-            
-        *   [获取静态数据](https://openapi.futunn.com/futu-api-doc/quote/get-static-info.html)
-            
-        *   [获取 IPO 信息](https://openapi.futunn.com/futu-api-doc/quote/get-ipo-list.html)
-            
-        *   [获取全局市场状态](https://openapi.futunn.com/futu-api-doc/quote/get-global-state.html)
-            
-        *   [获取交易日历](https://openapi.futunn.com/futu-api-doc/quote/request-trading-days.html)
-            
-        
-    *   个性化
-        
-    *   [行情定义](https://openapi.futunn.com/futu-api-doc/quote/quote.html)
-        
-    
-*   交易接口
-    
-*   基础接口
-    
-*   Q&A
-    
-
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-stock-filter.html#9310)
+[#](./quote_get-stock-filter.md#9310)
  条件选股
 ===================================================================================
 
@@ -113,7 +19,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | market | [Market](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427) | 市场标识<br>(ℹ️ 不区分沪股和深股，传入沪股或者深股都会返回沪深市场的股票) |
+    | market | [Market](./quote_quote.md#427) | 市场标识<br>(ℹ️ 不区分沪股和深股，传入沪股或者深股都会返回沪深市场的股票) |
     | filter\_list | list | 筛选条件的列表<br>(ℹ️ 参考下面的表格，列表中元素类型为 SimpleFilter 或 AccumulateFilter 或 FinancialFilter) |
     | plate\_code | str | 板块代码 |
     | begin | int | 数据起始点 |
@@ -123,63 +29,63 @@
         
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
-        | stock\_field | [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#860) | 简单属性 |
-        | filter\_min | float | 区间下限<br>(ℹ️ 闭区间  <br>不传默认为 -∞) |
-        | filter\_max | float | 区间上限<br>(ℹ️ 闭区间  <br>不传默认为 +∞) |
-        | is\_no\_filter | bool | 该字段是否不需要筛选<br>(ℹ️ True：不筛选  <br>False：筛选  <br>不传默认不筛选) |
-        | sort | [SortDir](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5471) | 排序方向<br>(ℹ️ 不传默认为不排序) |
+        | stock\_field | [StockField](./quote_quote.md#860) | 简单属性 |
+        | filter\_min | float | 区间下限<br>(ℹ️ 闭区间)  <br>不传默认为 -∞ |
+        | filter\_max | float | 区间上限<br>(ℹ️ 闭区间)  <br>不传默认为 +∞ |
+        | is\_no\_filter | bool | 该字段是否不需要筛选<br>(ℹ️ True：不筛选)  <br>False：筛选  <br>不传默认不筛选 |
+        | sort | [SortDir](./quote_quote.md#5471) | 排序方向<br>(ℹ️ 不传默认为不排序) |
         
     *   AccumulateFilter 对象相关参数如下：
         
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
-        | stock\_field | [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4370) | 累积属性 |
-        | filter\_min | float | 区间下限<br>(ℹ️ 闭区间  <br>不传默认为 -∞) |
-        | filter\_max | float | 区间上限<br>(ℹ️ 闭区间  <br>不传默认为 +∞) |
-        | is\_no\_filter | bool | 该字段是否不需要筛选<br>(ℹ️ True：不筛选  <br>False：筛选  <br>不传默认不筛选) |
-        | sort | [SortDir](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5471) | 排序方向<br>(ℹ️ 不传默认为不排序) |
+        | stock\_field | [StockField](./quote_quote.md#4370) | 累积属性 |
+        | filter\_min | float | 区间下限<br>(ℹ️ 闭区间)  <br>不传默认为 -∞ |
+        | filter\_max | float | 区间上限<br>(ℹ️ 闭区间)  <br>不传默认为 +∞ |
+        | is\_no\_filter | bool | 该字段是否不需要筛选<br>(ℹ️ True：不筛选)  <br>False：筛选  <br>不传默认不筛选 |
+        | sort | [SortDir](./quote_quote.md#5471) | 排序方向<br>(ℹ️ 不传默认为不排序) |
         | days | int | 所筛选的数据的累计天数 |
         
     *   FinancialFilter 对象相关参数如下：
         
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
-        | stock\_field | [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8542) | 财务属性 |
-        | filter\_min | float | 区间下限<br>(ℹ️ 闭区间  <br>不传默认为 -∞) |
-        | filter\_max | float | 区间上限<br>(ℹ️ 闭区间  <br>不传默认为 +∞) |
-        | is\_no\_filter | bool | 该字段是否不需要筛选<br>(ℹ️ True：不筛选  <br>False：筛选  <br>不传默认不筛选) |
-        | sort | [SortDir](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5471) | 排序方向<br>(ℹ️ 不传默认为不排序) |
-        | quarter | [FinancialQuarter](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2253) | 财报累积时间 |
+        | stock\_field | [StockField](./quote_quote.md#8542) | 财务属性 |
+        | filter\_min | float | 区间下限<br>(ℹ️ 闭区间)  <br>不传默认为 -∞ |
+        | filter\_max | float | 区间上限<br>(ℹ️ 闭区间)  <br>不传默认为 +∞ |
+        | is\_no\_filter | bool | 该字段是否不需要筛选<br>(ℹ️ True：不筛选)  <br>False：筛选  <br>不传默认不筛选 |
+        | sort | [SortDir](./quote_quote.md#5471) | 排序方向<br>(ℹ️ 不传默认为不排序) |
+        | quarter | [FinancialQuarter](./quote_quote.md#2253) | 财报累积时间 |
         
     *   CustomIndicatorFilter 对象相关参数如下：
         
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
-        | stock\_field1 | [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2057) | 自定义技术指标属性 |
-        | stock\_field1\_para | list | 自定义技术指标属性参数<br>(ℹ️ 根据指标类型进行传参：  <br>1\. MA：\[平均移动周期\]  <br>2.EMA：\[指数移动平均周期\]  <br>3.RSI：\[RSI 指标周期\]  <br>4.MACD：\[快速平均线值, 慢速平均线值, DIF值\]  <br>5.BOLL：\[均线周期, 偏移值\]  <br>6.KDJ：\[RSV 周期, K 值计算周期, D 值计算周期\]) |
-        | relative\_position | [RelativePosition](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2453) | 相对位置 |
-        | stock\_field2 | [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2057) | 自定义技术指标属性 |
-        | stock\_field2\_para | list | 自定义技术指标属性参数<br>(ℹ️ 根据指标类型进行传参：  <br>1\. MA：\[平均移动周期\]  <br>2.EMA：\[指数移动平均周期\]  <br>3.RSI：\[RSI 指标周期\]  <br>4.MACD：\[快速平均线值, 慢速平均线值, DIF值\]  <br>5.BOLL：\[均线周期, 偏移值\]  <br>6.KDJ：\[RSV 周期, K 值计算周期, D 值计算周期\]) |
-        | value | float | 自定义数值<br>(ℹ️ 当 stock\_field2 在 [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2057)<br> 中选择自定义数值时，value 为必传参数) |
-        | ktype | [KLType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4119) | K线类型 KLType<br>(ℹ️ 仅支持K\_60M，K\_DAY，K\_WEEK，K\_MON 四种时间周期) |
+        | stock\_field1 | [StockField](./quote_quote.md#2057) | 自定义技术指标属性 |
+        | stock\_field1\_para | list | 自定义技术指标属性参数<br>(ℹ️ 根据指标类型进行传参：)  <br>1\. MA：\[平均移动周期\]  <br>2.EMA：\[指数移动平均周期\]  <br>3.RSI：\[RSI 指标周期\]  <br>4.MACD：\[快速平均线值, 慢速平均线值, DIF值\]  <br>5.BOLL：\[均线周期, 偏移值\]  <br>6.KDJ：\[RSV 周期, K 值计算周期, D 值计算周期\] |
+        | relative\_position | [RelativePosition](./quote_quote.md#2453) | 相对位置 |
+        | stock\_field2 | [StockField](./quote_quote.md#2057) | 自定义技术指标属性 |
+        | stock\_field2\_para | list | 自定义技术指标属性参数<br>(ℹ️ 根据指标类型进行传参：)  <br>1\. MA：\[平均移动周期\]  <br>2.EMA：\[指数移动平均周期\]  <br>3.RSI：\[RSI 指标周期\]  <br>4.MACD：\[快速平均线值, 慢速平均线值, DIF值\]  <br>5.BOLL：\[均线周期, 偏移值\]  <br>6.KDJ：\[RSV 周期, K 值计算周期, D 值计算周期\] |
+        | value | float | 自定义数值<br>(ℹ️ 当 stock\_field2 在 [StockField](./quote_quote.md#2057))<br> 中选择自定义数值时，value 为必传参数 |
+        | ktype | [KLType](./quote_quote.md#4119) | K线类型 KLType<br>(ℹ️ 仅支持K\_60M，K\_DAY，K\_WEEK，K\_MON 四种时间周期) |
         | consecutive\_period | int | 筛选连续周期（consecutive\_period）都符合条件的数据<br>(ℹ️ 填写范围为\[1,12\]) |
-        | is\_no\_filter | bool | 该字段是否不需要筛选<br>(ℹ️ True：不筛选  <br>False：筛选  <br>不传默认不筛选) |
+        | is\_no\_filter | bool | 该字段是否不需要筛选<br>(ℹ️ True：不筛选)  <br>False：筛选  <br>不传默认不筛选 |
         
     *   PatternFilter 对象相关参数如下：
         
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
-        | stock\_field | [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#159) | 形态技术指标属性 |
-        | ktype | [KLType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4119) | K线类型 KLType （仅支持K\_60M，K\_DAY，K\_WEEK，K\_MON 四种时间周期） |
+        | stock\_field | [StockField](./quote_quote.md#159) | 形态技术指标属性 |
+        | ktype | [KLType](./quote_quote.md#4119) | K线类型 KLType （仅支持K\_60M，K\_DAY，K\_WEEK，K\_MON 四种时间周期） |
         | consecutive\_period | int | 筛选连续周期（consecutive\_period）都符合条件的数据<br>(ℹ️ 填写范围为\[1,12\]) |
-        | is\_no\_filter | bool | 该字段是否不需要筛选<br>(ℹ️ True：不筛选  <br>False：筛选  <br>不传默认不筛选) |
+        | is\_no\_filter | bool | 该字段是否不需要筛选<br>(ℹ️ True：不筛选)  <br>False：筛选  <br>不传默认不筛选 |
         
 
 *   **返回**
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | tuple | 当 ret == RET\_OK，返回选股数据 |
     | str | 当 ret != RET\_OK，返回错误描述 |
     
@@ -426,7 +332,7 @@
 11  
 12  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-stock-filter.html#2109)
+[#](./quote_get-stock-filter.md#2109)
  Qot\_StockFilter.proto
 -----------------------------------------------------------------------------------------------------
 
@@ -590,27 +496,27 @@
 74  
 75  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   市场类型参见 [QotMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427)
+> *   市场类型参见 [QotMarket](./quote_quote.md#427)
 >     
-> *   简单属性筛选条件参见 [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#860)
+> *   简单属性筛选条件参见 [StockField](./quote_quote.md#860)
 >     
-> *   累积属性筛选条件参见 [AccumulateField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4370)
+> *   累积属性筛选条件参见 [AccumulateField](./quote_quote.md#4370)
 >     
-> *   财务属性筛选条件参见 [FinancialField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8542)
+> *   财务属性筛选条件参见 [FinancialField](./quote_quote.md#8542)
 >     
-> *   自定义技术指标属性筛选条件参见 [CustomIndicatorField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2057)
+> *   自定义技术指标属性筛选条件参见 [CustomIndicatorField](./quote_quote.md#2057)
 >     
-> *   形态技术指标属性筛选条件参见 [PatternField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#159)
+> *   形态技术指标属性筛选条件参见 [PatternField](./quote_quote.md#159)
 >     
-> *   财报时间周期参见 [FinancialQuarter](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2253)
+> *   财报时间周期参见 [FinancialQuarter](./quote_quote.md#2253)
 >     
-> *   排序方向参见 [SortDir](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5471)
+> *   排序方向参见 [SortDir](./quote_quote.md#5471)
 >     
-> *   相对位置参见 [RelativePosition](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2453)
+> *   相对位置参见 [RelativePosition](./quote_quote.md#2453)
 >     
-> *   K线类型参见 [KLType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4119)
+> *   K线类型参见 [KLType](./quote_quote.md#4119)
 >     
 
 *   **返回**
@@ -734,21 +640,21 @@
 57  
 58  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   简单属性筛选条件参见 [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#860)
+> *   简单属性筛选条件参见 [StockField](./quote_quote.md#860)
 >     
-> *   累积属性筛选条件参见 [AccumulateField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4370)
+> *   累积属性筛选条件参见 [AccumulateField](./quote_quote.md#4370)
 >     
-> *   财务属性筛选条件参见 [FinancialField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8542)
+> *   财务属性筛选条件参见 [FinancialField](./quote_quote.md#8542)
 >     
-> *   财报时间周期参见 [FinancialQuarter](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2253)
+> *   财报时间周期参见 [FinancialQuarter](./quote_quote.md#2253)
 >     
-> *   自定义技术指标属性筛选条件参见 [CustomIndicatorField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2057)
+> *   自定义技术指标属性筛选条件参见 [CustomIndicatorField](./quote_quote.md#2057)
 >     
-> *   K线类型参见 [KLType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4119)
+> *   K线类型参见 [KLType](./quote_quote.md#4119)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -919,27 +825,27 @@
 74  
 75  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   市场类型参见 [QotMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427)
+> *   市场类型参见 [QotMarket](./quote_quote.md#427)
 >     
-> *   简单属性筛选条件参见 [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#860)
+> *   简单属性筛选条件参见 [StockField](./quote_quote.md#860)
 >     
-> *   累积属性筛选条件参见 [AccumulateField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4370)
+> *   累积属性筛选条件参见 [AccumulateField](./quote_quote.md#4370)
 >     
-> *   财务属性筛选条件参见 [FinancialField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8542)
+> *   财务属性筛选条件参见 [FinancialField](./quote_quote.md#8542)
 >     
-> *   自定义技术指标属性筛选条件参见 [CustomIndicatorField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2057)
+> *   自定义技术指标属性筛选条件参见 [CustomIndicatorField](./quote_quote.md#2057)
 >     
-> *   形态技术指标属性筛选条件参见 [PatternField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#159)
+> *   形态技术指标属性筛选条件参见 [PatternField](./quote_quote.md#159)
 >     
-> *   财报时间周期参见 [FinancialQuarter](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2253)
+> *   财报时间周期参见 [FinancialQuarter](./quote_quote.md#2253)
 >     
-> *   排序方向参见 [SortDir](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5471)
+> *   排序方向参见 [SortDir](./quote_quote.md#5471)
 >     
-> *   相对位置参见 [RelativePosition](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2453)
+> *   相对位置参见 [RelativePosition](./quote_quote.md#2453)
 >     
-> *   K线类型参见 [KLType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4119)
+> *   K线类型参见 [KLType](./quote_quote.md#4119)
 >     
 
 *   **返回**
@@ -1063,21 +969,21 @@
 57  
 58  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   简单属性筛选条件参见 [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#860)
+> *   简单属性筛选条件参见 [StockField](./quote_quote.md#860)
 >     
-> *   累积属性筛选条件参见 [AccumulateField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4370)
+> *   累积属性筛选条件参见 [AccumulateField](./quote_quote.md#4370)
 >     
-> *   财务属性筛选条件参见 [FinancialField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8542)
+> *   财务属性筛选条件参见 [FinancialField](./quote_quote.md#8542)
 >     
-> *   财报时间周期参见 [FinancialQuarter](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2253)
+> *   财报时间周期参见 [FinancialQuarter](./quote_quote.md#2253)
 >     
-> *   自定义技术指标属性筛选条件参见 [CustomIndicatorField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2057)
+> *   自定义技术指标属性筛选条件参见 [CustomIndicatorField](./quote_quote.md#2057)
 >     
-> *   K线类型参见 [KLType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4119)
+> *   K线类型参见 [KLType](./quote_quote.md#4119)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1377,27 +1283,27 @@
 74  
 75  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   市场类型参见 [QotMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427)
+> *   市场类型参见 [QotMarket](./quote_quote.md#427)
 >     
-> *   简单属性筛选条件参见 [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#860)
+> *   简单属性筛选条件参见 [StockField](./quote_quote.md#860)
 >     
-> *   累积属性筛选条件参见 [AccumulateField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4370)
+> *   累积属性筛选条件参见 [AccumulateField](./quote_quote.md#4370)
 >     
-> *   财务属性筛选条件参见 [FinancialField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8542)
+> *   财务属性筛选条件参见 [FinancialField](./quote_quote.md#8542)
 >     
-> *   自定义技术指标属性筛选条件参见 [CustomIndicatorField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2057)
+> *   自定义技术指标属性筛选条件参见 [CustomIndicatorField](./quote_quote.md#2057)
 >     
-> *   形态技术指标属性筛选条件参见 [PatternField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#159)
+> *   形态技术指标属性筛选条件参见 [PatternField](./quote_quote.md#159)
 >     
-> *   财报时间周期参见 [FinancialQuarter](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2253)
+> *   财报时间周期参见 [FinancialQuarter](./quote_quote.md#2253)
 >     
-> *   排序方向参见 [SortDir](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5471)
+> *   排序方向参见 [SortDir](./quote_quote.md#5471)
 >     
-> *   相对位置参见 [RelativePosition](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2453)
+> *   相对位置参见 [RelativePosition](./quote_quote.md#2453)
 >     
-> *   K线类型参见 [KLType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4119)
+> *   K线类型参见 [KLType](./quote_quote.md#4119)
 >     
 
 *   **返回**
@@ -1521,21 +1427,21 @@
 57  
 58  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   简单属性筛选条件参见 [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#860)
+> *   简单属性筛选条件参见 [StockField](./quote_quote.md#860)
 >     
-> *   累积属性筛选条件参见 [AccumulateField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4370)
+> *   累积属性筛选条件参见 [AccumulateField](./quote_quote.md#4370)
 >     
-> *   财务属性筛选条件参见 [FinancialField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8542)
+> *   财务属性筛选条件参见 [FinancialField](./quote_quote.md#8542)
 >     
-> *   财报时间周期参见 [FinancialQuarter](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2253)
+> *   财报时间周期参见 [FinancialQuarter](./quote_quote.md#2253)
 >     
-> *   自定义技术指标属性筛选条件参见 [CustomIndicatorField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2057)
+> *   自定义技术指标属性筛选条件参见 [CustomIndicatorField](./quote_quote.md#2057)
 >     
-> *   K线类型参见 [KLType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4119)
+> *   K线类型参见 [KLType](./quote_quote.md#4119)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1897,27 +1803,27 @@
 74  
 75  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   市场类型参见 [QotMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427)
+> *   市场类型参见 [QotMarket](./quote_quote.md#427)
 >     
-> *   简单属性筛选条件参见 [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#860)
+> *   简单属性筛选条件参见 [StockField](./quote_quote.md#860)
 >     
-> *   累积属性筛选条件参见 [AccumulateField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4370)
+> *   累积属性筛选条件参见 [AccumulateField](./quote_quote.md#4370)
 >     
-> *   财务属性筛选条件参见 [FinancialField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8542)
+> *   财务属性筛选条件参见 [FinancialField](./quote_quote.md#8542)
 >     
-> *   自定义技术指标属性筛选条件参见 [CustomIndicatorField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2057)
+> *   自定义技术指标属性筛选条件参见 [CustomIndicatorField](./quote_quote.md#2057)
 >     
-> *   形态技术指标属性筛选条件参见 [PatternField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#159)
+> *   形态技术指标属性筛选条件参见 [PatternField](./quote_quote.md#159)
 >     
-> *   财报时间周期参见 [FinancialQuarter](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2253)
+> *   财报时间周期参见 [FinancialQuarter](./quote_quote.md#2253)
 >     
-> *   排序方向参见 [SortDir](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5471)
+> *   排序方向参见 [SortDir](./quote_quote.md#5471)
 >     
-> *   相对位置参见 [RelativePosition](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2453)
+> *   相对位置参见 [RelativePosition](./quote_quote.md#2453)
 >     
-> *   K线类型参见 [KLType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4119)
+> *   K线类型参见 [KLType](./quote_quote.md#4119)
 >     
 
 *   **返回**
@@ -2041,21 +1947,21 @@
 57  
 58  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   简单属性筛选条件参见 [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#860)
+> *   简单属性筛选条件参见 [StockField](./quote_quote.md#860)
 >     
-> *   累积属性筛选条件参见 [AccumulateField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4370)
+> *   累积属性筛选条件参见 [AccumulateField](./quote_quote.md#4370)
 >     
-> *   财务属性筛选条件参见 [FinancialField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8542)
+> *   财务属性筛选条件参见 [FinancialField](./quote_quote.md#8542)
 >     
-> *   财报时间周期参见 [FinancialQuarter](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2253)
+> *   财报时间周期参见 [FinancialQuarter](./quote_quote.md#2253)
 >     
-> *   自定义技术指标属性筛选条件参见 [CustomIndicatorField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2057)
+> *   自定义技术指标属性筛选条件参见 [CustomIndicatorField](./quote_quote.md#2057)
 >     
-> *   K线类型参见 [KLType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4119)
+> *   K线类型参见 [KLType](./quote_quote.md#4119)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2432,27 +2338,27 @@
 74  
 75  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   市场类型参见 [QotMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427)
+> *   市场类型参见 [QotMarket](./quote_quote.md#427)
 >     
-> *   简单属性筛选条件参见 [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#860)
+> *   简单属性筛选条件参见 [StockField](./quote_quote.md#860)
 >     
-> *   累积属性筛选条件参见 [AccumulateField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4370)
+> *   累积属性筛选条件参见 [AccumulateField](./quote_quote.md#4370)
 >     
-> *   财务属性筛选条件参见 [FinancialField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8542)
+> *   财务属性筛选条件参见 [FinancialField](./quote_quote.md#8542)
 >     
-> *   自定义技术指标属性筛选条件参见 [CustomIndicatorField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2057)
+> *   自定义技术指标属性筛选条件参见 [CustomIndicatorField](./quote_quote.md#2057)
 >     
-> *   形态技术指标属性筛选条件参见 [PatternField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#159)
+> *   形态技术指标属性筛选条件参见 [PatternField](./quote_quote.md#159)
 >     
-> *   财报时间周期参见 [FinancialQuarter](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2253)
+> *   财报时间周期参见 [FinancialQuarter](./quote_quote.md#2253)
 >     
-> *   排序方向参见 [SortDir](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5471)
+> *   排序方向参见 [SortDir](./quote_quote.md#5471)
 >     
-> *   相对位置参见 [RelativePosition](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2453)
+> *   相对位置参见 [RelativePosition](./quote_quote.md#2453)
 >     
-> *   K线类型参见 [KLType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4119)
+> *   K线类型参见 [KLType](./quote_quote.md#4119)
 >     
 
 *   **返回**
@@ -2576,21 +2482,21 @@
 57  
 58  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   简单属性筛选条件参见 [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#860)
+> *   简单属性筛选条件参见 [StockField](./quote_quote.md#860)
 >     
-> *   累积属性筛选条件参见 [AccumulateField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4370)
+> *   累积属性筛选条件参见 [AccumulateField](./quote_quote.md#4370)
 >     
-> *   财务属性筛选条件参见 [FinancialField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8542)
+> *   财务属性筛选条件参见 [FinancialField](./quote_quote.md#8542)
 >     
-> *   财报时间周期参见 [FinancialQuarter](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2253)
+> *   财报时间周期参见 [FinancialQuarter](./quote_quote.md#2253)
 >     
-> *   自定义技术指标属性筛选条件参见 [CustomIndicatorField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2057)
+> *   自定义技术指标属性筛选条件参见 [CustomIndicatorField](./quote_quote.md#2057)
 >     
-> *   K线类型参见 [KLType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4119)
+> *   K线类型参见 [KLType](./quote_quote.md#4119)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2747,7 +2653,7 @@
 
 提示
 
-*   利用[获取子板块列表函数](https://openapi.futunn.com/futu-api-doc/quote/get-plate-list.html)
+*   利用[获取子板块列表函数](./quote_get-plate-list.md)
      获取子板块代码，条件选股支持的板块分别为
     1.  港股的行业板块和概念板块。
     2.  美股的行业板块
@@ -2798,7 +2704,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | market | [Market](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427) | 市场标识<br>(ℹ️ 不区分沪股和深股，传入沪股或者深股都会返回沪深市场的股票) |
+    | market | [Market](./quote_quote.md#427) | 市场标识<br>(ℹ️ 不区分沪股和深股，传入沪股或者深股都会返回沪深市场的股票) |
     | filter\_list | list | 筛选条件的列表<br>(ℹ️ 参考下面的表格，列表中元素类型为 SimpleFilter 或 AccumulateFilter 或 FinancialFilter) |
     | plate\_code | str | 板块代码 |
     | begin | int | 数据起始点 |
@@ -2808,63 +2714,63 @@
         
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
-        | stock\_field | [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#860) | 简单属性 |
-        | filter\_min | float | 区间下限<br>(ℹ️ 闭区间  <br>不传默认为 -∞) |
-        | filter\_max | float | 区间上限<br>(ℹ️ 闭区间  <br>不传默认为 +∞) |
-        | is\_no\_filter | bool | 该字段是否不需要筛选<br>(ℹ️ True：不筛选  <br>False：筛选  <br>不传默认不筛选) |
-        | sort | [SortDir](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5471) | 排序方向<br>(ℹ️ 不传默认为不排序) |
+        | stock\_field | [StockField](./quote_quote.md#860) | 简单属性 |
+        | filter\_min | float | 区间下限<br>(ℹ️ 闭区间)  <br>不传默认为 -∞ |
+        | filter\_max | float | 区间上限<br>(ℹ️ 闭区间)  <br>不传默认为 +∞ |
+        | is\_no\_filter | bool | 该字段是否不需要筛选<br>(ℹ️ True：不筛选)  <br>False：筛选  <br>不传默认不筛选 |
+        | sort | [SortDir](./quote_quote.md#5471) | 排序方向<br>(ℹ️ 不传默认为不排序) |
         
     *   AccumulateFilter 对象相关参数如下：
         
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
-        | stock\_field | [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4370) | 累积属性 |
-        | filter\_min | float | 区间下限<br>(ℹ️ 闭区间  <br>不传默认为 -∞) |
-        | filter\_max | float | 区间上限<br>(ℹ️ 闭区间  <br>不传默认为 +∞) |
-        | is\_no\_filter | bool | 该字段是否不需要筛选<br>(ℹ️ True：不筛选  <br>False：筛选  <br>不传默认不筛选) |
-        | sort | [SortDir](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5471) | 排序方向<br>(ℹ️ 不传默认为不排序) |
+        | stock\_field | [StockField](./quote_quote.md#4370) | 累积属性 |
+        | filter\_min | float | 区间下限<br>(ℹ️ 闭区间)  <br>不传默认为 -∞ |
+        | filter\_max | float | 区间上限<br>(ℹ️ 闭区间)  <br>不传默认为 +∞ |
+        | is\_no\_filter | bool | 该字段是否不需要筛选<br>(ℹ️ True：不筛选)  <br>False：筛选  <br>不传默认不筛选 |
+        | sort | [SortDir](./quote_quote.md#5471) | 排序方向<br>(ℹ️ 不传默认为不排序) |
         | days | int | 所筛选的数据的累计天数 |
         
     *   FinancialFilter 对象相关参数如下：
         
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
-        | stock\_field | [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8542) | 财务属性 |
-        | filter\_min | float | 区间下限<br>(ℹ️ 闭区间  <br>不传默认为 -∞) |
-        | filter\_max | float | 区间上限<br>(ℹ️ 闭区间  <br>不传默认为 +∞) |
-        | is\_no\_filter | bool | 该字段是否不需要筛选<br>(ℹ️ True：不筛选  <br>False：筛选  <br>不传默认不筛选) |
-        | sort | [SortDir](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5471) | 排序方向<br>(ℹ️ 不传默认为不排序) |
-        | quarter | [FinancialQuarter](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2253) | 财报累积时间 |
+        | stock\_field | [StockField](./quote_quote.md#8542) | 财务属性 |
+        | filter\_min | float | 区间下限<br>(ℹ️ 闭区间)  <br>不传默认为 -∞ |
+        | filter\_max | float | 区间上限<br>(ℹ️ 闭区间)  <br>不传默认为 +∞ |
+        | is\_no\_filter | bool | 该字段是否不需要筛选<br>(ℹ️ True：不筛选)  <br>False：筛选  <br>不传默认不筛选 |
+        | sort | [SortDir](./quote_quote.md#5471) | 排序方向<br>(ℹ️ 不传默认为不排序) |
+        | quarter | [FinancialQuarter](./quote_quote.md#2253) | 财报累积时间 |
         
     *   CustomIndicatorFilter 对象相关参数如下：
         
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
-        | stock\_field1 | [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2057) | 自定义技术指标属性 |
-        | stock\_field1\_para | list | 自定义技术指标属性参数<br>(ℹ️ 根据指标类型进行传参：  <br>1\. MA：\[平均移动周期\]  <br>2.EMA：\[指数移动平均周期\]  <br>3.RSI：\[RSI 指标周期\]  <br>4.MACD：\[快速平均线值, 慢速平均线值, DIF值\]  <br>5.BOLL：\[均线周期, 偏移值\]  <br>6.KDJ：\[RSV 周期, K 值计算周期, D 值计算周期\]) |
-        | relative\_position | [RelativePosition](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2453) | 相对位置 |
-        | stock\_field2 | [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2057) | 自定义技术指标属性 |
-        | stock\_field2\_para | list | 自定义技术指标属性参数<br>(ℹ️ 根据指标类型进行传参：  <br>1\. MA：\[平均移动周期\]  <br>2.EMA：\[指数移动平均周期\]  <br>3.RSI：\[RSI 指标周期\]  <br>4.MACD：\[快速平均线值, 慢速平均线值, DIF值\]  <br>5.BOLL：\[均线周期, 偏移值\]  <br>6.KDJ：\[RSV 周期, K 值计算周期, D 值计算周期\]) |
-        | value | float | 自定义数值<br>(ℹ️ 当 stock\_field2 在 [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2057)<br> 中选择自定义数值时，value 为必传参数) |
-        | ktype | [KLType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4119) | K线类型 KLType<br>(ℹ️ 仅支持K\_60M，K\_DAY，K\_WEEK，K\_MON 四种时间周期) |
+        | stock\_field1 | [StockField](./quote_quote.md#2057) | 自定义技术指标属性 |
+        | stock\_field1\_para | list | 自定义技术指标属性参数<br>(ℹ️ 根据指标类型进行传参：)  <br>1\. MA：\[平均移动周期\]  <br>2.EMA：\[指数移动平均周期\]  <br>3.RSI：\[RSI 指标周期\]  <br>4.MACD：\[快速平均线值, 慢速平均线值, DIF值\]  <br>5.BOLL：\[均线周期, 偏移值\]  <br>6.KDJ：\[RSV 周期, K 值计算周期, D 值计算周期\] |
+        | relative\_position | [RelativePosition](./quote_quote.md#2453) | 相对位置 |
+        | stock\_field2 | [StockField](./quote_quote.md#2057) | 自定义技术指标属性 |
+        | stock\_field2\_para | list | 自定义技术指标属性参数<br>(ℹ️ 根据指标类型进行传参：)  <br>1\. MA：\[平均移动周期\]  <br>2.EMA：\[指数移动平均周期\]  <br>3.RSI：\[RSI 指标周期\]  <br>4.MACD：\[快速平均线值, 慢速平均线值, DIF值\]  <br>5.BOLL：\[均线周期, 偏移值\]  <br>6.KDJ：\[RSV 周期, K 值计算周期, D 值计算周期\] |
+        | value | float | 自定义数值<br>(ℹ️ 当 stock\_field2 在 [StockField](./quote_quote.md#2057))<br> 中选择自定义数值时，value 为必传参数 |
+        | ktype | [KLType](./quote_quote.md#4119) | K线类型 KLType<br>(ℹ️ 仅支持K\_60M，K\_DAY，K\_WEEK，K\_MON 四种时间周期) |
         | consecutive\_period | int | 筛选连续周期（consecutive\_period）都符合条件的数据<br>(ℹ️ 填写范围为\[1,12\]) |
-        | is\_no\_filter | bool | 该字段是否不需要筛选<br>(ℹ️ True：不筛选  <br>False：筛选  <br>不传默认不筛选) |
+        | is\_no\_filter | bool | 该字段是否不需要筛选<br>(ℹ️ True：不筛选)  <br>False：筛选  <br>不传默认不筛选 |
         
     *   PatternFilter 对象相关参数如下：
         
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
-        | stock\_field | [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#159) | 形态技术指标属性 |
-        | ktype | [KLType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4119) | K线类型 KLType （仅支持K\_60M，K\_DAY，K\_WEEK，K\_MON 四种时间周期） |
+        | stock\_field | [StockField](./quote_quote.md#159) | 形态技术指标属性 |
+        | ktype | [KLType](./quote_quote.md#4119) | K线类型 KLType （仅支持K\_60M，K\_DAY，K\_WEEK，K\_MON 四种时间周期） |
         | consecutive\_period | int | 筛选连续周期（consecutive\_period）都符合条件的数据<br>(ℹ️ 填写范围为\[1,12\]) |
-        | is\_no\_filter | bool | 该字段是否不需要筛选<br>(ℹ️ True：不筛选  <br>False：筛选  <br>不传默认不筛选) |
+        | is\_no\_filter | bool | 该字段是否不需要筛选<br>(ℹ️ True：不筛选)  <br>False：筛选  <br>不传默认不筛选 |
         
 
 *   **返回**
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | tuple | 当 ret == RET\_OK，返回选股数据 |
     | str | 当 ret != RET\_OK，返回错误描述 |
     
@@ -3111,7 +3017,7 @@
 11  
 12  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-stock-filter.html#2109-2)
+[#](./quote_get-stock-filter.md#2109-2)
  Qot\_StockFilter.proto
 -------------------------------------------------------------------------------------------------------
 
@@ -3275,27 +3181,27 @@
 74  
 75  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   市场类型参见 [QotMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427)
+> *   市场类型参见 [QotMarket](./quote_quote.md#427)
 >     
-> *   简单属性筛选条件参见 [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#860)
+> *   简单属性筛选条件参见 [StockField](./quote_quote.md#860)
 >     
-> *   累积属性筛选条件参见 [AccumulateField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4370)
+> *   累积属性筛选条件参见 [AccumulateField](./quote_quote.md#4370)
 >     
-> *   财务属性筛选条件参见 [FinancialField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8542)
+> *   财务属性筛选条件参见 [FinancialField](./quote_quote.md#8542)
 >     
-> *   自定义技术指标属性筛选条件参见 [CustomIndicatorField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2057)
+> *   自定义技术指标属性筛选条件参见 [CustomIndicatorField](./quote_quote.md#2057)
 >     
-> *   形态技术指标属性筛选条件参见 [PatternField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#159)
+> *   形态技术指标属性筛选条件参见 [PatternField](./quote_quote.md#159)
 >     
-> *   财报时间周期参见 [FinancialQuarter](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2253)
+> *   财报时间周期参见 [FinancialQuarter](./quote_quote.md#2253)
 >     
-> *   排序方向参见 [SortDir](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5471)
+> *   排序方向参见 [SortDir](./quote_quote.md#5471)
 >     
-> *   相对位置参见 [RelativePosition](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2453)
+> *   相对位置参见 [RelativePosition](./quote_quote.md#2453)
 >     
-> *   K线类型参见 [KLType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4119)
+> *   K线类型参见 [KLType](./quote_quote.md#4119)
 >     
 
 *   **返回**
@@ -3419,21 +3325,21 @@
 57  
 58  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   简单属性筛选条件参见 [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#860)
+> *   简单属性筛选条件参见 [StockField](./quote_quote.md#860)
 >     
-> *   累积属性筛选条件参见 [AccumulateField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4370)
+> *   累积属性筛选条件参见 [AccumulateField](./quote_quote.md#4370)
 >     
-> *   财务属性筛选条件参见 [FinancialField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8542)
+> *   财务属性筛选条件参见 [FinancialField](./quote_quote.md#8542)
 >     
-> *   财报时间周期参见 [FinancialQuarter](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2253)
+> *   财报时间周期参见 [FinancialQuarter](./quote_quote.md#2253)
 >     
-> *   自定义技术指标属性筛选条件参见 [CustomIndicatorField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2057)
+> *   自定义技术指标属性筛选条件参见 [CustomIndicatorField](./quote_quote.md#2057)
 >     
-> *   K线类型参见 [KLType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4119)
+> *   K线类型参见 [KLType](./quote_quote.md#4119)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -3604,27 +3510,27 @@
 74  
 75  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   市场类型参见 [QotMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427)
+> *   市场类型参见 [QotMarket](./quote_quote.md#427)
 >     
-> *   简单属性筛选条件参见 [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#860)
+> *   简单属性筛选条件参见 [StockField](./quote_quote.md#860)
 >     
-> *   累积属性筛选条件参见 [AccumulateField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4370)
+> *   累积属性筛选条件参见 [AccumulateField](./quote_quote.md#4370)
 >     
-> *   财务属性筛选条件参见 [FinancialField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8542)
+> *   财务属性筛选条件参见 [FinancialField](./quote_quote.md#8542)
 >     
-> *   自定义技术指标属性筛选条件参见 [CustomIndicatorField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2057)
+> *   自定义技术指标属性筛选条件参见 [CustomIndicatorField](./quote_quote.md#2057)
 >     
-> *   形态技术指标属性筛选条件参见 [PatternField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#159)
+> *   形态技术指标属性筛选条件参见 [PatternField](./quote_quote.md#159)
 >     
-> *   财报时间周期参见 [FinancialQuarter](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2253)
+> *   财报时间周期参见 [FinancialQuarter](./quote_quote.md#2253)
 >     
-> *   排序方向参见 [SortDir](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5471)
+> *   排序方向参见 [SortDir](./quote_quote.md#5471)
 >     
-> *   相对位置参见 [RelativePosition](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2453)
+> *   相对位置参见 [RelativePosition](./quote_quote.md#2453)
 >     
-> *   K线类型参见 [KLType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4119)
+> *   K线类型参见 [KLType](./quote_quote.md#4119)
 >     
 
 *   **返回**
@@ -3748,21 +3654,21 @@
 57  
 58  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   简单属性筛选条件参见 [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#860)
+> *   简单属性筛选条件参见 [StockField](./quote_quote.md#860)
 >     
-> *   累积属性筛选条件参见 [AccumulateField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4370)
+> *   累积属性筛选条件参见 [AccumulateField](./quote_quote.md#4370)
 >     
-> *   财务属性筛选条件参见 [FinancialField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8542)
+> *   财务属性筛选条件参见 [FinancialField](./quote_quote.md#8542)
 >     
-> *   财报时间周期参见 [FinancialQuarter](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2253)
+> *   财报时间周期参见 [FinancialQuarter](./quote_quote.md#2253)
 >     
-> *   自定义技术指标属性筛选条件参见 [CustomIndicatorField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2057)
+> *   自定义技术指标属性筛选条件参见 [CustomIndicatorField](./quote_quote.md#2057)
 >     
-> *   K线类型参见 [KLType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4119)
+> *   K线类型参见 [KLType](./quote_quote.md#4119)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -4062,27 +3968,27 @@
 74  
 75  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   市场类型参见 [QotMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427)
+> *   市场类型参见 [QotMarket](./quote_quote.md#427)
 >     
-> *   简单属性筛选条件参见 [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#860)
+> *   简单属性筛选条件参见 [StockField](./quote_quote.md#860)
 >     
-> *   累积属性筛选条件参见 [AccumulateField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4370)
+> *   累积属性筛选条件参见 [AccumulateField](./quote_quote.md#4370)
 >     
-> *   财务属性筛选条件参见 [FinancialField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8542)
+> *   财务属性筛选条件参见 [FinancialField](./quote_quote.md#8542)
 >     
-> *   自定义技术指标属性筛选条件参见 [CustomIndicatorField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2057)
+> *   自定义技术指标属性筛选条件参见 [CustomIndicatorField](./quote_quote.md#2057)
 >     
-> *   形态技术指标属性筛选条件参见 [PatternField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#159)
+> *   形态技术指标属性筛选条件参见 [PatternField](./quote_quote.md#159)
 >     
-> *   财报时间周期参见 [FinancialQuarter](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2253)
+> *   财报时间周期参见 [FinancialQuarter](./quote_quote.md#2253)
 >     
-> *   排序方向参见 [SortDir](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5471)
+> *   排序方向参见 [SortDir](./quote_quote.md#5471)
 >     
-> *   相对位置参见 [RelativePosition](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2453)
+> *   相对位置参见 [RelativePosition](./quote_quote.md#2453)
 >     
-> *   K线类型参见 [KLType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4119)
+> *   K线类型参见 [KLType](./quote_quote.md#4119)
 >     
 
 *   **返回**
@@ -4206,21 +4112,21 @@
 57  
 58  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   简单属性筛选条件参见 [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#860)
+> *   简单属性筛选条件参见 [StockField](./quote_quote.md#860)
 >     
-> *   累积属性筛选条件参见 [AccumulateField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4370)
+> *   累积属性筛选条件参见 [AccumulateField](./quote_quote.md#4370)
 >     
-> *   财务属性筛选条件参见 [FinancialField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8542)
+> *   财务属性筛选条件参见 [FinancialField](./quote_quote.md#8542)
 >     
-> *   财报时间周期参见 [FinancialQuarter](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2253)
+> *   财报时间周期参见 [FinancialQuarter](./quote_quote.md#2253)
 >     
-> *   自定义技术指标属性筛选条件参见 [CustomIndicatorField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2057)
+> *   自定义技术指标属性筛选条件参见 [CustomIndicatorField](./quote_quote.md#2057)
 >     
-> *   K线类型参见 [KLType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4119)
+> *   K线类型参见 [KLType](./quote_quote.md#4119)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -4582,27 +4488,27 @@
 74  
 75  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   市场类型参见 [QotMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427)
+> *   市场类型参见 [QotMarket](./quote_quote.md#427)
 >     
-> *   简单属性筛选条件参见 [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#860)
+> *   简单属性筛选条件参见 [StockField](./quote_quote.md#860)
 >     
-> *   累积属性筛选条件参见 [AccumulateField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4370)
+> *   累积属性筛选条件参见 [AccumulateField](./quote_quote.md#4370)
 >     
-> *   财务属性筛选条件参见 [FinancialField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8542)
+> *   财务属性筛选条件参见 [FinancialField](./quote_quote.md#8542)
 >     
-> *   自定义技术指标属性筛选条件参见 [CustomIndicatorField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2057)
+> *   自定义技术指标属性筛选条件参见 [CustomIndicatorField](./quote_quote.md#2057)
 >     
-> *   形态技术指标属性筛选条件参见 [PatternField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#159)
+> *   形态技术指标属性筛选条件参见 [PatternField](./quote_quote.md#159)
 >     
-> *   财报时间周期参见 [FinancialQuarter](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2253)
+> *   财报时间周期参见 [FinancialQuarter](./quote_quote.md#2253)
 >     
-> *   排序方向参见 [SortDir](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5471)
+> *   排序方向参见 [SortDir](./quote_quote.md#5471)
 >     
-> *   相对位置参见 [RelativePosition](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2453)
+> *   相对位置参见 [RelativePosition](./quote_quote.md#2453)
 >     
-> *   K线类型参见 [KLType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4119)
+> *   K线类型参见 [KLType](./quote_quote.md#4119)
 >     
 
 *   **返回**
@@ -4726,21 +4632,21 @@
 57  
 58  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   简单属性筛选条件参见 [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#860)
+> *   简单属性筛选条件参见 [StockField](./quote_quote.md#860)
 >     
-> *   累积属性筛选条件参见 [AccumulateField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4370)
+> *   累积属性筛选条件参见 [AccumulateField](./quote_quote.md#4370)
 >     
-> *   财务属性筛选条件参见 [FinancialField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8542)
+> *   财务属性筛选条件参见 [FinancialField](./quote_quote.md#8542)
 >     
-> *   财报时间周期参见 [FinancialQuarter](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2253)
+> *   财报时间周期参见 [FinancialQuarter](./quote_quote.md#2253)
 >     
-> *   自定义技术指标属性筛选条件参见 [CustomIndicatorField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2057)
+> *   自定义技术指标属性筛选条件参见 [CustomIndicatorField](./quote_quote.md#2057)
 >     
-> *   K线类型参见 [KLType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4119)
+> *   K线类型参见 [KLType](./quote_quote.md#4119)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -5117,27 +5023,27 @@
 74  
 75  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   市场类型参见 [QotMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427)
+> *   市场类型参见 [QotMarket](./quote_quote.md#427)
 >     
-> *   简单属性筛选条件参见 [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#860)
+> *   简单属性筛选条件参见 [StockField](./quote_quote.md#860)
 >     
-> *   累积属性筛选条件参见 [AccumulateField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4370)
+> *   累积属性筛选条件参见 [AccumulateField](./quote_quote.md#4370)
 >     
-> *   财务属性筛选条件参见 [FinancialField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8542)
+> *   财务属性筛选条件参见 [FinancialField](./quote_quote.md#8542)
 >     
-> *   自定义技术指标属性筛选条件参见 [CustomIndicatorField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2057)
+> *   自定义技术指标属性筛选条件参见 [CustomIndicatorField](./quote_quote.md#2057)
 >     
-> *   形态技术指标属性筛选条件参见 [PatternField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#159)
+> *   形态技术指标属性筛选条件参见 [PatternField](./quote_quote.md#159)
 >     
-> *   财报时间周期参见 [FinancialQuarter](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2253)
+> *   财报时间周期参见 [FinancialQuarter](./quote_quote.md#2253)
 >     
-> *   排序方向参见 [SortDir](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5471)
+> *   排序方向参见 [SortDir](./quote_quote.md#5471)
 >     
-> *   相对位置参见 [RelativePosition](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2453)
+> *   相对位置参见 [RelativePosition](./quote_quote.md#2453)
 >     
-> *   K线类型参见 [KLType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4119)
+> *   K线类型参见 [KLType](./quote_quote.md#4119)
 >     
 
 *   **返回**
@@ -5261,21 +5167,21 @@
 57  
 58  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   简单属性筛选条件参见 [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#860)
+> *   简单属性筛选条件参见 [StockField](./quote_quote.md#860)
 >     
-> *   累积属性筛选条件参见 [AccumulateField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4370)
+> *   累积属性筛选条件参见 [AccumulateField](./quote_quote.md#4370)
 >     
-> *   财务属性筛选条件参见 [FinancialField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8542)
+> *   财务属性筛选条件参见 [FinancialField](./quote_quote.md#8542)
 >     
-> *   财报时间周期参见 [FinancialQuarter](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2253)
+> *   财报时间周期参见 [FinancialQuarter](./quote_quote.md#2253)
 >     
-> *   自定义技术指标属性筛选条件参见 [CustomIndicatorField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2057)
+> *   自定义技术指标属性筛选条件参见 [CustomIndicatorField](./quote_quote.md#2057)
 >     
-> *   K线类型参见 [KLType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4119)
+> *   K线类型参见 [KLType](./quote_quote.md#4119)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -5432,7 +5338,7 @@
 
 提示
 
-*   利用[获取子板块列表函数](https://openapi.futunn.com/futu-api-doc/quote/get-plate-list.html)
+*   利用[获取子板块列表函数](./quote_get-plate-list.md)
      获取子板块代码，条件选股支持的板块分别为
     1.  港股的行业板块和概念板块。
     2.  美股的行业板块
@@ -5465,7 +5371,7 @@
 *   简单属性，财务属性，形态属性不支持对同一字段重复指定筛选条件
 *   条件选股暂不支持美股盘前盘后、夜盘，筛选结果均按照盘中数据返回
 
-← [获取期货合约资料](https://openapi.futunn.com/futu-api-doc/quote/get-future-info.html) [获取板块内股票列表](https://openapi.futunn.com/futu-api-doc/quote/get-plate-stock.html)
+← [获取期货合约资料](./quote_get-future-info.md) [获取板块内股票列表](./quote_get-plate-stock.md)
  →
 
-[条件选股](https://openapi.futunn.com/futu-api-doc/quote/get-stock-filter.html)
+[条件选股](./quote_get-stock-filter.md)

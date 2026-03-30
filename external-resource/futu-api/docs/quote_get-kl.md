@@ -1,8 +1,4 @@
-# 获取实时 K 线 | Futu API 文档 v10.2
-
-> 来源: https://openapi.futunn.com/futu-api-doc/quote/get-kl.html
-
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-kl.html#3663)
+[#](./quote_get-kl.md#3663)
  获取实时 K 线
 =============================================================================
 
@@ -26,15 +22,15 @@
     | code | str | 股票代码 |
     | name | str | 股票名称 |
     | num | int | K 线数据个数<br>(ℹ️ 最多 1000 根) |
-    | ktype | [KLType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4119) | K 线类型 |
-    | autype | [AuType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6907) | 复权类型 |
+    | ktype | [KLType](./quote_quote.md#4119) | K 线类型 |
+    | autype | [AuType](./quote_quote.md#6907) | 复权类型 |
     
 
 *   **返回**
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | pd.DataFrame | 当 ret == RET\_OK，返回 K 线数据数据 |
     | str | 当 ret != RET\_OK，返回错误描述 |
     
@@ -44,7 +40,7 @@
         | --- | --- | --- |
         | code | str | 股票代码 |
         | name | str | 股票名称 |
-        | time\_key | str | 时间<br>(ℹ️ 格式：yyyy-MM-dd HH:mm:ss  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间) |
+        | time\_key | str | 时间<br>(ℹ️ 格式：yyyy-MM-dd HH:mm:ss)  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间 |
         | open | float | 开盘价 |
         | close | float | 收盘价 |
         | high | float | 最高价 |
@@ -53,7 +49,7 @@
         | turnover | float | 成交额 |
         | pe\_ratio | float | 市盈率 |
         | turnover\_rate | float | 换手率<br>(ℹ️ 该字段为百分比字段，默认返回小数，如 0.01 实际对应 1%) |
-        | last\_close | float | 昨收价<br>(ℹ️ 即前一个时间的收盘价  <br>为了效率原因，第一个数据的昨收价可能为 0) |
+        | last\_close | float | 昨收价<br>(ℹ️ 即前一个时间的收盘价)  <br>为了效率原因，第一个数据的昨收价可能为 0 |
         
 *   **Example**
     
@@ -108,7 +104,7 @@
 4  
 5  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-kl.html#7451)
+[#](./quote_get-kl.md#7451)
  Qot\_GetKL.proto
 -------------------------------------------------------------------------------------
 
@@ -146,11 +142,11 @@
 11  
 12  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   复权类型参见 [RehabType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6907)
+> *   复权类型参见 [RehabType](./quote_quote.md#6907)
 >     
-> *   K 线类型参见 [KLType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4119)
+> *   K 线类型参见 [KLType](./quote_quote.md#4119)
 >     
 
 *   **返回**
@@ -188,11 +184,11 @@
 14  
 15  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   K 线结构参见 [KLine](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5151)
+> *   K 线结构参见 [KLine](./quote_quote.md#5151)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -236,11 +232,11 @@
 11  
 12  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   复权类型参见 [RehabType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6907)
+> *   复权类型参见 [RehabType](./quote_quote.md#6907)
 >     
-> *   K 线类型参见 [KLType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4119)
+> *   K 线类型参见 [KLType](./quote_quote.md#4119)
 >     
 
 *   **返回**
@@ -278,11 +274,11 @@
 14  
 15  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   K 线结构参见 [KLine](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5151)
+> *   K 线结构参见 [KLine](./quote_quote.md#5151)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -503,11 +499,11 @@
 11  
 12  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   复权类型参见 [RehabType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6907)
+> *   复权类型参见 [RehabType](./quote_quote.md#6907)
 >     
-> *   K 线类型参见 [KLType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4119)
+> *   K 线类型参见 [KLType](./quote_quote.md#4119)
 >     
 
 *   **返回**
@@ -545,11 +541,11 @@
 14  
 15  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   K 线结构参见 [KLine](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5151)
+> *   K 线结构参见 [KLine](./quote_quote.md#5151)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -861,11 +857,11 @@
 11  
 12  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   复权类型参见 [RehabType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6907)
+> *   复权类型参见 [RehabType](./quote_quote.md#6907)
 >     
-> *   K 线类型参见 [KLType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4119)
+> *   K 线类型参见 [KLType](./quote_quote.md#4119)
 >     
 
 *   **返回**
@@ -903,11 +899,11 @@
 14  
 15  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   K 线结构参见 [KLine](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5151)
+> *   K 线结构参见 [KLine](./quote_quote.md#5151)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1260,11 +1256,11 @@
 11  
 12  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   复权类型参见 [RehabType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6907)
+> *   复权类型参见 [RehabType](./quote_quote.md#6907)
 >     
-> *   K 线类型参见 [KLType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4119)
+> *   K 线类型参见 [KLType](./quote_quote.md#4119)
 >     
 
 *   **返回**
@@ -1302,11 +1298,11 @@
 14  
 15  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   K 线结构参见 [KLine](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5151)
+> *   K 线结构参见 [KLine](./quote_quote.md#5151)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -1549,16 +1545,16 @@
 
 接口限制
 
-*   此接口为获取实时 K 线接口，最多能获取最近的 1000 根。如需获取历史 K 线，请参考 [获取历史 K 线](https://openapi.futunn.com/futu-api-doc/quote/request-history-kline.html)
+*   此接口为获取实时 K 线接口，最多能获取最近的 1000 根。如需获取历史 K 线，请参考 [获取历史 K 线](./quote_request-history-kline.md)
     
 *   市盈率和换手率字段，只有日 K 及以上周期的正股才有数据
 *   **期权**，仅提供日K, 1分K，5分K，15分K，60分K。
 
 提示
 
-*   此接口提供了一次性获取实时数据的功能，如需持续获取推送数据，请参考 [实时 K 线回调](https://openapi.futunn.com/futu-api-doc/quote/update-kl.html)
+*   此接口提供了一次性获取实时数据的功能，如需持续获取推送数据，请参考 [实时 K 线回调](./quote_update-kl.md)
      接口
-*   获取实时数据 和 实时数据回调 的差别，请参考 [如何通过订阅接口获取实时行情？](https://openapi.futunn.com/futu-api-doc/qa/quote.html#2692)
+*   获取实时数据 和 实时数据回调 的差别，请参考 [如何通过订阅接口获取实时行情？](./qa_quote.md#2692)
     
 
 *   Python
@@ -1581,15 +1577,15 @@
     | code | str | 股票代码 |
     | name | str | 股票名称 |
     | num | int | K 线数据个数<br>(ℹ️ 最多 1000 根) |
-    | ktype | [KLType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4119) | K 线类型 |
-    | autype | [AuType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6907) | 复权类型 |
+    | ktype | [KLType](./quote_quote.md#4119) | K 线类型 |
+    | autype | [AuType](./quote_quote.md#6907) | 复权类型 |
     
 
 *   **返回**
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | ret | [RET\_CODE](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467) | 接口调用结果 |
+    | ret | [RET\_CODE](./ftapi_common.md#7467) | 接口调用结果 |
     | data | pd.DataFrame | 当 ret == RET\_OK，返回 K 线数据数据 |
     | str | 当 ret != RET\_OK，返回错误描述 |
     
@@ -1599,7 +1595,7 @@
         | --- | --- | --- |
         | code | str | 股票代码 |
         | name | str | 股票名称 |
-        | time\_key | str | 时间<br>(ℹ️ 格式：yyyy-MM-dd HH:mm:ss  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间) |
+        | time\_key | str | 时间<br>(ℹ️ 格式：yyyy-MM-dd HH:mm:ss)  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间 |
         | open | float | 开盘价 |
         | close | float | 收盘价 |
         | high | float | 最高价 |
@@ -1608,7 +1604,7 @@
         | turnover | float | 成交额 |
         | pe\_ratio | float | 市盈率 |
         | turnover\_rate | float | 换手率<br>(ℹ️ 该字段为百分比字段，默认返回小数，如 0.01 实际对应 1%) |
-        | last\_close | float | 昨收价<br>(ℹ️ 即前一个时间的收盘价  <br>为了效率原因，第一个数据的昨收价可能为 0) |
+        | last\_close | float | 昨收价<br>(ℹ️ 即前一个时间的收盘价)  <br>为了效率原因，第一个数据的昨收价可能为 0 |
         
 *   **Example**
     
@@ -1663,7 +1659,7 @@
 4  
 5  
 
-[#](https://openapi.futunn.com/futu-api-doc/quote/get-kl.html#7451-2)
+[#](./quote_get-kl.md#7451-2)
  Qot\_GetKL.proto
 ---------------------------------------------------------------------------------------
 
@@ -1701,11 +1697,11 @@
 11  
 12  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   复权类型参见 [RehabType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6907)
+> *   复权类型参见 [RehabType](./quote_quote.md#6907)
 >     
-> *   K 线类型参见 [KLType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4119)
+> *   K 线类型参见 [KLType](./quote_quote.md#4119)
 >     
 
 *   **返回**
@@ -1743,11 +1739,11 @@
 14  
 15  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   K 线结构参见 [KLine](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5151)
+> *   K 线结构参见 [KLine](./quote_quote.md#5151)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **协议 ID**
@@ -1791,11 +1787,11 @@
 11  
 12  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   复权类型参见 [RehabType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6907)
+> *   复权类型参见 [RehabType](./quote_quote.md#6907)
 >     
-> *   K 线类型参见 [KLType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4119)
+> *   K 线类型参见 [KLType](./quote_quote.md#4119)
 >     
 
 *   **返回**
@@ -1833,11 +1829,11 @@
 14  
 15  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   K 线结构参见 [KLine](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5151)
+> *   K 线结构参见 [KLine](./quote_quote.md#5151)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2058,11 +2054,11 @@
 11  
 12  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   复权类型参见 [RehabType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6907)
+> *   复权类型参见 [RehabType](./quote_quote.md#6907)
 >     
-> *   K 线类型参见 [KLType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4119)
+> *   K 线类型参见 [KLType](./quote_quote.md#4119)
 >     
 
 *   **返回**
@@ -2100,11 +2096,11 @@
 14  
 15  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   K 线结构参见 [KLine](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5151)
+> *   K 线结构参见 [KLine](./quote_quote.md#5151)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2416,11 +2412,11 @@
 11  
 12  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   复权类型参见 [RehabType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6907)
+> *   复权类型参见 [RehabType](./quote_quote.md#6907)
 >     
-> *   K 线类型参见 [KLType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4119)
+> *   K 线类型参见 [KLType](./quote_quote.md#4119)
 >     
 
 *   **返回**
@@ -2458,11 +2454,11 @@
 14  
 15  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   K 线结构参见 [KLine](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5151)
+> *   K 线结构参见 [KLine](./quote_quote.md#5151)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -2815,11 +2811,11 @@
 11  
 12  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   复权类型参见 [RehabType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6907)
+> *   复权类型参见 [RehabType](./quote_quote.md#6907)
 >     
-> *   K 线类型参见 [KLType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4119)
+> *   K 线类型参见 [KLType](./quote_quote.md#4119)
 >     
 
 *   **返回**
@@ -2857,11 +2853,11 @@
 14  
 15  
 
-> *   股票结构参见 [Security](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1377)
+> *   股票结构参见 [Security](./quote_quote.md#1377)
 >     
-> *   K 线结构参见 [KLine](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5151)
+> *   K 线结构参见 [KLine](./quote_quote.md#5151)
 >     
-> *   接口调用结果，结构参见 [RetType](https://openapi.futunn.com/futu-api-doc/ftapi/common.html#7467)
+> *   接口调用结果，结构参见 [RetType](./ftapi_common.md#7467)
 >     
 
 *   **Example**
@@ -3104,17 +3100,19 @@
 
 接口限制
 
-*   此接口为获取实时 K 线接口，最多能获取最近的 1000 根。如需获取历史 K 线，请参考 [获取历史 K 线](https://openapi.futunn.com/futu-api-doc/quote/request-history-kline.html)
+*   此接口为获取实时 K 线接口，最多能获取最近的 1000 根。如需获取历史 K 线，请参考 [获取历史 K 线](./quote_request-history-kline.md)
     
 *   市盈率和换手率字段，只有日 K 及以上周期的正股才有数据
 *   **期权**，仅提供日K, 1分K，5分K，15分K，60分K。
 
 提示
 
-*   此接口提供了一次性获取实时数据的功能，如需持续获取推送数据，请参考 [实时 K 线回调](https://openapi.futunn.com/futu-api-doc/quote/update-kl.html)
+*   此接口提供了一次性获取实时数据的功能，如需持续获取推送数据，请参考 [实时 K 线回调](./quote_update-kl.md)
      接口
-*   获取实时数据 和 实时数据回调 的差别，请参考 [如何通过订阅接口获取实时行情？](https://openapi.futunn.com/futu-api-doc/qa/quote.html#2692)
+*   获取实时数据 和 实时数据回调 的差别，请参考 [如何通过订阅接口获取实时行情？](./qa_quote.md#2692)
     
 
-← [获取实时摆盘](https://openapi.futunn.com/futu-api-doc/quote/get-order-book.html) [获取实时分时](https://openapi.futunn.com/futu-api-doc/quote/get-rt.html)
+← [获取实时摆盘](./quote_get-order-book.md) [获取实时分时](./quote_get-rt.md)
  →
+
+[获取实时 K 线](./quote_get-kl.md)
