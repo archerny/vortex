@@ -1,0 +1,297 @@
+获取券商席位 ID
+=========
+
+该接口用于获取券商席位 ID 数据 (可每天同步一次)。
+
+CLI[安装 CLI](./cli.md)
+
+--------------------------------------------------------
+
+bash
+
+    # 港股所有做市商券商 ID 和名称
+    longbridge participants
+
+SDK Links
+---------
+
+|     |     |
+| --- | --- |
+| Python | [longbridge.openapi.QuoteContext.participants](https://longbridge.github.io/openapi/python/reference_all/#longbridge.openapi.QuoteContext.participants) |
+| Rust | [longbridge::quote::QuoteContext#participants](https://longbridge.github.io/openapi/rust/longbridge/quote/struct.QuoteContext.html#method.participants) |
+| Go  | [QuoteContext.Participants](https://pkg.go.dev/github.com/longbridge/openapi-go/quote#QuoteContext.Participants) |
+| Node.js | [QuoteContext#participants](https://longbridge.github.io/openapi/nodejs/classes/QuoteContext.html#participants) |
+| Java | [QuoteContext.getParticipants](https://longbridge.github.io/openapi/java/com/longbridge/quote/QuoteContext.html#getParticipants()) |
+| C++ | [longbridge::quote::QuoteContext::participants](https://longbridge.github.io/openapi/cpp/classlongbridge_1_1quote_1_1_quote_context.html#a4b1206889135f8712e52b88ef321f280) |
+
+Info
+
+[业务指令](./socket-biz-command.md)
+：`16`
+
+Request [​](./quote-pull-broker-ids.md#request)
+
+----------------------------------------------------------------------------------
+
+### Request Example [​](./quote-pull-broker-ids.md#request-example)
+
+PythonPython (async)Node.jsJavaRustC++Go
+
+python
+
+    from longbridge.openapi import QuoteContext, Config, OAuthBuilder
+    
+    oauth = OAuthBuilder("your-client-id").build(lambda url: print("Visit:", url))
+    config = Config.from_oauth(oauth)
+    ctx = QuoteContext(config)
+    
+    resp = ctx.participants()
+    print(resp)
+
+python
+
+    import asyncio
+    from longbridge.openapi import AsyncQuoteContext, Config, OAuthBuilder
+    
+    async def main() -> None:
+        oauth = await OAuthBuilder("your-client-id").build_async(lambda url: print("Visit:", url))
+        config = Config.from_oauth(oauth)
+        ctx = AsyncQuoteContext.create(config)
+    
+        resp = await ctx.participants()
+        print(resp)
+    
+    if __name__ == "__main__":
+        asyncio.run(main())
+
+javascript
+
+    const { Config, QuoteContext, OAuth } = require('longbridge')
+    
+    async function main() {
+      const oauth = await OAuth.build("your-client-id", (_, url) => {
+        console.log("Open this URL to authorize: " + url)
+      })
+      const config = Config.fromOAuth(oauth)
+      const ctx = QuoteContext.new(config)
+      const resp = await ctx.participants()
+      for (const obj of resp) {
+        console.log(obj.toString())
+      }
+    }
+    main().catch(console.error)
+
+java
+
+    import com.longbridge.*;
+    import com.longbridge.quote.*;
+    
+    class Main {
+        public static void main(String[] args) throws Exception {
+            try (OAuth oauth = new OAuthBuilder("your-client-id")
+                    .build(url -> System.out.println("Open to authorize: " + url))
+                    .get();
+                 Config config = Config.fromOAuth(oauth);
+                 QuoteContext ctx = QuoteContext.create(config)) {
+                ParticipantInfo[] resp = ctx.getParticipants().get();
+                for (ParticipantInfo obj : resp) {
+                    System.out.println(obj);
+                }
+            }
+        }
+    }
+
+rust
+
+    use std::sync::Arc;
+    use longbridge::{oauth::OAuthBuilder, quote::QuoteContext, Config};
+    
+    #[tokio::main]
+    async fn main() -> Result<(), Box<dyn std::error::Error>> {
+        let oauth = OAuthBuilder::new("your-client-id")
+            .build(|url| println!("Open this URL to authorize: {url}"))
+            .await?;
+        let config = Arc::new(Config::from_oauth(oauth));
+        let (ctx, _) = QuoteContext::new(config);
+        let resp = ctx.participants().await?;
+        println!("{:?}", resp);
+        Ok(())
+    }
+
+cpp
+
+    #include <iostream>
+    #include <longbridge.hpp>
+    
+    #ifdef WIN32
+    #include <windows.h>
+    #endif
+    
+    using namespace longbridge;
+    using namespace longbridge::quote;
+    
+    static void
+    run(const OAuth& oauth)
+    {
+        Config config = Config::from_oauth(oauth);
+        QuoteContext ctx = QuoteContext::create(config);
+    
+        ctx.participants([](auto res) {
+            if (!res) {
+                std::cout << "failed: " << *res.status().message() << std::endl;
+                return;
+            }
+            for (const auto& p : *res) {
+                std::cout << p.broker_ids[0] << " " << p.name << std::endl;
+            }
+        });
+    }
+    
+    int main(int argc, char const* argv[]) {
+    #ifdef WIN32
+        SetConsoleOutputCP(CP_UTF8);
+    #endif
+    
+        const std::string client_id = "your-client-id";
+        OAuthBuilder(client_id).build(
+        [](const std::string& url) {
+            std::cout << "Open this URL to authorize: " << url << std::endl;
+        },
+        [](auto res) {
+            if (!res) {
+                std::cout << "authorization failed: " << *res.status().message() << std::endl;
+                return;
+            }
+            run(*res);
+        });
+    
+        std::cin.get();
+        return 0;
+    }
+
+go
+
+    package main
+    
+    import (
+    	"context"
+    	"fmt"
+    	"log"
+    
+    	"github.com/longbridge/openapi-go/config"
+    	"github.com/longbridge/openapi-go/oauth"
+    	"github.com/longbridge/openapi-go/quote"
+    )
+    
+    func main() {
+    	o := oauth.New("your-client-id").
+    		OnOpenURL(func(url string) { fmt.Println("Open this URL to authorize:", url) })
+    	if err := o.Build(context.Background()); err != nil {
+    		log.Fatal(err)
+    	}
+    	conf, err := config.New(config.WithOAuthClient(o))
+    	if err != nil {
+    		log.Fatal(err)
+    	}
+    	qctx, err := quote.NewFromCfg(conf)
+    	if err != nil {
+    		log.Fatal(err)
+    	}
+    	defer qctx.Close()
+    	participants, err := qctx.Participants(context.Background())
+    	if err != nil {
+    		log.Fatal(err)
+    	}
+    	for _, p := range participants {
+    		fmt.Printf("%v %s\n", p.BrokerIds, p.ParticipantNameEn)
+    	}
+    }
+
+Response [​](./quote-pull-broker-ids.md#response)
+
+------------------------------------------------------------------------------------
+
+### Response Properties [​](./quote-pull-broker-ids.md#response-properties)
+
+| Name | Type | Description |
+| --- | --- | --- |
+| participant\_broker\_numbers | object\[\] | 券商席位 |
+| ∟ broker\_ids | int32\[\] | 券商对应的多个席位 ID |
+| ∟ participant\_name\_cn | string | 券商名称 (简) |
+| ∟ participant\_name\_en | string | 券商名称 (英) |
+| ∟ participant\_name\_hk | string | 券商名称 (繁) |
+
+### Protobuf [​](./quote-pull-broker-ids.md#protobuf)
+
+protobuf
+
+    message ParticipantBrokerIdsResponse {
+      repeated ParticipantInfo participant_broker_numbers = 1;
+    }
+    
+    message ParticipantInfo {
+      repeated int32 broker_ids = 1;
+      string participant_name_cn = 2;
+      string participant_name_en = 3;
+      string participant_name_hk = 4;
+    }
+
+### Response JSON Example [​](./quote-pull-broker-ids.md#response-json-example)
+
+json
+
+    {
+      "participant_broker_numbers": [\
+        {\
+          "broker_ids": [7738, 7739],\
+          "participant_name_cn": "华兴金融 (香港)",\
+          "participant_name_en": "China Renaissance(HK)",\
+          "participant_name_hk": "華興金融 (香港)"\
+        },\
+        {\
+          "broker_ids": [6390, 6396, 6398, 6399],\
+          "participant_name_cn": "国信 (香港)",\
+          "participant_name_en": "Guosen(HK)",\
+          "participant_name_hk": "國信 (香港)"\
+        },\
+        {\
+          "broker_ids": [3168, 3169],\
+          "participant_name_cn": "泰嘉",\
+          "participant_name_en": "Tiger",\
+          "participant_name_hk": "泰嘉"\
+        }\
+      ]
+    }
+
+错误码 [​](./quote-pull-broker-ids.md#%E9%94%99%E8%AF%AF%E7%A0%81)
+
+--------------------------------------------------------------------------------------------------
+
+| 协议错误码 | 业务错误码 | 描述  | 排查建议 |
+| --- | --- | --- | --- |
+| 3   | 301600 | 无效的请求 | 请求参数有误或解包失败 |
+| 3   | 301606 | 限流  | 降低请求频次 |
+| 7   | 301602 | 服务端内部错误 | 请重试或联系技术人员处理 |
+
+[LLMs Text](https://open.longbridge.com/docs/quote/pull/broker-ids.md)
+
+[Edit this page](https://github.com/longbridge/developers/edit/main/docs/zh-CN/docs/quote/pull/broker-ids.md)
+
+最后更新于:
+
+Pager
+
+[上一页获取标的经纪队列](./quote-pull-brokers.md)
+
+[下一页获取标的成交明细](./quote-pull-trade.md)
+
+[Longbridge](https://longbridge.com/)
+[Download](https://longbridge.com/download)
+[服务条款](https://support.longbridgewhale.com/topics/misc.disable/lp-user-agreement?locale=zh-CN)
+[隐私政策](https://support.longbridgewhale.com/topics/misc/privacy-policy?locale=zh-CN)
+
+[SDK](https://open.longbridge.com/sdk)
+[MCP](https://open.longbridge.com/docs/mcp)
+[CLI](https://open.longbridge.com/docs/cli)
+[LLM](https://open.longbridge.com/docs/llm)
+[](https://github.com/longbridge)
