@@ -26,48 +26,33 @@
 *   `CHANGE_RATE`
     
     涨跌幅
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%
     *   例如填写 \[-10.2, 20.4\] 值区间
     
 *   `AMPLITUDE`
     
     振幅
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%
     *   例如填写 \[0.5, 20.6\] 值区间
     
 *   `VOLUME`
     
     日均成交量
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 0 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 0 位，超出部分会被舍弃)
     *   例如填写 \[2000, 70000\] 值区间
     
 *   `TURNOVER`
     
     日均成交额
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   例如填写 \[1400, 890000\] 值区间
     
 *   `TURNOVER_RATE`
     
     换手率
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%
     *   例如填写 \[2, 30\] 值区间
     
@@ -641,98 +626,68 @@
 *   `NET_PROFIT`
     
     净利润
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   例如填写 \[100000000, 2500000000\] 值区间
     
 *   `NET_PROFIX_GROWTH`
     
     净利润增长率
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%
     *   例如填写 \[-10, 300\] 值区间
     
 *   `SUM_OF_BUSINESS`
     
     营业收入
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   例如填写 \[100000000, 6400000000\] 值区间
     
 *   `SUM_OF_BUSINESS_GROWTH`
     
     营收同比增长率
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%
     *   例如填写 \[-5, 200\] 值区间
     
 *   `NET_PROFIT_RATE`
     
     净利率
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%
     *   例如填写 \[10, 113\] 值区间
     
 *   `GROSS_PROFIT_RATE`
     
     毛利率
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%
     *   例如填写 \[4, 65\] 值区间
     
 *   `DEBT_ASSET_RATE`
     
     资产负债率
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%
     *   例如填写 \[5, 470\] 值区间
     
 *   `RETURN_ON_EQUITY_RATE`
     
     净资产收益率
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%
     *   例如填写 \[20, 230\] 值区间
     
 *   `ROIC`
     
     投入资本回报率
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%
     *   例如填写 \[1.0, 10.0\] 值区间
     
 *   `ROA_TTM`
     
     资产回报率 TTM
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%
     *   仅适用于年报
     *   例如填写 \[1.0, 10.0\] 值区间
@@ -740,30 +695,21 @@
 *   `EBIT_TTM`
     
     息税前利润 TTM
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%
     *   例如填写 \[1000000000, 1000000000\] 值区间
     
 *   `EBITDA`
     
     税息折旧及摊销前利润
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   单位：元
     *   例如填写 \[1000000000, 1000000000\] 值区间
     
 *   `OPERATING_MARGIN_TTM`
     
     营业利润率 TTM
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%
     *   仅适用于年报
     *   例如填写 \[1.0, 10.0\] 值区间
@@ -771,40 +717,28 @@
 *   `EBIT_MARGIN`
     
     EBIT 利润率
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%
     *   例如填写 \[1.0, 10.0\] 值区间
     
 *   `EBITDA_MARGIN`
     
     EBITDA 利润率
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%
     *   例如填写 \[1.0, 10.0\] 值区间
     
 *   `FINANCIAL_COST_RATE`
     
     财务成本率
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%
     *   例如填写 \[1.0, 10.0\] 值区间
     
 *   `OPERATING_PROFIT_TTM`
     
     营业利润 TTM
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   单位：元
     *   仅适用于年报
     *   例如填写 \[1000000000, 1000000000\] 值区间
@@ -812,10 +746,7 @@
 *   `SHAREHOLDER_NET_PROFIT_TTM`
     
     归属于母公司的净利润
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   单位：元
     *   仅适用于年报
     *   例如填写 \[1000000000, 1000000000\] 值区间
@@ -823,10 +754,7 @@
 *   `NET_PROFIT_CASH_COVER_TTM`
     
     盈利中的现金收入比例
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%
     *   仅适用于年报
     *   例如填写 \[1.0, 60.0\] 值区间
@@ -834,109 +762,76 @@
 *   `CURRENT_RATIO`
     
     流动比率
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。
     *   例如填写 \[100, 250\] 值区间
     
 *   `QUICK_RATIO`
     
     速动比率
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。
     *   例如填写 \[100, 250\] 值区间
     
 *   `CURRENT_ASSET_RATIO`
     
     流动资产率
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。
     *   例如填写 \[100, 250\] 值区间
     
 *   `CURRENT_DEBT_RATIO`
     
     流动负债率
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。
     *   例如填写 \[100, 250\] 值区间
     
 *   `EQUITY_MULTIPLIER`
     
     权益乘数
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   例如填写 \[100, 180\] 值区间
     
 *   `PROPERTY_RATIO`
     
     产权比率
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。
     *   例如填写 \[50, 100\] 值区间
     
 *   `CASH_AND_CASH_EQUIVALENTS`
     
     现金和现金等价物
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   单位：元
     *   例如填写 \[1000000000, 1000000000\] 值区间
     
 *   `TOTAL_ASSET_TURNOVER`
     
     总资产周转率
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。
     *   例如填写 \[50, 100\] 值区间
     
 *   `FIXED_ASSET_TURNOVER`
     
     固定资产周转率
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。
     *   例如填写 \[50, 100\] 值区间
     
 *   `INVENTORY_TURNOVER`
     
     存货周转率
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。
     *   例如填写 \[50, 100\] 值区间
     
 *   `OPERATING_CASH_FLOW_TTM`
     
     经营活动现金流 TTM
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   单位：元
     *   仅适用于年报
     *   例如填写 \[1000000000, 1000000000\] 值区间
@@ -944,160 +839,112 @@
 *   `ACCOUNTS_RECEIVABLE`
     
     应收账款净额
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   单位：元。
     *   例如填写 \[1000000000, 1000000000\] 值区间
     
 *   `EBIT_GROWTH_RATE`
     
     EBIT 同比增长率
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。
     *   例如填写 \[1.0, 10.0\] 值区间
     
 *   `OPERATING_PROFIT_GROWTH_RATE`
     
     营业利润同比增长率
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。
     *   例如填写 \[1.0, 10.0\] 值区间
     
 *   `TOTAL_ASSETS_GROWTH_RATE`
     
     总资产同比增长率
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。
     *   例如填写 \[1.0, 10.0\] 值区间
     
 *   `PROFIT_TO_SHAREHOLDERS_GROWTH_RATE`
     
     归母净利润同比增长率
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。
     *   例如填写 \[1.0, 10.0\] 值区间
     
 *   `PROFIT_BEFORE_TAX_GROWTH_RATE`
     
     总利润同比增长率
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。
     *   例如填写 \[1.0, 10.0\] 值区间
     
 *   `EPS_GROWTH_RATE`
     
     EPS 同比增长率
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。
     *   例如填写 \[1.0, 10.0\] 值区间
     
 *   `ROE_GROWTH_RATE`
     
     ROE 同比增长率
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。
     *   例如填写 \[1.0, 10.0\] 值区间
     
 *   `ROIC_GROWTH_RATE`
     
     ROIC 同比增长率
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。
     *   例如填写 \[1.0, 10.0\] 值区间
     
 *   `NOCF_GROWTH_RATE`
     
     经营现金流同比增长率
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。
     *   例如填写 \[1.0, 10.0\] 值区间
     
 *   `NOCF_PER_SHARE_GROWTH_RATE`
     
     每股经营现金流同比增长率
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。
     *   例如填写 \[1.0, 10.0\] 值区间
     
 *   `OPERATING_REVENUE_CASH_COVER`
     
     经营现金收入比
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。
     *   例如填写 \[10, 100\] 值区间
     
 *   `OPERATING_PROFIT_TO_TOTAL_PROFIT`
     
     营业利润占比
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。
     *   例如填写 \[10, 100\] 值区间
     
 *   `BASIC_EPS`
     
     基本每股收益
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   单位：元
     *   例如填写 \[0.1, 10\] 值区间
     
 *   `DILUTED_EPS`
     
     稀释每股收益
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   单位：元
     *   例如填写 \[0.1, 10\] 值区间
     
 *   `NOCF_PER_SHARE`
     
     每股经营现金净流量
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   单位：元
     *   例如填写 \[0.1, 10\] 值区间
     
@@ -1986,10 +1833,7 @@
 *   `RSI`
     
     RSI
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    指标参数的默认值为\[12\]
+    (ℹ️ 指标参数的默认值为\[12\])
     
 *   `EMA`
     
@@ -2026,74 +1870,47 @@
 *   `KDJ_K`
     
     KDJ 指标的 K 值
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    指标参数需要根据 KDJ 进行传参。不传则默认为 \[9,3,3\]
+    (ℹ️ 指标参数需要根据 KDJ 进行传参。不传则默认为 \[9,3,3\])
     
 *   `KDJ_D`
     
     KDJ 指标的 D 值
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    指标参数需要根据 KDJ 进行传参。不传则默认为 \[9,3,3\]
+    (ℹ️ 指标参数需要根据 KDJ 进行传参。不传则默认为 \[9,3,3\])
     
 *   `KDJ_J`
     
     KDJ 指标的 J 值
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    指标参数需要根据 KDJ 进行传参。不传则默认为 \[9,3,3\]
+    (ℹ️ 指标参数需要根据 KDJ 进行传参。不传则默认为 \[9,3,3\])
     
 *   `MACD_DIFF`
     
     MACD 指标的 DIFF 值
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    指标参数需要根据 MACD 进行传参。不传则默认为 \[12,26,9\]
+    (ℹ️ 指标参数需要根据 MACD 进行传参。不传则默认为 \[12,26,9\])
     
 *   `MACD_DEA`
     
     MACD 指标的 DEA 值
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    指标参数需要根据 MACD 进行传参。不传则默认为 \[12,26,9\]
+    (ℹ️ 指标参数需要根据 MACD 进行传参。不传则默认为 \[12,26,9\])
     
 *   `MACD`
     
     MACD
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    指标参数需要根据 MACD 进行传参。不传则默认为 \[12,26,9\]
+    (ℹ️ 指标参数需要根据 MACD 进行传参。不传则默认为 \[12,26,9\])
     
 *   `BOLL_UPPER`
     
     BOLL 指标的 UPPER 值
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    指标参数需要根据 BOLL 进行传参。不传则默认为 \[20,2\]
+    (ℹ️ 指标参数需要根据 BOLL 进行传参。不传则默认为 \[20,2\])
     
 *   `BOLL_MIDDLER`
     
     BOLL 指标的 MIDDLER 值
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    指标参数需要根据 BOLL 进行传参。不传则默认为 \[20,2\]
+    (ℹ️ 指标参数需要根据 BOLL 进行传参。不传则默认为 \[20,2\])
     
 *   `BOLL_LOWER`
     
     BOLL 指标的 LOWER 值
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    指标参数需要根据 BOLL 进行传参。不传则默认为 \[20,2\]
+    (ℹ️ 指标参数需要根据 BOLL 进行传参。不传则默认为 \[20,2\])
     
 *   `VALUE`
     
@@ -4066,26 +3883,17 @@
 *   `K_WEEK`
     
     周 K
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    期权暂不支持该K线类型
+    (ℹ️ 期权暂不支持该K线类型)
     
 *   `K_MON`
     
     月 K
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    期权暂不支持该K线类型
+    (ℹ️ 期权暂不支持该K线类型)
     
 *   `K_YEAR`
     
     年 K
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    期权暂不支持该K线类型
+    (ℹ️ 期权暂不支持该K线类型)
     
 *   `K_5M`
     
@@ -4098,10 +3906,7 @@
 *   `K_30M`
     
     30分 K
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    期权暂不支持该K线类型
+    (ℹ️ 期权暂不支持该K线类型)
     
 *   `K_60M`
     
@@ -4110,18 +3915,12 @@
 *   `K_3M`
     
     3分 K
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    期权暂不支持该K线类型
+    (ℹ️ 期权暂不支持该K线类型)
     
 *   `K_QUARTER`
     
     季 K
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    期权暂不支持该K线类型
+    (ℹ️ 期权暂不支持该K线类型)
     
 
 **KLType**
@@ -5049,10 +4848,7 @@
 *   `REGION`
     
     地域板块
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    港美股市场的地域分类数据暂为空
+    (ℹ️ 港美股市场的地域分类数据暂为空)
     
 *   `CONCEPT`
     
@@ -5061,10 +4857,7 @@
 *   `OTHER`
     
     其他板块
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    仅用于 [获取股票所属板块](https://openapi.futunn.com/futu-api-doc/quote/get-owner-plate.html)
+    (ℹ️ 仅用于 [获取股票所属板块](https://openapi.futunn.com/futu-api-doc/quote/get-owner-plate.html))
      接口的返回，不可作为其他接口的请求参数
     
 
@@ -5326,34 +5119,22 @@
 *   `CHANGE_RATE_UP`
     
     日涨幅超
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    该字段为百分比字段，设置时填 20 表示 20%
+    (ℹ️ 该字段为百分比字段，设置时填 20 表示 20%)
     
 *   `CHANGE_RATE_DOWN`
     
     日跌幅超
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    该字段为百分比字段，设置时填 20 表示 20%
+    (ℹ️ 该字段为百分比字段，设置时填 20 表示 20%)
     
 *   `FIVE_MIN_CHANGE_RATE_UP`
     
     5 分钟涨幅超
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    该字段为百分比字段，设置时填 20 表示 20%
+    (ℹ️ 该字段为百分比字段，设置时填 20 表示 20%)
     
 *   `FIVE_MIN_CHANGE_RATE_DOWN`
     
     5 分钟跌幅超
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    该字段为百分比字段，设置时填 20 表示 20%
+    (ℹ️ 该字段为百分比字段，设置时填 20 表示 20%)
     
 *   `VOLUME_UP`
     
@@ -5366,10 +5147,7 @@
 *   `TURNOVER_RATE_UP`
     
     换手率超过
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    该字段为百分比字段，设置时填 20 表示 20%
+    (ℹ️ 该字段为百分比字段，设置时填 20 表示 20%)
     
 *   `BID_PRICE_UP`
     
@@ -5390,18 +5168,12 @@
 *   `THREE_MIN_CHANGE_RATE_UP`
     
     3 分钟涨幅超
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    该字段为百分比字段，设置时填 20 表示 20%
+    (ℹ️ 该字段为百分比字段，设置时填 20 表示 20%)
     
 *   `THREE_MIN_CHANGE_RATE_DOWN`
     
     3 分钟跌幅超
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    该字段为百分比字段，设置时填 20 表示 20%
+    (ℹ️ 该字段为百分比字段，设置时填 20 表示 20%)
     
 
 **PriceReminderType**
@@ -5754,10 +5526,7 @@
 *   `BYDISCONN`
     
     与富途服务器连接断开期间，拉取补充的数据
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    最多 50 个
+    (ℹ️ 最多 50 个)
     
 *   `CACHE`
     
@@ -8115,18 +7884,12 @@
 *   `DELTA`
     
     对冲值
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    仅认购认沽支持该字段
+    (ℹ️ 仅认购认沽支持该字段)
     
 *   `IMPLIED_VOLATILITY`
     
     引伸波幅
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    仅认购认沽支持该字段
+    (ℹ️ 仅认购认沽支持该字段)
     
 *   `TYPE`
     
@@ -8163,10 +7926,7 @@
 *   `RECOVERY_PRICE`
     
     收回价
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    仅牛熊证支持该字段
+    (ℹ️ 仅牛熊证支持该字段)
     
 *   `CHANGE_PRICE`
     
@@ -8203,26 +7963,17 @@
 *   `UPPER_STRIKE_PRICE`
     
     上限价
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    仅用于界内证
+    (ℹ️ 仅用于界内证)
     
 *   `LOWER_STRIKE_PRICE`
     
     下限价
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    仅用于界内证
+    (ℹ️ 仅用于界内证)
     
 *   `INLINE_PRICE_STATUS`
     
     界内界外
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    仅用于界内证
+    (ℹ️ 仅用于界内证)
     
 *   `PRE_CUR_PRICE`
     
@@ -8930,10 +8681,7 @@
 *   `CUR_PRICE`
     
     最新价
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   例如填写 \[10, 20\] 值区间
     
 *   `CUR_PRICE_TO_HIGHEST52_WEEKS_RATIO`
@@ -8942,10 +8690,7 @@
     **CP**：现价  
     **WH52**：52 周最高  
     对应 PC 端“离 52 周高点百分比”
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%
     *   例如填写 \[-30, -10\] 值区间
     
@@ -8955,10 +8700,7 @@
     **CP**：现价  
     **WL52**：52 周最低  
     对应 PC 端“离 52 周低点百分比”
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%
     *   例如填写 \[20, 40\] 值区间
     
@@ -8967,10 +8709,7 @@
     **(TH - WH52) / WH52**  
     **TH**：今日最高  
     **WH52**：52 周最高  
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%
     *   例如填写 \[-3, -1\] 值区间
     
@@ -8979,144 +8718,99 @@
     **(TL - WL52) / WL52**  
     **TL**：今日最低  
     **WL52**：52 周最低  
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%
     *   例如填写 \[10, 70\] 值区间
     
 *   `VOLUME_RATIO`
     
     量比
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   例如填写 \[0.5, 30\] 值区间
     
 *   `BID_ASK_RATIO`
     
     委比
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%
     *   例如填写 \[-20, 80.5\] 值区间
     
 *   `LOT_PRICE`
     
     每手价格
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   例如填写 \[40, 100\] 值区间
     
 *   `MARKET_VAL`
     
     市值
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   例如填写 \[50000000, 3000000000\] 值区间
     
 *   `PE_ANNUAL`
     
     市盈率(静态)
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   例如填写 \[-8, 65.3\] 值区间
     
 *   `PE_TTM`
     
     市盈率 TTM
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   例如填写 \[-10, 20.5\] 值区间
     
 *   `PB_RATE`
     
     市净率
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   例如填写 \[0.5, 20\] 值区间
     
 *   `CHANGE_RATE_5MIN`
     
     五分钟价格涨跌幅
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%
     *   例如填写 \[-5, 6.3\] 值区间
     
 *   `CHANGE_RATE_BEGIN_YEAR`
     
     年初至今价格涨跌幅
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%
     *   例如填写 \[-50.1, 400.7\] 值区间
     
 *   `PS_TTM`
     
     市销率 TTM
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%
     *   例如填写 \[100, 500\] 值区间
     
 *   `PCF_TTM`
     
     市现率 TTM
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%
     *   例如填写 \[100, 1000\] 值区间
     
 *   `TOTAL_SHARE`
     
     总股数
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   单位：股
     *   例如填写 \[1000000000, 1000000000\] 值区间
     
 *   `FLOAT_SHARE`
     
     流通股数
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   单位：股
     *   例如填写 \[1000000000, 1000000000\] 值区间
     
 *   `FLOAT_MARKET_VAL`
     
     流通市值
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   精确到小数点后 3 位，超出部分会被舍弃
+    (ℹ️ *   精确到小数点后 3 位，超出部分会被舍弃)
     *   单位：元
     *   例如填写 \[1000000000, 1000000000\] 值区间
     
@@ -9743,26 +9437,17 @@
 *   `BUY`
     
     外盘
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    外盘（主动买入），即以卖一价或更高的价格成交股票
+    (ℹ️ 外盘（主动买入），即以卖一价或更高的价格成交股票)
     
 *   `SELL`
     
     内盘
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    内盘（主动卖出），即以买一价或更低的价格成交股票
+    (ℹ️ 内盘（主动卖出），即以买一价或更低的价格成交股票)
     
 *   `NEUTRAL`
     
     中性盘
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    中性盘，即以买一价与卖一价之间的价格撮合成交
+    (ℹ️ 中性盘，即以买一价与卖一价之间的价格撮合成交)
     
 
 **TickerDirection**
@@ -10397,19 +10082,13 @@
 *   `HK`
     
     香港市场
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   含股票、ETFs、窝轮、牛熊、期权、非假期交易期货
+    (ℹ️ *   含股票、ETFs、窝轮、牛熊、期权、非假期交易期货)
     *   不含假期交易期货
     
 *   `US`
     
     美国市场
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   含股票、ETFs、期权
+    (ℹ️ *   含股票、ETFs、期权)
     *   不含期货
     
       
@@ -11021,10 +10700,7 @@
 *   `US_OPTION`
     
     美国
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    仅美股期权适用
+    (ℹ️ 仅美股期权适用)
     
 *   `US_NYMEX`
     

@@ -136,9 +136,9 @@
         | code | str | 股票代码 |
         | name | str | 股票名称 |
         | sequence | int | 逐笔序号 |
-        | time | str | 成交时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd HH:mm:ss:xxx  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间 |
+        | time | str | 成交时间<br>(ℹ️ 格式：yyyy-MM-dd HH:mm:ss:xxx  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间) |
         | price | float | 成交价格 |
-        | volume | int | 成交数量<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>股数 |
+        | volume | int | 成交数量<br>(ℹ️ 股数) |
         | turnover | float | 成交金额 |
         | ticker\_direction | [TickerDirect](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8723) | 逐笔方向 |
         | type | [TickerType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2358) | 逐笔类型 |
@@ -1334,9 +1334,9 @@
         | code | str | 股票代码 |
         | name | str | 股票名称 |
         | sequence | int | 逐笔序号 |
-        | time | str | 成交时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd HH:mm:ss  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间 |
+        | time | str | 成交时间<br>(ℹ️ 格式：yyyy-MM-dd HH:mm:ss  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间) |
         | price | float | 成交价格 |
-        | volume | int | 成交数量<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>股数 |
+        | volume | int | 成交数量<br>(ℹ️ 股数) |
         | turnover | float | 成交金额 |
         | ticker\_direction | [TickerDirect](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8723) | 逐笔方向 |
         | type | [TickerType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2358) | 逐笔类型 |

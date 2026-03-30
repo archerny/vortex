@@ -113,7 +113,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | market | [Market](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427) | 市场标识<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>注意：这里不区分沪和深，输入沪或者深都会返回沪深市场的子板块 |
+    | market | [Market](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427) | 市场标识<br>(ℹ️ 注意：这里不区分沪和深，输入沪或者深都会返回沪深市场的子板块) |
     | plate\_class | [Plate](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1362) | 板块分类 |
     
 
@@ -1238,7 +1238,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | market | [Market](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427) | 市场标识<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>注意：这里不区分沪和深，输入沪或者深都会返回沪深市场的子板块 |
+    | market | [Market](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427) | 市场标识<br>(ℹ️ 注意：这里不区分沪和深，输入沪或者深都会返回沪深市场的子板块) |
     | plate\_class | [Plate](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1362) | 板块分类 |
     
 

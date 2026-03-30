@@ -29,13 +29,13 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | code\_list | list | 需要订阅的股票代码列表<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>list 中元素类型是 str |
-    | subtype\_list | list | 需要订阅的数据类型列表<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>list 中元素类型是 [SubType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5878) |
-    | is\_first\_push | bool | 订阅成功之后是否立即推送一次缓存数据<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   True：推送缓存  <br>    当脚本和 OpenD 之间出现断线重连，重新订阅时若设置为 True，会再次推送断线前的最后一条数据<br>*   False：不推送缓存。等待服务器的最新推送 |
-    | subscribe\_push | bool | 订阅后是否推送<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>订阅后，OpenD 提供了[两种取数据的方式](https://openapi.futunn.com/futu-api-doc/qa/quote.html#2692)<br>，如果您仅使用 **获取实时数据** 的方式，选择 False 可以节省一部分性能消耗<br><br>*   True：推送。如果使用 **实时数据回调** 的方式，则必须设置为 True<br>*   False：不推送。如果**仅**使用 **获取实时数据** 的方式，则建议设置为 False |
-    | is\_detailed\_orderbook | bool | 是否订阅详细的摆盘订单明细<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   仅用于港股 SF 行情权限下订阅港股 ORDER\_BOOK 类型<br>*   美股美期 LV2 权限下不提供详细摆盘订单明细 |
-    | extended\_time | bool | 是否允许美股盘前盘后数据<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅用于订阅美股实时 K 线、实时分时、实时逐笔 |
-    | session | [Session](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9152) | 美股订阅时段<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   仅用于订阅美股实时 K 线、实时分时、实时逐笔<br>*   订阅美股行情不支持入参OVERNIGHT<br>*   最低OpenD版本：9.2.4207 |
+    | code\_list | list | 需要订阅的股票代码列表<br>(ℹ️ list 中元素类型是 str) |
+    | subtype\_list | list | 需要订阅的数据类型列表<br>(ℹ️ list 中元素类型是 [SubType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5878)) |
+    | is\_first\_push | bool | 订阅成功之后是否立即推送一次缓存数据<br>(ℹ️ *   True：推送缓存  <br>    当脚本和 OpenD 之间出现断线重连，重新订阅时若设置为 True，会再次推送断线前的最后一条数据<br>*   False：不推送缓存。等待服务器的最新推送) |
+    | subscribe\_push | bool | 订阅后是否推送<br>(ℹ️ 订阅后，OpenD 提供了[两种取数据的方式](https://openapi.futunn.com/futu-api-doc/qa/quote.html#2692)<br>，如果您仅使用 **获取实时数据** 的方式，选择 False 可以节省一部分性能消耗<br><br>*   True：推送。如果使用 **实时数据回调** 的方式，则必须设置为 True<br>*   False：不推送。如果**仅**使用 **获取实时数据** 的方式，则建议设置为 False) |
+    | is\_detailed\_orderbook | bool | 是否订阅详细的摆盘订单明细<br>(ℹ️ *   仅用于港股 SF 行情权限下订阅港股 ORDER\_BOOK 类型<br>*   美股美期 LV2 权限下不提供详细摆盘订单明细) |
+    | extended\_time | bool | 是否允许美股盘前盘后数据<br>(ℹ️ 仅用于订阅美股实时 K 线、实时分时、实时逐笔) |
+    | session | [Session](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9152) | 美股订阅时段<br>(ℹ️ *   仅用于订阅美股实时 K 线、实时分时、实时逐笔<br>*   订阅美股行情不支持入参OVERNIGHT<br>*   最低OpenD版本：9.2.4207) |
     
 
 *   **返回**
@@ -107,9 +107,9 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | code\_list | list | 取消订阅的股票代码列表<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>list 中元素类型是 str |
-    | subtype\_list | list | 需要订阅的数据类型列表<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>list 中元素类型是 [SubType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5878) |
-    | unsubscribe\_all | bool | 取消所有订阅<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>为 True 时忽略其他参数 |
+    | code\_list | list | 取消订阅的股票代码列表<br>(ℹ️ list 中元素类型是 str) |
+    | subtype\_list | list | 需要订阅的数据类型列表<br>(ℹ️ list 中元素类型是 [SubType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5878)) |
+    | unsubscribe\_all | bool | 取消所有订阅<br>(ℹ️ 为 True 时忽略其他参数) |
     
 
 *   **Return**
@@ -1482,13 +1482,13 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | code\_list | list | 需要订阅的股票代码列表<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>list 中元素类型是 str |
-    | subtype\_list | list | 需要订阅的数据类型列表<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>list 中元素类型是 [SubType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5878) |
-    | is\_first\_push | bool | 订阅成功之后是否立即推送一次缓存数据<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   True：推送缓存  <br>    当脚本和 OpenD 之间出现断线重连，重新订阅时若设置为 True，会再次推送断线前的最后一条数据<br>*   False：不推送缓存。等待服务器的最新推送 |
-    | subscribe\_push | bool | 订阅后是否推送<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>订阅后，OpenD 提供了[两种取数据的方式](https://openapi.futunn.com/futu-api-doc/qa/quote.html#2692)<br>，如果您仅使用 **获取实时数据** 的方式，选择 False 可以节省一部分性能消耗<br><br>*   True：推送。如果使用 **实时数据回调** 的方式，则必须设置为 True<br>*   False：不推送。如果**仅**使用 **获取实时数据** 的方式，则建议设置为 False |
-    | is\_detailed\_orderbook | bool | 是否订阅详细的摆盘订单明细<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   仅用于港股 SF 行情权限下订阅港股 ORDER\_BOOK 类型<br>*   美股美期 LV2 权限下不提供详细摆盘订单明细 |
-    | extended\_time | bool | 是否允许美股盘前盘后数据<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅用于订阅美股实时 K 线、实时分时、实时逐笔 |
-    | session | [Session](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9152) | 美股订阅时段<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   仅用于订阅美股实时 K 线、实时分时、实时逐笔<br>*   订阅美股行情不支持入参OVERNIGHT<br>*   最低OpenD版本：9.2.4207 |
+    | code\_list | list | 需要订阅的股票代码列表<br>(ℹ️ list 中元素类型是 str) |
+    | subtype\_list | list | 需要订阅的数据类型列表<br>(ℹ️ list 中元素类型是 [SubType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5878)) |
+    | is\_first\_push | bool | 订阅成功之后是否立即推送一次缓存数据<br>(ℹ️ *   True：推送缓存  <br>    当脚本和 OpenD 之间出现断线重连，重新订阅时若设置为 True，会再次推送断线前的最后一条数据<br>*   False：不推送缓存。等待服务器的最新推送) |
+    | subscribe\_push | bool | 订阅后是否推送<br>(ℹ️ 订阅后，OpenD 提供了[两种取数据的方式](https://openapi.futunn.com/futu-api-doc/qa/quote.html#2692)<br>，如果您仅使用 **获取实时数据** 的方式，选择 False 可以节省一部分性能消耗<br><br>*   True：推送。如果使用 **实时数据回调** 的方式，则必须设置为 True<br>*   False：不推送。如果**仅**使用 **获取实时数据** 的方式，则建议设置为 False) |
+    | is\_detailed\_orderbook | bool | 是否订阅详细的摆盘订单明细<br>(ℹ️ *   仅用于港股 SF 行情权限下订阅港股 ORDER\_BOOK 类型<br>*   美股美期 LV2 权限下不提供详细摆盘订单明细) |
+    | extended\_time | bool | 是否允许美股盘前盘后数据<br>(ℹ️ 仅用于订阅美股实时 K 线、实时分时、实时逐笔) |
+    | session | [Session](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9152) | 美股订阅时段<br>(ℹ️ *   仅用于订阅美股实时 K 线、实时分时、实时逐笔<br>*   订阅美股行情不支持入参OVERNIGHT<br>*   最低OpenD版本：9.2.4207) |
     
 
 *   **返回**
@@ -1558,9 +1558,9 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | code\_list | list | 取消订阅的股票代码列表<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>list 中元素类型是 str |
-    | subtype\_list | list | 需要订阅的数据类型列表<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>list 中元素类型是 [SubType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5878) |
-    | unsubscribe\_all | bool | 取消所有订阅<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>为 True 时忽略其他参数 |
+    | code\_list | list | 取消订阅的股票代码列表<br>(ℹ️ list 中元素类型是 str) |
+    | subtype\_list | list | 需要订阅的数据类型列表<br>(ℹ️ list 中元素类型是 [SubType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5878)) |
+    | unsubscribe\_all | bool | 取消所有订阅<br>(ℹ️ 为 True 时忽略其他参数) |
     
 
 *   **Return**

@@ -23,7 +23,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | is\_all\_conn | bool | 是否返回所有连接的订阅状态<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>True：返回所有连接的订阅状态  <br>False：只返回当前连接的订阅状态 |
+    | is\_all\_conn | bool | 是否返回所有连接的订阅状态<br>(ℹ️ True：返回所有连接的订阅状态  <br>False：只返回当前连接的订阅状态) |
     
 
 *   **返回**
@@ -1157,7 +1157,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | is\_all\_conn | bool | 是否返回所有连接的订阅状态<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>True：返回所有连接的订阅状态  <br>False：只返回当前连接的订阅状态 |
+    | is\_all\_conn | bool | 是否返回所有连接的订阅状态<br>(ℹ️ True：返回所有连接的订阅状态  <br>False：只返回当前连接的订阅状态) |
     
 
 *   **返回**

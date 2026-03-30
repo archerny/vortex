@@ -104,13 +104,13 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | code | str | 代码过滤<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>只返回此代码对应的成交数据  <br>不传则返回所有 |
-    | deal\_market | [TrdMarket](https://openapi.futunn.com/futu-api-doc/trade/trade.html#719) | 成交标的所属市场过滤<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   成交标的市场过滤，会返回该市场下的成交数据<br>*   默认值为NONE，会返回账户下所有市场的成交数据 |
-    | start | str | 开始时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   严格按 YYYY-MM-DD HH:MM:SS 或 YYYY-MM-DD HH:MM:SS.MS 格式传<br>*   期货时区指定，请参见 [OpenD 配置](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#6724) |
-    | end | str | 结束时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   严格按 YYYY-MM-DD HH:MM:SS 或 YYYY-MM-DD HH:MM:SS.MS 格式传<br>*   期货时区指定，请参见 [OpenD 配置](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#6724) |
-    | trd\_env | [TrdEnv](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6374) | 交易环境<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅支持 TrdEnv.REAL（真实环境），模拟环境暂不支持查询成交数据 |
-    | acc\_id | int | 交易业务账户 ID<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准 |
-    | acc\_index | int | 交易业务账户列表中的账户序号<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户 |
+    | code | str | 代码过滤<br>(ℹ️ 只返回此代码对应的成交数据  <br>不传则返回所有) |
+    | deal\_market | [TrdMarket](https://openapi.futunn.com/futu-api-doc/trade/trade.html#719) | 成交标的所属市场过滤<br>(ℹ️ *   成交标的市场过滤，会返回该市场下的成交数据<br>*   默认值为NONE，会返回账户下所有市场的成交数据) |
+    | start | str | 开始时间<br>(ℹ️ *   严格按 YYYY-MM-DD HH:MM:SS 或 YYYY-MM-DD HH:MM:SS.MS 格式传<br>*   期货时区指定，请参见 [OpenD 配置](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#6724)) |
+    | end | str | 结束时间<br>(ℹ️ *   严格按 YYYY-MM-DD HH:MM:SS 或 YYYY-MM-DD HH:MM:SS.MS 格式传<br>*   期货时区指定，请参见 [OpenD 配置](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#6724)) |
+    | trd\_env | [TrdEnv](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6374) | 交易环境<br>(ℹ️ 仅支持 TrdEnv.REAL（真实环境），模拟环境暂不支持查询成交数据) |
+    | acc\_id | int | 交易业务账户 ID<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准) |
+    | acc\_index | int | 交易业务账户列表中的账户序号<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户) |
     
     *   start 和 end 的组合如下
         
@@ -139,13 +139,13 @@
         | code | str | 股票代码 |
         | stock\_name | str | 股票名称 |
         | deal\_market | [TrdMarket](https://openapi.futunn.com/futu-api-doc/trade/trade.html#719) | 成交标的所属市场 |
-        | qty | float | 成交数量<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>期权期货单位是"张" |
-        | price | float | 成交价格<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>精确到小数点后 3 位，超过部分四舍五入 |
-        | create\_time | str | 创建时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>期货时区指定，请参见 [OpenD 配置](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#6724) |
-        | counter\_broker\_id | int | 对手经纪号<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅港股有效 |
-        | counter\_broker\_name | str | 对手经纪名称<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅港股有效 |
+        | qty | float | 成交数量<br>(ℹ️ 期权期货单位是"张") |
+        | price | float | 成交价格<br>(ℹ️ 精确到小数点后 3 位，超过部分四舍五入) |
+        | create\_time | str | 创建时间<br>(ℹ️ 期货时区指定，请参见 [OpenD 配置](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#6724)) |
+        | counter\_broker\_id | int | 对手经纪号<br>(ℹ️ 仅港股有效) |
+        | counter\_broker\_name | str | 对手经纪名称<br>(ℹ️ 仅港股有效) |
         | status | [DealStatus](https://openapi.futunn.com/futu-api-doc/trade/trade.html#8317) | 成交状态 |
-        | jp\_acc\_type | [SubAccType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6112) | 日本账户类型<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅对日本券商生效 |
+        | jp\_acc\_type | [SubAccType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6112) | 日本账户类型<br>(ℹ️ 仅对日本券商生效) |
         
 *   **Example**
     
@@ -1406,13 +1406,13 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | code | str | 代码过滤<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>只返回此代码对应的成交数据  <br>不传则返回所有 |
-    | deal\_market | [TrdMarket](https://openapi.futunn.com/futu-api-doc/trade/trade.html#719) | 成交标的所属市场过滤<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   成交标的市场过滤，会返回该市场下的成交数据<br>*   默认值为NONE，会返回账户下所有市场的成交数据 |
-    | start | str | 开始时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   严格按 YYYY-MM-DD HH:MM:SS 或 YYYY-MM-DD HH:MM:SS.MS 格式传<br>*   期货时区指定，请参见 [OpenD 配置](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#6724) |
-    | end | str | 结束时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   严格按 YYYY-MM-DD HH:MM:SS 或 YYYY-MM-DD HH:MM:SS.MS 格式传<br>*   期货时区指定，请参见 [OpenD 配置](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#6724) |
-    | trd\_env | [TrdEnv](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6374) | 交易环境<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅支持 TrdEnv.REAL（真实环境），模拟环境暂不支持查询成交数据 |
-    | acc\_id | int | 交易业务账户 ID<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准 |
-    | acc\_index | int | 交易业务账户列表中的账户序号<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户 |
+    | code | str | 代码过滤<br>(ℹ️ 只返回此代码对应的成交数据  <br>不传则返回所有) |
+    | deal\_market | [TrdMarket](https://openapi.futunn.com/futu-api-doc/trade/trade.html#719) | 成交标的所属市场过滤<br>(ℹ️ *   成交标的市场过滤，会返回该市场下的成交数据<br>*   默认值为NONE，会返回账户下所有市场的成交数据) |
+    | start | str | 开始时间<br>(ℹ️ *   严格按 YYYY-MM-DD HH:MM:SS 或 YYYY-MM-DD HH:MM:SS.MS 格式传<br>*   期货时区指定，请参见 [OpenD 配置](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#6724)) |
+    | end | str | 结束时间<br>(ℹ️ *   严格按 YYYY-MM-DD HH:MM:SS 或 YYYY-MM-DD HH:MM:SS.MS 格式传<br>*   期货时区指定，请参见 [OpenD 配置](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#6724)) |
+    | trd\_env | [TrdEnv](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6374) | 交易环境<br>(ℹ️ 仅支持 TrdEnv.REAL（真实环境），模拟环境暂不支持查询成交数据) |
+    | acc\_id | int | 交易业务账户 ID<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准) |
+    | acc\_index | int | 交易业务账户列表中的账户序号<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户) |
     
     *   start 和 end 的组合如下
         
@@ -1441,13 +1441,13 @@
         | code | str | 股票代码 |
         | stock\_name | str | 股票名称 |
         | deal\_market | [TrdMarket](https://openapi.futunn.com/futu-api-doc/trade/trade.html#719) | 成交标的所属市场 |
-        | qty | float | 成交数量<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>期权期货单位是"张" |
-        | price | float | 成交价格<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>精确到小数点后 3 位，超过部分四舍五入 |
-        | create\_time | str | 创建时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>期货时区指定，请参见 [OpenD 配置](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#6724) |
-        | counter\_broker\_id | int | 对手经纪号<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅港股有效 |
-        | counter\_broker\_name | str | 对手经纪名称<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅港股有效 |
+        | qty | float | 成交数量<br>(ℹ️ 期权期货单位是"张") |
+        | price | float | 成交价格<br>(ℹ️ 精确到小数点后 3 位，超过部分四舍五入) |
+        | create\_time | str | 创建时间<br>(ℹ️ 期货时区指定，请参见 [OpenD 配置](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#6724)) |
+        | counter\_broker\_id | int | 对手经纪号<br>(ℹ️ 仅港股有效) |
+        | counter\_broker\_name | str | 对手经纪名称<br>(ℹ️ 仅港股有效) |
         | status | [DealStatus](https://openapi.futunn.com/futu-api-doc/trade/trade.html#8317) | 成交状态 |
-        | jp\_acc\_type | [SubAccType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6112) | 日本账户类型<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅对日本券商生效 |
+        | jp\_acc\_type | [SubAccType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6112) | 日本账户类型<br>(ℹ️ 仅对日本券商生效) |
         
 *   **Example**
     

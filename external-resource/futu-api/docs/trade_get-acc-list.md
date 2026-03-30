@@ -117,13 +117,13 @@
         | trd\_env | [TrdEnv](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6374) | 交易环境 |
         | acc\_type | [TrdAccType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#3974) | 账户类型 |
         | uni\_card\_num | str | 综合账户卡号，同移动端内的展示 |
-        | card\_num | str | 业务账户卡号<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>综合账户下包含一个或多个业务账户（综合证券账户、综合期货账户等等），与交易品种有关 |
+        | card\_num | str | 业务账户卡号<br>(ℹ️ 综合账户下包含一个或多个业务账户（综合证券账户、综合期货账户等等），与交易品种有关) |
         | security\_firm | [SecurityFirm](https://openapi.futunn.com/futu-api-doc/trade/trade.html#572) | 所属券商 |
-        | sim\_acc\_type | [SimAccType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6449) | 模拟账户类型<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅模拟账户适用 |
-        | trdmarket\_auth | list | 交易市场权限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>list 中元素类型是 [TrdMarket](https://openapi.futunn.com/futu-api-doc/trade/trade.html#719) |
+        | sim\_acc\_type | [SimAccType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6449) | 模拟账户类型<br>(ℹ️ 仅模拟账户适用) |
+        | trdmarket\_auth | list | 交易市场权限<br>(ℹ️ list 中元素类型是 [TrdMarket](https://openapi.futunn.com/futu-api-doc/trade/trade.html#719)) |
         | acc\_status | [TrdAccStatus](https://openapi.futunn.com/futu-api-doc/trade/trade.html#121) | 账户状态 |
-        | acc\_role | [TrdAccRole](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6395) | 账户结构<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>用于区分主子账户结构<br><br>*   MASTER: 主账户<br>*   NORMAL: 普通账户<br>*   IPO: 马来西亚 IPO 账户 |
-        | jp\_acc\_type | list | 日本账户类型<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>list 中元素类型是[SubAccType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6112)<br>，仅对日本券商生效 |
+        | acc\_role | [TrdAccRole](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6395) | 账户结构<br>(ℹ️ 用于区分主子账户结构<br><br>*   MASTER: 主账户<br>*   NORMAL: 普通账户<br>*   IPO: 马来西亚 IPO 账户) |
+        | jp\_acc\_type | list | 日本账户类型<br>(ℹ️ list 中元素类型是[SubAccType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6112)<br>，仅对日本券商生效) |
         
 *   **说明**
     
@@ -1280,13 +1280,13 @@
         | trd\_env | [TrdEnv](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6374) | 交易环境 |
         | acc\_type | [TrdAccType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#3974) | 账户类型 |
         | uni\_card\_num | str | 综合账户卡号，同移动端内的展示 |
-        | card\_num | str | 业务账户卡号<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>综合账户下包含一个或多个业务账户（综合证券账户、综合期货账户等等），与交易品种有关 |
+        | card\_num | str | 业务账户卡号<br>(ℹ️ 综合账户下包含一个或多个业务账户（综合证券账户、综合期货账户等等），与交易品种有关) |
         | security\_firm | [SecurityFirm](https://openapi.futunn.com/futu-api-doc/trade/trade.html#572) | 所属券商 |
-        | sim\_acc\_type | [SimAccType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6449) | 模拟账户类型<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅模拟账户适用 |
-        | trdmarket\_auth | list | 交易市场权限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>list 中元素类型是 [TrdMarket](https://openapi.futunn.com/futu-api-doc/trade/trade.html#719) |
+        | sim\_acc\_type | [SimAccType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6449) | 模拟账户类型<br>(ℹ️ 仅模拟账户适用) |
+        | trdmarket\_auth | list | 交易市场权限<br>(ℹ️ list 中元素类型是 [TrdMarket](https://openapi.futunn.com/futu-api-doc/trade/trade.html#719)) |
         | acc\_status | [TrdAccStatus](https://openapi.futunn.com/futu-api-doc/trade/trade.html#121) | 账户状态 |
-        | acc\_role | [TrdAccRole](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6395) | 账户结构<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>用于区分主子账户结构<br><br>*   MASTER: 主账户<br>*   NORMAL: 普通账户<br>*   IPO: 马来西亚 IPO 账户 |
-        | jp\_acc\_type | list | 日本账户类型<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>list 中元素类型是[SubAccType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6112)<br>，仅对日本券商生效 |
+        | acc\_role | [TrdAccRole](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6395) | 账户结构<br>(ℹ️ 用于区分主子账户结构<br><br>*   MASTER: 主账户<br>*   NORMAL: 普通账户<br>*   IPO: 马来西亚 IPO 账户) |
+        | jp\_acc\_type | list | 日本账户类型<br>(ℹ️ list 中元素类型是[SubAccType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6112)<br>，仅对日本券商生效) |
         
 *   **说明**
     

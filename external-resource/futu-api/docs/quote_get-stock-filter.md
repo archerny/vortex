@@ -113,8 +113,8 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | market | [Market](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427) | 市场标识<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>不区分沪股和深股，传入沪股或者深股都会返回沪深市场的股票 |
-    | filter\_list | list | 筛选条件的列表<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>参考下面的表格，列表中元素类型为 SimpleFilter 或 AccumulateFilter 或 FinancialFilter |
+    | market | [Market](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427) | 市场标识<br>(ℹ️ 不区分沪股和深股，传入沪股或者深股都会返回沪深市场的股票) |
+    | filter\_list | list | 筛选条件的列表<br>(ℹ️ 参考下面的表格，列表中元素类型为 SimpleFilter 或 AccumulateFilter 或 FinancialFilter) |
     | plate\_code | str | 板块代码 |
     | begin | int | 数据起始点 |
     | num | int | 请求数据个数 |
@@ -124,20 +124,20 @@
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
         | stock\_field | [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#860) | 简单属性 |
-        | filter\_min | float | 区间下限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>不传默认为 -∞ |
-        | filter\_max | float | 区间上限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>不传默认为 +∞ |
-        | is\_no\_filter | bool | 该字段是否不需要筛选<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>True：不筛选  <br>False：筛选  <br>不传默认不筛选 |
-        | sort | [SortDir](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5471) | 排序方向<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>不传默认为不排序 |
+        | filter\_min | float | 区间下限<br>(ℹ️ 闭区间  <br>不传默认为 -∞) |
+        | filter\_max | float | 区间上限<br>(ℹ️ 闭区间  <br>不传默认为 +∞) |
+        | is\_no\_filter | bool | 该字段是否不需要筛选<br>(ℹ️ True：不筛选  <br>False：筛选  <br>不传默认不筛选) |
+        | sort | [SortDir](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5471) | 排序方向<br>(ℹ️ 不传默认为不排序) |
         
     *   AccumulateFilter 对象相关参数如下：
         
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
         | stock\_field | [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4370) | 累积属性 |
-        | filter\_min | float | 区间下限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>不传默认为 -∞ |
-        | filter\_max | float | 区间上限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>不传默认为 +∞ |
-        | is\_no\_filter | bool | 该字段是否不需要筛选<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>True：不筛选  <br>False：筛选  <br>不传默认不筛选 |
-        | sort | [SortDir](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5471) | 排序方向<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>不传默认为不排序 |
+        | filter\_min | float | 区间下限<br>(ℹ️ 闭区间  <br>不传默认为 -∞) |
+        | filter\_max | float | 区间上限<br>(ℹ️ 闭区间  <br>不传默认为 +∞) |
+        | is\_no\_filter | bool | 该字段是否不需要筛选<br>(ℹ️ True：不筛选  <br>False：筛选  <br>不传默认不筛选) |
+        | sort | [SortDir](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5471) | 排序方向<br>(ℹ️ 不传默认为不排序) |
         | days | int | 所筛选的数据的累计天数 |
         
     *   FinancialFilter 对象相关参数如下：
@@ -145,10 +145,10 @@
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
         | stock\_field | [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8542) | 财务属性 |
-        | filter\_min | float | 区间下限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>不传默认为 -∞ |
-        | filter\_max | float | 区间上限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>不传默认为 +∞ |
-        | is\_no\_filter | bool | 该字段是否不需要筛选<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>True：不筛选  <br>False：筛选  <br>不传默认不筛选 |
-        | sort | [SortDir](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5471) | 排序方向<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>不传默认为不排序 |
+        | filter\_min | float | 区间下限<br>(ℹ️ 闭区间  <br>不传默认为 -∞) |
+        | filter\_max | float | 区间上限<br>(ℹ️ 闭区间  <br>不传默认为 +∞) |
+        | is\_no\_filter | bool | 该字段是否不需要筛选<br>(ℹ️ True：不筛选  <br>False：筛选  <br>不传默认不筛选) |
+        | sort | [SortDir](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5471) | 排序方向<br>(ℹ️ 不传默认为不排序) |
         | quarter | [FinancialQuarter](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2253) | 财报累积时间 |
         
     *   CustomIndicatorFilter 对象相关参数如下：
@@ -156,14 +156,14 @@
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
         | stock\_field1 | [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2057) | 自定义技术指标属性 |
-        | stock\_field1\_para | list | 自定义技术指标属性参数<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>根据指标类型进行传参：  <br>1\. MA：\[平均移动周期\]  <br>2.EMA：\[指数移动平均周期\]  <br>3.RSI：\[RSI 指标周期\]  <br>4.MACD：\[快速平均线值, 慢速平均线值, DIF值\]  <br>5.BOLL：\[均线周期, 偏移值\]  <br>6.KDJ：\[RSV 周期, K 值计算周期, D 值计算周期\] |
+        | stock\_field1\_para | list | 自定义技术指标属性参数<br>(ℹ️ 根据指标类型进行传参：  <br>1\. MA：\[平均移动周期\]  <br>2.EMA：\[指数移动平均周期\]  <br>3.RSI：\[RSI 指标周期\]  <br>4.MACD：\[快速平均线值, 慢速平均线值, DIF值\]  <br>5.BOLL：\[均线周期, 偏移值\]  <br>6.KDJ：\[RSV 周期, K 值计算周期, D 值计算周期\]) |
         | relative\_position | [RelativePosition](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2453) | 相对位置 |
         | stock\_field2 | [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2057) | 自定义技术指标属性 |
-        | stock\_field2\_para | list | 自定义技术指标属性参数<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>根据指标类型进行传参：  <br>1\. MA：\[平均移动周期\]  <br>2.EMA：\[指数移动平均周期\]  <br>3.RSI：\[RSI 指标周期\]  <br>4.MACD：\[快速平均线值, 慢速平均线值, DIF值\]  <br>5.BOLL：\[均线周期, 偏移值\]  <br>6.KDJ：\[RSV 周期, K 值计算周期, D 值计算周期\] |
-        | value | float | 自定义数值<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>当 stock\_field2 在 [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2057)<br> 中选择自定义数值时，value 为必传参数 |
-        | ktype | [KLType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4119) | K线类型 KLType<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅支持K\_60M，K\_DAY，K\_WEEK，K\_MON 四种时间周期 |
-        | consecutive\_period | int | 筛选连续周期（consecutive\_period）都符合条件的数据<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>填写范围为\[1,12\] |
-        | is\_no\_filter | bool | 该字段是否不需要筛选<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>True：不筛选  <br>False：筛选  <br>不传默认不筛选 |
+        | stock\_field2\_para | list | 自定义技术指标属性参数<br>(ℹ️ 根据指标类型进行传参：  <br>1\. MA：\[平均移动周期\]  <br>2.EMA：\[指数移动平均周期\]  <br>3.RSI：\[RSI 指标周期\]  <br>4.MACD：\[快速平均线值, 慢速平均线值, DIF值\]  <br>5.BOLL：\[均线周期, 偏移值\]  <br>6.KDJ：\[RSV 周期, K 值计算周期, D 值计算周期\]) |
+        | value | float | 自定义数值<br>(ℹ️ 当 stock\_field2 在 [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2057)<br> 中选择自定义数值时，value 为必传参数) |
+        | ktype | [KLType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4119) | K线类型 KLType<br>(ℹ️ 仅支持K\_60M，K\_DAY，K\_WEEK，K\_MON 四种时间周期) |
+        | consecutive\_period | int | 筛选连续周期（consecutive\_period）都符合条件的数据<br>(ℹ️ 填写范围为\[1,12\]) |
+        | is\_no\_filter | bool | 该字段是否不需要筛选<br>(ℹ️ True：不筛选  <br>False：筛选  <br>不传默认不筛选) |
         
     *   PatternFilter 对象相关参数如下：
         
@@ -171,8 +171,8 @@
         | --- | --- | --- |
         | stock\_field | [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#159) | 形态技术指标属性 |
         | ktype | [KLType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4119) | K线类型 KLType （仅支持K\_60M，K\_DAY，K\_WEEK，K\_MON 四种时间周期） |
-        | consecutive\_period | int | 筛选连续周期（consecutive\_period）都符合条件的数据<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>填写范围为\[1,12\] |
-        | is\_no\_filter | bool | 该字段是否不需要筛选<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>True：不筛选  <br>False：筛选  <br>不传默认不筛选 |
+        | consecutive\_period | int | 筛选连续周期（consecutive\_period）都符合条件的数据<br>(ℹ️ 填写范围为\[1,12\]) |
+        | is\_no\_filter | bool | 该字段是否不需要筛选<br>(ℹ️ True：不筛选  <br>False：筛选  <br>不传默认不筛选) |
         
 
 *   **返回**
@@ -189,7 +189,7 @@
         | --- | --- | --- |
         | last\_page | bool | 是否是最后一页 |
         | all\_count | int | 列表总数量 |
-        | stock\_list | list | 选股数据<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>list 中元素类型是 FilterStockData |
+        | stock\_list | list | 选股数据<br>(ℹ️ list 中元素类型是 FilterStockData) |
         
         *   FilterStockData 类型的字段格式：
             
@@ -198,77 +198,77 @@
             | stock\_code | str | 股票代码 |
             | stock\_name | str | 股票名字 |
             | cur\_price | float | 最新价 |
-            | cur\_price\_to\_highest\_52weeks\_ratio | float | (现价 - 52周最高)/52周最高<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | cur\_price\_to\_lowest\_52weeks\_ratio | float | (现价 - 52周最低)/52周最低<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | high\_price\_to\_highest\_52weeks\_ratio | float | (今日最高 - 52周最高)/52周最高<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | low\_price\_to\_lowest\_52weeks\_ratio | float | (今日最低 - 52周最低)/52周最低<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+            | cur\_price\_to\_highest\_52weeks\_ratio | float | (现价 - 52周最高)/52周最高<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | cur\_price\_to\_lowest\_52weeks\_ratio | float | (现价 - 52周最低)/52周最低<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | high\_price\_to\_highest\_52weeks\_ratio | float | (今日最高 - 52周最高)/52周最高<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | low\_price\_to\_lowest\_52weeks\_ratio | float | (今日最低 - 52周最低)/52周最低<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
             | volume\_ratio | float | 量比  |
-            | bid\_ask\_ratio | float | 委比<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+            | bid\_ask\_ratio | float | 委比<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
             | lot\_price | float | 每手价格 |
             | market\_val | float | 市值  |
             | pe\_annual | float | 市盈率 |
             | pe\_ttm | float | 市盈率 TTM |
             | pb\_rate | float | 市净率 |
-            | change\_rate\_5min | float | 五分钟价格涨跌幅<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | change\_rate\_begin\_year | float | 年初至今价格涨跌幅<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | ps\_ttm | float | 市销率 TTM<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | pcf\_ttm | float | 市现率 TTM<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | total\_share | float | 总股数<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>单位：股 |
-            | float\_share | float | 流通股数<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>单位：股 |
-            | float\_market\_val | float | 流通市值<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>单位：元 |
-            | change\_rate | float | 涨跌幅<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | amplitude | float | 振幅<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+            | change\_rate\_5min | float | 五分钟价格涨跌幅<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | change\_rate\_begin\_year | float | 年初至今价格涨跌幅<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | ps\_ttm | float | 市销率 TTM<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | pcf\_ttm | float | 市现率 TTM<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | total\_share | float | 总股数<br>(ℹ️ 单位：股) |
+            | float\_share | float | 流通股数<br>(ℹ️ 单位：股) |
+            | float\_market\_val | float | 流通市值<br>(ℹ️ 单位：元) |
+            | change\_rate | float | 涨跌幅<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | amplitude | float | 振幅<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
             | volume | float | 日均成交量 |
             | turnover | float | 日均成交额 |
-            | turnover\_rate | float | 换手率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+            | turnover\_rate | float | 换手率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
             | net\_profit | float | 净利润 |
-            | net\_profix\_growth | float | 净利润增长率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+            | net\_profix\_growth | float | 净利润增长率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
             | sum\_of\_business | float | 营业收入 |
-            | sum\_of\_business\_growth | float | 营业同比增长率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | net\_profit\_rate | float | 净利率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | gross\_profit\_rate | float | 毛利率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | debt\_asset\_rate | float | 资产负债率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | return\_on\_equity\_rate | float | 净资产收益率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | roic | float | 投入资本回报率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | roa\_ttm | float | 资产回报率 TTM<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。仅适用于年报 |
-            | ebit\_ttm | float | 息税前利润 TTM<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>单位：元。仅适用于年报 |
-            | ebitda | float | 税息折旧及摊销前利润<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>单位：元 |
-            | operating\_margin\_ttm | float | 营业利润率 TTM<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。仅适用于年报 |
-            | ebit\_margin | float | EBIT 利润率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | ebitda\_margin | float | EBITDA 利润率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | financial\_cost\_rate | float | 财务成本率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | operating\_profit\_ttm | float | 营业利润 TTM<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>单位：元。仅适用于年报 |
-            | shareholder\_net\_profit\_ttm | float | 归属于母公司的净利润<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>单位：元。仅适用于年报 |
-            | net\_profit\_cash\_cover\_ttm | float | 盈利中的现金收入比例<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。仅适用于年报 |
-            | current\_ratio | float | 流动比率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | quick\_ratio | float | 速动比率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | current\_asset\_ratio | float | 流动资产率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | current\_debt\_ratio | float | 流动负债率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+            | sum\_of\_business\_growth | float | 营业同比增长率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | net\_profit\_rate | float | 净利率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | gross\_profit\_rate | float | 毛利率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | debt\_asset\_rate | float | 资产负债率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | return\_on\_equity\_rate | float | 净资产收益率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | roic | float | 投入资本回报率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | roa\_ttm | float | 资产回报率 TTM<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。仅适用于年报) |
+            | ebit\_ttm | float | 息税前利润 TTM<br>(ℹ️ 单位：元。仅适用于年报) |
+            | ebitda | float | 税息折旧及摊销前利润<br>(ℹ️ 单位：元) |
+            | operating\_margin\_ttm | float | 营业利润率 TTM<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。仅适用于年报) |
+            | ebit\_margin | float | EBIT 利润率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | ebitda\_margin | float | EBITDA 利润率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | financial\_cost\_rate | float | 财务成本率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | operating\_profit\_ttm | float | 营业利润 TTM<br>(ℹ️ 单位：元。仅适用于年报) |
+            | shareholder\_net\_profit\_ttm | float | 归属于母公司的净利润<br>(ℹ️ 单位：元。仅适用于年报) |
+            | net\_profit\_cash\_cover\_ttm | float | 盈利中的现金收入比例<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。仅适用于年报) |
+            | current\_ratio | float | 流动比率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | quick\_ratio | float | 速动比率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | current\_asset\_ratio | float | 流动资产率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | current\_debt\_ratio | float | 流动负债率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
             | equity\_multiplier | float | 权益乘数 |
-            | property\_ratio | float | 产权比率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | cash\_and\_cash\_equivalents | float | 现金和现金等价<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>单位：元 |
-            | total\_asset\_turnover | float | 总资产周转率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | fixed\_asset\_turnover | float | 固定资产周转率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | inventory\_turnover | float | 存货周转率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | operating\_cash\_flow\_ttm | float | 经营活动现金流 TTM<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>单位：元。仅适用于年报 |
-            | accounts\_receivable | float | 应收账款净额<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>单位：元 |
-            | ebit\_growth\_rate | float | EBIT 同比增长率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | operating\_profit\_growth\_rate | float | 营业利润同比增长率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | total\_assets\_growth\_rate | float | 总资产同比增长率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | profit\_to\_shareholders\_growth\_rate | float | 归母净利润同比增长率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | profit\_before\_tax\_growth\_rate | float | 总利润同比增长率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | eps\_growth\_rate | float | EPS 同比增长率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | roe\_growth\_rate | float | ROE 同比增长率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | roic\_growth\_rate | float | ROIC 同比增长率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | nocf\_growth\_rate | float | 经营现金流同比增长率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | nocf\_per\_share\_growth\_rate | float | 每股经营现金流同比增长率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | operating\_revenue\_cash\_cover | float | 经营现金收入比<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | operating\_profit\_to\_total\_profit | float | 营业利润占比<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | basic\_eps | float | 基本每股收益<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>单位：元 |
-            | diluted\_eps | float | 稀释每股收益<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>单位：元 |
-            | nocf\_per\_share | float | 每股经营现金净流量<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>单位：元 |
+            | property\_ratio | float | 产权比率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | cash\_and\_cash\_equivalents | float | 现金和现金等价<br>(ℹ️ 单位：元) |
+            | total\_asset\_turnover | float | 总资产周转率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | fixed\_asset\_turnover | float | 固定资产周转率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | inventory\_turnover | float | 存货周转率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | operating\_cash\_flow\_ttm | float | 经营活动现金流 TTM<br>(ℹ️ 单位：元。仅适用于年报) |
+            | accounts\_receivable | float | 应收账款净额<br>(ℹ️ 单位：元) |
+            | ebit\_growth\_rate | float | EBIT 同比增长率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | operating\_profit\_growth\_rate | float | 营业利润同比增长率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | total\_assets\_growth\_rate | float | 总资产同比增长率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | profit\_to\_shareholders\_growth\_rate | float | 归母净利润同比增长率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | profit\_before\_tax\_growth\_rate | float | 总利润同比增长率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | eps\_growth\_rate | float | EPS 同比增长率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | roe\_growth\_rate | float | ROE 同比增长率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | roic\_growth\_rate | float | ROIC 同比增长率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | nocf\_growth\_rate | float | 经营现金流同比增长率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | nocf\_per\_share\_growth\_rate | float | 每股经营现金流同比增长率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | operating\_revenue\_cash\_cover | float | 经营现金收入比<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | operating\_profit\_to\_total\_profit | float | 营业利润占比<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | basic\_eps | float | 基本每股收益<br>(ℹ️ 单位：元) |
+            | diluted\_eps | float | 稀释每股收益<br>(ℹ️ 单位：元) |
+            | nocf\_per\_share | float | 每股经营现金净流量<br>(ℹ️ 单位：元) |
             | price | float | 最新价格 |
-            | ma  | float | 简单均线<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>根据 MA 参数返回具体的数值 |
+            | ma  | float | 简单均线<br>(ℹ️ 根据 MA 参数返回具体的数值) |
             | ma5 | float | 5日简单均线 |
             | ma10 | float | 10日简单均线 |
             | ma20 | float | 20日简单均线 |
@@ -276,8 +276,8 @@
             | ma60 | float | 60日简单均线 |
             | ma120 | float | 120日简单均线 |
             | ma250 | float | 250日简单均线 |
-            | rsi | float | RSI的值<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>根据 RSI 参数返回具体的数值，RSI 默认参数为12 |
-            | ema | float | 指数移动均线<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>根据 EMA 参数返回具体的数值 |
+            | rsi | float | RSI的值<br>(ℹ️ 根据 RSI 参数返回具体的数值，RSI 默认参数为12) |
+            | ema | float | 指数移动均线<br>(ℹ️ 根据 EMA 参数返回具体的数值) |
             | ema5 | float | 5日指数移动均线 |
             | ema10 | float | 10日指数移动均线 |
             | ema20 | float | 20日指数移动均线 |
@@ -285,15 +285,15 @@
             | ema60 | float | 60日指数移动均线 |
             | ema120 | float | 120日指数移动均线 |
             | ema250 | float | 250日指数移动均线 |
-            | kdj\_k | float | KDJ 指标的 K 值<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>根据 KDJ 参数返回具体的数值，KDJ 默认参数为\[9,3,3\] |
-            | kdj\_d | float | KDJ 指标的 D 值<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>根据 KDJ 参数返回具体的数值，KDJ 默认参数为\[9,3,3\] |
-            | kdj\_j | float | KDJ 指标的 J 值<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>根据 KDJ 参数返回具体的数值，KDJ 默认参数为\[9,3,3\] |
-            | macd\_diff | float | MACD 指标的 DIFF 值<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>根据 MACD 参数返回具体的数值，MACD 默认参数为\[12,26,9\] |
-            | macd\_dea | float | MACD 指标的 DEA 值<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>根据 MACD 参数返回具体的数值，MACD 默认参数为\[12,26,9\] |
-            | macd | float | MACD 指标的 MACD 值<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>根据 MACD 参数返回具体的数值，MACD 默认参数为\[12,26,9\] |
-            | boll\_upper | float | BOLL 指标的 UPPER 值<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>根据 BOLL 参数返回具体的数值，BOLL 默认参数为\[20.2\] |
-            | boll\_middler | float | BOLL 指标的 MIDDLER 值<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>根据 BOLL 参数返回具体的数值，BOLL 默认参数为\[20.2\] |
-            | boll\_lower | float | BOLL 指标的 LOWER 值<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>根据 BOLL 参数返回具体的数值，BOLL 默认参数为\[20.2\] |
+            | kdj\_k | float | KDJ 指标的 K 值<br>(ℹ️ 根据 KDJ 参数返回具体的数值，KDJ 默认参数为\[9,3,3\]) |
+            | kdj\_d | float | KDJ 指标的 D 值<br>(ℹ️ 根据 KDJ 参数返回具体的数值，KDJ 默认参数为\[9,3,3\]) |
+            | kdj\_j | float | KDJ 指标的 J 值<br>(ℹ️ 根据 KDJ 参数返回具体的数值，KDJ 默认参数为\[9,3,3\]) |
+            | macd\_diff | float | MACD 指标的 DIFF 值<br>(ℹ️ 根据 MACD 参数返回具体的数值，MACD 默认参数为\[12,26,9\]) |
+            | macd\_dea | float | MACD 指标的 DEA 值<br>(ℹ️ 根据 MACD 参数返回具体的数值，MACD 默认参数为\[12,26,9\]) |
+            | macd | float | MACD 指标的 MACD 值<br>(ℹ️ 根据 MACD 参数返回具体的数值，MACD 默认参数为\[12,26,9\]) |
+            | boll\_upper | float | BOLL 指标的 UPPER 值<br>(ℹ️ 根据 BOLL 参数返回具体的数值，BOLL 默认参数为\[20.2\]) |
+            | boll\_middler | float | BOLL 指标的 MIDDLER 值<br>(ℹ️ 根据 BOLL 参数返回具体的数值，BOLL 默认参数为\[20.2\]) |
+            | boll\_lower | float | BOLL 指标的 LOWER 值<br>(ℹ️ 根据 BOLL 参数返回具体的数值，BOLL 默认参数为\[20.2\]) |
             
 *   **Example**
     
@@ -2798,8 +2798,8 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | market | [Market](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427) | 市场标识<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>不区分沪股和深股，传入沪股或者深股都会返回沪深市场的股票 |
-    | filter\_list | list | 筛选条件的列表<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>参考下面的表格，列表中元素类型为 SimpleFilter 或 AccumulateFilter 或 FinancialFilter |
+    | market | [Market](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427) | 市场标识<br>(ℹ️ 不区分沪股和深股，传入沪股或者深股都会返回沪深市场的股票) |
+    | filter\_list | list | 筛选条件的列表<br>(ℹ️ 参考下面的表格，列表中元素类型为 SimpleFilter 或 AccumulateFilter 或 FinancialFilter) |
     | plate\_code | str | 板块代码 |
     | begin | int | 数据起始点 |
     | num | int | 请求数据个数 |
@@ -2809,20 +2809,20 @@
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
         | stock\_field | [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#860) | 简单属性 |
-        | filter\_min | float | 区间下限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>不传默认为 -∞ |
-        | filter\_max | float | 区间上限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>不传默认为 +∞ |
-        | is\_no\_filter | bool | 该字段是否不需要筛选<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>True：不筛选  <br>False：筛选  <br>不传默认不筛选 |
-        | sort | [SortDir](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5471) | 排序方向<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>不传默认为不排序 |
+        | filter\_min | float | 区间下限<br>(ℹ️ 闭区间  <br>不传默认为 -∞) |
+        | filter\_max | float | 区间上限<br>(ℹ️ 闭区间  <br>不传默认为 +∞) |
+        | is\_no\_filter | bool | 该字段是否不需要筛选<br>(ℹ️ True：不筛选  <br>False：筛选  <br>不传默认不筛选) |
+        | sort | [SortDir](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5471) | 排序方向<br>(ℹ️ 不传默认为不排序) |
         
     *   AccumulateFilter 对象相关参数如下：
         
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
         | stock\_field | [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4370) | 累积属性 |
-        | filter\_min | float | 区间下限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>不传默认为 -∞ |
-        | filter\_max | float | 区间上限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>不传默认为 +∞ |
-        | is\_no\_filter | bool | 该字段是否不需要筛选<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>True：不筛选  <br>False：筛选  <br>不传默认不筛选 |
-        | sort | [SortDir](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5471) | 排序方向<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>不传默认为不排序 |
+        | filter\_min | float | 区间下限<br>(ℹ️ 闭区间  <br>不传默认为 -∞) |
+        | filter\_max | float | 区间上限<br>(ℹ️ 闭区间  <br>不传默认为 +∞) |
+        | is\_no\_filter | bool | 该字段是否不需要筛选<br>(ℹ️ True：不筛选  <br>False：筛选  <br>不传默认不筛选) |
+        | sort | [SortDir](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5471) | 排序方向<br>(ℹ️ 不传默认为不排序) |
         | days | int | 所筛选的数据的累计天数 |
         
     *   FinancialFilter 对象相关参数如下：
@@ -2830,10 +2830,10 @@
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
         | stock\_field | [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8542) | 财务属性 |
-        | filter\_min | float | 区间下限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>不传默认为 -∞ |
-        | filter\_max | float | 区间上限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>不传默认为 +∞ |
-        | is\_no\_filter | bool | 该字段是否不需要筛选<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>True：不筛选  <br>False：筛选  <br>不传默认不筛选 |
-        | sort | [SortDir](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5471) | 排序方向<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>不传默认为不排序 |
+        | filter\_min | float | 区间下限<br>(ℹ️ 闭区间  <br>不传默认为 -∞) |
+        | filter\_max | float | 区间上限<br>(ℹ️ 闭区间  <br>不传默认为 +∞) |
+        | is\_no\_filter | bool | 该字段是否不需要筛选<br>(ℹ️ True：不筛选  <br>False：筛选  <br>不传默认不筛选) |
+        | sort | [SortDir](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5471) | 排序方向<br>(ℹ️ 不传默认为不排序) |
         | quarter | [FinancialQuarter](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2253) | 财报累积时间 |
         
     *   CustomIndicatorFilter 对象相关参数如下：
@@ -2841,14 +2841,14 @@
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
         | stock\_field1 | [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2057) | 自定义技术指标属性 |
-        | stock\_field1\_para | list | 自定义技术指标属性参数<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>根据指标类型进行传参：  <br>1\. MA：\[平均移动周期\]  <br>2.EMA：\[指数移动平均周期\]  <br>3.RSI：\[RSI 指标周期\]  <br>4.MACD：\[快速平均线值, 慢速平均线值, DIF值\]  <br>5.BOLL：\[均线周期, 偏移值\]  <br>6.KDJ：\[RSV 周期, K 值计算周期, D 值计算周期\] |
+        | stock\_field1\_para | list | 自定义技术指标属性参数<br>(ℹ️ 根据指标类型进行传参：  <br>1\. MA：\[平均移动周期\]  <br>2.EMA：\[指数移动平均周期\]  <br>3.RSI：\[RSI 指标周期\]  <br>4.MACD：\[快速平均线值, 慢速平均线值, DIF值\]  <br>5.BOLL：\[均线周期, 偏移值\]  <br>6.KDJ：\[RSV 周期, K 值计算周期, D 值计算周期\]) |
         | relative\_position | [RelativePosition](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2453) | 相对位置 |
         | stock\_field2 | [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2057) | 自定义技术指标属性 |
-        | stock\_field2\_para | list | 自定义技术指标属性参数<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>根据指标类型进行传参：  <br>1\. MA：\[平均移动周期\]  <br>2.EMA：\[指数移动平均周期\]  <br>3.RSI：\[RSI 指标周期\]  <br>4.MACD：\[快速平均线值, 慢速平均线值, DIF值\]  <br>5.BOLL：\[均线周期, 偏移值\]  <br>6.KDJ：\[RSV 周期, K 值计算周期, D 值计算周期\] |
-        | value | float | 自定义数值<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>当 stock\_field2 在 [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2057)<br> 中选择自定义数值时，value 为必传参数 |
-        | ktype | [KLType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4119) | K线类型 KLType<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅支持K\_60M，K\_DAY，K\_WEEK，K\_MON 四种时间周期 |
-        | consecutive\_period | int | 筛选连续周期（consecutive\_period）都符合条件的数据<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>填写范围为\[1,12\] |
-        | is\_no\_filter | bool | 该字段是否不需要筛选<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>True：不筛选  <br>False：筛选  <br>不传默认不筛选 |
+        | stock\_field2\_para | list | 自定义技术指标属性参数<br>(ℹ️ 根据指标类型进行传参：  <br>1\. MA：\[平均移动周期\]  <br>2.EMA：\[指数移动平均周期\]  <br>3.RSI：\[RSI 指标周期\]  <br>4.MACD：\[快速平均线值, 慢速平均线值, DIF值\]  <br>5.BOLL：\[均线周期, 偏移值\]  <br>6.KDJ：\[RSV 周期, K 值计算周期, D 值计算周期\]) |
+        | value | float | 自定义数值<br>(ℹ️ 当 stock\_field2 在 [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2057)<br> 中选择自定义数值时，value 为必传参数) |
+        | ktype | [KLType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4119) | K线类型 KLType<br>(ℹ️ 仅支持K\_60M，K\_DAY，K\_WEEK，K\_MON 四种时间周期) |
+        | consecutive\_period | int | 筛选连续周期（consecutive\_period）都符合条件的数据<br>(ℹ️ 填写范围为\[1,12\]) |
+        | is\_no\_filter | bool | 该字段是否不需要筛选<br>(ℹ️ True：不筛选  <br>False：筛选  <br>不传默认不筛选) |
         
     *   PatternFilter 对象相关参数如下：
         
@@ -2856,8 +2856,8 @@
         | --- | --- | --- |
         | stock\_field | [StockField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#159) | 形态技术指标属性 |
         | ktype | [KLType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4119) | K线类型 KLType （仅支持K\_60M，K\_DAY，K\_WEEK，K\_MON 四种时间周期） |
-        | consecutive\_period | int | 筛选连续周期（consecutive\_period）都符合条件的数据<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>填写范围为\[1,12\] |
-        | is\_no\_filter | bool | 该字段是否不需要筛选<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>True：不筛选  <br>False：筛选  <br>不传默认不筛选 |
+        | consecutive\_period | int | 筛选连续周期（consecutive\_period）都符合条件的数据<br>(ℹ️ 填写范围为\[1,12\]) |
+        | is\_no\_filter | bool | 该字段是否不需要筛选<br>(ℹ️ True：不筛选  <br>False：筛选  <br>不传默认不筛选) |
         
 
 *   **返回**
@@ -2874,7 +2874,7 @@
         | --- | --- | --- |
         | last\_page | bool | 是否是最后一页 |
         | all\_count | int | 列表总数量 |
-        | stock\_list | list | 选股数据<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>list 中元素类型是 FilterStockData |
+        | stock\_list | list | 选股数据<br>(ℹ️ list 中元素类型是 FilterStockData) |
         
         *   FilterStockData 类型的字段格式：
             
@@ -2883,77 +2883,77 @@
             | stock\_code | str | 股票代码 |
             | stock\_name | str | 股票名字 |
             | cur\_price | float | 最新价 |
-            | cur\_price\_to\_highest\_52weeks\_ratio | float | (现价 - 52周最高)/52周最高<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | cur\_price\_to\_lowest\_52weeks\_ratio | float | (现价 - 52周最低)/52周最低<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | high\_price\_to\_highest\_52weeks\_ratio | float | (今日最高 - 52周最高)/52周最高<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | low\_price\_to\_lowest\_52weeks\_ratio | float | (今日最低 - 52周最低)/52周最低<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+            | cur\_price\_to\_highest\_52weeks\_ratio | float | (现价 - 52周最高)/52周最高<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | cur\_price\_to\_lowest\_52weeks\_ratio | float | (现价 - 52周最低)/52周最低<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | high\_price\_to\_highest\_52weeks\_ratio | float | (今日最高 - 52周最高)/52周最高<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | low\_price\_to\_lowest\_52weeks\_ratio | float | (今日最低 - 52周最低)/52周最低<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
             | volume\_ratio | float | 量比  |
-            | bid\_ask\_ratio | float | 委比<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+            | bid\_ask\_ratio | float | 委比<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
             | lot\_price | float | 每手价格 |
             | market\_val | float | 市值  |
             | pe\_annual | float | 市盈率 |
             | pe\_ttm | float | 市盈率 TTM |
             | pb\_rate | float | 市净率 |
-            | change\_rate\_5min | float | 五分钟价格涨跌幅<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | change\_rate\_begin\_year | float | 年初至今价格涨跌幅<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | ps\_ttm | float | 市销率 TTM<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | pcf\_ttm | float | 市现率 TTM<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | total\_share | float | 总股数<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>单位：股 |
-            | float\_share | float | 流通股数<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>单位：股 |
-            | float\_market\_val | float | 流通市值<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>单位：元 |
-            | change\_rate | float | 涨跌幅<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | amplitude | float | 振幅<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+            | change\_rate\_5min | float | 五分钟价格涨跌幅<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | change\_rate\_begin\_year | float | 年初至今价格涨跌幅<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | ps\_ttm | float | 市销率 TTM<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | pcf\_ttm | float | 市现率 TTM<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | total\_share | float | 总股数<br>(ℹ️ 单位：股) |
+            | float\_share | float | 流通股数<br>(ℹ️ 单位：股) |
+            | float\_market\_val | float | 流通市值<br>(ℹ️ 单位：元) |
+            | change\_rate | float | 涨跌幅<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | amplitude | float | 振幅<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
             | volume | float | 日均成交量 |
             | turnover | float | 日均成交额 |
-            | turnover\_rate | float | 换手率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+            | turnover\_rate | float | 换手率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
             | net\_profit | float | 净利润 |
-            | net\_profix\_growth | float | 净利润增长率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+            | net\_profix\_growth | float | 净利润增长率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
             | sum\_of\_business | float | 营业收入 |
-            | sum\_of\_business\_growth | float | 营业同比增长率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | net\_profit\_rate | float | 净利率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | gross\_profit\_rate | float | 毛利率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | debt\_asset\_rate | float | 资产负债率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | return\_on\_equity\_rate | float | 净资产收益率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | roic | float | 投入资本回报率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | roa\_ttm | float | 资产回报率 TTM<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。仅适用于年报 |
-            | ebit\_ttm | float | 息税前利润 TTM<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>单位：元。仅适用于年报 |
-            | ebitda | float | 税息折旧及摊销前利润<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>单位：元 |
-            | operating\_margin\_ttm | float | 营业利润率 TTM<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。仅适用于年报 |
-            | ebit\_margin | float | EBIT 利润率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | ebitda\_margin | float | EBITDA 利润率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | financial\_cost\_rate | float | 财务成本率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | operating\_profit\_ttm | float | 营业利润 TTM<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>单位：元。仅适用于年报 |
-            | shareholder\_net\_profit\_ttm | float | 归属于母公司的净利润<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>单位：元。仅适用于年报 |
-            | net\_profit\_cash\_cover\_ttm | float | 盈利中的现金收入比例<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。仅适用于年报 |
-            | current\_ratio | float | 流动比率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | quick\_ratio | float | 速动比率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | current\_asset\_ratio | float | 流动资产率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | current\_debt\_ratio | float | 流动负债率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+            | sum\_of\_business\_growth | float | 营业同比增长率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | net\_profit\_rate | float | 净利率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | gross\_profit\_rate | float | 毛利率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | debt\_asset\_rate | float | 资产负债率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | return\_on\_equity\_rate | float | 净资产收益率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | roic | float | 投入资本回报率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | roa\_ttm | float | 资产回报率 TTM<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。仅适用于年报) |
+            | ebit\_ttm | float | 息税前利润 TTM<br>(ℹ️ 单位：元。仅适用于年报) |
+            | ebitda | float | 税息折旧及摊销前利润<br>(ℹ️ 单位：元) |
+            | operating\_margin\_ttm | float | 营业利润率 TTM<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。仅适用于年报) |
+            | ebit\_margin | float | EBIT 利润率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | ebitda\_margin | float | EBITDA 利润率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | financial\_cost\_rate | float | 财务成本率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | operating\_profit\_ttm | float | 营业利润 TTM<br>(ℹ️ 单位：元。仅适用于年报) |
+            | shareholder\_net\_profit\_ttm | float | 归属于母公司的净利润<br>(ℹ️ 单位：元。仅适用于年报) |
+            | net\_profit\_cash\_cover\_ttm | float | 盈利中的现金收入比例<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。仅适用于年报) |
+            | current\_ratio | float | 流动比率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | quick\_ratio | float | 速动比率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | current\_asset\_ratio | float | 流动资产率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | current\_debt\_ratio | float | 流动负债率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
             | equity\_multiplier | float | 权益乘数 |
-            | property\_ratio | float | 产权比率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | cash\_and\_cash\_equivalents | float | 现金和现金等价<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>单位：元 |
-            | total\_asset\_turnover | float | 总资产周转率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | fixed\_asset\_turnover | float | 固定资产周转率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | inventory\_turnover | float | 存货周转率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | operating\_cash\_flow\_ttm | float | 经营活动现金流 TTM<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>单位：元。仅适用于年报 |
-            | accounts\_receivable | float | 应收账款净额<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>单位：元 |
-            | ebit\_growth\_rate | float | EBIT 同比增长率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | operating\_profit\_growth\_rate | float | 营业利润同比增长率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | total\_assets\_growth\_rate | float | 总资产同比增长率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | profit\_to\_shareholders\_growth\_rate | float | 归母净利润同比增长率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | profit\_before\_tax\_growth\_rate | float | 总利润同比增长率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | eps\_growth\_rate | float | EPS 同比增长率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | roe\_growth\_rate | float | ROE 同比增长率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | roic\_growth\_rate | float | ROIC 同比增长率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | nocf\_growth\_rate | float | 经营现金流同比增长率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | nocf\_per\_share\_growth\_rate | float | 每股经营现金流同比增长率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | operating\_revenue\_cash\_cover | float | 经营现金收入比<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | operating\_profit\_to\_total\_profit | float | 营业利润占比<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | basic\_eps | float | 基本每股收益<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>单位：元 |
-            | diluted\_eps | float | 稀释每股收益<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>单位：元 |
-            | nocf\_per\_share | float | 每股经营现金净流量<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>单位：元 |
+            | property\_ratio | float | 产权比率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | cash\_and\_cash\_equivalents | float | 现金和现金等价<br>(ℹ️ 单位：元) |
+            | total\_asset\_turnover | float | 总资产周转率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | fixed\_asset\_turnover | float | 固定资产周转率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | inventory\_turnover | float | 存货周转率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | operating\_cash\_flow\_ttm | float | 经营活动现金流 TTM<br>(ℹ️ 单位：元。仅适用于年报) |
+            | accounts\_receivable | float | 应收账款净额<br>(ℹ️ 单位：元) |
+            | ebit\_growth\_rate | float | EBIT 同比增长率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | operating\_profit\_growth\_rate | float | 营业利润同比增长率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | total\_assets\_growth\_rate | float | 总资产同比增长率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | profit\_to\_shareholders\_growth\_rate | float | 归母净利润同比增长率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | profit\_before\_tax\_growth\_rate | float | 总利润同比增长率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | eps\_growth\_rate | float | EPS 同比增长率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | roe\_growth\_rate | float | ROE 同比增长率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | roic\_growth\_rate | float | ROIC 同比增长率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | nocf\_growth\_rate | float | 经营现金流同比增长率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | nocf\_per\_share\_growth\_rate | float | 每股经营现金流同比增长率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | operating\_revenue\_cash\_cover | float | 经营现金收入比<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | operating\_profit\_to\_total\_profit | float | 营业利润占比<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | basic\_eps | float | 基本每股收益<br>(ℹ️ 单位：元) |
+            | diluted\_eps | float | 稀释每股收益<br>(ℹ️ 单位：元) |
+            | nocf\_per\_share | float | 每股经营现金净流量<br>(ℹ️ 单位：元) |
             | price | float | 最新价格 |
-            | ma  | float | 简单均线<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>根据 MA 参数返回具体的数值 |
+            | ma  | float | 简单均线<br>(ℹ️ 根据 MA 参数返回具体的数值) |
             | ma5 | float | 5日简单均线 |
             | ma10 | float | 10日简单均线 |
             | ma20 | float | 20日简单均线 |
@@ -2961,8 +2961,8 @@
             | ma60 | float | 60日简单均线 |
             | ma120 | float | 120日简单均线 |
             | ma250 | float | 250日简单均线 |
-            | rsi | float | RSI的值<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>根据 RSI 参数返回具体的数值，RSI 默认参数为12 |
-            | ema | float | 指数移动均线<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>根据 EMA 参数返回具体的数值 |
+            | rsi | float | RSI的值<br>(ℹ️ 根据 RSI 参数返回具体的数值，RSI 默认参数为12) |
+            | ema | float | 指数移动均线<br>(ℹ️ 根据 EMA 参数返回具体的数值) |
             | ema5 | float | 5日指数移动均线 |
             | ema10 | float | 10日指数移动均线 |
             | ema20 | float | 20日指数移动均线 |
@@ -2970,15 +2970,15 @@
             | ema60 | float | 60日指数移动均线 |
             | ema120 | float | 120日指数移动均线 |
             | ema250 | float | 250日指数移动均线 |
-            | kdj\_k | float | KDJ 指标的 K 值<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>根据 KDJ 参数返回具体的数值，KDJ 默认参数为\[9,3,3\] |
-            | kdj\_d | float | KDJ 指标的 D 值<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>根据 KDJ 参数返回具体的数值，KDJ 默认参数为\[9,3,3\] |
-            | kdj\_j | float | KDJ 指标的 J 值<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>根据 KDJ 参数返回具体的数值，KDJ 默认参数为\[9,3,3\] |
-            | macd\_diff | float | MACD 指标的 DIFF 值<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>根据 MACD 参数返回具体的数值，MACD 默认参数为\[12,26,9\] |
-            | macd\_dea | float | MACD 指标的 DEA 值<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>根据 MACD 参数返回具体的数值，MACD 默认参数为\[12,26,9\] |
-            | macd | float | MACD 指标的 MACD 值<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>根据 MACD 参数返回具体的数值，MACD 默认参数为\[12,26,9\] |
-            | boll\_upper | float | BOLL 指标的 UPPER 值<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>根据 BOLL 参数返回具体的数值，BOLL 默认参数为\[20.2\] |
-            | boll\_middler | float | BOLL 指标的 MIDDLER 值<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>根据 BOLL 参数返回具体的数值，BOLL 默认参数为\[20.2\] |
-            | boll\_lower | float | BOLL 指标的 LOWER 值<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>根据 BOLL 参数返回具体的数值，BOLL 默认参数为\[20.2\] |
+            | kdj\_k | float | KDJ 指标的 K 值<br>(ℹ️ 根据 KDJ 参数返回具体的数值，KDJ 默认参数为\[9,3,3\]) |
+            | kdj\_d | float | KDJ 指标的 D 值<br>(ℹ️ 根据 KDJ 参数返回具体的数值，KDJ 默认参数为\[9,3,3\]) |
+            | kdj\_j | float | KDJ 指标的 J 值<br>(ℹ️ 根据 KDJ 参数返回具体的数值，KDJ 默认参数为\[9,3,3\]) |
+            | macd\_diff | float | MACD 指标的 DIFF 值<br>(ℹ️ 根据 MACD 参数返回具体的数值，MACD 默认参数为\[12,26,9\]) |
+            | macd\_dea | float | MACD 指标的 DEA 值<br>(ℹ️ 根据 MACD 参数返回具体的数值，MACD 默认参数为\[12,26,9\]) |
+            | macd | float | MACD 指标的 MACD 值<br>(ℹ️ 根据 MACD 参数返回具体的数值，MACD 默认参数为\[12,26,9\]) |
+            | boll\_upper | float | BOLL 指标的 UPPER 值<br>(ℹ️ 根据 BOLL 参数返回具体的数值，BOLL 默认参数为\[20.2\]) |
+            | boll\_middler | float | BOLL 指标的 MIDDLER 值<br>(ℹ️ 根据 BOLL 参数返回具体的数值，BOLL 默认参数为\[20.2\]) |
+            | boll\_lower | float | BOLL 指标的 LOWER 值<br>(ℹ️ 根据 BOLL 参数返回具体的数值，BOLL 默认参数为\[20.2\]) |
             
 *   **Example**
     

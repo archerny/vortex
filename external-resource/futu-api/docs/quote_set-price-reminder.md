@@ -118,9 +118,9 @@
     | key | int | 标识，新增和删除全部的情况不需要填 |
     | reminder\_type | [PriceReminderType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5160) | 到价提醒的类型，删除、启用、禁用的情况下会忽略该入参 |
     | reminder\_freq | [PriceReminderFreq](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1059) | 到价提醒的频率，删除、启用、禁用的情况下会忽略该入参 |
-    | value | float | 提醒值，删除、启用、禁用的情况下会忽略该入参<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>精确到小数点后 3 位，超出部分会被舍弃 |
+    | value | float | 提醒值，删除、启用、禁用的情况下会忽略该入参<br>(ℹ️ 精确到小数点后 3 位，超出部分会被舍弃) |
     | note | str | 用户设置的备注，仅支持 20 个以内的中文字符，删除、启用、禁用的情况下会忽略该入参 |
-    | reminder\_session\_list | list | 美股到价提醒的时段列表，删除、启用、禁用的情况下会忽略该入参<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   list中元素类型是[PriceReminderMarketStatus](https://openapi.futunn.com/futu-api-doc/quote/quote.html#482)<br>    <br>*   美股默认到价提醒时段：盘中+盘前盘后 |
+    | reminder\_session\_list | list | 美股到价提醒的时段列表，删除、启用、禁用的情况下会忽略该入参<br>(ℹ️ *   list中元素类型是[PriceReminderMarketStatus](https://openapi.futunn.com/futu-api-doc/quote/quote.html#482)<br>    <br>*   美股默认到价提醒时段：盘中+盘前盘后) |
     
 
 *   **返回**
@@ -1425,9 +1425,9 @@
     | key | int | 标识，新增和删除全部的情况不需要填 |
     | reminder\_type | [PriceReminderType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5160) | 到价提醒的类型，删除、启用、禁用的情况下会忽略该入参 |
     | reminder\_freq | [PriceReminderFreq](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1059) | 到价提醒的频率，删除、启用、禁用的情况下会忽略该入参 |
-    | value | float | 提醒值，删除、启用、禁用的情况下会忽略该入参<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>精确到小数点后 3 位，超出部分会被舍弃 |
+    | value | float | 提醒值，删除、启用、禁用的情况下会忽略该入参<br>(ℹ️ 精确到小数点后 3 位，超出部分会被舍弃) |
     | note | str | 用户设置的备注，仅支持 20 个以内的中文字符，删除、启用、禁用的情况下会忽略该入参 |
-    | reminder\_session\_list | list | 美股到价提醒的时段列表，删除、启用、禁用的情况下会忽略该入参<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   list中元素类型是[PriceReminderMarketStatus](https://openapi.futunn.com/futu-api-doc/quote/quote.html#482)<br>    <br>*   美股默认到价提醒时段：盘中+盘前盘后 |
+    | reminder\_session\_list | list | 美股到价提醒的时段列表，删除、启用、禁用的情况下会忽略该入参<br>(ℹ️ *   list中元素类型是[PriceReminderMarketStatus](https://openapi.futunn.com/futu-api-doc/quote/quote.html#482)<br>    <br>*   美股默认到价提醒时段：盘中+盘前盘后) |
     
 
 *   **返回**

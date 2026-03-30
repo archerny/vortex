@@ -113,9 +113,9 @@ Moomoo API 的功能主要有两部分：行情和交易。
 | 期货  | ✓   |
 | 指数  | ✓   |
 | 板块  | ✓   |
-| 美国市场 | 股票、ETFs<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>含纽交所、美交所、纳斯达克上市的股票、ETFs | ✓   |
+| 美国市场 | 股票、ETFs<br>(ℹ️ 含纽交所、美交所、纳斯达克上市的股票、ETFs) | ✓   |
 | OTC 股票 | X   |
-| 期权<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>含普通股票期权、指数期权 | ✓   |
+| 期权<br>(ℹ️ 含普通股票期权、指数期权) | ✓   |
 | 期货  | ✓   |
 | 指数  | X   |
 | 板块  | ✓   |
@@ -140,9 +140,9 @@ Moomoo API 的功能主要有两部分：行情和交易。
 | 期货  | ✓   |
 | 指数  | ✓   |
 | 板块  | ✓   |
-| 美国市场 | 股票、ETFs<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>含纽交所、美交所、纳斯达克上市的股票、ETFs | ✓   |
+| 美国市场 | 股票、ETFs<br>(ℹ️ 含纽交所、美交所、纳斯达克上市的股票、ETFs) | ✓   |
 | OTC 股票 | X   |
-| 期权<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>含普通股票期权、指数期权 | ✓   |
+| 期权<br>(ℹ️ 含普通股票期权、指数期权) | ✓   |
 | 期货  | ✓   |
 | 指数  | X   |
 | 板块  | ✓   |
@@ -174,7 +174,7 @@ Moomoo API 的功能主要有两部分：行情和交易。
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | FUTU HK | Moomoo US | Moomoo SG | Moomoo AU | Moomoo MY | Moomoo CA | Moomoo JP |
 | 香港市场 | 股票、ETFs、窝轮、牛熊、界内证 | ✓   | ✓   | ✓   | ✓   | ✓   | ✓   | X   | X   |
-| 期权<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>含指数期权，需使用期货账户交易 | ✓   | ✓   | X   | X   | X   | X   | X   | X   |
+| 期权<br>(ℹ️ 含指数期权，需使用期货账户交易) | ✓   | ✓   | X   | X   | X   | X   | X   | X   |
 | 期货  | ✓   | ✓   | X   | X   | X   | X   | X   | X   |
 | 美国市场 | 股票、ETFs | ✓   | ✓   | ✓   | ✓   | ✓   | ✓   | ✓   | ✓   |
 | 期权  | ✓   | ✓   | ✓   | ✓   | ✓   | ✓   | ✓   | ✓   |

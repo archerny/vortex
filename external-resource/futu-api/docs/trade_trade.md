@@ -115,10 +115,7 @@
 *   `OPT_DANGER`
     
     危险
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    期权相关
+    (ℹ️ 期权相关)
     
 
 提示
@@ -561,36 +558,24 @@
 *   `CANCEL`
     
     撤单
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    未成交订单将直接从交易所撮合队列中撤销。
+    (ℹ️ 未成交订单将直接从交易所撮合队列中撤销。)
     
 *   `DISABLE`
     
     使失效
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   指让订单失效，对交易所来说，DISABLE 的效果等同于 CANCEL。
+    (ℹ️ *   指让订单失效，对交易所来说，DISABLE 的效果等同于 CANCEL。)
     *   订单「失效」后，未成交订单将直接从交易所撮合队列中撤出，但订单信息（如价格和数量）会继续保留在富途服务器，您随时可以重新 ENABLE 它。
     
 *   `ENABLE`
     
     使生效
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   指让处于失效状态的订单重新生效。对交易所来说，ENABLE 等同于下一笔新订单。
+    (ℹ️ *   指让处于失效状态的订单重新生效。对交易所来说，ENABLE 等同于下一笔新订单。)
     *   订单重新「生效」后，将按照原来的价格数量重新提交到交易所，并按照价格优先、时间优先顺序重新排队。
     
 *   `DELETE`
     
     删除
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    指对已撤单/下单失败的订单进行隐藏操作。
+    (ℹ️ 指对已撤单/下单失败的订单进行隐藏操作。)
     
 
 **ModifyOrderOp**
@@ -849,34 +834,22 @@
 *   `WAITING_SUBMIT`
     
     待提交
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    富途服务器已经收到指令，正在准备提交给上游交易所
+    (ℹ️ 富途服务器已经收到指令，正在准备提交给上游交易所)
     
 *   `SUBMITTING`
     
     提交中
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    富途服务器已将指令发送给上游交易所，上游交易所处理中
+    (ℹ️ 富途服务器已将指令发送给上游交易所，上游交易所处理中)
     
 *   `SUBMITTED`
     
     已提交，等待成交
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    已经成功提交给上游交易所
+    (ℹ️ 已经成功提交给上游交易所)
     
 *   `FILLED_PART`
     
     部分成交
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    剩余部分仍未撤单。您可选择执行撤单，或者继续等待全部成交
+    (ℹ️ 剩余部分仍未撤单。您可选择执行撤单，或者继续等待全部成交)
     
 *   `FILLED_ALL`
     
@@ -897,18 +870,12 @@
 *   `DISABLED`
     
     已失效
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    您主动执行失效操作后的订单状态，失效订单不会提交到上游交易所
+    (ℹ️ 您主动执行失效操作后的订单状态，失效订单不会提交到上游交易所)
     
 *   `DELETED`
     
     已删除，无成交的订单才能删除
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    您主动执行删除订单操作后的订单状态
+    (ℹ️ 您主动执行删除订单操作后的订单状态)
     
 
 **OrderStatus**
@@ -1120,44 +1087,29 @@
 *   `ABSOLUTE_LIMIT`
     
     绝对限价订单
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    只有价格完全匹配才成交，否则下单失败
+    (ℹ️ 只有价格完全匹配才成交，否则下单失败)
     
     *   举例：下一笔价格为 5 元的绝对限价买单，卖方的价格必须也是 5 元才能成交，卖方即使低于 5 元也不能成交，下单失败。卖出同理
     
 *   `AUCTION`
     
     竞价市价单
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    仅港股早盘竞价和收盘竞价有效
+    (ℹ️ 仅港股早盘竞价和收盘竞价有效)
     
 *   `AUCTION_LIMIT`
     
     竞价限价单
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    仅早盘竞价和收盘竞价有效，参与竞价，且要求满足指定价格才会成交
+    (ℹ️ 仅早盘竞价和收盘竞价有效，参与竞价，且要求满足指定价格才会成交)
     
 *   `SPECIAL_LIMIT`
     
     特别限价单
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    成交规则同增强限价订单，且部分成交后，交易所自动撤销订单
+    (ℹ️ 成交规则同增强限价订单，且部分成交后，交易所自动撤销订单)
     
 *   `SPECIAL_LIMIT_ALL`
     
     特别限价且要求全部成交订单
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    全部成交，否则自动撤单
+    (ℹ️ 全部成交，否则自动撤单)
     
 *   `STOP`
     
@@ -1186,34 +1138,22 @@
 *   `TWAP_LIMIT`
     
     时间加权限价算法单（港股和美股）
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    算法订单只支持订单查询，不支持交易。
+    (ℹ️ 算法订单只支持订单查询，不支持交易。)
     
 *   `TWAP`
     
     时间加权市价算法单（仅美股）
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    算法订单只支持订单查询，不支持交易。
+    (ℹ️ 算法订单只支持订单查询，不支持交易。)
     
 *   `VWAP_LIMIT`
     
     成交量加权限价算法单（港股和美股）
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    算法订单只支持订单查询，不支持交易。
+    (ℹ️ 算法订单只支持订单查询，不支持交易。)
     
 *   `VWAP`
     
     成交量加权市价算法单（仅美股）
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    算法订单只支持订单查询，不支持交易。
+    (ℹ️ 算法订单只支持订单查询，不支持交易。)
     
 
 **OrderType**
@@ -1471,10 +1411,7 @@
 *   `LONG`
     
     多仓
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    默认情况是多仓
+    (ℹ️ 默认情况是多仓)
     
 *   `SHORT`
     
@@ -1858,18 +1795,12 @@
 *   `CN`
     
     A 股市场
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    A 股市场仅支持模拟交易，不支持实盘交易
+    (ℹ️ A 股市场仅支持模拟交易，不支持实盘交易)
     
 *   `HKCC`
     
     香港 A 股通市场
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   A 股通市场仅支持实盘交易，不支持模拟交易
+    (ℹ️ *   A 股通市场仅支持实盘交易，不支持模拟交易)
     *   A 股通只能交易沪股通、深股通股票，具体以港交所 [A 股通名单](https://www.hkex.com.hk/mutual-market/stock-connect/eligible-stocks/view-all-eligible-securities?sc_lang=zh-HK)
          为准
     
@@ -1880,90 +1811,57 @@
 *   `FUTURES_SIMULATE_US`
     
     美国期货模拟市场
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    最低 OpenD 版本要求：7.7.3908
+    (ℹ️ 最低 OpenD 版本要求：7.7.3908)
     
 *   `FUTURES_SIMULATE_HK`
     
     香港期货模拟市场
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    最低 OpenD 版本要求：7.7.3908
+    (ℹ️ 最低 OpenD 版本要求：7.7.3908)
     
 *   `FUTURES_SIMULATE_SG`
     
     新加坡期货模拟市场
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    最低 OpenD 版本要求：7.7.3908
+    (ℹ️ 最低 OpenD 版本要求：7.7.3908)
     
 *   `FUTURES_SIMULATE_JP`
     
     日本期货模拟市场
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    最低 OpenD 版本要求：7.7.3908
+    (ℹ️ 最低 OpenD 版本要求：7.7.3908)
     
 *   `HKFUND`
     
     香港基金市场
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    最低 OpenD 版本要求：8.2.4218
+    (ℹ️ 最低 OpenD 版本要求：8.2.4218)
     
 *   `USFUND`
     
     美国基金市场
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    最低 OpenD 版本要求：8.2.4218
+    (ℹ️ 最低 OpenD 版本要求：8.2.4218)
     
 *   `SG`
     
     新加坡市场
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    最低 OpenD 版本要求：9.0.5008
+    (ℹ️ 最低 OpenD 版本要求：9.0.5008)
     
 *   `JP`
     
     日本市场
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    最低 OpenD 版本要求：9.0.5008
+    (ℹ️ 最低 OpenD 版本要求：9.0.5008)
     
 *   `AU`
     
     澳大利亚市场
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    最低 OpenD 版本要求：9.0.5008
+    (ℹ️ 最低 OpenD 版本要求：9.0.5008)
     
 *   `MY`
     
     马来西亚市场
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    最低 OpenD 版本要求：9.0.5008
+    (ℹ️ 最低 OpenD 版本要求：9.0.5008)
     
 *   `CA`
     
     加拿大市场
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    最低 OpenD 版本要求：9.0.5008
+    (ℹ️ 最低 OpenD 版本要求：9.0.5008)
     
 
 **TrdMarket**
@@ -2617,19 +2515,13 @@
 *   `SELL_SHORT`
     
     卖空
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   日本券商适用
+    (ℹ️ *   日本券商适用)
     *   其他券商仅用于订单列表展示，不建议作为下单的方向
     
 *   `BUY_BACK`
     
     买回
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    *   日本券商适用
+    (ℹ️ *   日本券商适用)
     *   其他券商仅用于订单列表展示，不建议作为下单的方向
     
 
@@ -3384,26 +3276,17 @@
 *   `Unlimited`
     
     无限次
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    当前可以无限次日内交易，注意留意剩余日内交易购买力
+    (ℹ️ 当前可以无限次日内交易，注意留意剩余日内交易购买力)
     
 *   `EM_Call`
     
     EM-Call
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    当前状态不能新建仓位，需要补充资产净值至$25000以上，否则会被禁止新建仓位90天
+    (ℹ️ 当前状态不能新建仓位，需要补充资产净值至$25000以上，否则会被禁止新建仓位90天)
     
 *   `DT_Call`
     
     DT-Call
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    当前状态有未补平的日内交易追缴金额（DT Call），需要在5个交易日内足额入金来补平 DT Call，否则会被禁止新建仓位，直到足额存入资金才会解禁
+    (ℹ️ 当前状态有未补平的日内交易追缴金额（DT Call），需要在5个交易日内足额入金来补平 DT Call，否则会被禁止新建仓位，直到足额存入资金才会解禁)
     
 
 **DTStatus**

@@ -25,8 +25,8 @@
     | --- | --- | --- |
     | stock\_code | str | 股票代码 |
     | period\_type | [PeriodType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2644) | 周期类型 |
-    | start | str | 开始时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd  <br>例如：“2017-06-20” |
-    | end | str | 结束时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd  <br>例如：“2017-06-20” |
+    | start | str | 开始时间<br>(ℹ️ 格式：yyyy-MM-dd  <br>例如：“2017-06-20”) |
+    | end | str | 结束时间<br>(ℹ️ 格式：yyyy-MM-dd  <br>例如：“2017-06-20”) |
     
     *   start 和 end 的组合如下
         
@@ -51,13 +51,13 @@
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
         | in\_flow | float | 整体净流入 |
-        | main\_in\_flow | float | 主力大单净流入<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅历史周期（日、周、月）有效 |
+        | main\_in\_flow | float | 主力大单净流入<br>(ℹ️ 仅历史周期（日、周、月）有效) |
         | super\_in\_flow | float | 特大单净流入 |
         | big\_in\_flow | float | 大单净流入 |
         | mid\_in\_flow | float | 中单净流入 |
         | sml\_in\_flow | float | 小单净流入 |
-        | capital\_flow\_item\_time | str | 开始时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd HH:mm:ss  <br>精确到分钟 |
-        | last\_valid\_time | str | 数据最后有效时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅实时周期有效 |
+        | capital\_flow\_item\_time | str | 开始时间<br>(ℹ️ 格式：yyyy-MM-dd HH:mm:ss  <br>精确到分钟) |
+        | last\_valid\_time | str | 数据最后有效时间<br>(ℹ️ 仅实时周期有效) |
         
 *   **Example**
     
@@ -1643,8 +1643,8 @@
     | --- | --- | --- |
     | stock\_code | str | 股票代码 |
     | period\_type | [PeriodType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2644) | 周期类型 |
-    | start | str | 开始时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd  <br>例如：“2017-06-20” |
-    | end | str | 结束时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd  <br>例如：“2017-06-20” |
+    | start | str | 开始时间<br>(ℹ️ 格式：yyyy-MM-dd  <br>例如：“2017-06-20”) |
+    | end | str | 结束时间<br>(ℹ️ 格式：yyyy-MM-dd  <br>例如：“2017-06-20”) |
     
     *   start 和 end 的组合如下
         
@@ -1669,13 +1669,13 @@
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
         | in\_flow | float | 整体净流入 |
-        | main\_in\_flow | float | 主力大单净流入<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅历史周期（日、周、月）有效 |
+        | main\_in\_flow | float | 主力大单净流入<br>(ℹ️ 仅历史周期（日、周、月）有效) |
         | super\_in\_flow | float | 特大单净流入 |
         | big\_in\_flow | float | 大单净流入 |
         | mid\_in\_flow | float | 中单净流入 |
         | sml\_in\_flow | float | 小单净流入 |
-        | capital\_flow\_item\_time | str | 开始时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd HH:mm:ss  <br>精确到分钟 |
-        | last\_valid\_time | str | 数据最后有效时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅实时周期有效 |
+        | capital\_flow\_item\_time | str | 开始时间<br>(ℹ️ 格式：yyyy-MM-dd HH:mm:ss  <br>精确到分钟) |
+        | last\_valid\_time | str | 数据最后有效时间<br>(ℹ️ 仅实时周期有效) |
         
 *   **Example**
     

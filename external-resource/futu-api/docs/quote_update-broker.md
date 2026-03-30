@@ -52,8 +52,8 @@
             | bid\_broker\_id | int | 经纪买盘 ID |
             | bid\_broker\_name | str | 经纪买盘名称 |
             | bid\_broker\_pos | int | 经纪档位 |
-            | order\_id | int | 交易所订单 ID<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   不是下单接口返回的订单 ID<br>*   只有港股 SF 行情权限支持返回该字段 |
-            | order\_volume | int | 单笔委托数量<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>只有港股 SF 行情权限支持返回该字段 |
+            | order\_id | int | 交易所订单 ID<br>(ℹ️ *   不是下单接口返回的订单 ID<br>*   只有港股 SF 行情权限支持返回该字段) |
+            | order\_volume | int | 单笔委托数量<br>(ℹ️ 只有港股 SF 行情权限支持返回该字段) |
             
         *   ask\_frame\_table 格式如下：
             
@@ -64,8 +64,8 @@
             | ask\_broker\_id | int | 经纪卖盘 ID |
             | ask\_broker\_name | str | 经纪卖盘名称 |
             | ask\_broker\_pos | int | 经纪档位 |
-            | order\_id | int | 交易所订单 ID<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   不是下单接口返回的订单 ID<br>*   只有港股 SF 行情权限支持返回该字段 |
-            | order\_volume | int | 单笔委托数量<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>只有港股 SF 行情权限支持返回该字段 |
+            | order\_id | int | 交易所订单 ID<br>(ℹ️ *   不是下单接口返回的订单 ID<br>*   只有港股 SF 行情权限支持返回该字段) |
+            | order\_volume | int | 单笔委托数量<br>(ℹ️ 只有港股 SF 行情权限支持返回该字段) |
             
 *   **Example**
     
@@ -1284,8 +1284,8 @@
             | bid\_broker\_id | int | 经纪买盘 ID |
             | bid\_broker\_name | str | 经纪买盘名称 |
             | bid\_broker\_pos | int | 经纪档位 |
-            | order\_id | int | 交易所订单 ID<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   不是下单接口返回的订单 ID<br>*   只有港股 SF 行情权限支持返回该字段 |
-            | order\_volume | int | 单笔委托数量<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>只有港股 SF 行情权限支持返回该字段 |
+            | order\_id | int | 交易所订单 ID<br>(ℹ️ *   不是下单接口返回的订单 ID<br>*   只有港股 SF 行情权限支持返回该字段) |
+            | order\_volume | int | 单笔委托数量<br>(ℹ️ 只有港股 SF 行情权限支持返回该字段) |
             
         *   ask\_frame\_table 格式如下：
             
@@ -1296,8 +1296,8 @@
             | ask\_broker\_id | int | 经纪卖盘 ID |
             | ask\_broker\_name | str | 经纪卖盘名称 |
             | ask\_broker\_pos | int | 经纪档位 |
-            | order\_id | int | 交易所订单 ID<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   不是下单接口返回的订单 ID<br>*   只有港股 SF 行情权限支持返回该字段 |
-            | order\_volume | int | 单笔委托数量<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>只有港股 SF 行情权限支持返回该字段 |
+            | order\_id | int | 交易所订单 ID<br>(ℹ️ *   不是下单接口返回的订单 ID<br>*   只有港股 SF 行情权限支持返回该字段) |
+            | order\_volume | int | 单笔委托数量<br>(ℹ️ 只有港股 SF 行情权限支持返回该字段) |
             
 *   **Example**
     

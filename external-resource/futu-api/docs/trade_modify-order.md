@@ -114,16 +114,16 @@
     | --- | --- | --- |
     | modify\_order\_op | [ModifyOrderOp](https://openapi.futunn.com/futu-api-doc/trade/trade.html#2969) | 改单操作类型 |
     | order\_id | str | 订单号 |
-    | qty | float | 订单改单后的数量<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>期权和期货单位是“张”  <br>精确到小数点后 0 位，超出部分会被舍弃 |
-    | price | float | 订单改单后的价格<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>证券账户精确到小数点后 3 位，超出部分会被舍弃  <br>期货账户精确到小数点后 9 位，超出部分会被舍弃 |
-    | adjust\_limit | float | 价格微调幅度<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>OpenD 会对传入价格自动调整到合法价位上（期货忽略此参数）<br><br>*   正数代表向上调整，负数代表向下调整<br>*   例如：0.015 代表向上调整且幅度不超过 1.5%；-0.01 代表向下调整且幅度不超过 1%。默认 0 表示不调整 |
+    | qty | float | 订单改单后的数量<br>(ℹ️ 期权和期货单位是“张”  <br>精确到小数点后 0 位，超出部分会被舍弃) |
+    | price | float | 订单改单后的价格<br>(ℹ️ 证券账户精确到小数点后 3 位，超出部分会被舍弃  <br>期货账户精确到小数点后 9 位，超出部分会被舍弃) |
+    | adjust\_limit | float | 价格微调幅度<br>(ℹ️ OpenD 会对传入价格自动调整到合法价位上（期货忽略此参数）<br><br>*   正数代表向上调整，负数代表向下调整<br>*   例如：0.015 代表向上调整且幅度不超过 1.5%；-0.01 代表向下调整且幅度不超过 1%。默认 0 表示不调整) |
     | trd\_env | [TrdEnv](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6374) | 交易环境 |
-    | acc\_id | int | 交易业务账户 ID<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准 |
-    | acc\_index | int | 交易业务账户列表中的账户序号<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户 |
-    | aux\_price | float | 触发价格<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   当订单是**止损市价单**、**止损限价单**、**触及限价单（止盈）**、**触及市价单（止盈）** 时，aux\_price 为必传参数<br>*   证券账户精确到小数点后 3 位，期货账户精确到小数点后 9 位，超过部分四舍五入 |
-    | trail\_type | [TrailType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#5644) | 跟踪类型<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>当订单是**跟踪止损市价单**、**跟踪止损限价单时**，trail\_type 为必传参数 |
-    | trail\_value | float | 跟踪金额/百分比<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   当订单是**跟踪止损市价单**、**跟踪止损限价单**时，trail\_value 为必传参数<br>*   当跟踪类型为比例时，该字段为百分比字段，传入 20 实际对应 20%<br>*   当跟踪类型为金额时，证券账户精确到小数点后 3 位，期货账户精确到小数点后 9 位，超过部分四舍五入<br>*   当跟踪类型为比例时，精确到小数点后 2 位，超过部分四舍五入 |
-    | trail\_spread | float | 指定价差<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   当订单是**跟踪止损限价单**时，trail\_spread 为必传参数<br>*   证券账户精确到小数点后 3 位，期货账户精确到小数点后 9 位，超过部分四舍五入 |
+    | acc\_id | int | 交易业务账户 ID<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准) |
+    | acc\_index | int | 交易业务账户列表中的账户序号<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户) |
+    | aux\_price | float | 触发价格<br>(ℹ️ *   当订单是**止损市价单**、**止损限价单**、**触及限价单（止盈）**、**触及市价单（止盈）** 时，aux\_price 为必传参数<br>*   证券账户精确到小数点后 3 位，期货账户精确到小数点后 9 位，超过部分四舍五入) |
+    | trail\_type | [TrailType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#5644) | 跟踪类型<br>(ℹ️ 当订单是**跟踪止损市价单**、**跟踪止损限价单时**，trail\_type 为必传参数) |
+    | trail\_value | float | 跟踪金额/百分比<br>(ℹ️ *   当订单是**跟踪止损市价单**、**跟踪止损限价单**时，trail\_value 为必传参数<br>*   当跟踪类型为比例时，该字段为百分比字段，传入 20 实际对应 20%<br>*   当跟踪类型为金额时，证券账户精确到小数点后 3 位，期货账户精确到小数点后 9 位，超过部分四舍五入<br>*   当跟踪类型为比例时，精确到小数点后 2 位，超过部分四舍五入) |
+    | trail\_spread | float | 指定价差<br>(ℹ️ *   当订单是**跟踪止损限价单**时，trail\_spread 为必传参数<br>*   证券账户精确到小数点后 3 位，期货账户精确到小数点后 9 位，超过部分四舍五入) |
     
 
 *   **返回**
@@ -203,9 +203,9 @@
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
     | trd\_env | [TrdEnv](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6374) | 交易环境 |
-    | acc\_id | int | 交易业务账户 ID<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准  <br>当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准 |
-    | acc\_index | int | 交易业务账户列表中的账户序号<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户 |
-    | trdmarket | [TrdMarket](https://openapi.futunn.com/futu-api-doc/trade/trade.html#719) | 指定交易市场<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>撤销指定账户指定市场的订单  <br>默认状态时，撤销指定账户全部市场的订单 |
+    | acc\_id | int | 交易业务账户 ID<br>(ℹ️ 当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准  <br>当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准) |
+    | acc\_index | int | 交易业务账户列表中的账户序号<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户) |
+    | trdmarket | [TrdMarket](https://openapi.futunn.com/futu-api-doc/trade/trade.html#719) | 指定交易市场<br>(ℹ️ 撤销指定账户指定市场的订单  <br>默认状态时，撤销指定账户全部市场的订单) |
     
 
 *   **返回**
@@ -1605,16 +1605,16 @@
     | --- | --- | --- |
     | modify\_order\_op | [ModifyOrderOp](https://openapi.futunn.com/futu-api-doc/trade/trade.html#2969) | 改单操作类型 |
     | order\_id | str | 订单号 |
-    | qty | float | 订单改单后的数量<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>期权和期货单位是“张”  <br>精确到小数点后 0 位，超出部分会被舍弃 |
-    | price | float | 订单改单后的价格<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>证券账户精确到小数点后 3 位，超出部分会被舍弃  <br>期货账户精确到小数点后 9 位，超出部分会被舍弃 |
-    | adjust\_limit | float | 价格微调幅度<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>OpenD 会对传入价格自动调整到合法价位上（期货忽略此参数）<br><br>*   正数代表向上调整，负数代表向下调整<br>*   例如：0.015 代表向上调整且幅度不超过 1.5%；-0.01 代表向下调整且幅度不超过 1%。默认 0 表示不调整 |
+    | qty | float | 订单改单后的数量<br>(ℹ️ 期权和期货单位是“张”  <br>精确到小数点后 0 位，超出部分会被舍弃) |
+    | price | float | 订单改单后的价格<br>(ℹ️ 证券账户精确到小数点后 3 位，超出部分会被舍弃  <br>期货账户精确到小数点后 9 位，超出部分会被舍弃) |
+    | adjust\_limit | float | 价格微调幅度<br>(ℹ️ OpenD 会对传入价格自动调整到合法价位上（期货忽略此参数）<br><br>*   正数代表向上调整，负数代表向下调整<br>*   例如：0.015 代表向上调整且幅度不超过 1.5%；-0.01 代表向下调整且幅度不超过 1%。默认 0 表示不调整) |
     | trd\_env | [TrdEnv](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6374) | 交易环境 |
-    | acc\_id | int | 交易业务账户 ID<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准 |
-    | acc\_index | int | 交易业务账户列表中的账户序号<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户 |
-    | aux\_price | float | 触发价格<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   当订单是**止损市价单**、**止损限价单**、**触及限价单（止盈）**、**触及市价单（止盈）** 时，aux\_price 为必传参数<br>*   证券账户精确到小数点后 3 位，期货账户精确到小数点后 9 位，超过部分四舍五入 |
-    | trail\_type | [TrailType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#5644) | 跟踪类型<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>当订单是**跟踪止损市价单**、**跟踪止损限价单时**，trail\_type 为必传参数 |
-    | trail\_value | float | 跟踪金额/百分比<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   当订单是**跟踪止损市价单**、**跟踪止损限价单**时，trail\_value 为必传参数<br>*   当跟踪类型为比例时，该字段为百分比字段，传入 20 实际对应 20%<br>*   当跟踪类型为金额时，证券账户精确到小数点后 3 位，期货账户精确到小数点后 9 位，超过部分四舍五入<br>*   当跟踪类型为比例时，精确到小数点后 2 位，超过部分四舍五入 |
-    | trail\_spread | float | 指定价差<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   当订单是**跟踪止损限价单**时，trail\_spread 为必传参数<br>*   证券账户精确到小数点后 3 位，期货账户精确到小数点后 9 位，超过部分四舍五入 |
+    | acc\_id | int | 交易业务账户 ID<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准) |
+    | acc\_index | int | 交易业务账户列表中的账户序号<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户) |
+    | aux\_price | float | 触发价格<br>(ℹ️ *   当订单是**止损市价单**、**止损限价单**、**触及限价单（止盈）**、**触及市价单（止盈）** 时，aux\_price 为必传参数<br>*   证券账户精确到小数点后 3 位，期货账户精确到小数点后 9 位，超过部分四舍五入) |
+    | trail\_type | [TrailType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#5644) | 跟踪类型<br>(ℹ️ 当订单是**跟踪止损市价单**、**跟踪止损限价单时**，trail\_type 为必传参数) |
+    | trail\_value | float | 跟踪金额/百分比<br>(ℹ️ *   当订单是**跟踪止损市价单**、**跟踪止损限价单**时，trail\_value 为必传参数<br>*   当跟踪类型为比例时，该字段为百分比字段，传入 20 实际对应 20%<br>*   当跟踪类型为金额时，证券账户精确到小数点后 3 位，期货账户精确到小数点后 9 位，超过部分四舍五入<br>*   当跟踪类型为比例时，精确到小数点后 2 位，超过部分四舍五入) |
+    | trail\_spread | float | 指定价差<br>(ℹ️ *   当订单是**跟踪止损限价单**时，trail\_spread 为必传参数<br>*   证券账户精确到小数点后 3 位，期货账户精确到小数点后 9 位，超过部分四舍五入) |
     
 
 *   **返回**
@@ -1694,9 +1694,9 @@
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
     | trd\_env | [TrdEnv](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6374) | 交易环境 |
-    | acc\_id | int | 交易业务账户 ID<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准  <br>当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准 |
-    | acc\_index | int | 交易业务账户列表中的账户序号<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户 |
-    | trdmarket | [TrdMarket](https://openapi.futunn.com/futu-api-doc/trade/trade.html#719) | 指定交易市场<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>撤销指定账户指定市场的订单  <br>默认状态时，撤销指定账户全部市场的订单 |
+    | acc\_id | int | 交易业务账户 ID<br>(ℹ️ 当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准  <br>当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准) |
+    | acc\_index | int | 交易业务账户列表中的账户序号<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户) |
+    | trdmarket | [TrdMarket](https://openapi.futunn.com/futu-api-doc/trade/trade.html#719) | 指定交易市场<br>(ℹ️ 撤销指定账户指定市场的订单  <br>默认状态时，撤销指定账户全部市场的订单) |
     
 
 *   **返回**

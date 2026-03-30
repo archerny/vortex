@@ -1144,7 +1144,7 @@ InitConnect.proto
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | all\_daemon | bool | 是否设置为 daemon 线程<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   True：设置为 daemon 线程<br>*   False：设置为非 daemon 线程<br>*   默认为 False |
+    | all\_daemon | bool | 是否设置为 daemon 线程<br>(ℹ️ *   True：设置为 daemon 线程<br>*   False：设置为非 daemon 线程<br>*   默认为 False) |
     
 *   **Example**
     

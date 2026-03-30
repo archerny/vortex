@@ -23,7 +23,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | code\_list | list | 需要查询市场状态的股票代码列表<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>list 中元素类型是 str |
+    | code\_list | list | 需要查询市场状态的股票代码列表<br>(ℹ️ list 中元素类型是 str) |
     
 
 *   **返回**
@@ -1176,7 +1176,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | code\_list | list | 需要查询市场状态的股票代码列表<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>list 中元素类型是 str |
+    | code\_list | list | 需要查询市场状态的股票代码列表<br>(ℹ️ list 中元素类型是 str) |
     
 
 *   **返回**

@@ -115,7 +115,7 @@
     | --- | --- | --- |
     | market | [Market](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427) | 市场类型 |
     | stock\_type | [SecurityType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3325) | 股票类型，但不支持传入 SecurityType.DRVT |
-    | code\_list | list | 股票列表<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   默认为 None，代表获取全市场股票的静态信息<br>*   若传入股票列表，只返回指定股票的信息<br>*   list 中元素类型是 str |
+    | code\_list | list | 股票列表<br>(ℹ️ *   默认为 None，代表获取全市场股票的静态信息<br>*   若传入股票列表，只返回指定股票的信息<br>*   list 中元素类型是 str) |
     
     注：当 market 和 code\_list 同时存在时，会忽略 market，仅对 code\_list 进行查询。
     
@@ -134,20 +134,20 @@
         | --- | --- | --- |
         | code | str | 股票代码 |
         | name | str | 股票名称 |
-        | lot\_size | int | 每手股数，期权表示每份合约股数<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>指数期权无该字段<br><br>，期货表示合约乘数 |
+        | lot\_size | int | 每手股数，期权表示每份合约股数<br>(ℹ️ 指数期权无该字段<br><br>，期货表示合约乘数) |
         | stock\_type | [SecurityType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3325) | 股票类型 |
         | stock\_child\_type | [WrtType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#926) | 窝轮子类型 |
         | stock\_owner | str | 窝轮所属正股的代码，或期权标的股的代码 |
         | option\_type | [OptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3713) | 期权类型 |
-        | strike\_time | str | 期权行权日<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间 |
+        | strike\_time | str | 期权行权日<br>(ℹ️ 格式：yyyy-MM-dd  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间) |
         | strike\_price | float | 期权行权价 |
-        | suspension | bool | 期权是否停牌<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>True：停牌  <br>False：未停牌 |
-        | listing\_date | str | 上市时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>此字段停止维护，不建议使用  <br>格式：yyyy-MM-dd |
+        | suspension | bool | 期权是否停牌<br>(ℹ️ True：停牌  <br>False：未停牌) |
+        | listing\_date | str | 上市时间<br>(ℹ️ 此字段停止维护，不建议使用  <br>格式：yyyy-MM-dd) |
         | stock\_id | int | 股票 ID |
         | delisting | bool | 是否退市 |
         | index\_option\_type | str | 指数期权类型 |
         | main\_contract | bool | 是否主连合约 |
-        | last\_trade\_time | str | 最后交易时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>主连，当月，下月等期货没有该字段 |
+        | last\_trade\_time | str | 最后交易时间<br>(ℹ️ 主连，当月，下月等期货没有该字段) |
         | exchange\_type | [ExchType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6898) | 所属交易所 |
         
 *   **Example**
@@ -1326,7 +1326,7 @@
     | --- | --- | --- |
     | market | [Market](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427) | 市场类型 |
     | stock\_type | [SecurityType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3325) | 股票类型，但不支持传入 SecurityType.DRVT |
-    | code\_list | list | 股票列表<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   默认为 None，代表获取全市场股票的静态信息<br>*   若传入股票列表，只返回指定股票的信息<br>*   list 中元素类型是 str |
+    | code\_list | list | 股票列表<br>(ℹ️ *   默认为 None，代表获取全市场股票的静态信息<br>*   若传入股票列表，只返回指定股票的信息<br>*   list 中元素类型是 str) |
     
     注：当 market 和 code\_list 同时存在时，会忽略 market，仅对 code\_list 进行查询。
     
@@ -1345,20 +1345,20 @@
         | --- | --- | --- |
         | code | str | 股票代码 |
         | name | str | 股票名称 |
-        | lot\_size | int | 每手股数，期权表示每份合约股数<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>指数期权无该字段<br><br>，期货表示合约乘数 |
+        | lot\_size | int | 每手股数，期权表示每份合约股数<br>(ℹ️ 指数期权无该字段<br><br>，期货表示合约乘数) |
         | stock\_type | [SecurityType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3325) | 股票类型 |
         | stock\_child\_type | [WrtType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#926) | 窝轮子类型 |
         | stock\_owner | str | 窝轮所属正股的代码，或期权标的股的代码 |
         | option\_type | [OptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3713) | 期权类型 |
-        | strike\_time | str | 期权行权日<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间 |
+        | strike\_time | str | 期权行权日<br>(ℹ️ 格式：yyyy-MM-dd  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间) |
         | strike\_price | float | 期权行权价 |
-        | suspension | bool | 期权是否停牌<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>True：停牌  <br>False：未停牌 |
-        | listing\_date | str | 上市时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>此字段停止维护，不建议使用  <br>格式：yyyy-MM-dd |
+        | suspension | bool | 期权是否停牌<br>(ℹ️ True：停牌  <br>False：未停牌) |
+        | listing\_date | str | 上市时间<br>(ℹ️ 此字段停止维护，不建议使用  <br>格式：yyyy-MM-dd) |
         | stock\_id | int | 股票 ID |
         | delisting | bool | 是否退市 |
         | index\_option\_type | str | 指数期权类型 |
         | main\_contract | bool | 是否主连合约 |
-        | last\_trade\_time | str | 最后交易时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>主连，当月，下月等期货没有该字段 |
+        | last\_trade\_time | str | 最后交易时间<br>(ℹ️ 主连，当月，下月等期货没有该字段) |
         | exchange\_type | [ExchType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6898) | 所属交易所 |
         
 *   **Example**

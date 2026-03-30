@@ -100,17 +100,17 @@
     
     | 实例  | 账户  |
     | --- | --- |
-    | OpenSecTradeContext | 证券账户<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>股票、ETFs、窝轮牛熊、股票及指数的期权使用此账户 |
-    | OpenFutureTradeContext | 期货账户<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>期货、期货期权使用此账户 |
+    | OpenSecTradeContext | 证券账户<br>(ℹ️ 股票、ETFs、窝轮牛熊、股票及指数的期权使用此账户) |
+    | OpenFutureTradeContext | 期货账户<br>(ℹ️ 期货、期货期权使用此账户) |
     
 *   **参数**
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | filter\_trdmarket | [TrdMarket](https://openapi.futunn.com/futu-api-doc/trade/trade.html#719) | 筛选对应交易市场权限的账户<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   此参数仅对 OpenSecTradeContext 适用<br>*   此参数仅用于筛选账户，不影响交易连接 |
+    | filter\_trdmarket | [TrdMarket](https://openapi.futunn.com/futu-api-doc/trade/trade.html#719) | 筛选对应交易市场权限的账户<br>(ℹ️ *   此参数仅对 OpenSecTradeContext 适用<br>*   此参数仅用于筛选账户，不影响交易连接) |
     | host | str | OpenD 监听的 IP 地址 |
     | port | int | OpenD 监听的 IP 端口 |
-    | is\_encrypt | bool | 是否启用加密<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>默认 None 表示：使用 [enable\_proto\_encrypt](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#319)<br> 的设置 |
+    | is\_encrypt | bool | 是否启用加密<br>(ℹ️ 默认 None 表示：使用 [enable\_proto\_encrypt](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#319)<br> 的设置) |
     | security\_firm | [SecurityFirm](https://openapi.futunn.com/futu-api-doc/trade/trade.html#572) | 所属券商 |
     
 *   **Example**
@@ -632,17 +632,17 @@
     
     | 实例  | 账户  |
     | --- | --- |
-    | OpenSecTradeContext | 证券账户<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>股票、ETFs、窝轮牛熊、股票及指数的期权使用此账户 |
-    | OpenFutureTradeContext | 期货账户<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>期货、期货期权使用此账户 |
+    | OpenSecTradeContext | 证券账户<br>(ℹ️ 股票、ETFs、窝轮牛熊、股票及指数的期权使用此账户) |
+    | OpenFutureTradeContext | 期货账户<br>(ℹ️ 期货、期货期权使用此账户) |
     
 *   **参数**
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | filter\_trdmarket | [TrdMarket](https://openapi.futunn.com/futu-api-doc/trade/trade.html#719) | 筛选对应交易市场权限的账户<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   此参数仅对 OpenSecTradeContext 适用<br>*   此参数仅用于筛选账户，不影响交易连接 |
+    | filter\_trdmarket | [TrdMarket](https://openapi.futunn.com/futu-api-doc/trade/trade.html#719) | 筛选对应交易市场权限的账户<br>(ℹ️ *   此参数仅对 OpenSecTradeContext 适用<br>*   此参数仅用于筛选账户，不影响交易连接) |
     | host | str | OpenD 监听的 IP 地址 |
     | port | int | OpenD 监听的 IP 端口 |
-    | is\_encrypt | bool | 是否启用加密<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>默认 None 表示：使用 [enable\_proto\_encrypt](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#319)<br> 的设置 |
+    | is\_encrypt | bool | 是否启用加密<br>(ℹ️ 默认 None 表示：使用 [enable\_proto\_encrypt](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#319)<br> 的设置) |
     | security\_firm | [SecurityFirm](https://openapi.futunn.com/futu-api-doc/trade/trade.html#572) | 所属券商 |
     
 *   **Example**

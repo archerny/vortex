@@ -56,8 +56,8 @@
 | 美国市场 | 证券类产品（含纽交所、美交所、纳斯达克上市的股票、ETFs） | \* 与客户端行情权限不共用，如需获得 LV1 权限（基本报价，含夜盘），请购买 [Nasdaq Basic](https://qtcardfthk.futufin.com/intro/nasdaq-basic?type=12&is_support_buy=1&clientlang=0)<br> 。  <br>\* 与客户端行情权限不共用，如需获得 LV2 权限（基本报价+深度摆盘，含夜盘深度摆盘），请购买 [Nasdaq Basic+TotalView](https://qtcardfthk.futufin.com/intro/nasdaq-basic?type=18&is_support_buy=1&clientlang=0)<br> 。 |
 | 板块  |
 | OTC 股票 | 暂不支持获取 |
-| 期权（含普通股票期权、指数期权） | \* 达到门槛<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>门槛要求为：总资产大于20000港元<br><br>的客户：免费获得 LV1 权限。  <br>\* 未达到门槛<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>门槛要求为：总资产大于20000港元<br><br>的客户：请购买 [OPRA 期权 LV1 实时行情](https://qtcardfthk.futufin.com/intro/api-usoption-realtime?type=16&is_support_buy=1&clientlang=0)<br> 获得 LV1 权限。 |
-| 期货  | \* 已开通期货账户<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   富途证券(香港)/moomoo证券(新加坡) 支持开通期货账户<br>*   moomoo证券(美国) 暂不支持<br><br>的客户：  <br>如需获取 CME Group 行情<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>包含 CME, CBOT, NYMEX, COMEX 行情<br><br>，请购买 [CME Group 期货 LV2](https://qtcardfthk.futufin.com/intro/cme?type=30&clientlang=0&is_support_buy=1)<br>  <br>如需获取 CME 行情，请购买 [CME 期货 LV2](https://qtcardfthk.futufin.com/intro/cme?type=31&clientlang=0&is_support_buy=1)<br>  <br>如需获取 CBOT 行情，请购买 [CBOT 期货 LV2](https://qtcardfthk.futufin.com/intro/cme?type=32&clientlang=0&is_support_buy=1)<br>  <br>如需获取 NYMEX 行情，请购买 [NYMEX 期货 LV2](https://qtcardfthk.futufin.com/intro/cme?type=33&clientlang=0&is_support_buy=1)<br>  <br>如需获取 COMEX 行情，请购买 [COMEX 期货 LV2](https://qtcardfthk.futufin.com/intro/cme?type=34&clientlang=0&is_support_buy=1)<br>  <br>  <br>\* 未开通期货账户的客户：不支持获取 |
+| 期权（含普通股票期权、指数期权） | \* 达到门槛<br>(ℹ️ 门槛要求为：总资产大于20000港元<br><br>的客户：免费获得 LV1 权限。  <br>\* 未达到门槛<br>(ℹ️ 门槛要求为：总资产大于20000港元<br><br>的客户：请购买 [OPRA 期权 LV1 实时行情](https://qtcardfthk.futufin.com/intro/api-usoption-realtime?type=16&is_support_buy=1&clientlang=0)<br> 获得 LV1 权限。)) |
+| 期货  | \* 已开通期货账户<br>(ℹ️ *   富途证券(香港)/moomoo证券(新加坡) 支持开通期货账户<br>*   moomoo证券(美国) 暂不支持<br><br>的客户：  <br>如需获取 CME Group 行情<br>(ℹ️ 包含 CME, CBOT, NYMEX, COMEX 行情<br><br>，请购买 [CME Group 期货 LV2](https://qtcardfthk.futufin.com/intro/cme?type=30&clientlang=0&is_support_buy=1)<br>  <br>如需获取 CME 行情，请购买 [CME 期货 LV2](https://qtcardfthk.futufin.com/intro/cme?type=31&clientlang=0&is_support_buy=1)<br>  <br>如需获取 CBOT 行情，请购买 [CBOT 期货 LV2](https://qtcardfthk.futufin.com/intro/cme?type=32&clientlang=0&is_support_buy=1)<br>  <br>如需获取 NYMEX 行情，请购买 [NYMEX 期货 LV2](https://qtcardfthk.futufin.com/intro/cme?type=33&clientlang=0&is_support_buy=1)<br>  <br>如需获取 COMEX 行情，请购买 [COMEX 期货 LV2](https://qtcardfthk.futufin.com/intro/cme?type=34&clientlang=0&is_support_buy=1)<br>  <br>  <br>\* 未开通期货账户的客户：不支持获取)) |
 | 指数  | 暂不支持获取 |
 | A 股市场 | 证券类产品（含股票、ETFs） | \* 中国内地 IP 个人客户：免费获取 LV1 行情  <br>\* 港澳台及海外IP客户/机构客户：暂不支持 |
 | 指数  |
@@ -75,8 +75,8 @@
 | 美国市场 | 证券类产品（含纽交所、美交所、纳斯达克上市的股票、ETFs） | \* 与客户端行情权限不共用，如需获得 LV1 权限（基本报价，含夜盘），请购买 [Nasdaq Basic](https://qtcard.moomoo.com/intro/nasdaq-basic?is_support_buy=1&type=12&goods_type=1022&clientlang=0)<br> 。  <br>\* 与客户端行情权限不共用，如需获得 LV2 权限（基本报价+深度摆盘，含夜盘深度摆盘），请购买 [Nasdaq Basic+TotalView](https://qtcard.moomoo.com/intro/nasdaq-basic?is_support_buy=1&type=16&goods_type=1026&clientlang=0)<br> 。 |
 | 板块  |
 | OTC 股票 | 暂不支持获取 |
-| 期权（含普通股票期权、指数期权） | \* 达到门槛<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>门槛要求为：<br><br>*   港美股总资产大于0<br>*   港美股有过交易<br><br>的客户：免费获得 LV1 权限。  <br>\* 未达到门槛<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>门槛要求为：<br><br>*   港美股总资产大于3000美金<br>*   港美股有过交易<br><br>的客户：请购买 [OPRA 期权 LV1 实时行情](https://qtcard.moomoo.com/intro/api-usoption-realtime?goods_type=1024&type=15&is_support_buy=1&clientlang=0)<br> 获得 LV1 权限。 |
-| 期货  | \* 已开通期货账户<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   富途证券(香港)/moomoo证券(新加坡)/moomoo证券(马来西亚) 支持开通期货账户<br>*   moomoo证券(美国)/moomoo证券(日本)/moomoo证券(加拿大)/moomoo证券(澳大利亚) 暂不支持<br><br>的客户：  <br>如需获取 CME Group 行情<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>包含 CME, CBOT, NYMEX, COMEX 行情<br><br>，请购买 [CME Group 期货 LV2](https://qtcard.moomoo.com/intro/cme?type=25&goods_type=1044&is_support_buy=1)<br>  <br>如需获取 CME 行情，请购买 [CME 期货 LV2](https://qtcard.moomoo.com/intro/cme?type=26&goods_type=1046&is_support_buy=1)<br>  <br>如需获取 CBOT 行情，请购买 [CBOT 期货 LV2](https://qtcard.moomoo.com/intro/cme?type=27&goods_type=1048&is_support_buy=1)<br>  <br>如需获取 NYMEX 行情，请购买 [NYMEX 期货 LV2](https://qtcard.moomoo.com/intro/cme?type=28&goods_type=1050&is_support_buy=1)<br>  <br>如需获取 COMEX 行情，请购买 [COMEX 期货 LV2](https://qtcard.moomoo.com/intro/cme?type=29&goods_type=1052&is_support_buy=1)<br>  <br>  <br>\* 未开通期货账户的客户：不支持获取 |
+| 期权（含普通股票期权、指数期权） | \* 达到门槛<br>(ℹ️ 门槛要求为：<br><br>*   港美股总资产大于0<br>*   港美股有过交易<br><br>的客户：免费获得 LV1 权限。  <br>\* 未达到门槛<br>(ℹ️ 门槛要求为：<br><br>*   港美股总资产大于3000美金<br>*   港美股有过交易<br><br>的客户：请购买 [OPRA 期权 LV1 实时行情](https://qtcard.moomoo.com/intro/api-usoption-realtime?goods_type=1024&type=15&is_support_buy=1&clientlang=0)<br> 获得 LV1 权限。)) |
+| 期货  | \* 已开通期货账户<br>(ℹ️ *   富途证券(香港)/moomoo证券(新加坡)/moomoo证券(马来西亚) 支持开通期货账户<br>*   moomoo证券(美国)/moomoo证券(日本)/moomoo证券(加拿大)/moomoo证券(澳大利亚) 暂不支持<br><br>的客户：  <br>如需获取 CME Group 行情<br>(ℹ️ 包含 CME, CBOT, NYMEX, COMEX 行情<br><br>，请购买 [CME Group 期货 LV2](https://qtcard.moomoo.com/intro/cme?type=25&goods_type=1044&is_support_buy=1)<br>  <br>如需获取 CME 行情，请购买 [CME 期货 LV2](https://qtcard.moomoo.com/intro/cme?type=26&goods_type=1046&is_support_buy=1)<br>  <br>如需获取 CBOT 行情，请购买 [CBOT 期货 LV2](https://qtcard.moomoo.com/intro/cme?type=27&goods_type=1048&is_support_buy=1)<br>  <br>如需获取 NYMEX 行情，请购买 [NYMEX 期货 LV2](https://qtcard.moomoo.com/intro/cme?type=28&goods_type=1050&is_support_buy=1)<br>  <br>如需获取 COMEX 行情，请购买 [COMEX 期货 LV2](https://qtcard.moomoo.com/intro/cme?type=29&goods_type=1052&is_support_buy=1)<br>  <br>  <br>\* 未开通期货账户的客户：不支持获取)) |
 | 指数  | 暂不支持获取 |
 | A 股市场 | 证券类产品（含股票、ETFs） | \* 中国内地 IP 个人客户：免费获取 LV1 行情。  <br>\* 港澳台及海外IP客户/机构客户：暂不支持。 |
 | 指数  |
@@ -154,10 +154,7 @@
 *   订阅额度和历史 K 线额度为系统自动分配，不需要手动申请。
 *   新入金的账户，额度等级会在 2 小时内自动生效。
 *   在途资产
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    参与港股新股认购、供股可能会产生在途资产
+    (ℹ️ 参与港股新股认购、供股可能会产生在途资产)
     
     不会用于额度计算。
 

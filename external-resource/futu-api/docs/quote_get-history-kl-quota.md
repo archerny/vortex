@@ -113,7 +113,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | get\_detail | bool | 是否返回拉取历史 K 线的详细纪录<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>True：返回  <br>False：不返回 |
+    | get\_detail | bool | 是否返回拉取历史 K 线的详细纪录<br>(ℹ️ True：返回  <br>False：不返回) |
     
 
 *   **返回**
@@ -128,9 +128,9 @@
         
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
-        | used\_quota | int | 已用额度<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>即当前周期内已经下载过多少只股票 |
+        | used\_quota | int | 已用额度<br>(ℹ️ 即当前周期内已经下载过多少只股票) |
         | remain\_quota | int | 剩余额度 |
-        | detail\_list | list | 拉取历史 K 线的详细纪录，含股票代码和拉取时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>list 中元素类型是 dict |
+        | detail\_list | list | 拉取历史 K 线的详细纪录，含股票代码和拉取时间<br>(ℹ️ list 中元素类型是 dict) |
         
         *   detail\_list 数据列格式如下
             
@@ -138,7 +138,7 @@
             | --- | --- | --- |
             | code | str | 股票代码 |
             | name | str | 股票名称 |
-            | request\_time | str | 最后一次拉取的时间字符串<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd HH:mm:ss |
+            | request\_time | str | 最后一次拉取的时间字符串<br>(ℹ️ 格式：yyyy-MM-dd HH:mm:ss) |
             
 *   **Example**
     
@@ -1228,7 +1228,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | get\_detail | bool | 是否返回拉取历史 K 线的详细纪录<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>True：返回  <br>False：不返回 |
+    | get\_detail | bool | 是否返回拉取历史 K 线的详细纪录<br>(ℹ️ True：返回  <br>False：不返回) |
     
 
 *   **返回**
@@ -1243,9 +1243,9 @@
         
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
-        | used\_quota | int | 已用额度<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>即当前周期内已经下载过多少只股票 |
+        | used\_quota | int | 已用额度<br>(ℹ️ 即当前周期内已经下载过多少只股票) |
         | remain\_quota | int | 剩余额度 |
-        | detail\_list | list | 拉取历史 K 线的详细纪录，含股票代码和拉取时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>list 中元素类型是 dict |
+        | detail\_list | list | 拉取历史 K 线的详细纪录，含股票代码和拉取时间<br>(ℹ️ list 中元素类型是 dict) |
         
         *   detail\_list 数据列格式如下
             
@@ -1253,7 +1253,7 @@
             | --- | --- | --- |
             | code | str | 股票代码 |
             | name | str | 股票名称 |
-            | request\_time | str | 最后一次拉取的时间字符串<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd HH:mm:ss |
+            | request\_time | str | 最后一次拉取的时间字符串<br>(ℹ️ 格式：yyyy-MM-dd HH:mm:ss) |
             
 *   **Example**
     

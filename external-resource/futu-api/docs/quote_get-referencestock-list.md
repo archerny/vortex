@@ -129,13 +129,13 @@
         | lot\_size | int | 每手股数，期货表示合约乘数 |
         | stock\_type | [SecurityType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3325) | 证券类型 |
         | stock\_name | str | 证券名字 |
-        | list\_time | str | 上市时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间 |
-        | wrt\_valid | bool | 是否是窝轮<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>若为 True，下面 wrt 开头的字段有效 |
+        | list\_time | str | 上市时间<br>(ℹ️ 格式：yyyy-MM-dd  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间) |
+        | wrt\_valid | bool | 是否是窝轮<br>(ℹ️ 若为 True，下面 wrt 开头的字段有效) |
         | wrt\_type | [WrtType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#926) | 窝轮类型 |
         | wrt\_code | str | 所属正股 |
-        | future\_valid | bool | 是否是期货<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>若为 True，以下 future 开头的字段有效 |
-        | future\_main\_contract | bool | 是否主连合约<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>期货特有字段 |
-        | future\_last\_trade\_time | str | 最后交易时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>期货特有字段  <br>主连，当月，下月等无该字段 |
+        | future\_valid | bool | 是否是期货<br>(ℹ️ 若为 True，以下 future 开头的字段有效) |
+        | future\_main\_contract | bool | 是否主连合约<br>(ℹ️ 期货特有字段) |
+        | future\_last\_trade\_time | str | 最后交易时间<br>(ℹ️ 期货特有字段  <br>主连，当月，下月等无该字段) |
         
 *   **Example**
     
@@ -1607,13 +1607,13 @@
         | lot\_size | int | 每手股数，期货表示合约乘数 |
         | stock\_type | [SecurityType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3325) | 证券类型 |
         | stock\_name | str | 证券名字 |
-        | list\_time | str | 上市时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间 |
-        | wrt\_valid | bool | 是否是窝轮<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>若为 True，下面 wrt 开头的字段有效 |
+        | list\_time | str | 上市时间<br>(ℹ️ 格式：yyyy-MM-dd  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间) |
+        | wrt\_valid | bool | 是否是窝轮<br>(ℹ️ 若为 True，下面 wrt 开头的字段有效) |
         | wrt\_type | [WrtType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#926) | 窝轮类型 |
         | wrt\_code | str | 所属正股 |
-        | future\_valid | bool | 是否是期货<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>若为 True，以下 future 开头的字段有效 |
-        | future\_main\_contract | bool | 是否主连合约<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>期货特有字段 |
-        | future\_last\_trade\_time | str | 最后交易时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>期货特有字段  <br>主连，当月，下月等无该字段 |
+        | future\_valid | bool | 是否是期货<br>(ℹ️ 若为 True，以下 future 开头的字段有效) |
+        | future\_main\_contract | bool | 是否主连合约<br>(ℹ️ 期货特有字段) |
+        | future\_last\_trade\_time | str | 最后交易时间<br>(ℹ️ 期货特有字段  <br>主连，当月，下月等无该字段) |
         
 *   **Example**
     

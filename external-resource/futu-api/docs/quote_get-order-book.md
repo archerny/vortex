@@ -25,7 +25,7 @@
     | --- | --- | --- |
     | code | str | 股票代码 |
     | name | str | 股票名称 |
-    | num | int | 请求摆盘档数<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>摆盘档数获取上限请参见 [摆盘档数明细](https://openapi.futunn.com/futu-api-doc/qa/quote.html#5336) |
+    | num | int | 请求摆盘档数<br>(ℹ️ 摆盘档数获取上限请参见 [摆盘档数明细](https://openapi.futunn.com/futu-api-doc/qa/quote.html#5336)) |
     
 
 *   **返回**
@@ -42,10 +42,10 @@
         | --- | --- | --- |
         | code | str | 股票代码 |
         | name | str | 股票名称 |
-        | svr\_recv\_time\_bid | str | 富途服务器从交易所收到买盘数据的时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>部分数据的接收时间为零，例如服务器重启或第一次推送的缓存数据 |
-        | svr\_recv\_time\_ask | str | 富途服务器从交易所收到卖盘数据的时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>部分数据的接收时间为零，例如服务器重启或第一次推送的缓存数据 |
-        | Bid | list | 每个元祖包含如下信息：委托价格，委托数量，委托订单数，委托订单明细<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>委托订单明细<br><br>*   明细内容：交易所订单 ID，单笔委托数量<br>*   港股 SF 权限下最多支持 1000 笔委托订单明细；  <br>    其余行情权限不支持获取此类数据 |
-        | Ask | list | 每个元祖包含如下信息：委托价格，委托数量，委托订单数，委托订单明细<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>委托订单明细<br><br>*   明细内容：交易所订单 ID，单笔委托数量<br>*   港股 SF 权限下最多支持 1000 笔委托订单明细；  <br>    其余行情权限不支持获取此类数据 |
+        | svr\_recv\_time\_bid | str | 富途服务器从交易所收到买盘数据的时间<br>(ℹ️ 部分数据的接收时间为零，例如服务器重启或第一次推送的缓存数据) |
+        | svr\_recv\_time\_ask | str | 富途服务器从交易所收到卖盘数据的时间<br>(ℹ️ 部分数据的接收时间为零，例如服务器重启或第一次推送的缓存数据) |
+        | Bid | list | 每个元祖包含如下信息：委托价格，委托数量，委托订单数，委托订单明细<br>(ℹ️ 委托订单明细<br><br>*   明细内容：交易所订单 ID，单笔委托数量<br>*   港股 SF 权限下最多支持 1000 笔委托订单明细；  <br>    其余行情权限不支持获取此类数据) |
+        | Ask | list | 每个元祖包含如下信息：委托价格，委托数量，委托订单数，委托订单明细<br>(ℹ️ 委托订单明细<br><br>*   明细内容：交易所订单 ID，单笔委托数量<br>*   港股 SF 权限下最多支持 1000 笔委托订单明细；  <br>    其余行情权限不支持获取此类数据) |
         
         其中，Bid 和 Ask 字段的结构如下：
         
@@ -1533,7 +1533,7 @@
     | --- | --- | --- |
     | code | str | 股票代码 |
     | name | str | 股票名称 |
-    | num | int | 请求摆盘档数<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>摆盘档数获取上限请参见 [摆盘档数明细](https://openapi.futunn.com/futu-api-doc/qa/quote.html#5336) |
+    | num | int | 请求摆盘档数<br>(ℹ️ 摆盘档数获取上限请参见 [摆盘档数明细](https://openapi.futunn.com/futu-api-doc/qa/quote.html#5336)) |
     
 
 *   **返回**
@@ -1550,10 +1550,10 @@
         | --- | --- | --- |
         | code | str | 股票代码 |
         | name | str | 股票名称 |
-        | svr\_recv\_time\_bid | str | 富途服务器从交易所收到买盘数据的时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>部分数据的接收时间为零，例如服务器重启或第一次推送的缓存数据 |
-        | svr\_recv\_time\_ask | str | 富途服务器从交易所收到卖盘数据的时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>部分数据的接收时间为零，例如服务器重启或第一次推送的缓存数据 |
-        | Bid | list | 每个元祖包含如下信息：委托价格，委托数量，委托订单数，委托订单明细<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>委托订单明细<br><br>*   明细内容：交易所订单 ID，单笔委托数量<br>*   港股 SF 权限下最多支持 1000 笔委托订单明细；  <br>    其余行情权限不支持获取此类数据 |
-        | Ask | list | 每个元祖包含如下信息：委托价格，委托数量，委托订单数，委托订单明细<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>委托订单明细<br><br>*   明细内容：交易所订单 ID，单笔委托数量<br>*   港股 SF 权限下最多支持 1000 笔委托订单明细；  <br>    其余行情权限不支持获取此类数据 |
+        | svr\_recv\_time\_bid | str | 富途服务器从交易所收到买盘数据的时间<br>(ℹ️ 部分数据的接收时间为零，例如服务器重启或第一次推送的缓存数据) |
+        | svr\_recv\_time\_ask | str | 富途服务器从交易所收到卖盘数据的时间<br>(ℹ️ 部分数据的接收时间为零，例如服务器重启或第一次推送的缓存数据) |
+        | Bid | list | 每个元祖包含如下信息：委托价格，委托数量，委托订单数，委托订单明细<br>(ℹ️ 委托订单明细<br><br>*   明细内容：交易所订单 ID，单笔委托数量<br>*   港股 SF 权限下最多支持 1000 笔委托订单明细；  <br>    其余行情权限不支持获取此类数据) |
+        | Ask | list | 每个元祖包含如下信息：委托价格，委托数量，委托订单数，委托订单明细<br>(ℹ️ 委托订单明细<br><br>*   明细内容：交易所订单 ID，单笔委托数量<br>*   港股 SF 权限下最多支持 1000 笔委托订单明细；  <br>    其余行情权限不支持获取此类数据) |
         
         其中，Bid 和 Ask 字段的结构如下：
         

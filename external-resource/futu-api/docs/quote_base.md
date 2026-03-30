@@ -29,7 +29,7 @@
     | --- | --- | --- |
     | host | str | OpenD 监听的 IP 地址 |
     | port | int | OpenD 监听的端口 |
-    | is\_encrypt | bool | 是否启用加密<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   默认为 None，表示使用 [enable\_proto\_encrypt](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#319)<br>     的设置<br>*   True：强制加密  <br>    False：强制不加密 |
+    | is\_encrypt | bool | 是否启用加密<br>(ℹ️ *   默认为 None，表示使用 [enable\_proto\_encrypt](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#319)<br>     的设置<br>*   True：强制加密  <br>    False：强制不加密) |
     
 *   **Example**
     
@@ -576,7 +576,7 @@
     | --- | --- | --- |
     | host | str | OpenD 监听的 IP 地址 |
     | port | int | OpenD 监听的端口 |
-    | is\_encrypt | bool | 是否启用加密<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   默认为 None，表示使用 [enable\_proto\_encrypt](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#319)<br>     的设置<br>*   True：强制加密  <br>    False：强制不加密 |
+    | is\_encrypt | bool | 是否启用加密<br>(ℹ️ *   默认为 None，表示使用 [enable\_proto\_encrypt](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#319)<br>     的设置<br>*   True：强制加密  <br>    False：强制不加密) |
     
 *   **Example**
     

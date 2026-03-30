@@ -46,7 +46,7 @@
         | capital\_out\_big | float | 流出资金额度，大单 |
         | capital\_out\_mid | float | 流出资金额度，中单 |
         | capital\_out\_small | float | 流出资金额度，小单 |
-        | update\_time | str | 更新时间字符串<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd HH:mm:ss |
+        | update\_time | str | 更新时间字符串<br>(ℹ️ 格式：yyyy-MM-dd HH:mm:ss) |
         
 *   **Example**
     
@@ -1264,7 +1264,7 @@
         | capital\_out\_big | float | 流出资金额度，大单 |
         | capital\_out\_mid | float | 流出资金额度，中单 |
         | capital\_out\_small | float | 流出资金额度，小单 |
-        | update\_time | str | 更新时间字符串<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd HH:mm:ss |
+        | update\_time | str | 更新时间字符串<br>(ℹ️ 格式：yyyy-MM-dd HH:mm:ss) |
         
 *   **Example**
     

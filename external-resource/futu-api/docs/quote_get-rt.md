@@ -40,12 +40,12 @@
         | --- | --- | --- |
         | code | str | 股票代码 |
         | name | str | 股票名称 |
-        | time | str | 时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd HH:mm:ss  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间 |
-        | is\_blank | bool | 数据状态<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>False：正常数据  <br>True：伪造数据 |
+        | time | str | 时间<br>(ℹ️ 格式：yyyy-MM-dd HH:mm:ss  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间) |
+        | is\_blank | bool | 数据状态<br>(ℹ️ False：正常数据  <br>True：伪造数据) |
         | opened\_mins | int | 零点到当前多少分钟 |
         | cur\_price | float | 当前价格 |
         | last\_close | float | 昨天收盘的价格 |
-        | avg\_price | float | 平均价格<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>对于期权，该字段为 N/A |
+        | avg\_price | float | 平均价格<br>(ℹ️ 对于期权，该字段为 N/A) |
         | volume | float | 成交量 |
         | turnover | float | 成交金额 |
         
@@ -1498,12 +1498,12 @@
         | --- | --- | --- |
         | code | str | 股票代码 |
         | name | str | 股票名称 |
-        | time | str | 时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd HH:mm:ss  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间 |
-        | is\_blank | bool | 数据状态<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>False：正常数据  <br>True：伪造数据 |
+        | time | str | 时间<br>(ℹ️ 格式：yyyy-MM-dd HH:mm:ss  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间) |
+        | is\_blank | bool | 数据状态<br>(ℹ️ False：正常数据  <br>True：伪造数据) |
         | opened\_mins | int | 零点到当前多少分钟 |
         | cur\_price | float | 当前价格 |
         | last\_close | float | 昨天收盘的价格 |
-        | avg\_price | float | 平均价格<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>对于期权，该字段为 N/A |
+        | avg\_price | float | 平均价格<br>(ℹ️ 对于期权，该字段为 N/A) |
         | volume | float | 成交量 |
         | turnover | float | 成交金额 |
         

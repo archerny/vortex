@@ -111,12 +111,12 @@
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
     | code | str | 标的股票代码 |
-    | index\_option\_type | [IndexOptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5149) | 指数期权类型<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅对港股指数期权筛选有效，正股、ETFs、美股指数期权可忽略此参数 |
-    | start | str | 开始日期，该日期指到期日<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>例如：“2017-08-01” |
-    | end | str | 结束日期（包括这一天），该日期指到期日<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>例如：“2017-08-30” |
-    | option\_type | [OptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3713) | 期权看涨看跌类型<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>默认为全部 |
-    | option\_cond\_type | [OptionCondType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3227) | 期权价内外类型<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>默认为全部 |
-    | data\_filter | OptionDataFilter | 数据筛选条件<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>默认为不筛选 |
+    | index\_option\_type | [IndexOptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5149) | 指数期权类型<br>(ℹ️ 仅对港股指数期权筛选有效，正股、ETFs、美股指数期权可忽略此参数) |
+    | start | str | 开始日期，该日期指到期日<br>(ℹ️ 例如：“2017-08-01”) |
+    | end | str | 结束日期（包括这一天），该日期指到期日<br>(ℹ️ 例如：“2017-08-30”) |
+    | option\_type | [OptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3713) | 期权看涨看跌类型<br>(ℹ️ 默认为全部) |
+    | option\_cond\_type | [OptionCondType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3227) | 期权价内外类型<br>(ℹ️ 默认为全部) |
+    | data\_filter | OptionDataFilter | 数据筛选条件<br>(ℹ️ 默认为不筛选) |
     
     *   start 和 end 的组合如下：
         
@@ -131,24 +131,24 @@
         
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
-        | implied\_volatility\_min | float | 隐含波动率过滤起点<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>精确到小数点后 0 位，超出部分会被舍弃  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-        | implied\_volatility\_max | float | 隐含波动率过滤终点<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>精确到小数点后 0 位，超出部分会被舍弃  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-        | delta\_min | float | 希腊值 Delta 过滤起点<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | delta\_max | float | 希腊值 Delta 过滤终点<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | gamma\_min | float | 希腊值 Gamma 过滤起点<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | gamma\_max | float | 希腊值 Gamma 过滤终点<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | vega\_min | float | 希腊值 Vega 过滤起点<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | vega\_max | float | 希腊值 Vega 过滤终点<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | theta\_min | float | 希腊值 Theta 过滤起点<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | theta\_max | float | 希腊值 Theta 过滤终点<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | rho\_min | float | 希腊值 Rho 过滤起点<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | rho\_max | float | 希腊值 Rho 过滤终点<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | net\_open\_interest\_min | float | 净未平仓合约数过滤起点<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>精确到小数点后 0 位，超出部分会被舍弃 |
-        | net\_open\_interest\_max | float | 净未平仓合约数过滤终点<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>精确到小数点后 0 位，超出部分会被舍弃 |
-        | open\_interest\_min | float | 未平仓合约数过滤起点<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>精确到小数点后 0 位，超出部分会被舍弃 |
-        | open\_interest\_max | float | 未平仓合约数过滤终点<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>精确到小数点后 0 位，超出部分会被舍弃 |
-        | vol\_min | float | 成交量过滤起点<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>精确到小数点后 0 位，超出部分会被舍弃 |
-        | vol\_max | float | 成交量过滤终点<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>精确到小数点后 0 位，超出部分会被舍弃 |
+        | implied\_volatility\_min | float | 隐含波动率过滤起点<br>(ℹ️ 精确到小数点后 0 位，超出部分会被舍弃  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+        | implied\_volatility\_max | float | 隐含波动率过滤终点<br>(ℹ️ 精确到小数点后 0 位，超出部分会被舍弃  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+        | delta\_min | float | 希腊值 Delta 过滤起点<br>(ℹ️ 精确到小数点后 3 位，超出部分会被舍弃) |
+        | delta\_max | float | 希腊值 Delta 过滤终点<br>(ℹ️ 精确到小数点后 3 位，超出部分会被舍弃) |
+        | gamma\_min | float | 希腊值 Gamma 过滤起点<br>(ℹ️ 精确到小数点后 3 位，超出部分会被舍弃) |
+        | gamma\_max | float | 希腊值 Gamma 过滤终点<br>(ℹ️ 精确到小数点后 3 位，超出部分会被舍弃) |
+        | vega\_min | float | 希腊值 Vega 过滤起点<br>(ℹ️ 精确到小数点后 3 位，超出部分会被舍弃) |
+        | vega\_max | float | 希腊值 Vega 过滤终点<br>(ℹ️ 精确到小数点后 3 位，超出部分会被舍弃) |
+        | theta\_min | float | 希腊值 Theta 过滤起点<br>(ℹ️ 精确到小数点后 3 位，超出部分会被舍弃) |
+        | theta\_max | float | 希腊值 Theta 过滤终点<br>(ℹ️ 精确到小数点后 3 位，超出部分会被舍弃) |
+        | rho\_min | float | 希腊值 Rho 过滤起点<br>(ℹ️ 精确到小数点后 3 位，超出部分会被舍弃) |
+        | rho\_max | float | 希腊值 Rho 过滤终点<br>(ℹ️ 精确到小数点后 3 位，超出部分会被舍弃) |
+        | net\_open\_interest\_min | float | 净未平仓合约数过滤起点<br>(ℹ️ 精确到小数点后 0 位，超出部分会被舍弃) |
+        | net\_open\_interest\_max | float | 净未平仓合约数过滤终点<br>(ℹ️ 精确到小数点后 0 位，超出部分会被舍弃) |
+        | open\_interest\_min | float | 未平仓合约数过滤起点<br>(ℹ️ 精确到小数点后 0 位，超出部分会被舍弃) |
+        | open\_interest\_max | float | 未平仓合约数过滤终点<br>(ℹ️ 精确到小数点后 0 位，超出部分会被舍弃) |
+        | vol\_min | float | 成交量过滤起点<br>(ℹ️ 精确到小数点后 0 位，超出部分会被舍弃) |
+        | vol\_max | float | 成交量过滤终点<br>(ℹ️ 精确到小数点后 0 位，超出部分会被舍弃) |
         
 
 *   **返回**
@@ -165,13 +165,13 @@
         | --- | --- | --- |
         | code | str | 股票代码 |
         | name | str | 名字  |
-        | lot\_size | int | 每手股数，期权表示每份合约股数<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>指数期权无该字段 |
+        | lot\_size | int | 每手股数，期权表示每份合约股数<br>(ℹ️ 指数期权无该字段) |
         | stock\_type | [SecurityType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3325) | 股票类型 |
         | option\_type | [OptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3713) | 期权类型 |
         | stock\_owner | str | 标的股 |
-        | strike\_time | str | 行权日<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间 |
+        | strike\_time | str | 行权日<br>(ℹ️ 格式：yyyy-MM-dd  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间) |
         | strike\_price | float | 行权价 |
-        | suspension | bool | 是否停牌<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>True：停牌  <br>False：未停牌 |
+        | suspension | bool | 是否停牌<br>(ℹ️ True：停牌  <br>False：未停牌) |
         | stock\_id | int | 股票 ID |
         | index\_option\_type | [IndexOptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5149) | 指数期权类型 |
         | expiration\_cycle | [ExpirationCycle](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2235) | 交割周期 |
@@ -2596,12 +2596,12 @@
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
     | code | str | 标的股票代码 |
-    | index\_option\_type | [IndexOptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5149) | 指数期权类型<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅对港股指数期权筛选有效，正股、ETFs、美股指数期权可忽略此参数 |
-    | start | str | 开始日期，该日期指到期日<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>例如：“2017-08-01” |
-    | end | str | 结束日期（包括这一天），该日期指到期日<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>例如：“2017-08-30” |
-    | option\_type | [OptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3713) | 期权看涨看跌类型<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>默认为全部 |
-    | option\_cond\_type | [OptionCondType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3227) | 期权价内外类型<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>默认为全部 |
-    | data\_filter | OptionDataFilter | 数据筛选条件<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>默认为不筛选 |
+    | index\_option\_type | [IndexOptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5149) | 指数期权类型<br>(ℹ️ 仅对港股指数期权筛选有效，正股、ETFs、美股指数期权可忽略此参数) |
+    | start | str | 开始日期，该日期指到期日<br>(ℹ️ 例如：“2017-08-01”) |
+    | end | str | 结束日期（包括这一天），该日期指到期日<br>(ℹ️ 例如：“2017-08-30”) |
+    | option\_type | [OptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3713) | 期权看涨看跌类型<br>(ℹ️ 默认为全部) |
+    | option\_cond\_type | [OptionCondType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3227) | 期权价内外类型<br>(ℹ️ 默认为全部) |
+    | data\_filter | OptionDataFilter | 数据筛选条件<br>(ℹ️ 默认为不筛选) |
     
     *   start 和 end 的组合如下：
         
@@ -2616,24 +2616,24 @@
         
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
-        | implied\_volatility\_min | float | 隐含波动率过滤起点<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>精确到小数点后 0 位，超出部分会被舍弃  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-        | implied\_volatility\_max | float | 隐含波动率过滤终点<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>精确到小数点后 0 位，超出部分会被舍弃  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-        | delta\_min | float | 希腊值 Delta 过滤起点<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | delta\_max | float | 希腊值 Delta 过滤终点<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | gamma\_min | float | 希腊值 Gamma 过滤起点<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | gamma\_max | float | 希腊值 Gamma 过滤终点<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | vega\_min | float | 希腊值 Vega 过滤起点<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | vega\_max | float | 希腊值 Vega 过滤终点<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | theta\_min | float | 希腊值 Theta 过滤起点<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | theta\_max | float | 希腊值 Theta 过滤终点<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | rho\_min | float | 希腊值 Rho 过滤起点<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | rho\_max | float | 希腊值 Rho 过滤终点<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | net\_open\_interest\_min | float | 净未平仓合约数过滤起点<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>精确到小数点后 0 位，超出部分会被舍弃 |
-        | net\_open\_interest\_max | float | 净未平仓合约数过滤终点<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>精确到小数点后 0 位，超出部分会被舍弃 |
-        | open\_interest\_min | float | 未平仓合约数过滤起点<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>精确到小数点后 0 位，超出部分会被舍弃 |
-        | open\_interest\_max | float | 未平仓合约数过滤终点<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>精确到小数点后 0 位，超出部分会被舍弃 |
-        | vol\_min | float | 成交量过滤起点<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>精确到小数点后 0 位，超出部分会被舍弃 |
-        | vol\_max | float | 成交量过滤终点<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>精确到小数点后 0 位，超出部分会被舍弃 |
+        | implied\_volatility\_min | float | 隐含波动率过滤起点<br>(ℹ️ 精确到小数点后 0 位，超出部分会被舍弃  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+        | implied\_volatility\_max | float | 隐含波动率过滤终点<br>(ℹ️ 精确到小数点后 0 位，超出部分会被舍弃  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+        | delta\_min | float | 希腊值 Delta 过滤起点<br>(ℹ️ 精确到小数点后 3 位，超出部分会被舍弃) |
+        | delta\_max | float | 希腊值 Delta 过滤终点<br>(ℹ️ 精确到小数点后 3 位，超出部分会被舍弃) |
+        | gamma\_min | float | 希腊值 Gamma 过滤起点<br>(ℹ️ 精确到小数点后 3 位，超出部分会被舍弃) |
+        | gamma\_max | float | 希腊值 Gamma 过滤终点<br>(ℹ️ 精确到小数点后 3 位，超出部分会被舍弃) |
+        | vega\_min | float | 希腊值 Vega 过滤起点<br>(ℹ️ 精确到小数点后 3 位，超出部分会被舍弃) |
+        | vega\_max | float | 希腊值 Vega 过滤终点<br>(ℹ️ 精确到小数点后 3 位，超出部分会被舍弃) |
+        | theta\_min | float | 希腊值 Theta 过滤起点<br>(ℹ️ 精确到小数点后 3 位，超出部分会被舍弃) |
+        | theta\_max | float | 希腊值 Theta 过滤终点<br>(ℹ️ 精确到小数点后 3 位，超出部分会被舍弃) |
+        | rho\_min | float | 希腊值 Rho 过滤起点<br>(ℹ️ 精确到小数点后 3 位，超出部分会被舍弃) |
+        | rho\_max | float | 希腊值 Rho 过滤终点<br>(ℹ️ 精确到小数点后 3 位，超出部分会被舍弃) |
+        | net\_open\_interest\_min | float | 净未平仓合约数过滤起点<br>(ℹ️ 精确到小数点后 0 位，超出部分会被舍弃) |
+        | net\_open\_interest\_max | float | 净未平仓合约数过滤终点<br>(ℹ️ 精确到小数点后 0 位，超出部分会被舍弃) |
+        | open\_interest\_min | float | 未平仓合约数过滤起点<br>(ℹ️ 精确到小数点后 0 位，超出部分会被舍弃) |
+        | open\_interest\_max | float | 未平仓合约数过滤终点<br>(ℹ️ 精确到小数点后 0 位，超出部分会被舍弃) |
+        | vol\_min | float | 成交量过滤起点<br>(ℹ️ 精确到小数点后 0 位，超出部分会被舍弃) |
+        | vol\_max | float | 成交量过滤终点<br>(ℹ️ 精确到小数点后 0 位，超出部分会被舍弃) |
         
 
 *   **返回**
@@ -2650,13 +2650,13 @@
         | --- | --- | --- |
         | code | str | 股票代码 |
         | name | str | 名字  |
-        | lot\_size | int | 每手股数，期权表示每份合约股数<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>指数期权无该字段 |
+        | lot\_size | int | 每手股数，期权表示每份合约股数<br>(ℹ️ 指数期权无该字段) |
         | stock\_type | [SecurityType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3325) | 股票类型 |
         | option\_type | [OptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3713) | 期权类型 |
         | stock\_owner | str | 标的股 |
-        | strike\_time | str | 行权日<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间 |
+        | strike\_time | str | 行权日<br>(ℹ️ 格式：yyyy-MM-dd  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间) |
         | strike\_price | float | 行权价 |
-        | suspension | bool | 是否停牌<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>True：停牌  <br>False：未停牌 |
+        | suspension | bool | 是否停牌<br>(ℹ️ True：停牌  <br>False：未停牌) |
         | stock\_id | int | 股票 ID |
         | index\_option\_type | [IndexOptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5149) | 指数期权类型 |
         | expiration\_cycle | [ExpirationCycle](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2235) | 交割周期 |

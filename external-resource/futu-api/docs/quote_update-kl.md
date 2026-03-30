@@ -136,7 +136,7 @@
         | --- | --- | --- |
         | code | str | 股票代码 |
         | name | str | 股票名称 |
-        | time\_key | str | 时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd HH:mm:ss  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间 |
+        | time\_key | str | 时间<br>(ℹ️ 格式：yyyy-MM-dd HH:mm:ss  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间) |
         | open | float | 开盘价 |
         | close | float | 收盘价 |
         | high | float | 最高价 |
@@ -144,8 +144,8 @@
         | volume | int | 成交量 |
         | turnover | float | 成交额 |
         | pe\_ratio | float | 市盈率 |
-        | turnover\_rate | float | 换手率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认返回小数，如 0.01 实际对应 1% |
-        | last\_close | float | 昨收价<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>即前一个时间的收盘价  <br>出于效率原因，第一个数据的昨收价可能为 0 |
+        | turnover\_rate | float | 换手率<br>(ℹ️ 该字段为百分比字段，默认返回小数，如 0.01 实际对应 1%) |
+        | last\_close | float | 昨收价<br>(ℹ️ 即前一个时间的收盘价  <br>出于效率原因，第一个数据的昨收价可能为 0) |
         | k\_type | [KLType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4119) | K 线类型 |
         
 *   **Example**
@@ -1398,7 +1398,7 @@
         | --- | --- | --- |
         | code | str | 股票代码 |
         | name | str | 股票名称 |
-        | time\_key | str | 时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd HH:mm:ss  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间 |
+        | time\_key | str | 时间<br>(ℹ️ 格式：yyyy-MM-dd HH:mm:ss  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间) |
         | open | float | 开盘价 |
         | close | float | 收盘价 |
         | high | float | 最高价 |
@@ -1406,8 +1406,8 @@
         | volume | int | 成交量 |
         | turnover | float | 成交额 |
         | pe\_ratio | float | 市盈率 |
-        | turnover\_rate | float | 换手率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认返回小数，如 0.01 实际对应 1% |
-        | last\_close | float | 昨收价<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>即前一个时间的收盘价  <br>出于效率原因，第一个数据的昨收价可能为 0 |
+        | turnover\_rate | float | 换手率<br>(ℹ️ 该字段为百分比字段，默认返回小数，如 0.01 实际对应 1%) |
+        | last\_close | float | 昨收价<br>(ℹ️ 即前一个时间的收盘价  <br>出于效率原因，第一个数据的昨收价可能为 0) |
         | k\_type | [KLType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4119) | K 线类型 |
         
 *   **Example**

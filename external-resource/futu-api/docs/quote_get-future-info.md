@@ -109,7 +109,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | code\_list | list | 股票代码列表<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>list 中元素类型是 str |
+    | code\_list | list | 股票代码列表<br>(ℹ️ list 中元素类型是 str) |
     
 
 *   **返回**
@@ -134,10 +134,10 @@
         | price\_currency | str | 报价货币 |
         | price\_unit | str | 报价单位 |
         | min\_change | float | 最小变动 |
-        | min\_change\_unit | str | 最小变动的单位<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段已废弃 |
+        | min\_change\_unit | str | 最小变动的单位<br>(ℹ️ 该字段已废弃) |
         | trade\_time | str | 交易时间 |
         | time\_zone | str | 时区  |
-        | last\_trade\_time | str | 最后交易时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>主连，当月，下月等期货没有该字段 |
+        | last\_trade\_time | str | 最后交易时间<br>(ℹ️ 主连，当月，下月等期货没有该字段) |
         | exchange\_format\_url | str | 交易所规格链接 url |
         | origin\_code | str | 实际合约代码 |
         
@@ -1721,7 +1721,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | code\_list | list | 股票代码列表<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>list 中元素类型是 str |
+    | code\_list | list | 股票代码列表<br>(ℹ️ list 中元素类型是 str) |
     
 
 *   **返回**
@@ -1746,10 +1746,10 @@
         | price\_currency | str | 报价货币 |
         | price\_unit | str | 报价单位 |
         | min\_change | float | 最小变动 |
-        | min\_change\_unit | str | 最小变动的单位<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段已废弃 |
+        | min\_change\_unit | str | 最小变动的单位<br>(ℹ️ 该字段已废弃) |
         | trade\_time | str | 交易时间 |
         | time\_zone | str | 时区  |
-        | last\_trade\_time | str | 最后交易时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>主连，当月，下月等期货没有该字段 |
+        | last\_trade\_time | str | 最后交易时间<br>(ℹ️ 主连，当月，下月等期货没有该字段) |
         | exchange\_format\_url | str | 交易所规格链接 url |
         | origin\_code | str | 实际合约代码 |
         

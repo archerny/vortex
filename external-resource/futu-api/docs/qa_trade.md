@@ -755,7 +755,7 @@ Moomoo API 仅对一部分品类，支持了 **非交易时段下单** 的功能
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Futu HK | Moomoo US | Moomoo SG | Moomoo AU | Moomoo MY | Moomoo CA | Moomoo JP |
 | 香港市场 | 股票、ETFs、窝轮、牛熊、界内证 | ✓   | ✓   | ✓   | ✓   | ✓   | ✓   | X   | X   |
-| 期权<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>含指数期权，需使用期货账户交易 | ✓   | ✓   | X   | X   | X   | X   | X   | X   |
+| 期权<br>(ℹ️ 含指数期权，需使用期货账户交易) | ✓   | ✓   | X   | X   | X   | X   | X   | X   |
 | 期货  | ✓   | ✓   | X   | X   | X   | X   | X   | X   |
 | 美国市场 | 股票、ETFs | ✓   | ✓   | ✓   | ✓   | ✓   | ✓   | ✓   | ✓   |
 | 期权  | ✓   | ✓   | ✓   | ✓   | ✓   | ✓   | ✓   | ✓   |
@@ -850,10 +850,7 @@ A：
  概述
 
 客户使用moomoo证券(美国) 账户进行日内交易时，会受到美国 FINRA 的监管限制（此为美国券商受到的监管要求，与交易股票的所属市场无关。其他国家或地区的券商
-
-![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-
-如：富途证券(香港)、moomoo证券(新加坡)
+(ℹ️ 如：富途证券(香港)、moomoo证券(新加坡))
 
 的交易账户则不受此限制）。若用户在任意连续的5个交易日内，进行日内交易 3 次以上，则会被标记为典型日内交易者（PDT）。  
 更多详情，[点击这里](https://fastsupport.fututrade.com/hans/category11014/scid11017)
@@ -893,10 +890,7 @@ A：
  接口，可以获取日内交易相关的返回值，如：剩余日内交易次数、初始日内交易购买力、剩余日内交易购买力等。
 
 客户使用moomoo证券(美国) 账户进行日内交易时，会受到美国 FINRA 的监管限制（此为美国券商受到的监管要求，与交易股票的所属市场无关。其他国家或地区的券商
-
-![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-
-如：富途证券(香港)、moomoo证券(新加坡)
+(ℹ️ 如：富途证券(香港)、moomoo证券(新加坡))
 
 的交易账户则不受此限制）。若用户在任意连续的5个交易日内，进行日内交易 3 次以上，则会被标记为典型日内交易者（PDT）。  
 更多详情，[点击这里](https://www.moomoo.com/us/hans/support/topic4_5?=zh-cn)

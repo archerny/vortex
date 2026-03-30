@@ -113,7 +113,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | market | [Market](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427) | 市场标识<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>注意：这里不区分沪和深，输入沪或者深都会返回沪深市场的股票 |
+    | market | [Market](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427) | 市场标识<br>(ℹ️ 注意：这里不区分沪和深，输入沪或者深都会返回沪深市场的股票) |
     
 
 *   **返回**
@@ -130,7 +130,7 @@
         | --- | --- | --- |
         | code | str | 股票代码 |
         | name | str | 股票名称 |
-        | list\_time | str | 上市日期，美股是预计上市日期<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd |
+        | list\_time | str | 上市日期，美股是预计上市日期<br>(ℹ️ 格式：yyyy-MM-dd) |
         | list\_timestamp | float | 上市日期时间戳，美股是预计上市日期时间戳 |
         | apply\_code | str | 申购代码（A 股适用） |
         | issue\_size | int | 发行总数（A 股适用）；发行量（美股适用） |
@@ -138,24 +138,24 @@
         | apply\_upper\_limit | int | 申购上限（A 股适用） |
         | apply\_limit\_market\_value | int | 顶格申购需配市值（A 股适用） |
         | is\_estimate\_ipo\_price | bool | 是否预估发行价（A 股适用） |
-        | ipo\_price | float | 发行价<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>预估值会因为募集资金、发行数量、发行费用等数据变动而变动，仅供参考。实际数据公布后会第一时间更新<br><br>（A 股适用） |
+        | ipo\_price | float | 发行价<br>(ℹ️ 预估值会因为募集资金、发行数量、发行费用等数据变动而变动，仅供参考。实际数据公布后会第一时间更新<br><br>（A 股适用）) |
         | industry\_pe\_rate | float | 行业市盈率（A 股适用） |
         | is\_estimate\_winning\_ratio | bool | 是否预估中签率（A 股适用） |
-        | winning\_ratio | float | 中签率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   预估值会因为募集资金、发行数量、发行费用等数据变动而变动，仅供参考。实际数据公布后会第一时间更新<br>*   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%<br><br>（A 股适用） |
+        | winning\_ratio | float | 中签率<br>(ℹ️ *   预估值会因为募集资金、发行数量、发行费用等数据变动而变动，仅供参考。实际数据公布后会第一时间更新<br>*   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%<br><br>（A 股适用）) |
         | issue\_pe\_rate | float | 发行市盈率（A 股适用） |
-        | apply\_time | str | 申购日期字符串<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd<br><br>（A 股适用） |
+        | apply\_time | str | 申购日期字符串<br>(ℹ️ 格式：yyyy-MM-dd<br><br>（A 股适用）) |
         | apply\_timestamp | float | 申购日期时间戳（A 股适用） |
-        | winning\_time | str | 公布中签日期字符串<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd<br><br>（A 股适用） |
+        | winning\_time | str | 公布中签日期字符串<br>(ℹ️ 格式：yyyy-MM-dd<br><br>（A 股适用）) |
         | winning\_timestamp | float | 公布中签日期时间戳（A 股适用） |
         | is\_has\_won | bool | 是否已经公布中签号（A 股适用） |
-        | winning\_num\_data | str | 中签号（A 股适用）<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式类似：  <br>末"五"位数：12345，12346  <br>末"六"位数：123456 |
+        | winning\_num\_data | str | 中签号（A 股适用）<br>(ℹ️ 格式类似：  <br>末"五"位数：12345，12346  <br>末"六"位数：123456) |
         | ipo\_price\_min | float | 最低发售价（港股适用）；最低发行价（美股适用） |
         | ipo\_price\_max | float | 最高发售价（港股适用）；最高发行价（美股适用） |
         | list\_price | float | 上市价（港股适用） |
         | lot\_size | int | 每手股数 |
         | entrance\_price | float | 入场费（港股适用） |
-        | is\_subscribe\_status | bool | 是否为认购状态<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>True：认购中  <br>False：待上市 |
-        | apply\_end\_time | str | 截止认购日期字符串<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd<br><br>（港股适用） |
+        | is\_subscribe\_status | bool | 是否为认购状态<br>(ℹ️ True：认购中  <br>False：待上市) |
+        | apply\_end\_time | str | 截止认购日期字符串<br>(ℹ️ 格式：yyyy-MM-dd<br><br>（港股适用）) |
         | apply\_end\_timestamp | float | 截止认购日期时间戳 |
         
 *   **Example**
@@ -2077,7 +2077,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | market | [Market](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427) | 市场标识<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>注意：这里不区分沪和深，输入沪或者深都会返回沪深市场的股票 |
+    | market | [Market](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427) | 市场标识<br>(ℹ️ 注意：这里不区分沪和深，输入沪或者深都会返回沪深市场的股票) |
     
 
 *   **返回**
@@ -2094,7 +2094,7 @@
         | --- | --- | --- |
         | code | str | 股票代码 |
         | name | str | 股票名称 |
-        | list\_time | str | 上市日期，美股是预计上市日期<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd |
+        | list\_time | str | 上市日期，美股是预计上市日期<br>(ℹ️ 格式：yyyy-MM-dd) |
         | list\_timestamp | float | 上市日期时间戳，美股是预计上市日期时间戳 |
         | apply\_code | str | 申购代码（A 股适用） |
         | issue\_size | int | 发行总数（A 股适用）；发行量（美股适用） |
@@ -2102,24 +2102,24 @@
         | apply\_upper\_limit | int | 申购上限（A 股适用） |
         | apply\_limit\_market\_value | int | 顶格申购需配市值（A 股适用） |
         | is\_estimate\_ipo\_price | bool | 是否预估发行价（A 股适用） |
-        | ipo\_price | float | 发行价<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>预估值会因为募集资金、发行数量、发行费用等数据变动而变动，仅供参考。实际数据公布后会第一时间更新<br><br>（A 股适用） |
+        | ipo\_price | float | 发行价<br>(ℹ️ 预估值会因为募集资金、发行数量、发行费用等数据变动而变动，仅供参考。实际数据公布后会第一时间更新<br><br>（A 股适用）) |
         | industry\_pe\_rate | float | 行业市盈率（A 股适用） |
         | is\_estimate\_winning\_ratio | bool | 是否预估中签率（A 股适用） |
-        | winning\_ratio | float | 中签率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   预估值会因为募集资金、发行数量、发行费用等数据变动而变动，仅供参考。实际数据公布后会第一时间更新<br>*   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%<br><br>（A 股适用） |
+        | winning\_ratio | float | 中签率<br>(ℹ️ *   预估值会因为募集资金、发行数量、发行费用等数据变动而变动，仅供参考。实际数据公布后会第一时间更新<br>*   该字段为百分比字段，默认不展示 %，如 20 实际对应 20%<br><br>（A 股适用）) |
         | issue\_pe\_rate | float | 发行市盈率（A 股适用） |
-        | apply\_time | str | 申购日期字符串<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd<br><br>（A 股适用） |
+        | apply\_time | str | 申购日期字符串<br>(ℹ️ 格式：yyyy-MM-dd<br><br>（A 股适用）) |
         | apply\_timestamp | float | 申购日期时间戳（A 股适用） |
-        | winning\_time | str | 公布中签日期字符串<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd<br><br>（A 股适用） |
+        | winning\_time | str | 公布中签日期字符串<br>(ℹ️ 格式：yyyy-MM-dd<br><br>（A 股适用）) |
         | winning\_timestamp | float | 公布中签日期时间戳（A 股适用） |
         | is\_has\_won | bool | 是否已经公布中签号（A 股适用） |
-        | winning\_num\_data | str | 中签号（A 股适用）<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式类似：  <br>末"五"位数：12345，12346  <br>末"六"位数：123456 |
+        | winning\_num\_data | str | 中签号（A 股适用）<br>(ℹ️ 格式类似：  <br>末"五"位数：12345，12346  <br>末"六"位数：123456) |
         | ipo\_price\_min | float | 最低发售价（港股适用）；最低发行价（美股适用） |
         | ipo\_price\_max | float | 最高发售价（港股适用）；最高发行价（美股适用） |
         | list\_price | float | 上市价（港股适用） |
         | lot\_size | int | 每手股数 |
         | entrance\_price | float | 入场费（港股适用） |
-        | is\_subscribe\_status | bool | 是否为认购状态<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>True：认购中  <br>False：待上市 |
-        | apply\_end\_time | str | 截止认购日期字符串<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd<br><br>（港股适用） |
+        | is\_subscribe\_status | bool | 是否为认购状态<br>(ℹ️ True：认购中  <br>False：待上市) |
+        | apply\_end\_time | str | 截止认购日期字符串<br>(ℹ️ 格式：yyyy-MM-dd<br><br>（港股适用）) |
         | apply\_end\_timestamp | float | 截止认购日期时间戳 |
         
 *   **Example**

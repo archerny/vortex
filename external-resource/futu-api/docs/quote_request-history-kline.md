@@ -24,15 +24,15 @@
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
     | code | str | 股票代码 |
-    | start | str | 开始时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd  <br>例如：“2017-06-20” |
-    | end | str | 结束时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd  <br>例如：“2017-07-20” |
+    | start | str | 开始时间<br>(ℹ️ 格式：yyyy-MM-dd  <br>例如：“2017-06-20”) |
+    | end | str | 结束时间<br>(ℹ️ 格式：yyyy-MM-dd  <br>例如：“2017-07-20”) |
     | ktype | [KLType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4119) | K 线类型 |
     | autype | [AuType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6907) | 复权类型 |
     | fields | [KLFields](https://openapi.futunn.com/futu-api-doc/quote/quote.html#481) | 需返回的字段列表 |
-    | max\_count | int | 本次请求最大返回的 K 线根数<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   传 None 表示返回 start 和 end 之间所有的数据<br><br>*   注意：OpenD 接收到所有数据后才会下发给脚本，  <br>    如果您要获取的 K 线根数大于 1000 根，建议选择分页，防止出现超时 |
-    | page\_req\_key | bytes | 分页请求<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>如果 start 和 end 之间的 K 线根数多于 max\_count：  <br>1\. 首页请求时应该传 None  <br>2\. 后续页请求时必须要传入上次调用返回的参数 page\_req\_key |
-    | extended\_time | bool | 是否允许美股盘前盘后数据<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>False：不允许  <br>True：允许 |
-    | session | [Session](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9152) | 获取美股分时段历史K线<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   仅用于获取美股分时段历史K线<br><br>*   获取美股历史K线不支持入参OVERNIGHT<br><br>*   最低OpenD版本要求：9.2.4207 |
+    | max\_count | int | 本次请求最大返回的 K 线根数<br>(ℹ️ *   传 None 表示返回 start 和 end 之间所有的数据<br><br>*   注意：OpenD 接收到所有数据后才会下发给脚本，  <br>    如果您要获取的 K 线根数大于 1000 根，建议选择分页，防止出现超时) |
+    | page\_req\_key | bytes | 分页请求<br>(ℹ️ 如果 start 和 end 之间的 K 线根数多于 max\_count：  <br>1\. 首页请求时应该传 None  <br>2\. 后续页请求时必须要传入上次调用返回的参数 page\_req\_key) |
+    | extended\_time | bool | 是否允许美股盘前盘后数据<br>(ℹ️ False：不允许  <br>True：允许) |
+    | session | [Session](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9152) | 获取美股分时段历史K线<br>(ℹ️ *   仅用于获取美股分时段历史K线<br><br>*   获取美股历史K线不支持入参OVERNIGHT<br><br>*   最低OpenD版本要求：9.2.4207) |
     
     *   start 和 end 的组合如下
         
@@ -59,12 +59,12 @@
         | --- | --- | --- |
         | code | str | 股票代码 |
         | name | str | 股票名称 |
-        | time\_key | str | K 线时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd HH:mm:ss  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间 |
+        | time\_key | str | K 线时间<br>(ℹ️ 格式：yyyy-MM-dd HH:mm:ss  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间) |
         | open | float | 开盘价 |
         | close | float | 收盘价 |
         | high | float | 最高价 |
         | low | float | 最低价 |
-        | pe\_ratio | float | 市盈率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为比例字段，默认不展示 % |
+        | pe\_ratio | float | 市盈率<br>(ℹ️ 该字段为比例字段，默认不展示 %) |
         | turnover\_rate | float | 换手率 |
         | volume | int | 成交量 |
         | turnover | float | 成交额 |
@@ -1692,14 +1692,14 @@
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
     | code | str | 股票代码 |
-    | start | str | 开始时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd  <br>例如：“2017-06-20” |
-    | end | str | 结束时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd  <br>例如：“2017-07-20” |
+    | start | str | 开始时间<br>(ℹ️ 格式：yyyy-MM-dd  <br>例如：“2017-06-20”) |
+    | end | str | 结束时间<br>(ℹ️ 格式：yyyy-MM-dd  <br>例如：“2017-07-20”) |
     | ktype | [KLType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4119) | K 线类型 |
     | autype | [AuType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6907) | 复权类型 |
     | fields | [KLFields](https://openapi.futunn.com/futu-api-doc/quote/quote.html#481) | 需返回的字段列表 |
-    | max\_count | int | 本次请求最大返回的 K 线根数<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   传 None 表示返回 start 和 end 之间所有的数据<br><br>*   注意：OpenD 接收到所有数据后才会下发给脚本，  <br>    如果您要获取的 K 线根数大于 1000 根，建议选择分页，防止出现超时 |
-    | page\_req\_key | bytes | 分页请求<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>如果 start 和 end 之间的 K 线根数多于 max\_count：  <br>1\. 首页请求时应该传 None  <br>2\. 后续页请求时必须要传入上次调用返回的参数 page\_req\_key |
-    | extended\_time | bool | 是否允许美股盘前盘后数据<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>False：不允许  <br>True：允许 |
+    | max\_count | int | 本次请求最大返回的 K 线根数<br>(ℹ️ *   传 None 表示返回 start 和 end 之间所有的数据<br><br>*   注意：OpenD 接收到所有数据后才会下发给脚本，  <br>    如果您要获取的 K 线根数大于 1000 根，建议选择分页，防止出现超时) |
+    | page\_req\_key | bytes | 分页请求<br>(ℹ️ 如果 start 和 end 之间的 K 线根数多于 max\_count：  <br>1\. 首页请求时应该传 None  <br>2\. 后续页请求时必须要传入上次调用返回的参数 page\_req\_key) |
+    | extended\_time | bool | 是否允许美股盘前盘后数据<br>(ℹ️ False：不允许  <br>True：允许) |
     
     *   start 和 end 的组合如下
         
@@ -1726,12 +1726,12 @@
         | --- | --- | --- |
         | code | str | 股票代码 |
         | name | str | 股票名称 |
-        | time\_key | str | K 线时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd HH:mm:ss  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间 |
+        | time\_key | str | K 线时间<br>(ℹ️ 格式：yyyy-MM-dd HH:mm:ss  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间) |
         | open | float | 开盘价 |
         | close | float | 收盘价 |
         | high | float | 最高价 |
         | low | float | 最低价 |
-        | pe\_ratio | float | 市盈率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为比例字段，默认不展示 % |
+        | pe\_ratio | float | 市盈率<br>(ℹ️ 该字段为比例字段，默认不展示 %) |
         | turnover\_rate | float | 换手率 |
         | volume | int | 成交量 |
         | turnover | float | 成交额 |

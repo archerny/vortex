@@ -94,11 +94,11 @@
 | [Get Maximum Tradable Quantity](https://openapi.futunn.com/futu-api-doc/trade/get-max-trd-qtys.html) | 查询账户最大可买卖数量 |
 | [Get Positions List](https://openapi.futunn.com/futu-api-doc/trade/get-position-list.html) | 获取持仓列表 |
 | [Get Margin Trading Data](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html) | 获取融资融券数据 |
-| [Get Cash Flow Summary](https://openapi.futunn.com/futu-api-doc/trade/get-acc-cash-flow.html) | 查询账户现金流水<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>最低版本要求：9.1.5108 |
+| [Get Cash Flow Summary](https://openapi.futunn.com/futu-api-doc/trade/get-acc-cash-flow.html) | 查询账户现金流水<br>(ℹ️ 最低版本要求：9.1.5108) |
 | 订单  | [Place Order](https://openapi.futunn.com/futu-api-doc/trade/place-order.html) | 下单  |
 | [Modify or Cancel Order](https://openapi.futunn.com/futu-api-doc/trade/modify-order.html) | 改单撤单 |
 | [Get Order list](https://openapi.futunn.com/futu-api-doc/trade/get-order-list.html) | 查询未完成订单 |
-| [Get Order Fees](https://openapi.futunn.com/futu-api-doc/trade/order-fee-query.html) | 查询订单费用<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>最低版本要求：8.2.4218 |
+| [Get Order Fees](https://openapi.futunn.com/futu-api-doc/trade/order-fee-query.html) | 查询订单费用<br>(ℹ️ 最低版本要求：8.2.4218) |
 | [Get Historical Order List](https://openapi.futunn.com/futu-api-doc/trade/get-history-order-list.html) | 查询历史订单 |
 | [Order Callback](https://openapi.futunn.com/futu-api-doc/trade/update-order.html) | 订单回调 |
 | [Trade Data Callback](https://openapi.futunn.com/futu-api-doc/trade/sub-acc-push.html) | 订阅交易推送 |
@@ -114,11 +114,11 @@
 | [GetMaxTrdQtys](https://openapi.futunn.com/futu-api-doc/trade/get-max-trd-qtys.html) | 查询账户下最大可买卖数量 |
 | [GetPositionList](https://openapi.futunn.com/futu-api-doc/trade/get-position-list.html) | 获取账户持仓列表 |
 | [GetMarginRatio](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html) | 获取融资融券数据 |
-| [FlowSummary](https://openapi.futunn.com/futu-api-doc/trade/get-acc-cash-flow.html) | 查询账户现金流水<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>最低版本要求：9.1.5108 |
+| [FlowSummary](https://openapi.futunn.com/futu-api-doc/trade/get-acc-cash-flow.html) | 查询账户现金流水<br>(ℹ️ 最低版本要求：9.1.5108) |
 | 订单  | [PlaceOrder](https://openapi.futunn.com/futu-api-doc/trade/place-order.html) | 下单  |
 | [ModifyOrder](https://openapi.futunn.com/futu-api-doc/trade/modify-order.html) | 修改订单 |
 | [GetOrderList](https://openapi.futunn.com/futu-api-doc/trade/get-order-list.html) | 获取订单列表 |
-| [GetOrderFee](https://openapi.futunn.com/futu-api-doc/trade/order-fee-query.html) | 获取订单费用<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>最低版本要求：8.2.4218 |
+| [GetOrderFee](https://openapi.futunn.com/futu-api-doc/trade/order-fee-query.html) | 获取订单费用<br>(ℹ️ 最低版本要求：8.2.4218) |
 | [GetHistoryOrderList](https://openapi.futunn.com/futu-api-doc/trade/get-history-order-list.html) | 获取历史订单列表 |
 | [UpdateOrder](https://openapi.futunn.com/futu-api-doc/trade/update-order.html) | 订单更新 |
 | [SubAccPush](https://openapi.futunn.com/futu-api-doc/trade/sub-acc-push.html) | 订阅交易推送 |
@@ -134,11 +134,11 @@
 | [getMaxTrdQtys](https://openapi.futunn.com/futu-api-doc/trade/get-max-trd-qtys.html) | 查询账户下最大可买卖数量 |
 | [getPositionList](https://openapi.futunn.com/futu-api-doc/trade/get-position-list.html) | 获取账户持仓列表 |
 | [getMarginRatio](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html) | 获取融资融券数据 |
-| [FlowSummary](https://openapi.futunn.com/futu-api-doc/trade/get-acc-cash-flow.html) | 查询账户现金流水<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>最低版本要求：9.1.5108 |
+| [FlowSummary](https://openapi.futunn.com/futu-api-doc/trade/get-acc-cash-flow.html) | 查询账户现金流水<br>(ℹ️ 最低版本要求：9.1.5108) |
 | 订单  | [placeOrder](https://openapi.futunn.com/futu-api-doc/trade/place-order.html) | 下单  |
 | [modifyOrder](https://openapi.futunn.com/futu-api-doc/trade/modify-order.html) | 修改订单 |
 | [getOrderList](https://openapi.futunn.com/futu-api-doc/trade/get-order-list.html) | 获取订单列表 |
-| [getOrderFee](https://openapi.futunn.com/futu-api-doc/trade/order-fee-query.html) | 获取订单费用<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>最低版本要求：8.2.4218 |
+| [getOrderFee](https://openapi.futunn.com/futu-api-doc/trade/order-fee-query.html) | 获取订单费用<br>(ℹ️ 最低版本要求：8.2.4218) |
 | [getHistoryOrderList](https://openapi.futunn.com/futu-api-doc/trade/get-history-order-list.html) | 获取历史订单列表 |
 | [updateOrder](https://openapi.futunn.com/futu-api-doc/trade/update-order.html) | 订单更新 |
 | [subAccPush](https://openapi.futunn.com/futu-api-doc/trade/sub-acc-push.html) | 订阅交易推送 |
@@ -154,11 +154,11 @@
 | [GetMaxTrdQtys](https://openapi.futunn.com/futu-api-doc/trade/get-max-trd-qtys.html) | 查询账户下最大可买卖数量 |
 | [GetPositionList](https://openapi.futunn.com/futu-api-doc/trade/get-position-list.html) | 获取账户持仓列表 |
 | [GetMarginRatio](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html) | 获取融资融券数据 |
-| [FlowSummary](https://openapi.futunn.com/futu-api-doc/trade/get-acc-cash-flow.html) | 查询账户现金流水<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>最低版本要求：9.1.5108 |
+| [FlowSummary](https://openapi.futunn.com/futu-api-doc/trade/get-acc-cash-flow.html) | 查询账户现金流水<br>(ℹ️ 最低版本要求：9.1.5108) |
 | 订单  | [PlaceOrder](https://openapi.futunn.com/futu-api-doc/trade/place-order.html) | 下单  |
 | [ModifyOrder](https://openapi.futunn.com/futu-api-doc/trade/modify-order.html) | 修改订单 |
 | [GetOrderList](https://openapi.futunn.com/futu-api-doc/trade/get-order-list.html) | 获取订单列表 |
-| [GetOrderFee](https://openapi.futunn.com/futu-api-doc/trade/order-fee-query.html) | 获取订单费用<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>最低版本要求：8.2.4218 |
+| [GetOrderFee](https://openapi.futunn.com/futu-api-doc/trade/order-fee-query.html) | 获取订单费用<br>(ℹ️ 最低版本要求：8.2.4218) |
 | [GetHistoryOrderList](https://openapi.futunn.com/futu-api-doc/trade/get-history-order-list.html) | 获取历史订单列表 |
 | [UpdateOrder](https://openapi.futunn.com/futu-api-doc/trade/update-order.html) | 订单更新 |
 | [SubAccPush](https://openapi.futunn.com/futu-api-doc/trade/sub-acc-push.html) | 订阅交易推送 |
@@ -174,11 +174,11 @@
 | [GetMaxTrdQtys](https://openapi.futunn.com/futu-api-doc/trade/get-max-trd-qtys.html) | 查询账户下最大可买卖数量 |
 | [GetPositionList](https://openapi.futunn.com/futu-api-doc/trade/get-position-list.html) | 获取账户持仓列表 |
 | [GetMarginRatio](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html) | 获取融资融券数据 |
-| [FlowSummary](https://openapi.futunn.com/futu-api-doc/trade/get-acc-cash-flow.html) | 查询账户现金流水<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>最低版本要求：9.1.5108 |
+| [FlowSummary](https://openapi.futunn.com/futu-api-doc/trade/get-acc-cash-flow.html) | 查询账户现金流水<br>(ℹ️ 最低版本要求：9.1.5108) |
 | 订单  | [PlaceOrder](https://openapi.futunn.com/futu-api-doc/trade/place-order.html) | 下单  |
 | [ModifyOrder](https://openapi.futunn.com/futu-api-doc/trade/modify-order.html) | 修改订单 |
 | [GetOrderList](https://openapi.futunn.com/futu-api-doc/trade/get-order-list.html) | 获取订单列表 |
-| [GetOrderFee](https://openapi.futunn.com/futu-api-doc/trade/order-fee-query.html) | 获取订单费用<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>最低版本要求：8.2.4218 |
+| [GetOrderFee](https://openapi.futunn.com/futu-api-doc/trade/order-fee-query.html) | 获取订单费用<br>(ℹ️ 最低版本要求：8.2.4218) |
 | [GetHistoryOrderList](https://openapi.futunn.com/futu-api-doc/trade/get-history-order-list.html) | 获取历史订单列表 |
 | [UpdateOrder](https://openapi.futunn.com/futu-api-doc/trade/update-order.html) | 订单更新 |
 | [SubAccPush](https://openapi.futunn.com/futu-api-doc/trade/sub-acc-push.html) | 订阅交易推送 |
@@ -194,11 +194,11 @@
 | 2111 | [Trd\_GetMaxTrdQtys](https://openapi.futunn.com/futu-api-doc/trade/get-max-trd-qtys.html) | 获取最大交易数量 |
 | 2102 | [Trd\_GetPositionList](https://openapi.futunn.com/futu-api-doc/trade/get-position-list.html) | 获取账户持仓 |
 | 2223 | [Trd\_GetMarginRatio](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html) | 获取融资融券数据 |
-| 2226 | [Trd\_FlowSummary](https://openapi.futunn.com/futu-api-doc/trade/get-acc-cash-flow.html) | 查询账户现金流水<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>最低版本要求：9.1.5108 |
+| 2226 | [Trd\_FlowSummary](https://openapi.futunn.com/futu-api-doc/trade/get-acc-cash-flow.html) | 查询账户现金流水<br>(ℹ️ 最低版本要求：9.1.5108) |
 | 订单  | 2202 | [Trd\_PlaceOrder](https://openapi.futunn.com/futu-api-doc/trade/place-order.html) | 下单  |
 | 2205 | [Trd\_ModifyOrder](https://openapi.futunn.com/futu-api-doc/trade/modify-order.html) | 修改订单 |
 | 2201 | [Trd\_GetOrderList](https://openapi.futunn.com/futu-api-doc/trade/get-order-list.html) | 获取订单列表 |
-| 2225 | [Trd\_GetOrderFee](https://openapi.futunn.com/futu-api-doc/trade/order-fee-query.html) | 获取订单费用<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>最低版本要求：8.2.4218 |
+| 2225 | [Trd\_GetOrderFee](https://openapi.futunn.com/futu-api-doc/trade/order-fee-query.html) | 获取订单费用<br>(ℹ️ 最低版本要求：8.2.4218) |
 | 2221 | [Trd\_GetHistoryOrderList](https://openapi.futunn.com/futu-api-doc/trade/get-history-order-list.html) | 获取历史订单列表 |
 | 2208 | [Trd\_UpdateOrder](https://openapi.futunn.com/futu-api-doc/trade/update-order.html) | 推送订单状态变动通知 |
 | 2008 | [Trd\_SubAccPush](https://openapi.futunn.com/futu-api-doc/trade/sub-acc-push.html) | 订阅业务账户的交易推送数据 |

@@ -111,7 +111,7 @@
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
     | code | str | 标的股票代码 |
-    | index\_option\_type | [IndexOptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5149) | 指数期权类型<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅对港股指数期权筛选有效，正股、ETFs、美股指数期权可忽略此参数 |
+    | index\_option\_type | [IndexOptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5149) | 指数期权类型<br>(ℹ️ 仅对港股指数期权筛选有效，正股、ETFs、美股指数期权可忽略此参数) |
     
 
 *   **返回**
@@ -126,9 +126,9 @@
         
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
-        | strike\_time | str | 期权链行权日<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间 |
-        | option\_expiry\_date\_distance | int | 距离到期日天数<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>负数表示已过期 |
-        | expiration\_cycle | [ExpirationCycle](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2235) | 交割周期<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>支持香港指数期权、美股指数期权 |
+        | strike\_time | str | 期权链行权日<br>(ℹ️ 格式：yyyy-MM-dd  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间) |
+        | option\_expiry\_date\_distance | int | 距离到期日天数<br>(ℹ️ 负数表示已过期) |
+        | expiration\_cycle | [ExpirationCycle](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2235) | 交割周期<br>(ℹ️ 支持香港指数期权、美股指数期权) |
         
 *   **Example**
     
@@ -1346,7 +1346,7 @@
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
     | code | str | 标的股票代码 |
-    | index\_option\_type | [IndexOptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5149) | 指数期权类型<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅对港股指数期权筛选有效，正股、ETFs、美股指数期权可忽略此参数 |
+    | index\_option\_type | [IndexOptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5149) | 指数期权类型<br>(ℹ️ 仅对港股指数期权筛选有效，正股、ETFs、美股指数期权可忽略此参数) |
     
 
 *   **返回**
@@ -1361,9 +1361,9 @@
         
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
-        | strike\_time | str | 期权链行权日<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间 |
-        | option\_expiry\_date\_distance | int | 距离到期日天数<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>负数表示已过期 |
-        | expiration\_cycle | [ExpirationCycle](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2235) | 交割周期<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>支持香港指数期权、美股指数期权 |
+        | strike\_time | str | 期权链行权日<br>(ℹ️ 格式：yyyy-MM-dd  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间) |
+        | option\_expiry\_date\_distance | int | 距离到期日天数<br>(ℹ️ 负数表示已过期) |
+        | expiration\_cycle | [ExpirationCycle](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2235) | 交割周期<br>(ℹ️ 支持香港指数期权、美股指数期权) |
         
 *   **Example**
     

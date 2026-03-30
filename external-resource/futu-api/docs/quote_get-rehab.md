@@ -39,25 +39,25 @@
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
         | ex\_div\_date | str | 除权除息日 |
-        | split\_base | float | 拆股分子<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>拆股比例=拆股分子/拆股分母 |
+        | split\_base | float | 拆股分子<br>(ℹ️ 拆股比例=拆股分子/拆股分母) |
         | split\_ert | float | 拆股分母 |
-        | join\_base | float | 合股分子<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>合股比例=合股分子/合股分母 |
+        | join\_base | float | 合股分子<br>(ℹ️ 合股比例=合股分子/合股分母) |
         | join\_ert | float | 合股分母 |
-        | split\_ratio | float | 拆合股比例<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>\- 当公司出现合股，5股合1股时，合股分子=5，合股分母=1，拆合股比例=合股分子/合股分母=5/1  <br>\- 当公司出现拆股，1股拆5股时，拆股分子=1，拆股分母=5，拆合股比例=拆股分子/拆股分母=1/5 |
+        | split\_ratio | float | 拆合股比例<br>(ℹ️ \- 当公司出现合股，5股合1股时，合股分子=5，合股分母=1，拆合股比例=合股分子/合股分母=5/1  <br>\- 当公司出现拆股，1股拆5股时，拆股分子=1，拆股分母=5，拆合股比例=拆股分子/拆股分母=1/5) |
         | per\_cash\_div | float | 每股派现 |
-        | bonus\_base | float | 送股分子<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>送股比例=送股分子/送股分母 |
+        | bonus\_base | float | 送股分子<br>(ℹ️ 送股比例=送股分子/送股分母) |
         | bonus\_ert | float | 送股分母 |
-        | per\_share\_div\_ratio | float | 送股比例<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>\- 当公司出现送股，5股送1股时，送股分子=5，送股分母=1，送股比例=送股分子/送股分母=5/1 |
-        | transfer\_base | float | 转增股分子<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>转增股比例=转增股分子/转增股分母 |
+        | per\_share\_div\_ratio | float | 送股比例<br>(ℹ️ \- 当公司出现送股，5股送1股时，送股分子=5，送股分母=1，送股比例=送股分子/送股分母=5/1) |
+        | transfer\_base | float | 转增股分子<br>(ℹ️ 转增股比例=转增股分子/转增股分母) |
         | transfer\_ert | float | 转增股分母 |
-        | per\_share\_trans\_ratio | float | 转增股比例<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>\- 当公司出现转增股，10股转增3股时，转增股分子=10，转增股分母=3，转增股比例=转增股分子/转增股分母=10/3 |
-        | allot\_base | float | 配股分子<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>配股比例=配股分子/配股分母 |
+        | per\_share\_trans\_ratio | float | 转增股比例<br>(ℹ️ \- 当公司出现转增股，10股转增3股时，转增股分子=10，转增股分母=3，转增股比例=转增股分子/转增股分母=10/3) |
+        | allot\_base | float | 配股分子<br>(ℹ️ 配股比例=配股分子/配股分母) |
         | allot\_ert | float | 配股分母 |
-        | allotment\_ratio | float | 配股比例<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>\- 当公司出现配股，5股配1股时，配股分子=5，配股分母=1，配股比例=配股分子/配股分母=5/1 |
+        | allotment\_ratio | float | 配股比例<br>(ℹ️ \- 当公司出现配股，5股配1股时，配股分子=5，配股分母=1，配股比例=配股分子/配股分母=5/1) |
         | allotment\_price | float | 配股价 |
-        | add\_base | float | 增发股分子<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>增发股比例=增发股分子/增发股分母 |
+        | add\_base | float | 增发股分子<br>(ℹ️ 增发股比例=增发股分子/增发股分母) |
         | add\_ert | float | 增发股分母 |
-        | stk\_spo\_ratio | float | 增发比例<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>\- 当公司出现增发股，1股增发5股时，增发股分子=1，增发股分母=5，增发股比例=增发股分子/增发股分母=1/5 |
+        | stk\_spo\_ratio | float | 增发比例<br>(ℹ️ \- 当公司出现增发股，1股增发5股时，增发股分子=1，增发股分母=5，增发股比例=增发股分子/增发股分母=1/5) |
         | stk\_spo\_price | float | 增发价格 |
         | spin\_off\_base | float | 分立分子 |
         | spin\_off\_ert | float | 分立分母 |
@@ -1285,25 +1285,25 @@
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
         | ex\_div\_date | str | 除权除息日 |
-        | split\_base | float | 拆股分子<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>拆股比例=拆股分子/拆股分母 |
+        | split\_base | float | 拆股分子<br>(ℹ️ 拆股比例=拆股分子/拆股分母) |
         | split\_ert | float | 拆股分母 |
-        | join\_base | float | 合股分子<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>合股比例=合股分子/合股分母 |
+        | join\_base | float | 合股分子<br>(ℹ️ 合股比例=合股分子/合股分母) |
         | join\_ert | float | 合股分母 |
-        | split\_ratio | float | 拆合股比例<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>\- 当公司出现合股，5股合1股时，合股分子=5，合股分母=1，拆合股比例=合股分子/合股分母=5/1  <br>\- 当公司出现拆股，1股拆5股时，拆股分子=1，拆股分母=5，拆合股比例=拆股分子/拆股分母=1/5 |
+        | split\_ratio | float | 拆合股比例<br>(ℹ️ \- 当公司出现合股，5股合1股时，合股分子=5，合股分母=1，拆合股比例=合股分子/合股分母=5/1  <br>\- 当公司出现拆股，1股拆5股时，拆股分子=1，拆股分母=5，拆合股比例=拆股分子/拆股分母=1/5) |
         | per\_cash\_div | float | 每股派现 |
-        | bonus\_base | float | 送股分子<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>送股比例=送股分子/送股分母 |
+        | bonus\_base | float | 送股分子<br>(ℹ️ 送股比例=送股分子/送股分母) |
         | bonus\_ert | float | 送股分母 |
-        | per\_share\_div\_ratio | float | 送股比例<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>\- 当公司出现送股，5股送1股时，送股分子=5，送股分母=1，送股比例=送股分子/送股分母=5/1 |
-        | transfer\_base | float | 转增股分子<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>转增股比例=转增股分子/转增股分母 |
+        | per\_share\_div\_ratio | float | 送股比例<br>(ℹ️ \- 当公司出现送股，5股送1股时，送股分子=5，送股分母=1，送股比例=送股分子/送股分母=5/1) |
+        | transfer\_base | float | 转增股分子<br>(ℹ️ 转增股比例=转增股分子/转增股分母) |
         | transfer\_ert | float | 转增股分母 |
-        | per\_share\_trans\_ratio | float | 转增股比例<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>\- 当公司出现转增股，10股转增3股时，转增股分子=10，转增股分母=3，转增股比例=转增股分子/转增股分母=10/3 |
-        | allot\_base | float | 配股分子<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>配股比例=配股分子/配股分母 |
+        | per\_share\_trans\_ratio | float | 转增股比例<br>(ℹ️ \- 当公司出现转增股，10股转增3股时，转增股分子=10，转增股分母=3，转增股比例=转增股分子/转增股分母=10/3) |
+        | allot\_base | float | 配股分子<br>(ℹ️ 配股比例=配股分子/配股分母) |
         | allot\_ert | float | 配股分母 |
-        | allotment\_ratio | float | 配股比例<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>\- 当公司出现配股，5股配1股时，配股分子=5，配股分母=1，配股比例=配股分子/配股分母=5/1 |
+        | allotment\_ratio | float | 配股比例<br>(ℹ️ \- 当公司出现配股，5股配1股时，配股分子=5，配股分母=1，配股比例=配股分子/配股分母=5/1) |
         | allotment\_price | float | 配股价 |
-        | add\_base | float | 增发股分子<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>增发股比例=增发股分子/增发股分母 |
+        | add\_base | float | 增发股分子<br>(ℹ️ 增发股比例=增发股分子/增发股分母) |
         | add\_ert | float | 增发股分母 |
-        | stk\_spo\_ratio | float | 增发比例<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>\- 当公司出现增发股，1股增发5股时，增发股分子=1，增发股分母=5，增发股比例=增发股分子/增发股分母=1/5 |
+        | stk\_spo\_ratio | float | 增发比例<br>(ℹ️ \- 当公司出现增发股，1股增发5股时，增发股分子=1，增发股分母=5，增发股比例=增发股分子/增发股分母=1/5) |
         | stk\_spo\_price | float | 增发价格 |
         | spin\_off\_base | float | 分立分子 |
         | spin\_off\_ert | float | 分立分母 |

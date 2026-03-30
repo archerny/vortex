@@ -118,25 +118,25 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | price | float | 订单价格<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   当订单是市价单或竞价单类型，仍需对 price 传参，price 可以传入任意值<br>*   精度：<br>    *   期货：整数8位，小数9位，支持负数价格<br>    *   美股期权：小数2位<br>    *   美股：不超过$1，允许小数4位<br>    *   其他：小数3位，超出部分四舍五入 |
-    | qty | float | 订单数量<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>期权期货单位是"张" |
-    | code | str | 标的代码<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>如果 code 为期货主连代码，则会自动转为实际对应的合约代码 |
+    | price | float | 订单价格<br>(ℹ️ *   当订单是市价单或竞价单类型，仍需对 price 传参，price 可以传入任意值<br>*   精度：<br>    *   期货：整数8位，小数9位，支持负数价格<br>    *   美股期权：小数2位<br>    *   美股：不超过$1，允许小数4位<br>    *   其他：小数3位，超出部分四舍五入) |
+    | qty | float | 订单数量<br>(ℹ️ 期权期货单位是"张") |
+    | code | str | 标的代码<br>(ℹ️ 如果 code 为期货主连代码，则会自动转为实际对应的合约代码) |
     | trd\_side | [TrdSide](https://openapi.futunn.com/futu-api-doc/trade/trade.html#5815) | 交易方向 |
     | order\_type | [OrderType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4181) | 订单类型 |
-    | adjust\_limit | float | 价格微调幅度<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>OpenD 会对传入价格自动调整到合法价位上<br><br>*   正数代表向上调整，负数代表向下调整<br>*   例如：0.015 代表向上调整且幅度不超过 1.5%；-0.01 代表向下调整且幅度不超过 1%。默认 0 表示不调整 |
+    | adjust\_limit | float | 价格微调幅度<br>(ℹ️ OpenD 会对传入价格自动调整到合法价位上<br><br>*   正数代表向上调整，负数代表向下调整<br>*   例如：0.015 代表向上调整且幅度不超过 1.5%；-0.01 代表向下调整且幅度不超过 1%。默认 0 表示不调整) |
     | trd\_env | [TrdEnv](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6374) | 交易环境 |
-    | acc\_id | int | 交易业务账户 ID<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准 |
-    | acc\_index | int | 交易业务账户列表中的账户序号<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户 |
-    | remark | str | 备注<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   订单会带上此备注字段，方便您标识订单<br>*   转成 utf8 后的长度上限为 64 字节 |
-    | time\_in\_force | [TimeInForce](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4241) | 有效期限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>香港市场、A 股市场和环球期货的市价单，仅支持当日有效 |
-    | fill\_outside\_rth | bool | 是否允许盘前盘后<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>用于港股盘前竞价与美股盘前盘后，且盘前盘后时段不支持市价单 |
-    | aux\_price | float | 触发价格<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   当订单是**止损市价单**、**止损限价单**、**触及限价单（止盈）**、**触及市价单（止盈）** 时，aux\_price 为必传参数<br>*   同price精度，超过部分四舍五入 |
-    | trail\_type | [TrailType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#5644) | 跟踪类型<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>当订单是**跟踪止损市价单**、**跟踪止损限价单时**，trail\_type 为必传参数 |
-    | trail\_value | float | 跟踪金额/百分比<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   当订单是**跟踪止损市价单**、**跟踪止损限价单**时，trail\_value 为必传参数<br>*   当跟踪类型为比例时，该字段为百分比字段，传入 20 实际对应 20%<br>*   当跟踪类型为金额时，整数部分同price；小数部分美股期权固定2位，美股4位，其他同price；超过部分四舍五入<br>*   当跟踪类型为比例时，精确到小数点后 2 位，整数部分同price，超过部分四舍五入 |
-    | trail\_spread | float | 指定价差<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   当订单是**跟踪止损限价单**时，trail\_spread 为必传参数<br>*   证券账户精确到小数点后 3 位，期货账户精确到小数点后 9 位，超过部分四舍五入 |
-    | session | [Session](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9152) | 美股交易时段<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅对美股生效，支持传入**RTH**、**ETH**、**OVERNIGHT**、**ALL** |
-    | jp\_acc\_type | [SubAccType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6112) | 日本账户类型<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅日本券商适用 |
-    | position\_id | int | 持仓ID<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   日本券商平仓时需要填写<br>*   可通过[查询持仓](https://openapi.futunn.com/futu-api-doc/trade/get-position-list.html)<br>    接口获取 |
+    | acc\_id | int | 交易业务账户 ID<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准) |
+    | acc\_index | int | 交易业务账户列表中的账户序号<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户) |
+    | remark | str | 备注<br>(ℹ️ *   订单会带上此备注字段，方便您标识订单<br>*   转成 utf8 后的长度上限为 64 字节) |
+    | time\_in\_force | [TimeInForce](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4241) | 有效期限<br>(ℹ️ 香港市场、A 股市场和环球期货的市价单，仅支持当日有效) |
+    | fill\_outside\_rth | bool | 是否允许盘前盘后<br>(ℹ️ 用于港股盘前竞价与美股盘前盘后，且盘前盘后时段不支持市价单) |
+    | aux\_price | float | 触发价格<br>(ℹ️ *   当订单是**止损市价单**、**止损限价单**、**触及限价单（止盈）**、**触及市价单（止盈）** 时，aux\_price 为必传参数<br>*   同price精度，超过部分四舍五入) |
+    | trail\_type | [TrailType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#5644) | 跟踪类型<br>(ℹ️ 当订单是**跟踪止损市价单**、**跟踪止损限价单时**，trail\_type 为必传参数) |
+    | trail\_value | float | 跟踪金额/百分比<br>(ℹ️ *   当订单是**跟踪止损市价单**、**跟踪止损限价单**时，trail\_value 为必传参数<br>*   当跟踪类型为比例时，该字段为百分比字段，传入 20 实际对应 20%<br>*   当跟踪类型为金额时，整数部分同price；小数部分美股期权固定2位，美股4位，其他同price；超过部分四舍五入<br>*   当跟踪类型为比例时，精确到小数点后 2 位，整数部分同price，超过部分四舍五入) |
+    | trail\_spread | float | 指定价差<br>(ℹ️ *   当订单是**跟踪止损限价单**时，trail\_spread 为必传参数<br>*   证券账户精确到小数点后 3 位，期货账户精确到小数点后 9 位，超过部分四舍五入) |
+    | session | [Session](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9152) | 美股交易时段<br>(ℹ️ 仅对美股生效，支持传入**RTH**、**ETH**、**OVERNIGHT**、**ALL**) |
+    | jp\_acc\_type | [SubAccType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6112) | 日本账户类型<br>(ℹ️ 仅日本券商适用) |
+    | position\_id | int | 持仓ID<br>(ℹ️ *   日本券商平仓时需要填写<br>*   可通过[查询持仓](https://openapi.futunn.com/futu-api-doc/trade/get-position-list.html)<br>    接口获取) |
     
 *   **返回**
     
@@ -156,16 +156,16 @@
         | order\_id | str | 订单号 |
         | code | str | 股票代码 |
         | stock\_name | str | 股票名称 |
-        | qty | float | 订单数量<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>期权期货单位是"张" |
-        | price | float | 订单价格<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>精确到小数点后 3 位，超出部分四舍五入 |
-        | create\_time | str | 创建时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd HH:mm:ss  <br>期货时区指定，请参见 [FutuOpenD 配置](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#6724) |
-        | updated\_time | str | 最后更新时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd HH:mm:ss  <br>期货时区指定，请参见 [FutuOpenD 配置](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#6724) |
-        | dealt\_qty | float | 成交数量<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>期权期货单位是"张" |
-        | dealt\_avg\_price | float | 成交均价<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>无精度限制 |
-        | last\_err\_msg | str | 最后的错误描述<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>如果有错误，会返回最后一次错误的原因  <br>如果无错误，返回空字符串 |
-        | remark | str | 下单时备注的标识<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>详见 [place\_order](https://openapi.futunn.com/futu-api-doc/trade/place-order.html)<br> 接口参数中的 remark |
+        | qty | float | 订单数量<br>(ℹ️ 期权期货单位是"张") |
+        | price | float | 订单价格<br>(ℹ️ 精确到小数点后 3 位，超出部分四舍五入) |
+        | create\_time | str | 创建时间<br>(ℹ️ 格式：yyyy-MM-dd HH:mm:ss  <br>期货时区指定，请参见 [FutuOpenD 配置](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#6724)) |
+        | updated\_time | str | 最后更新时间<br>(ℹ️ 格式：yyyy-MM-dd HH:mm:ss  <br>期货时区指定，请参见 [FutuOpenD 配置](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#6724)) |
+        | dealt\_qty | float | 成交数量<br>(ℹ️ 期权期货单位是"张") |
+        | dealt\_avg\_price | float | 成交均价<br>(ℹ️ 无精度限制) |
+        | last\_err\_msg | str | 最后的错误描述<br>(ℹ️ 如果有错误，会返回最后一次错误的原因  <br>如果无错误，返回空字符串) |
+        | remark | str | 下单时备注的标识<br>(ℹ️ 详见 [place\_order](https://openapi.futunn.com/futu-api-doc/trade/place-order.html)<br> 接口参数中的 remark) |
         | time\_in\_force | [TimeInForce](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4241) | 有效期限 |
-        | fill\_outside\_rth | bool | 是否允许盘前盘后（用于港股盘前竞价与美股盘前盘后）<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>True：允许  <br>False：不允许 |
+        | fill\_outside\_rth | bool | 是否允许盘前盘后（用于港股盘前竞价与美股盘前盘后）<br>(ℹ️ True：允许  <br>False：不允许) |
         | session | [Session](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9152) | 交易订单时段（仅用于美股） |
         | aux\_price | float | 触发价格 |
         | trail\_type | [TrailType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#5644) | 跟踪类型 |
@@ -1629,25 +1629,25 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | price | float | 订单价格<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   当订单是市价单或竞价单类型，仍需对 price 传参，price 可以传入任意值<br>*   精度：<br>    *   期货：整数8位，小数9位，支持负数价格<br>    *   美股期权：小数2位<br>    *   美股：不超过$1，允许小数4位<br>    *   其他：小数3位，超出部分四舍五入 |
-    | qty | float | 订单数量<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>期权期货单位是"张" |
-    | code | str | 标的代码<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>如果 code 为期货主连代码，则会自动转为实际对应的合约代码 |
+    | price | float | 订单价格<br>(ℹ️ *   当订单是市价单或竞价单类型，仍需对 price 传参，price 可以传入任意值<br>*   精度：<br>    *   期货：整数8位，小数9位，支持负数价格<br>    *   美股期权：小数2位<br>    *   美股：不超过$1，允许小数4位<br>    *   其他：小数3位，超出部分四舍五入) |
+    | qty | float | 订单数量<br>(ℹ️ 期权期货单位是"张") |
+    | code | str | 标的代码<br>(ℹ️ 如果 code 为期货主连代码，则会自动转为实际对应的合约代码) |
     | trd\_side | [TrdSide](https://openapi.futunn.com/futu-api-doc/trade/trade.html#5815) | 交易方向 |
     | order\_type | [OrderType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4181) | 订单类型 |
-    | adjust\_limit | float | 价格微调幅度<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>OpenD 会对传入价格自动调整到合法价位上<br><br>*   正数代表向上调整，负数代表向下调整<br>*   例如：0.015 代表向上调整且幅度不超过 1.5%；-0.01 代表向下调整且幅度不超过 1%。默认 0 表示不调整 |
+    | adjust\_limit | float | 价格微调幅度<br>(ℹ️ OpenD 会对传入价格自动调整到合法价位上<br><br>*   正数代表向上调整，负数代表向下调整<br>*   例如：0.015 代表向上调整且幅度不超过 1.5%；-0.01 代表向下调整且幅度不超过 1%。默认 0 表示不调整) |
     | trd\_env | [TrdEnv](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6374) | 交易环境 |
-    | acc\_id | int | 交易业务账户 ID<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准 |
-    | acc\_index | int | 交易业务账户列表中的账户序号<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户 |
-    | remark | str | 备注<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   订单会带上此备注字段，方便您标识订单<br>*   转成 utf8 后的长度上限为 64 字节 |
-    | time\_in\_force | [TimeInForce](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4241) | 有效期限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>香港市场、A 股市场和环球期货的市价单，仅支持当日有效 |
-    | fill\_outside\_rth | bool | 是否允许盘前盘后<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>用于港股盘前竞价与美股盘前盘后，且盘前盘后时段不支持市价单 |
-    | aux\_price | float | 触发价格<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   当订单是**止损市价单**、**止损限价单**、**触及限价单（止盈）**、**触及市价单（止盈）** 时，aux\_price 为必传参数<br>*   同price精度，超过部分四舍五入 |
-    | trail\_type | [TrailType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#5644) | 跟踪类型<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>当订单是**跟踪止损市价单**、**跟踪止损限价单时**，trail\_type 为必传参数 |
-    | trail\_value | float | 跟踪金额/百分比<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   当订单是**跟踪止损市价单**、**跟踪止损限价单**时，trail\_value 为必传参数<br>*   当跟踪类型为比例时，该字段为百分比字段，传入 20 实际对应 20%<br>*   当跟踪类型为金额时，整数部分同price；小数部分美股期权固定2位，美股4位，其他同price；超过部分四舍五入<br>*   当跟踪类型为比例时，精确到小数点后 2 位，整数部分同price，超过部分四舍五入 |
-    | trail\_spread | float | 指定价差<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   当订单是**跟踪止损限价单**时，trail\_spread 为必传参数<br>*   证券账户精确到小数点后 3 位，期货账户精确到小数点后 9 位，超过部分四舍五入 |
-    | session | [Session](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9152) | 美股交易时段<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅对美股生效，支持传入**RTH**、**ETH**、**OVERNIGHT**、**ALL** |
-    | jp\_acc\_type | [SubAccType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6112) | 日本账户类型<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅日本券商适用 |
-    | position\_id | int | 持仓ID<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   日本券商平仓时需要填写<br>*   可通过[查询持仓](https://openapi.futunn.com/futu-api-doc/trade/get-position-list.html)<br>    接口获取 |
+    | acc\_id | int | 交易业务账户 ID<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准) |
+    | acc\_index | int | 交易业务账户列表中的账户序号<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户) |
+    | remark | str | 备注<br>(ℹ️ *   订单会带上此备注字段，方便您标识订单<br>*   转成 utf8 后的长度上限为 64 字节) |
+    | time\_in\_force | [TimeInForce](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4241) | 有效期限<br>(ℹ️ 香港市场、A 股市场和环球期货的市价单，仅支持当日有效) |
+    | fill\_outside\_rth | bool | 是否允许盘前盘后<br>(ℹ️ 用于港股盘前竞价与美股盘前盘后，且盘前盘后时段不支持市价单) |
+    | aux\_price | float | 触发价格<br>(ℹ️ *   当订单是**止损市价单**、**止损限价单**、**触及限价单（止盈）**、**触及市价单（止盈）** 时，aux\_price 为必传参数<br>*   同price精度，超过部分四舍五入) |
+    | trail\_type | [TrailType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#5644) | 跟踪类型<br>(ℹ️ 当订单是**跟踪止损市价单**、**跟踪止损限价单时**，trail\_type 为必传参数) |
+    | trail\_value | float | 跟踪金额/百分比<br>(ℹ️ *   当订单是**跟踪止损市价单**、**跟踪止损限价单**时，trail\_value 为必传参数<br>*   当跟踪类型为比例时，该字段为百分比字段，传入 20 实际对应 20%<br>*   当跟踪类型为金额时，整数部分同price；小数部分美股期权固定2位，美股4位，其他同price；超过部分四舍五入<br>*   当跟踪类型为比例时，精确到小数点后 2 位，整数部分同price，超过部分四舍五入) |
+    | trail\_spread | float | 指定价差<br>(ℹ️ *   当订单是**跟踪止损限价单**时，trail\_spread 为必传参数<br>*   证券账户精确到小数点后 3 位，期货账户精确到小数点后 9 位，超过部分四舍五入) |
+    | session | [Session](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9152) | 美股交易时段<br>(ℹ️ 仅对美股生效，支持传入**RTH**、**ETH**、**OVERNIGHT**、**ALL**) |
+    | jp\_acc\_type | [SubAccType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6112) | 日本账户类型<br>(ℹ️ 仅日本券商适用) |
+    | position\_id | int | 持仓ID<br>(ℹ️ *   日本券商平仓时需要填写<br>*   可通过[查询持仓](https://openapi.futunn.com/futu-api-doc/trade/get-position-list.html)<br>    接口获取) |
     
 *   **返回**
     
@@ -1667,16 +1667,16 @@
         | order\_id | str | 订单号 |
         | code | str | 股票代码 |
         | stock\_name | str | 股票名称 |
-        | qty | float | 订单数量<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>期权期货单位是"张" |
-        | price | float | 订单价格<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>精确到小数点后 3 位，超出部分四舍五入 |
-        | create\_time | str | 创建时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd HH:mm:ss  <br>期货时区指定，请参见 [OpenD 配置](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#6724) |
-        | updated\_time | str | 最后更新时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd HH:mm:ss  <br>期货时区指定，请参见 [OpenD 配置](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#6724) |
-        | dealt\_qty | float | 成交数量<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>期权期货单位是"张" |
-        | dealt\_avg\_price | float | 成交均价<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>无精度限制 |
-        | last\_err\_msg | str | 最后的错误描述<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>如果有错误，会返回最后一次错误的原因  <br>如果无错误，返回空字符串 |
-        | remark | str | 下单时备注的标识<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>详见 [place\_order](https://openapi.futunn.com/futu-api-doc/trade/place-order.html)<br> 接口参数中的 remark |
+        | qty | float | 订单数量<br>(ℹ️ 期权期货单位是"张") |
+        | price | float | 订单价格<br>(ℹ️ 精确到小数点后 3 位，超出部分四舍五入) |
+        | create\_time | str | 创建时间<br>(ℹ️ 格式：yyyy-MM-dd HH:mm:ss  <br>期货时区指定，请参见 [OpenD 配置](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#6724)) |
+        | updated\_time | str | 最后更新时间<br>(ℹ️ 格式：yyyy-MM-dd HH:mm:ss  <br>期货时区指定，请参见 [OpenD 配置](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#6724)) |
+        | dealt\_qty | float | 成交数量<br>(ℹ️ 期权期货单位是"张") |
+        | dealt\_avg\_price | float | 成交均价<br>(ℹ️ 无精度限制) |
+        | last\_err\_msg | str | 最后的错误描述<br>(ℹ️ 如果有错误，会返回最后一次错误的原因  <br>如果无错误，返回空字符串) |
+        | remark | str | 下单时备注的标识<br>(ℹ️ 详见 [place\_order](https://openapi.futunn.com/futu-api-doc/trade/place-order.html)<br> 接口参数中的 remark) |
         | time\_in\_force | [TimeInForce](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4241) | 有效期限 |
-        | fill\_outside\_rth | bool | 是否允许盘前盘后（用于港股盘前竞价与美股盘前盘后）<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>True：允许  <br>False：不允许 |
+        | fill\_outside\_rth | bool | 是否允许盘前盘后（用于港股盘前竞价与美股盘前盘后）<br>(ℹ️ True：允许  <br>False：不允许) |
         | aux\_price | float | 触发价格 |
         | trail\_type | [TrailType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#5644) | 跟踪类型 |
         | trail\_value | float | 跟踪金额/百分比 |

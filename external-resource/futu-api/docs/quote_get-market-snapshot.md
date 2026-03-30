@@ -23,7 +23,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | code\_list | list | 股票代码列表<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>每次最多可请求 400 个标的  <br>list 内元素类型为 str |
+    | code\_list | list | 股票代码列表<br>(ℹ️ 每次最多可请求 400 个标的  <br>list 内元素类型为 str) |
     
 
 *   **返回**
@@ -40,7 +40,7 @@
         | --- | --- | --- |
         | code | str | 股票代码 |
         | name | str | 股票名称 |
-        | update\_time | str | 当前价更新时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd HH:mm:ss  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间 |
+        | update\_time | str | 当前价更新时间<br>(ℹ️ 格式：yyyy-MM-dd HH:mm:ss  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间) |
         | last\_price | float | 最新价格 |
         | open\_price | float | 今日开盘价 |
         | high\_price | float | 最高价格 |
@@ -48,54 +48,54 @@
         | prev\_close\_price | float | 昨收盘价格 |
         | volume | int | 成交数量 |
         | turnover | float | 成交金额 |
-        | turnover\_rate | float | 换手率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-        | suspension | bool | 是否停牌<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>True：停牌 |
-        | listing\_date | str | 上市日期<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd |
-        | equity\_valid | bool | 是否正股<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>此字段返回为 True 时，以下正股相关字段才有合法数值 |
+        | turnover\_rate | float | 换手率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+        | suspension | bool | 是否停牌<br>(ℹ️ True：停牌) |
+        | listing\_date | str | 上市日期<br>(ℹ️ 格式：yyyy-MM-dd) |
+        | equity\_valid | bool | 是否正股<br>(ℹ️ 此字段返回为 True 时，以下正股相关字段才有合法数值) |
         | issued\_shares | int | 总股本 |
-        | total\_market\_val | float | 总市值<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>单位：元 |
+        | total\_market\_val | float | 总市值<br>(ℹ️ 单位：元) |
         | net\_asset | int | 资产净值 |
         | net\_profit | int | 净利润 |
         | earning\_per\_share | float | 每股盈利 |
         | outstanding\_shares | int | 流通股本 |
         | net\_asset\_per\_share | float | 每股净资产 |
-        | circular\_market\_val | float | 流通市值<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>单位：元 |
-        | ey\_ratio | float | 收益率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为比例字段，默认不展示 % |
-        | pe\_ratio | float | 市盈率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为比例字段，默认不展示 % |
-        | pb\_ratio | float | 市净率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为比例字段，默认不展示 % |
-        | pe\_ttm\_ratio | float | 市盈率 TTM<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为比例字段，默认不展示 % |
+        | circular\_market\_val | float | 流通市值<br>(ℹ️ 单位：元) |
+        | ey\_ratio | float | 收益率<br>(ℹ️ 该字段为比例字段，默认不展示 %) |
+        | pe\_ratio | float | 市盈率<br>(ℹ️ 该字段为比例字段，默认不展示 %) |
+        | pb\_ratio | float | 市净率<br>(ℹ️ 该字段为比例字段，默认不展示 %) |
+        | pe\_ttm\_ratio | float | 市盈率 TTM<br>(ℹ️ 该字段为比例字段，默认不展示 %) |
         | dividend\_ttm | float | 股息 TTM，派息 |
-        | dividend\_ratio\_ttm | float | 股息率 TTM<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+        | dividend\_ratio\_ttm | float | 股息率 TTM<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
         | dividend\_lfy | float | 股息 LFY，上一年度派息 |
-        | dividend\_lfy\_ratio | float | 股息率 LFY<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+        | dividend\_lfy\_ratio | float | 股息率 LFY<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
         | stock\_owner | str | 窝轮所属正股的代码或期权的标的股代码 |
-        | wrt\_valid | bool | 是否是窝轮<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>此字段返回为 True 时，以下窝轮相关字段才有合法数值 |
+        | wrt\_valid | bool | 是否是窝轮<br>(ℹ️ 此字段返回为 True 时，以下窝轮相关字段才有合法数值) |
         | wrt\_conversion\_ratio | float | 换股比率 |
         | wrt\_type | [WrtType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#926) | 窝轮类型 |
         | wrt\_strike\_price | float | 行使价格 |
         | wrt\_maturity\_date | str | 格式化窝轮到期时间 |
         | wrt\_end\_trade | str | 格式化窝轮最后交易时间 |
-        | wrt\_leverage | float | 杠杆比率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>单位：倍 |
-        | wrt\_ipop | float | 价内/价外<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+        | wrt\_leverage | float | 杠杆比率<br>(ℹ️ 单位：倍) |
+        | wrt\_ipop | float | 价内/价外<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
         | wrt\_break\_even\_point | float | 打和点 |
         | wrt\_conversion\_price | float | 换股价 |
-        | wrt\_price\_recovery\_ratio | float | 正股距收回价<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+        | wrt\_price\_recovery\_ratio | float | 正股距收回价<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
         | wrt\_score | float | 窝轮综合评分 |
         | wrt\_code | str | 窝轮对应的正股（此字段已废除，修改为 stock\_owner） |
         | wrt\_recovery\_price | float | 窝轮收回价 |
         | wrt\_street\_vol | float | 窝轮街货量 |
         | wrt\_issue\_vol | float | 窝轮发行量 |
-        | wrt\_street\_ratio | float | 窝轮街货占比<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+        | wrt\_street\_ratio | float | 窝轮街货占比<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
         | wrt\_delta | float | 窝轮对冲值 |
         | wrt\_implied\_volatility | float | 窝轮引伸波幅 |
-        | wrt\_premium | float | 窝轮溢价<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-        | wrt\_upper\_strike\_price | float | 上限价<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅界内证支持该字段 |
-        | wrt\_lower\_strike\_price | float | 下限价<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅界内证支持该字段 |
-        | wrt\_inline\_price\_status | [PriceType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6407) | 界内界外<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅界内证支持该字段 |
+        | wrt\_premium | float | 窝轮溢价<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+        | wrt\_upper\_strike\_price | float | 上限价<br>(ℹ️ 仅界内证支持该字段) |
+        | wrt\_lower\_strike\_price | float | 下限价<br>(ℹ️ 仅界内证支持该字段) |
+        | wrt\_inline\_price\_status | [PriceType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6407) | 界内界外<br>(ℹ️ 仅界内证支持该字段) |
         | wrt\_issuer\_code | str | 发行人代码 |
-        | option\_valid | bool | 是否是期权<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>此字段返回为 True 时，以下期权相关字段才有合法数值 |
+        | option\_valid | bool | 是否是期权<br>(ℹ️ 此字段返回为 True 时，以下期权相关字段才有合法数值) |
         | option\_type | [OptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3713) | 期权类型 |
-        | strike\_time | str | 期权行权日<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间 |
+        | strike\_time | str | 期权行权日<br>(ℹ️ 格式：yyyy-MM-dd  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间) |
         | option\_strike\_price | float | 行权价 |
         | option\_contract\_size | float | 每份合约数 |
         | option\_open\_interest | int | 总未平仓合约数 |
@@ -107,37 +107,37 @@
         | option\_theta | float | 希腊值 Theta |
         | option\_rho | float | 希腊值 Rho |
         | index\_option\_type | [IndexOptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5149) | 指数期权类型 |
-        | option\_net\_open\_interest | int | 净未平仓合约数<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅港股期权适用 |
-        | option\_expiry\_date\_distance | int | 距离到期日天数<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>负数表示已过期 |
-        | option\_contract\_nominal\_value | float | 合约名义金额<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅港股期权适用 |
-        | option\_owner\_lot\_multiplier | float | 相等正股手数<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>指数期权无该字段，仅港股期权适用 |
+        | option\_net\_open\_interest | int | 净未平仓合约数<br>(ℹ️ 仅港股期权适用) |
+        | option\_expiry\_date\_distance | int | 距离到期日天数<br>(ℹ️ 负数表示已过期) |
+        | option\_contract\_nominal\_value | float | 合约名义金额<br>(ℹ️ 仅港股期权适用) |
+        | option\_owner\_lot\_multiplier | float | 相等正股手数<br>(ℹ️ 指数期权无该字段，仅港股期权适用) |
         | option\_area\_type | [OptionAreaType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#7077) | 期权类型（按行权时间） |
         | option\_contract\_multiplier | float | 合约乘数 |
-        | plate\_valid | bool | 是否为板块类型<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>此字段返回为 True 时，以下板块相关字段才有合法数值 |
+        | plate\_valid | bool | 是否为板块类型<br>(ℹ️ 此字段返回为 True 时，以下板块相关字段才有合法数值) |
         | plate\_raise\_count | int | 板块类型上涨支数 |
         | plate\_fall\_count | int | 板块类型下跌支数 |
         | plate\_equal\_count | int | 板块类型平盘支数 |
-        | index\_valid | bool | 是否有指数类型<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>此字段返回为 True 时，以下指数相关字段才有合法数值 |
+        | index\_valid | bool | 是否有指数类型<br>(ℹ️ 此字段返回为 True 时，以下指数相关字段才有合法数值) |
         | index\_raise\_count | int | 指数类型上涨支数 |
         | index\_fall\_count | int | 指数类型下跌支数 |
         | index\_equal\_count | int | 指数类型平盘支数 |
-        | lot\_size | int | 每手股数，股票期权表示每份合约的股数<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>指数期权无该字段<br><br>，期货表示合约乘数 |
-        | price\_spread | float | 当前向上的摆盘价差<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>即摆盘数据的卖一价相邻档位的报价差 |
+        | lot\_size | int | 每手股数，股票期权表示每份合约的股数<br>(ℹ️ 指数期权无该字段<br><br>，期货表示合约乘数) |
+        | price\_spread | float | 当前向上的摆盘价差<br>(ℹ️ 即摆盘数据的卖一价相邻档位的报价差) |
         | ask\_price | float | 卖价  |
         | bid\_price | float | 买价  |
         | ask\_vol | float | 卖量  |
         | bid\_vol | float | 买量  |
-        | enable\_margin | bool | 是否可融资（已废弃）<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>请使用 [获取融资融券数据](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html)<br> 接口获取 |
+        | enable\_margin | bool | 是否可融资（已废弃）<br>(ℹ️ 请使用 [获取融资融券数据](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html)<br> 接口获取) |
         | mortgage\_ratio | float | 股票抵押率（已废弃） |
-        | long\_margin\_initial\_ratio | float | 融资初始保证金率（已废弃）<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>请使用 [获取融资融券数据](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html)<br> 接口获取 |
-        | enable\_short\_sell | bool | 是否可卖空（已废弃）<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>请使用 [获取融资融券数据](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html)<br> 接口获取 |
-        | short\_sell\_rate | float | 卖空参考利率（已废弃）<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>请使用 [获取融资融券数据](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html)<br> 接口获取 |
-        | short\_available\_volume | int | 剩余可卖空数量（已废弃）<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>请使用 [获取融资融券数据](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html)<br> 接口获取 |
-        | short\_margin\_initial\_ratio | float | 卖空（融券）初始保证金率（已废弃）<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>请使用 [获取融资融券数据](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html)<br> 接口获取 |
+        | long\_margin\_initial\_ratio | float | 融资初始保证金率（已废弃）<br>(ℹ️ 请使用 [获取融资融券数据](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html)<br> 接口获取) |
+        | enable\_short\_sell | bool | 是否可卖空（已废弃）<br>(ℹ️ 请使用 [获取融资融券数据](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html)<br> 接口获取) |
+        | short\_sell\_rate | float | 卖空参考利率（已废弃）<br>(ℹ️ 请使用 [获取融资融券数据](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html)<br> 接口获取) |
+        | short\_available\_volume | int | 剩余可卖空数量（已废弃）<br>(ℹ️ 请使用 [获取融资融券数据](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html)<br> 接口获取) |
+        | short\_margin\_initial\_ratio | float | 卖空（融券）初始保证金率（已废弃）<br>(ℹ️ 请使用 [获取融资融券数据](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html)<br> 接口获取) |
         | sec\_status | [SecurityStatus](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9969) | 股票状态 |
-        | amplitude | float | 振幅<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+        | amplitude | float | 振幅<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
         | avg\_price | float | 平均价 |
-        | bid\_ask\_ratio | float | 委比<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+        | bid\_ask\_ratio | float | 委比<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
         | volume\_ratio | float | 量比  |
         | highest52weeks\_price | float | 52 周最高价 |
         | lowest52weeks\_price | float | 52 周最低价 |
@@ -149,36 +149,36 @@
         | pre\_volume | int | 盘前成交量 |
         | pre\_turnover | float | 盘前成交额 |
         | pre\_change\_val | float | 盘前涨跌额 |
-        | pre\_change\_rate | float | 盘前涨跌幅<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-        | pre\_amplitude | float | 盘前振幅<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+        | pre\_change\_rate | float | 盘前涨跌幅<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+        | pre\_amplitude | float | 盘前振幅<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
         | after\_price | float | 盘后价格 |
         | after\_high\_price | float | 盘后最高价 |
         | after\_low\_price | float | 盘后最低价 |
-        | after\_volume | int | 盘后成交量<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>科创板支持该数据 |
-        | after\_turnover | float | 盘后成交额<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>科创板支持该数据 |
+        | after\_volume | int | 盘后成交量<br>(ℹ️ 科创板支持该数据) |
+        | after\_turnover | float | 盘后成交额<br>(ℹ️ 科创板支持该数据) |
         | after\_change\_val | float | 盘后涨跌额 |
-        | after\_change\_rate | float | 盘后涨跌幅<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-        | after\_amplitude | float | 盘后振幅<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+        | after\_change\_rate | float | 盘后涨跌幅<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+        | after\_amplitude | float | 盘后振幅<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
         | overnight\_price | float | 夜盘价格 |
         | overnight\_high\_price | float | 夜盘最高价 |
         | overnight\_low\_price | float | 夜盘最低价 |
         | overnight\_volume | int | 夜盘成交量 |
         | overnight\_turnover | float | 夜盘成交额 |
         | overnight\_change\_val | float | 夜盘涨跌额 |
-        | overnight\_change\_rate | float | 夜盘涨跌幅<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-        | overnight\_amplitude | float | 夜盘振幅<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+        | overnight\_change\_rate | float | 夜盘涨跌幅<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+        | overnight\_amplitude | float | 夜盘振幅<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
         | future\_valid | bool | 是否期货 |
         | future\_last\_settle\_price | float | 昨结  |
         | future\_position | float | 持仓量 |
         | future\_position\_change | float | 日增仓 |
         | future\_main\_contract | bool | 是否主连合约 |
-        | future\_last\_trade\_time | str | 最后交易时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>主连，当月，下月等期货没有该字段 |
+        | future\_last\_trade\_time | str | 最后交易时间<br>(ℹ️ 主连，当月，下月等期货没有该字段) |
         | trust\_valid | bool | 是否基金 |
-        | trust\_dividend\_yield | float | 股息率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-        | trust\_aum | float | 资产规模<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>单位：元 |
+        | trust\_dividend\_yield | float | 股息率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+        | trust\_aum | float | 资产规模<br>(ℹ️ 单位：元) |
         | trust\_outstanding\_units | int | 总发行量 |
         | trust\_netAssetValue | float | 单位净值 |
-        | trust\_premium | float | 溢价<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+        | trust\_premium | float | 溢价<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
         | trust\_assetClass | [AssetClass](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4752) | 资产类别 |
         
 *   **Example**
@@ -3341,7 +3341,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | code\_list | list | 股票代码列表<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>每次最多可请求 400 个标的  <br>list 内元素类型为 str |
+    | code\_list | list | 股票代码列表<br>(ℹ️ 每次最多可请求 400 个标的  <br>list 内元素类型为 str) |
     
 
 *   **返回**
@@ -3358,7 +3358,7 @@
         | --- | --- | --- |
         | code | str | 股票代码 |
         | name | str | 股票名称 |
-        | update\_time | str | 当前价更新时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd HH:mm:ss  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间 |
+        | update\_time | str | 当前价更新时间<br>(ℹ️ 格式：yyyy-MM-dd HH:mm:ss  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间) |
         | last\_price | float | 最新价格 |
         | open\_price | float | 今日开盘价 |
         | high\_price | float | 最高价格 |
@@ -3366,54 +3366,54 @@
         | prev\_close\_price | float | 昨收盘价格 |
         | volume | int | 成交数量 |
         | turnover | float | 成交金额 |
-        | turnover\_rate | float | 换手率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-        | suspension | bool | 是否停牌<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>True：停牌 |
-        | listing\_date | str | 上市日期<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd |
-        | equity\_valid | bool | 是否正股<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>此字段返回为 True 时，以下正股相关字段才有合法数值 |
+        | turnover\_rate | float | 换手率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+        | suspension | bool | 是否停牌<br>(ℹ️ True：停牌) |
+        | listing\_date | str | 上市日期<br>(ℹ️ 格式：yyyy-MM-dd) |
+        | equity\_valid | bool | 是否正股<br>(ℹ️ 此字段返回为 True 时，以下正股相关字段才有合法数值) |
         | issued\_shares | int | 总股本 |
-        | total\_market\_val | float | 总市值<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>单位：元 |
+        | total\_market\_val | float | 总市值<br>(ℹ️ 单位：元) |
         | net\_asset | int | 资产净值 |
         | net\_profit | int | 净利润 |
         | earning\_per\_share | float | 每股盈利 |
         | outstanding\_shares | int | 流通股本 |
         | net\_asset\_per\_share | float | 每股净资产 |
-        | circular\_market\_val | float | 流通市值<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>单位：元 |
-        | ey\_ratio | float | 收益率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为比例字段，默认不展示 % |
-        | pe\_ratio | float | 市盈率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为比例字段，默认不展示 % |
-        | pb\_ratio | float | 市净率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为比例字段，默认不展示 % |
-        | pe\_ttm\_ratio | float | 市盈率 TTM<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为比例字段，默认不展示 % |
+        | circular\_market\_val | float | 流通市值<br>(ℹ️ 单位：元) |
+        | ey\_ratio | float | 收益率<br>(ℹ️ 该字段为比例字段，默认不展示 %) |
+        | pe\_ratio | float | 市盈率<br>(ℹ️ 该字段为比例字段，默认不展示 %) |
+        | pb\_ratio | float | 市净率<br>(ℹ️ 该字段为比例字段，默认不展示 %) |
+        | pe\_ttm\_ratio | float | 市盈率 TTM<br>(ℹ️ 该字段为比例字段，默认不展示 %) |
         | dividend\_ttm | float | 股息 TTM，派息 |
-        | dividend\_ratio\_ttm | float | 股息率 TTM<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+        | dividend\_ratio\_ttm | float | 股息率 TTM<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
         | dividend\_lfy | float | 股息 LFY，上一年度派息 |
-        | dividend\_lfy\_ratio | float | 股息率 LFY<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+        | dividend\_lfy\_ratio | float | 股息率 LFY<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
         | stock\_owner | str | 窝轮所属正股的代码或期权的标的股代码 |
-        | wrt\_valid | bool | 是否是窝轮<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>此字段返回为 True 时，以下窝轮相关字段才有合法数值 |
+        | wrt\_valid | bool | 是否是窝轮<br>(ℹ️ 此字段返回为 True 时，以下窝轮相关字段才有合法数值) |
         | wrt\_conversion\_ratio | float | 换股比率 |
         | wrt\_type | [WrtType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#926) | 窝轮类型 |
         | wrt\_strike\_price | float | 行使价格 |
         | wrt\_maturity\_date | str | 格式化窝轮到期时间 |
         | wrt\_end\_trade | str | 格式化窝轮最后交易时间 |
-        | wrt\_leverage | float | 杠杆比率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>单位：倍 |
-        | wrt\_ipop | float | 价内/价外<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+        | wrt\_leverage | float | 杠杆比率<br>(ℹ️ 单位：倍) |
+        | wrt\_ipop | float | 价内/价外<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
         | wrt\_break\_even\_point | float | 打和点 |
         | wrt\_conversion\_price | float | 换股价 |
-        | wrt\_price\_recovery\_ratio | float | 正股距收回价<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+        | wrt\_price\_recovery\_ratio | float | 正股距收回价<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
         | wrt\_score | float | 窝轮综合评分 |
         | wrt\_code | str | 窝轮对应的正股（此字段已废除，修改为 stock\_owner） |
         | wrt\_recovery\_price | float | 窝轮收回价 |
         | wrt\_street\_vol | float | 窝轮街货量 |
         | wrt\_issue\_vol | float | 窝轮发行量 |
-        | wrt\_street\_ratio | float | 窝轮街货占比<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+        | wrt\_street\_ratio | float | 窝轮街货占比<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
         | wrt\_delta | float | 窝轮对冲值 |
         | wrt\_implied\_volatility | float | 窝轮引伸波幅 |
-        | wrt\_premium | float | 窝轮溢价<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-        | wrt\_upper\_strike\_price | float | 上限价<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅界内证支持该字段 |
-        | wrt\_lower\_strike\_price | float | 下限价<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅界内证支持该字段 |
-        | wrt\_inline\_price\_status | [PriceType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6407) | 界内界外<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅界内证支持该字段 |
+        | wrt\_premium | float | 窝轮溢价<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+        | wrt\_upper\_strike\_price | float | 上限价<br>(ℹ️ 仅界内证支持该字段) |
+        | wrt\_lower\_strike\_price | float | 下限价<br>(ℹ️ 仅界内证支持该字段) |
+        | wrt\_inline\_price\_status | [PriceType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6407) | 界内界外<br>(ℹ️ 仅界内证支持该字段) |
         | wrt\_issuer\_code | str | 发行人代码 |
-        | option\_valid | bool | 是否是期权<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>此字段返回为 True 时，以下期权相关字段才有合法数值 |
+        | option\_valid | bool | 是否是期权<br>(ℹ️ 此字段返回为 True 时，以下期权相关字段才有合法数值) |
         | option\_type | [OptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3713) | 期权类型 |
-        | strike\_time | str | 期权行权日<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间 |
+        | strike\_time | str | 期权行权日<br>(ℹ️ 格式：yyyy-MM-dd  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间) |
         | option\_strike\_price | float | 行权价 |
         | option\_contract\_size | float | 每份合约数 |
         | option\_open\_interest | int | 总未平仓合约数 |
@@ -3425,37 +3425,37 @@
         | option\_theta | float | 希腊值 Theta |
         | option\_rho | float | 希腊值 Rho |
         | index\_option\_type | [IndexOptionType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5149) | 指数期权类型 |
-        | option\_net\_open\_interest | int | 净未平仓合约数<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅港股期权适用 |
-        | option\_expiry\_date\_distance | int | 距离到期日天数<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>负数表示已过期 |
-        | option\_contract\_nominal\_value | float | 合约名义金额<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅港股期权适用 |
-        | option\_owner\_lot\_multiplier | float | 相等正股手数<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>指数期权无该字段，仅港股期权适用 |
+        | option\_net\_open\_interest | int | 净未平仓合约数<br>(ℹ️ 仅港股期权适用) |
+        | option\_expiry\_date\_distance | int | 距离到期日天数<br>(ℹ️ 负数表示已过期) |
+        | option\_contract\_nominal\_value | float | 合约名义金额<br>(ℹ️ 仅港股期权适用) |
+        | option\_owner\_lot\_multiplier | float | 相等正股手数<br>(ℹ️ 指数期权无该字段，仅港股期权适用) |
         | option\_area\_type | [OptionAreaType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#7077) | 期权类型（按行权时间） |
         | option\_contract\_multiplier | float | 合约乘数 |
-        | plate\_valid | bool | 是否为板块类型<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>此字段返回为 True 时，以下板块相关字段才有合法数值 |
+        | plate\_valid | bool | 是否为板块类型<br>(ℹ️ 此字段返回为 True 时，以下板块相关字段才有合法数值) |
         | plate\_raise\_count | int | 板块类型上涨支数 |
         | plate\_fall\_count | int | 板块类型下跌支数 |
         | plate\_equal\_count | int | 板块类型平盘支数 |
-        | index\_valid | bool | 是否有指数类型<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>此字段返回为 True 时，以下指数相关字段才有合法数值 |
+        | index\_valid | bool | 是否有指数类型<br>(ℹ️ 此字段返回为 True 时，以下指数相关字段才有合法数值) |
         | index\_raise\_count | int | 指数类型上涨支数 |
         | index\_fall\_count | int | 指数类型下跌支数 |
         | index\_equal\_count | int | 指数类型平盘支数 |
-        | lot\_size | int | 每手股数，股票期权表示每份合约的股数<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>指数期权无该字段<br><br>，期货表示合约乘数 |
-        | price\_spread | float | 当前向上的摆盘价差<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>即摆盘数据的卖一价相邻档位的报价差 |
+        | lot\_size | int | 每手股数，股票期权表示每份合约的股数<br>(ℹ️ 指数期权无该字段<br><br>，期货表示合约乘数) |
+        | price\_spread | float | 当前向上的摆盘价差<br>(ℹ️ 即摆盘数据的卖一价相邻档位的报价差) |
         | ask\_price | float | 卖价  |
         | bid\_price | float | 买价  |
         | ask\_vol | float | 卖量  |
         | bid\_vol | float | 买量  |
-        | enable\_margin | bool | 是否可融资（已废弃）<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>请使用 [获取融资融券数据](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html)<br> 接口获取 |
+        | enable\_margin | bool | 是否可融资（已废弃）<br>(ℹ️ 请使用 [获取融资融券数据](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html)<br> 接口获取) |
         | mortgage\_ratio | float | 股票抵押率（已废弃） |
-        | long\_margin\_initial\_ratio | float | 融资初始保证金率（已废弃）<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>请使用 [获取融资融券数据](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html)<br> 接口获取 |
-        | enable\_short\_sell | bool | 是否可卖空（已废弃）<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>请使用 [获取融资融券数据](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html)<br> 接口获取 |
-        | short\_sell\_rate | float | 卖空参考利率（已废弃）<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>请使用 [获取融资融券数据](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html)<br> 接口获取 |
-        | short\_available\_volume | int | 剩余可卖空数量（已废弃）<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>请使用 [获取融资融券数据](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html)<br> 接口获取 |
-        | short\_margin\_initial\_ratio | float | 卖空（融券）初始保证金率（已废弃）<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>请使用 [获取融资融券数据](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html)<br> 接口获取 |
+        | long\_margin\_initial\_ratio | float | 融资初始保证金率（已废弃）<br>(ℹ️ 请使用 [获取融资融券数据](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html)<br> 接口获取) |
+        | enable\_short\_sell | bool | 是否可卖空（已废弃）<br>(ℹ️ 请使用 [获取融资融券数据](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html)<br> 接口获取) |
+        | short\_sell\_rate | float | 卖空参考利率（已废弃）<br>(ℹ️ 请使用 [获取融资融券数据](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html)<br> 接口获取) |
+        | short\_available\_volume | int | 剩余可卖空数量（已废弃）<br>(ℹ️ 请使用 [获取融资融券数据](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html)<br> 接口获取) |
+        | short\_margin\_initial\_ratio | float | 卖空（融券）初始保证金率（已废弃）<br>(ℹ️ 请使用 [获取融资融券数据](https://openapi.futunn.com/futu-api-doc/trade/get-margin-ratio.html)<br> 接口获取) |
         | sec\_status | [SecurityStatus](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9969) | 股票状态 |
-        | amplitude | float | 振幅<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+        | amplitude | float | 振幅<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
         | avg\_price | float | 平均价 |
-        | bid\_ask\_ratio | float | 委比<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+        | bid\_ask\_ratio | float | 委比<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
         | volume\_ratio | float | 量比  |
         | highest52weeks\_price | float | 52 周最高价 |
         | lowest52weeks\_price | float | 52 周最低价 |
@@ -3467,36 +3467,36 @@
         | pre\_volume | int | 盘前成交量 |
         | pre\_turnover | float | 盘前成交额 |
         | pre\_change\_val | float | 盘前涨跌额 |
-        | pre\_change\_rate | float | 盘前涨跌幅<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-        | pre\_amplitude | float | 盘前振幅<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+        | pre\_change\_rate | float | 盘前涨跌幅<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+        | pre\_amplitude | float | 盘前振幅<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
         | after\_price | float | 盘后价格 |
         | after\_high\_price | float | 盘后最高价 |
         | after\_low\_price | float | 盘后最低价 |
-        | after\_volume | int | 盘后成交量<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>科创板支持该数据 |
-        | after\_turnover | float | 盘后成交额<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>科创板支持该数据 |
+        | after\_volume | int | 盘后成交量<br>(ℹ️ 科创板支持该数据) |
+        | after\_turnover | float | 盘后成交额<br>(ℹ️ 科创板支持该数据) |
         | after\_change\_val | float | 盘后涨跌额 |
-        | after\_change\_rate | float | 盘后涨跌幅<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-        | after\_amplitude | float | 盘后振幅<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+        | after\_change\_rate | float | 盘后涨跌幅<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+        | after\_amplitude | float | 盘后振幅<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
         | overnight\_price | float | 夜盘价格 |
         | overnight\_high\_price | float | 夜盘最高价 |
         | overnight\_low\_price | float | 夜盘最低价 |
         | overnight\_volume | int | 夜盘成交量 |
         | overnight\_turnover | float | 夜盘成交额 |
         | overnight\_change\_val | float | 夜盘涨跌额 |
-        | overnight\_change\_rate | float | 夜盘涨跌幅<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-        | overnight\_amplitude | float | 夜盘振幅<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+        | overnight\_change\_rate | float | 夜盘涨跌幅<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+        | overnight\_amplitude | float | 夜盘振幅<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
         | future\_valid | bool | 是否期货 |
         | future\_last\_settle\_price | float | 昨结  |
         | future\_position | float | 持仓量 |
         | future\_position\_change | float | 日增仓 |
         | future\_main\_contract | bool | 是否主连合约 |
-        | future\_last\_trade\_time | str | 最后交易时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>主连，当月，下月等期货没有该字段 |
+        | future\_last\_trade\_time | str | 最后交易时间<br>(ℹ️ 主连，当月，下月等期货没有该字段) |
         | trust\_valid | bool | 是否基金 |
-        | trust\_dividend\_yield | float | 股息率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-        | trust\_aum | float | 资产规模<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>单位：元 |
+        | trust\_dividend\_yield | float | 股息率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+        | trust\_aum | float | 资产规模<br>(ℹ️ 单位：元) |
         | trust\_outstanding\_units | int | 总发行量 |
         | trust\_netAssetValue | float | 单位净值 |
-        | trust\_premium | float | 溢价<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+        | trust\_premium | float | 溢价<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
         | trust\_assetClass | [AssetClass](https://openapi.futunn.com/futu-api-doc/quote/quote.html#4752) | 资产类别 |
         
 *   **Example**

@@ -113,9 +113,9 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | plate\_code | str | 板块代码<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>先利用 [获取板块列表](https://openapi.futunn.com/futu-api-doc/quote/get-plate-list.html)<br> 获取板块代码  <br>例如：“SH.BK0001”，“SH.BK0002” |
+    | plate\_code | str | 板块代码<br>(ℹ️ 先利用 [获取板块列表](https://openapi.futunn.com/futu-api-doc/quote/get-plate-list.html)<br> 获取板块代码  <br>例如：“SH.BK0001”，“SH.BK0002”) |
     | sort\_field | [SortField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2930) | 排序字段 |
-    | ascend | bool | 排序方向<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>True：升序  <br>False：降序 |
+    | ascend | bool | 排序方向<br>(ℹ️ True：升序  <br>False：降序) |
     
 
 *   **返回**
@@ -134,10 +134,10 @@
         | lot\_size | int | 每手股数，期货表示合约乘数 |
         | stock\_name | str | 股票名称 |
         | stock\_type | [SecurityType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3325) | 股票类型 |
-        | list\_time | str | 上市时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间 |
+        | list\_time | str | 上市时间<br>(ℹ️ 格式：yyyy-MM-dd  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间) |
         | stock\_id | int | 股票 ID |
-        | main\_contract | bool | 是否主连合约<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>期货特有字段 |
-        | last\_trade\_time | str | 最后交易时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>期货特有字段  <br>主连，当月，下月等期货没有该字段 |
+        | main\_contract | bool | 是否主连合约<br>(ℹ️ 期货特有字段) |
+        | last\_trade\_time | str | 最后交易时间<br>(ℹ️ 期货特有字段  <br>主连，当月，下月等期货没有该字段) |
         
 *   **Example**
     
@@ -1421,9 +1421,9 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | plate\_code | str | 板块代码<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>先利用 [获取板块列表](https://openapi.futunn.com/futu-api-doc/quote/get-plate-list.html)<br> 获取板块代码  <br>例如：“SH.BK0001”，“SH.BK0002” |
+    | plate\_code | str | 板块代码<br>(ℹ️ 先利用 [获取板块列表](https://openapi.futunn.com/futu-api-doc/quote/get-plate-list.html)<br> 获取板块代码  <br>例如：“SH.BK0001”，“SH.BK0002”) |
     | sort\_field | [SortField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2930) | 排序字段 |
-    | ascend | bool | 排序方向<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>True：升序  <br>False：降序 |
+    | ascend | bool | 排序方向<br>(ℹ️ True：升序  <br>False：降序) |
     
 
 *   **返回**
@@ -1442,10 +1442,10 @@
         | lot\_size | int | 每手股数，期货表示合约乘数 |
         | stock\_name | str | 股票名称 |
         | stock\_type | [SecurityType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3325) | 股票类型 |
-        | list\_time | str | 上市时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间 |
+        | list\_time | str | 上市时间<br>(ℹ️ 格式：yyyy-MM-dd  <br>港股和 A 股市场默认是北京时间，美股市场默认是美东时间) |
         | stock\_id | int | 股票 ID |
-        | main\_contract | bool | 是否主连合约<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>期货特有字段 |
-        | last\_trade\_time | str | 最后交易时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>期货特有字段  <br>主连，当月，下月等期货没有该字段 |
+        | main\_contract | bool | 是否主连合约<br>(ℹ️ 期货特有字段) |
+        | last\_trade\_time | str | 最后交易时间<br>(ℹ️ 期货特有字段  <br>主连，当月，下月等期货没有该字段) |
         
 *   **Example**
     

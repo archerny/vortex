@@ -124,11 +124,11 @@
         | order\_id | str | 订单号 |
         | code | str | 股票代码 |
         | stock\_name | str | 股票名称 |
-        | qty | float | 成交数量<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>期权期货单位是"张" |
+        | qty | float | 成交数量<br>(ℹ️ 期权期货单位是"张") |
         | price | float | 成交价格 |
-        | create\_time | str | 创建时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>期货时区指定，请参见 [FutuOpenD 配置](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#6724) |
-        | counter\_broker\_id | int | 对手经纪号<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅港股有效 |
-        | counter\_broker\_name | str | 对手经纪名称<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅港股有效 |
+        | create\_time | str | 创建时间<br>(ℹ️ 期货时区指定，请参见 [FutuOpenD 配置](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#6724)) |
+        | counter\_broker\_id | int | 对手经纪号<br>(ℹ️ 仅港股有效) |
+        | counter\_broker\_name | str | 对手经纪名称<br>(ℹ️ 仅港股有效) |
         | status | [DealStatus](https://openapi.futunn.com/futu-api-doc/trade/trade.html#8317) | 成交状态 |
         
 *   **Example**
@@ -1253,11 +1253,11 @@
         | order\_id | str | 订单号 |
         | code | str | 股票代码 |
         | stock\_name | str | 股票名称 |
-        | qty | float | 成交数量<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>期权期货单位是"张" |
+        | qty | float | 成交数量<br>(ℹ️ 期权期货单位是"张") |
         | price | float | 成交价格 |
-        | create\_time | str | 创建时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>期货时区指定，请参见 [OpenD 配置](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#6724) |
-        | counter\_broker\_id | int | 对手经纪号<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅港股有效 |
-        | counter\_broker\_name | str | 对手经纪名称<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅港股有效 |
+        | create\_time | str | 创建时间<br>(ℹ️ 期货时区指定，请参见 [OpenD 配置](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#6724)) |
+        | counter\_broker\_id | int | 对手经纪号<br>(ℹ️ 仅港股有效) |
+        | counter\_broker\_name | str | 对手经纪名称<br>(ℹ️ 仅港股有效) |
         | status | [DealStatus](https://openapi.futunn.com/futu-api-doc/trade/trade.html#8317) | 成交状态 |
         
 *   **Example**

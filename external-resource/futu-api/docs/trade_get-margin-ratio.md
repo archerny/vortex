@@ -23,7 +23,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | code\_list | list | 股票代码列表<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>每次最多可请求 100 个标的  <br>list 内元素类型为 str |
+    | code\_list | list | 股票代码列表<br>(ℹ️ 每次最多可请求 100 个标的  <br>list 内元素类型为 str) |
     
 
 *   **返回**
@@ -41,16 +41,16 @@
         | code | str | 股票代码 |
         | is\_long\_permit | bool | 是否允许融资 |
         | is\_short\_permit | bool | 是否允许融券 |
-        | short\_pool\_remain | float | 卖空池剩余<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>单位：股 |
-        | short\_fee\_rate | float | 融券参考利率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-        | alert\_long\_ratio | float | 融资预警比率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-        | alert\_short\_ratio | float | 融券预警比率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-        | im\_long\_ratio | float | 融资初始保证金率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-        | im\_short\_ratio | float | 融券初始保证金率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-        | mcm\_long\_ratio | float | 融资 margin call 保证金率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-        | mcm\_short\_ratio | float | 融券 margin call 保证金率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-        | mm\_long\_ratio | float | 融资维持保证金率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-        | mm\_short\_ratio | float | 融券维持保证金率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+        | short\_pool\_remain | float | 卖空池剩余<br>(ℹ️ 单位：股) |
+        | short\_fee\_rate | float | 融券参考利率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+        | alert\_long\_ratio | float | 融资预警比率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+        | alert\_short\_ratio | float | 融券预警比率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+        | im\_long\_ratio | float | 融资初始保证金率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+        | im\_short\_ratio | float | 融券初始保证金率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+        | mcm\_long\_ratio | float | 融资 margin call 保证金率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+        | mcm\_short\_ratio | float | 融券 margin call 保证金率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+        | mm\_long\_ratio | float | 融资维持保证金率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+        | mm\_short\_ratio | float | 融券维持保证金率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
         
 *   **Example**
     
@@ -1495,7 +1495,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | code\_list | list | 股票代码列表<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>每次最多可请求 100 个标的  <br>list 内元素类型为 str |
+    | code\_list | list | 股票代码列表<br>(ℹ️ 每次最多可请求 100 个标的  <br>list 内元素类型为 str) |
     
 
 *   **返回**
@@ -1513,16 +1513,16 @@
         | code | str | 股票代码 |
         | is\_long\_permit | bool | 是否允许融资 |
         | is\_short\_permit | bool | 是否允许融券 |
-        | short\_pool\_remain | float | 卖空池剩余<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>单位：股 |
-        | short\_fee\_rate | float | 融券参考利率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-        | alert\_long\_ratio | float | 融资预警比率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-        | alert\_short\_ratio | float | 融券预警比率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-        | im\_long\_ratio | float | 融资初始保证金率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-        | im\_short\_ratio | float | 融券初始保证金率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-        | mcm\_long\_ratio | float | 融资 margin call 保证金率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-        | mcm\_short\_ratio | float | 融券 margin call 保证金率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-        | mm\_long\_ratio | float | 融资维持保证金率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-        | mm\_short\_ratio | float | 融券维持保证金率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+        | short\_pool\_remain | float | 卖空池剩余<br>(ℹ️ 单位：股) |
+        | short\_fee\_rate | float | 融券参考利率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+        | alert\_long\_ratio | float | 融资预警比率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+        | alert\_short\_ratio | float | 融券预警比率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+        | im\_long\_ratio | float | 融资初始保证金率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+        | im\_short\_ratio | float | 融券初始保证金率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+        | mcm\_long\_ratio | float | 融资 margin call 保证金率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+        | mcm\_short\_ratio | float | 融券 margin call 保证金率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+        | mm\_long\_ratio | float | 融资维持保证金率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+        | mm\_short\_ratio | float | 融券维持保证金率<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
         
 *   **Example**
     

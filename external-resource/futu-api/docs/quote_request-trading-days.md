@@ -115,8 +115,8 @@
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
     | market | [TradeDateMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#940) | 市场类型 |
-    | start | str | 起始日期<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd  <br>例如：“2018-01-01” |
-    | end | str | 结束日期<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd  <br>例如：“2018-01-01” |
+    | start | str | 起始日期<br>(ℹ️ 格式：yyyy-MM-dd  <br>例如：“2018-01-01”) |
+    | end | str | 结束日期<br>(ℹ️ 格式：yyyy-MM-dd  <br>例如：“2018-01-01”) |
     | code | str | 股票代码 |
     
     注：当 market 和 code 同时存在时，会忽略 market，仅对 code 进行查询。
@@ -143,7 +143,7 @@
         
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
-        | time | str | 时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd |
+        | time | str | 时间<br>(ℹ️ 格式：yyyy-MM-dd) |
         | trade\_date\_type | [TradeDateType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6676) | 交易日类型 |
         
 *   **Example**
@@ -1379,10 +1379,7 @@
 
 *   每 30 秒内最多请求 30 次获取交易日接口。
 *   历史交易日历提供过去 10 年的数据，未来交易日历提供到今年 12 月 31 日
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    举例：今天的日期是 2021 年 7 月 6 日，我们仅提供 2011-07-06 到 2021-12-31 期间的交易日历
+    (ℹ️ 举例：今天的日期是 2021 年 7 月 6 日，我们仅提供 2011-07-06 到 2021-12-31 期间的交易日历)
     
     。
 
@@ -1405,8 +1402,8 @@
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
     | market | [TradeDateMarket](https://openapi.futunn.com/futu-api-doc/quote/quote.html#940) | 市场类型 |
-    | start | str | 起始日期<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd  <br>例如：“2018-01-01” |
-    | end | str | 结束日期<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd  <br>例如：“2018-01-01” |
+    | start | str | 起始日期<br>(ℹ️ 格式：yyyy-MM-dd  <br>例如：“2018-01-01”) |
+    | end | str | 结束日期<br>(ℹ️ 格式：yyyy-MM-dd  <br>例如：“2018-01-01”) |
     | code | str | 股票代码 |
     
     注：当 market 和 code 同时存在时，会忽略 market，仅对 code 进行查询。
@@ -1433,7 +1430,7 @@
         
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
-        | time | str | 时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd |
+        | time | str | 时间<br>(ℹ️ 格式：yyyy-MM-dd) |
         | trade\_date\_type | [TradeDateType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6676) | 交易日类型 |
         
 *   **Example**
@@ -2669,10 +2666,7 @@
 
 *   每 30 秒内最多请求 30 次获取交易日接口。
 *   历史交易日历提供过去 10 年的数据，未来交易日历提供到今年 12 月 31 日
-    
-    ![](https://openapi.futunn.com/futu-api-doc/img/tip.png)
-    
-    举例：今天的日期是 2021 年 7 月 6 日，我们仅提供 2011-07-06 到 2021-12-31 期间的交易日历
+    (ℹ️ 举例：今天的日期是 2021 年 7 月 6 日，我们仅提供 2011-07-06 到 2021-12-31 期间的交易日历)
     
     。
 

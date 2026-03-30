@@ -132,17 +132,17 @@
         | order\_id | str | 订单号 |
         | code | str | 股票代码 |
         | stock\_name | str | 股票名称 |
-        | qty | float | 订单数量<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>期权期货单位是"张" |
-        | price | float | 订单价格<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>精确到小数点后 3 位，超出部分四舍五入 |
+        | qty | float | 订单数量<br>(ℹ️ 期权期货单位是"张") |
+        | price | float | 订单价格<br>(ℹ️ 精确到小数点后 3 位，超出部分四舍五入) |
         | currency | [Currency](https://openapi.futunn.com/futu-api-doc/trade/trade.html#8019) | 交易货币 |
-        | create\_time | str | 创建时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>期货时区指定，请参见 [OpenD 配置](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#6724) |
-        | updated\_time | str | 最后更新时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>期货时区指定，请参见 [OpenD 配置](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#6724) |
-        | dealt\_qty | float | 成交数量<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>期权期货单位是"张" |
-        | dealt\_avg\_price | float | 成交均价<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>无精度限制 |
-        | last\_err\_msg | str | 最后的错误描述<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>如果有错误，会返回最后一次错误的原因  <br>如果无错误，返回空字符串 |
-        | remark | str | 下单时备注的标识<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>详见 [place\_order](https://openapi.futunn.com/futu-api-doc/trade/place-order.html)<br> 接口参数中的 remark |
+        | create\_time | str | 创建时间<br>(ℹ️ 期货时区指定，请参见 [OpenD 配置](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#6724)) |
+        | updated\_time | str | 最后更新时间<br>(ℹ️ 期货时区指定，请参见 [OpenD 配置](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#6724)) |
+        | dealt\_qty | float | 成交数量<br>(ℹ️ 期权期货单位是"张") |
+        | dealt\_avg\_price | float | 成交均价<br>(ℹ️ 无精度限制) |
+        | last\_err\_msg | str | 最后的错误描述<br>(ℹ️ 如果有错误，会返回最后一次错误的原因  <br>如果无错误，返回空字符串) |
+        | remark | str | 下单时备注的标识<br>(ℹ️ 详见 [place\_order](https://openapi.futunn.com/futu-api-doc/trade/place-order.html)<br> 接口参数中的 remark) |
         | time\_in\_force | [TimeInForce](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4241) | 有效期限 |
-        | fill\_outside\_rth | bool | 是否允许盘前盘后（仅用于美股）<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>True：允许  <br>False：不允许 |
+        | fill\_outside\_rth | bool | 是否允许盘前盘后（仅用于美股）<br>(ℹ️ True：允许  <br>False：不允许) |
         | session | [Session](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9152) | 交易订单时段（仅用于美股） |
         | aux\_price | float | 触发价格 |
         | trail\_type | [TrailType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#5644) | 跟踪类型 |
@@ -1466,17 +1466,17 @@
         | order\_id | str | 订单号 |
         | code | str | 股票代码 |
         | stock\_name | str | 股票名称 |
-        | qty | float | 订单数量<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>期权期货单位是"张" |
-        | price | float | 订单价格<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>精确到小数点后 3 位，超出部分四舍五入 |
+        | qty | float | 订单数量<br>(ℹ️ 期权期货单位是"张") |
+        | price | float | 订单价格<br>(ℹ️ 精确到小数点后 3 位，超出部分四舍五入) |
         | currency | [Currency](https://openapi.futunn.com/futu-api-doc/trade/trade.html#8019) | 交易货币 |
-        | create\_time | str | 创建时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>期货时区指定，请参见 [OpenD 配置](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#6724) |
-        | updated\_time | str | 最后更新时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>期货时区指定，请参见 [OpenD 配置](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#6724) |
-        | dealt\_qty | float | 成交数量<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>期权期货单位是"张" |
-        | dealt\_avg\_price | float | 成交均价<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>无精度限制 |
-        | last\_err\_msg | str | 最后的错误描述<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>如果有错误，会返回最后一次错误的原因  <br>如果无错误，返回空字符串 |
-        | remark | str | 下单时备注的标识<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>详见 [place\_order](https://openapi.futunn.com/futu-api-doc/trade/place-order.html)<br> 接口参数中的 remark |
+        | create\_time | str | 创建时间<br>(ℹ️ 期货时区指定，请参见 [OpenD 配置](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#6724)) |
+        | updated\_time | str | 最后更新时间<br>(ℹ️ 期货时区指定，请参见 [OpenD 配置](https://openapi.futunn.com/futu-api-doc/quick/opend-base.html#6724)) |
+        | dealt\_qty | float | 成交数量<br>(ℹ️ 期权期货单位是"张") |
+        | dealt\_avg\_price | float | 成交均价<br>(ℹ️ 无精度限制) |
+        | last\_err\_msg | str | 最后的错误描述<br>(ℹ️ 如果有错误，会返回最后一次错误的原因  <br>如果无错误，返回空字符串) |
+        | remark | str | 下单时备注的标识<br>(ℹ️ 详见 [place\_order](https://openapi.futunn.com/futu-api-doc/trade/place-order.html)<br> 接口参数中的 remark) |
         | time\_in\_force | [TimeInForce](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4241) | 有效期限 |
-        | fill\_outside\_rth | bool | 是否允许盘前盘后（仅用于美股）<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>True：允许  <br>False：不允许 |
+        | fill\_outside\_rth | bool | 是否允许盘前盘后（仅用于美股）<br>(ℹ️ True：允许  <br>False：不允许) |
         | session | [Session](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9152) | 交易订单时段（仅用于美股） |
         | aux\_price | float | 触发价格 |
         | trail\_type | [TrailType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#5644) | 跟踪类型 |

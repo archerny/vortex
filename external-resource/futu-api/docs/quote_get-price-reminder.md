@@ -114,7 +114,7 @@
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
     | code | str | 股票代码 |
-    | market | [Market](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427) | 市场类型<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>输入沪股市场和深股市场，都会认为是 A 股市场 |
+    | market | [Market](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427) | 市场类型<br>(ℹ️ 输入沪股市场和深股市场，都会认为是 A 股市场) |
     
     注：code 和 market 都存在的情况下，code 优先。
     
@@ -137,8 +137,8 @@
         | reminder\_freq | [PriceReminderFreq](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1059) | 到价提醒的频率 |
         | value | float | 提醒值 |
         | enable | bool | 是否启用 |
-        | note | str | 备注<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅支持 20 个以内的中文字符 |
-        | reminder\_session\_list | list | 美股到价提醒时段列表<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>list中元素类型是[PriceReminderMarketStatus](https://openapi.futunn.com/futu-api-doc/quote/quote.html#482) |
+        | note | str | 备注<br>(ℹ️ 仅支持 20 个以内的中文字符) |
+        | reminder\_session\_list | list | 美股到价提醒时段列表<br>(ℹ️ list中元素类型是[PriceReminderMarketStatus](https://openapi.futunn.com/futu-api-doc/quote/quote.html#482)) |
         
 *   **Example**
     
@@ -1550,7 +1550,7 @@
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
     | code | str | 股票代码 |
-    | market | [Market](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427) | 市场类型<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>输入沪股市场和深股市场，都会认为是 A 股市场 |
+    | market | [Market](https://openapi.futunn.com/futu-api-doc/quote/quote.html#427) | 市场类型<br>(ℹ️ 输入沪股市场和深股市场，都会认为是 A 股市场) |
     
     注：code 和 market 都存在的情况下，code 优先。
     
@@ -1573,8 +1573,8 @@
         | reminder\_freq | [PriceReminderFreq](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1059) | 到价提醒的频率 |
         | value | float | 提醒值 |
         | enable | bool | 是否启用 |
-        | note | str | 备注<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅支持 20 个以内的中文字符 |
-        | reminder\_session\_list | list | 美股到价提醒时段列表<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>list中元素类型是[PriceReminderMarketStatus](https://openapi.futunn.com/futu-api-doc/quote/quote.html#482) |
+        | note | str | 备注<br>(ℹ️ 仅支持 20 个以内的中文字符) |
+        | reminder\_session\_list | list | 美股到价提醒时段列表<br>(ℹ️ list中元素类型是[PriceReminderMarketStatus](https://openapi.futunn.com/futu-api-doc/quote/quote.html#482)) |
         
 *   **Example**
     

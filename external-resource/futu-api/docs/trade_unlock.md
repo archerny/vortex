@@ -101,9 +101,9 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | password | str | 交易密码<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>如果 password\_md5 不为空，就使用传入的 password\_md5 解锁；否则使用 password 转 MD5 得到 password\_md5 再解锁 |
-    | password\_md5 | str | 交易密码的 32 位 MD5 加密（全小写）<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>解锁交易必须要填密码，锁定交易忽略 |
-    | is\_unlock | bool | 解锁或锁定<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>True：解锁  <br>False：锁定 |
+    | password | str | 交易密码<br>(ℹ️ 如果 password\_md5 不为空，就使用传入的 password\_md5 解锁；否则使用 password 转 MD5 得到 password\_md5 再解锁) |
+    | password\_md5 | str | 交易密码的 32 位 MD5 加密（全小写）<br>(ℹ️ 解锁交易必须要填密码，锁定交易忽略) |
+    | is\_unlock | bool | 解锁或锁定<br>(ℹ️ True：解锁  <br>False：锁定) |
     
 
 *   **返回**
@@ -1111,9 +1111,9 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | password | str | 交易密码<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>如果 password\_md5 不为空，就使用传入的 password\_md5 解锁；否则使用 password 转 MD5 得到 password\_md5 再解锁 |
-    | password\_md5 | str | 交易密码的 32 位 MD5 加密（全小写）<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>解锁交易必须要填密码，锁定交易忽略 |
-    | is\_unlock | bool | 解锁或锁定<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>True：解锁  <br>False：锁定 |
+    | password | str | 交易密码<br>(ℹ️ 如果 password\_md5 不为空，就使用传入的 password\_md5 解锁；否则使用 password 转 MD5 得到 password\_md5 再解锁) |
+    | password\_md5 | str | 交易密码的 32 位 MD5 加密（全小写）<br>(ℹ️ 解锁交易必须要填密码，锁定交易忽略) |
+    | is\_unlock | bool | 解锁或锁定<br>(ℹ️ True：解锁  <br>False：锁定) |
     
 
 *   **返回**

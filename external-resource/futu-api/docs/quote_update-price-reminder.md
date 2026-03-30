@@ -135,7 +135,7 @@
         | change\_rate | str | 当前涨跌幅 |
         | market\_status | [PriceReminderMarketStatus](https://openapi.futunn.com/futu-api-doc/quote/quote.html#482) | 触发的时间段 |
         | content | str | 到价提醒文字内容 |
-        | note | str | 备注<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅支持 20 个以内的中文字符 |
+        | note | str | 备注<br>(ℹ️ 仅支持 20 个以内的中文字符) |
         | key | int | 到价提醒标识 |
         | reminder\_type | [PriceReminderType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5160) | 到价提醒的类型 |
         | set\_value | float | 用户设置的提醒值 |
@@ -1266,7 +1266,7 @@
         | change\_rate | str | 当前涨跌幅 |
         | market\_status | [PriceReminderMarketStatus](https://openapi.futunn.com/futu-api-doc/quote/quote.html#482) | 触发的时间段 |
         | content | str | 到价提醒文字内容 |
-        | note | str | 备注<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅支持 20 个以内的中文字符 |
+        | note | str | 备注<br>(ℹ️ 仅支持 20 个以内的中文字符) |
         | key | int | 到价提醒标识 |
         | reminder\_type | [PriceReminderType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#5160) | 到价提醒的类型 |
         | set\_value | float | 用户设置的提醒值 |

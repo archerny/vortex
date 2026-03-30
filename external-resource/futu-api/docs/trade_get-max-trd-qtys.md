@@ -110,16 +110,16 @@
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
     | order\_type | [OrderType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4181) | 订单类型 |
-    | code | str | 证券代码<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>如果是期货交易，且 code 为期货主连代码，则会自动转为对应的实际合约代码 |
-    | price | float | 报价<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>证券账户精确到小数点后 3 位，超出部分会被舍弃  <br>期货账户精确到小数点后 9 位，超出部分会被舍弃 |
-    | order\_id | str | 订单号<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   默认传 None，查询的是新下单的最大可买可卖数量<br>*   如果是改单则要传订单号，此时计算最大可买可卖时，会返回此订单可改成的最大数量<br>*   如果通过此参数，查询某笔订单最大可改成的数量，需要在下单之后，间隔 0.5 秒以上再调用此接口 |
-    | adjust\_limit | float | 价格微调幅度<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>OpenD 会对传入价格自动调整到合法价位上（期货会忽略此参数）<br><br>*   正数代表向上调整，负数代表向下调整<br>*   例如：0.015 代表向上调整且幅度不超过 1.5%；-0.01 代表向下调整且幅度不超过 1%。默认 0 表示不调整 |
+    | code | str | 证券代码<br>(ℹ️ 如果是期货交易，且 code 为期货主连代码，则会自动转为对应的实际合约代码) |
+    | price | float | 报价<br>(ℹ️ 证券账户精确到小数点后 3 位，超出部分会被舍弃  <br>期货账户精确到小数点后 9 位，超出部分会被舍弃) |
+    | order\_id | str | 订单号<br>(ℹ️ *   默认传 None，查询的是新下单的最大可买可卖数量<br>*   如果是改单则要传订单号，此时计算最大可买可卖时，会返回此订单可改成的最大数量<br>*   如果通过此参数，查询某笔订单最大可改成的数量，需要在下单之后，间隔 0.5 秒以上再调用此接口) |
+    | adjust\_limit | float | 价格微调幅度<br>(ℹ️ OpenD 会对传入价格自动调整到合法价位上（期货会忽略此参数）<br><br>*   正数代表向上调整，负数代表向下调整<br>*   例如：0.015 代表向上调整且幅度不超过 1.5%；-0.01 代表向下调整且幅度不超过 1%。默认 0 表示不调整) |
     | trd\_env | [TrdEnv](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6374) | 交易环境 |
-    | acc\_id | int | 交易业务账户 ID<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准 |
-    | acc\_index | int | 交易业务账户列表中的账户序号<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户 |
-    | session | [Session](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9152) | 美股交易时段<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅对美股生效，支持传入**RTH**、**ETH**、**OVERNIGHT**、**ALL** |
-    | jp\_acc\_type | [SubAccType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6112) | 日本账户类型<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅日本券商适用 |
-    | position\_id | int | 持仓ID<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   适用于日本衍生品账户查询**持仓可卖**和**平仓需买回**<br>*   可通过[查询持仓](https://openapi.futunn.com/futu-api-doc/trade/get-position-list.html)<br>    接口获取 |
+    | acc\_id | int | 交易业务账户 ID<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准) |
+    | acc\_index | int | 交易业务账户列表中的账户序号<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户) |
+    | session | [Session](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9152) | 美股交易时段<br>(ℹ️ 仅对美股生效，支持传入**RTH**、**ETH**、**OVERNIGHT**、**ALL**) |
+    | jp\_acc\_type | [SubAccType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6112) | 日本账户类型<br>(ℹ️ 仅日本券商适用) |
+    | position\_id | int | 持仓ID<br>(ℹ️ *   适用于日本衍生品账户查询**持仓可卖**和**平仓需买回**<br>*   可通过[查询持仓](https://openapi.futunn.com/futu-api-doc/trade/get-position-list.html)<br>    接口获取) |
     
 
 *   **返回**
@@ -134,13 +134,13 @@
         
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
-        | max\_cash\_buy | float | 现金可买<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   期权的单位是“张”<br>*   期货账户不适用 |
-        | max\_cash\_and\_margin\_buy | float | 最大可买<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   期权的单位是“张”<br>*   期货账户不适用 |
-        | max\_position\_sell | float | 持仓可卖<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>期权的单位是"张" |
-        | max\_sell\_short | float | 可卖空<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   期权的单位是“张”<br>*   期货账户不适用 |
-        | max\_buy\_back | float | 平仓需买入<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   当持有净空仓时，必须先买回空头持仓的股数，才能再继续买多<br>*   期货、期权的单位是“张” |
-        | long\_required\_im | float | 买 1 张合约所带来的初始保证金变动<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   当前仅期货和期权适用。<br>*   无持仓时，返回 **买入** 1 张的初始保证金占用（正数）。<br>*   有多仓时，返回 **买入** 1 张的初始保证金占用（正数）。<br>*   有空仓时，返回 **买回** 1 张的初始保证金释放（负数）。 |
-        | short\_required\_im | float | 卖 1 张合约所带来的初始保证金变动<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   当前仅期货和期权适用。<br>*   无持仓时，返回 **卖空** 1 张的初始保证金占用（正数）。<br>*   有多仓时，返回 **卖出** 1 张的初始保证金释放（负数）。<br>*   有空仓时，返回 **卖空** 1 张的初始保证金释放（正数）。 |
+        | max\_cash\_buy | float | 现金可买<br>(ℹ️ *   期权的单位是“张”<br>*   期货账户不适用) |
+        | max\_cash\_and\_margin\_buy | float | 最大可买<br>(ℹ️ *   期权的单位是“张”<br>*   期货账户不适用) |
+        | max\_position\_sell | float | 持仓可卖<br>(ℹ️ 期权的单位是"张") |
+        | max\_sell\_short | float | 可卖空<br>(ℹ️ *   期权的单位是“张”<br>*   期货账户不适用) |
+        | max\_buy\_back | float | 平仓需买入<br>(ℹ️ *   当持有净空仓时，必须先买回空头持仓的股数，才能再继续买多<br>*   期货、期权的单位是“张”) |
+        | long\_required\_im | float | 买 1 张合约所带来的初始保证金变动<br>(ℹ️ *   当前仅期货和期权适用。<br>*   无持仓时，返回 **买入** 1 张的初始保证金占用（正数）。<br>*   有多仓时，返回 **买入** 1 张的初始保证金占用（正数）。<br>*   有空仓时，返回 **买回** 1 张的初始保证金释放（负数）。) |
+        | short\_required\_im | float | 卖 1 张合约所带来的初始保证金变动<br>(ℹ️ *   当前仅期货和期权适用。<br>*   无持仓时，返回 **卖空** 1 张的初始保证金占用（正数）。<br>*   有多仓时，返回 **卖出** 1 张的初始保证金释放（负数）。<br>*   有空仓时，返回 **卖空** 1 张的初始保证金释放（正数）。) |
         | session | [Session](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9152) | 交易订单时段（仅用于美股） |
         
 *   **Example**
@@ -1439,16 +1439,16 @@
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
     | order\_type | [OrderType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#4181) | 订单类型 |
-    | code | str | 证券代码<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>如果是期货交易，且 code 为期货主连代码，则会自动转为对应的实际合约代码 |
-    | price | float | 报价<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>证券账户精确到小数点后 3 位，超出部分会被舍弃  <br>期货账户精确到小数点后 9 位，超出部分会被舍弃 |
-    | order\_id | str | 订单号<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   默认传 None，查询的是新下单的最大可买可卖数量<br>*   如果是改单则要传订单号，此时计算最大可买可卖时，会返回此订单可改成的最大数量<br>*   如果通过此参数，查询某笔订单最大可改成的数量，需要在下单之后，间隔 0.5 秒以上再调用此接口 |
-    | adjust\_limit | float | 价格微调幅度<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>OpenD 会对传入价格自动调整到合法价位上（期货会忽略此参数）<br><br>*   正数代表向上调整，负数代表向下调整<br>*   例如：0.015 代表向上调整且幅度不超过 1.5%；-0.01 代表向下调整且幅度不超过 1%。默认 0 表示不调整 |
+    | code | str | 证券代码<br>(ℹ️ 如果是期货交易，且 code 为期货主连代码，则会自动转为对应的实际合约代码) |
+    | price | float | 报价<br>(ℹ️ 证券账户精确到小数点后 3 位，超出部分会被舍弃  <br>期货账户精确到小数点后 9 位，超出部分会被舍弃) |
+    | order\_id | str | 订单号<br>(ℹ️ *   默认传 None，查询的是新下单的最大可买可卖数量<br>*   如果是改单则要传订单号，此时计算最大可买可卖时，会返回此订单可改成的最大数量<br>*   如果通过此参数，查询某笔订单最大可改成的数量，需要在下单之后，间隔 0.5 秒以上再调用此接口) |
+    | adjust\_limit | float | 价格微调幅度<br>(ℹ️ OpenD 会对传入价格自动调整到合法价位上（期货会忽略此参数）<br><br>*   正数代表向上调整，负数代表向下调整<br>*   例如：0.015 代表向上调整且幅度不超过 1.5%；-0.01 代表向下调整且幅度不超过 1%。默认 0 表示不调整) |
     | trd\_env | [TrdEnv](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6374) | 交易环境 |
-    | acc\_id | int | 交易业务账户 ID<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准 |
-    | acc\_index | int | 交易业务账户列表中的账户序号<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户 |
-    | session | [Session](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9152) | 美股交易时段<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅对美股生效，支持传入**RTH**、**ETH**、**OVERNIGHT**、**ALL** |
-    | jp\_acc\_type | [SubAccType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6112) | 日本账户类型<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅日本券商适用 |
-    | position\_id | int | 持仓ID<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   适用于日本衍生品账户查询**持仓可卖**和**平仓需买回**<br>*   可通过[查询持仓](https://openapi.futunn.com/futu-api-doc/trade/get-position-list.html)<br>    接口获取 |
+    | acc\_id | int | 交易业务账户 ID<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准) |
+    | acc\_index | int | 交易业务账户列表中的账户序号<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户) |
+    | session | [Session](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9152) | 美股交易时段<br>(ℹ️ 仅对美股生效，支持传入**RTH**、**ETH**、**OVERNIGHT**、**ALL**) |
+    | jp\_acc\_type | [SubAccType](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6112) | 日本账户类型<br>(ℹ️ 仅日本券商适用) |
+    | position\_id | int | 持仓ID<br>(ℹ️ *   适用于日本衍生品账户查询**持仓可卖**和**平仓需买回**<br>*   可通过[查询持仓](https://openapi.futunn.com/futu-api-doc/trade/get-position-list.html)<br>    接口获取) |
     
 
 *   **返回**
@@ -1463,13 +1463,13 @@
         
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
-        | max\_cash\_buy | float | 现金可买<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   期权的单位是“张”<br>*   期货账户不适用 |
-        | max\_cash\_and\_margin\_buy | float | 最大可买<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   期权的单位是“张”<br>*   期货账户不适用 |
-        | max\_position\_sell | float | 持仓可卖<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>期权的单位是"张" |
-        | max\_sell\_short | float | 可卖空<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   期权的单位是“张”<br>*   期货账户不适用 |
-        | max\_buy\_back | float | 平仓需买入<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   当持有净空仓时，必须先买回空头持仓的股数，才能再继续买多<br>*   期货、期权的单位是“张” |
-        | long\_required\_im | float | 买 1 张合约所带来的初始保证金变动。<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   当前仅期货和期权适用。<br>*   无持仓时，返回 **买入** 1 张的初始保证金占用（正数）。<br>*   有多仓时，返回 **买入** 1 张的初始保证金占用（正数）。<br>*   有空仓时，返回 **买回** 1 张的初始保证金释放（负数）。 |
-        | short\_required\_im | float | 卖 1 张合约所带来的初始保证金变动。<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   当前仅期货和期权适用。<br>*   无持仓时，返回 **卖空** 1 张的初始保证金占用（正数）。<br>*   有多仓时，返回 **卖出** 1 张的初始保证金释放（负数）。<br>*   有空仓时，返回 **卖空** 1 张的初始保证金释放（正数）。 |
+        | max\_cash\_buy | float | 现金可买<br>(ℹ️ *   期权的单位是“张”<br>*   期货账户不适用) |
+        | max\_cash\_and\_margin\_buy | float | 最大可买<br>(ℹ️ *   期权的单位是“张”<br>*   期货账户不适用) |
+        | max\_position\_sell | float | 持仓可卖<br>(ℹ️ 期权的单位是"张") |
+        | max\_sell\_short | float | 可卖空<br>(ℹ️ *   期权的单位是“张”<br>*   期货账户不适用) |
+        | max\_buy\_back | float | 平仓需买入<br>(ℹ️ *   当持有净空仓时，必须先买回空头持仓的股数，才能再继续买多<br>*   期货、期权的单位是“张”) |
+        | long\_required\_im | float | 买 1 张合约所带来的初始保证金变动。<br>(ℹ️ *   当前仅期货和期权适用。<br>*   无持仓时，返回 **买入** 1 张的初始保证金占用（正数）。<br>*   有多仓时，返回 **买入** 1 张的初始保证金占用（正数）。<br>*   有空仓时，返回 **买回** 1 张的初始保证金释放（负数）。) |
+        | short\_required\_im | float | 卖 1 张合约所带来的初始保证金变动。<br>(ℹ️ *   当前仅期货和期权适用。<br>*   无持仓时，返回 **卖空** 1 张的初始保证金占用（正数）。<br>*   有多仓时，返回 **卖出** 1 张的初始保证金释放（负数）。<br>*   有空仓时，返回 **卖空** 1 张的初始保证金释放（正数）。) |
         | session | [Session](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9152) | 交易订单时段（仅用于美股） |
         
 *   **Example**

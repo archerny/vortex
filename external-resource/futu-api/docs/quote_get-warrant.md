@@ -117,38 +117,38 @@
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
         | begin | int | 数据起始点 |
-        | num | int | 请求数据个数<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>最大 200 |
+        | num | int | 请求数据个数<br>(ℹ️ 最大 200) |
         | sort\_field | [SortField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2930) | 根据哪个字段排序 |
-        | ascend | bool | 排序方向<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>True：升序  <br>False：降序 |
-        | type\_list | list | 窝轮类型过滤列表<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>list 中元素类型是 [WrtType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#926) |
-        | issuer\_list | list | 发行人过滤列表<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>list 中元素类型是 [Issuer](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8363) |
+        | ascend | bool | 排序方向<br>(ℹ️ True：升序  <br>False：降序) |
+        | type\_list | list | 窝轮类型过滤列表<br>(ℹ️ list 中元素类型是 [WrtType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#926)) |
+        | issuer\_list | list | 发行人过滤列表<br>(ℹ️ list 中元素类型是 [Issuer](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8363)) |
         | maturity\_time\_min | str | 到期日过滤范围的开始时间 |
         | maturity\_time\_max | str | 到期日过滤范围的结束时间 |
         | ipo\_period | [IpoPeriod](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9546) | 上市时段 |
-        | price\_type | [PriceType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6407) | 价内/价外<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>暂不支持界内证的界内外筛选 |
+        | price\_type | [PriceType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6407) | 价内/价外<br>(ℹ️ 暂不支持界内证的界内外筛选) |
         | status | [WarrantStatus](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6556) | 窝轮状态 |
-        | cur\_price\_min | float | 最新价的过滤下限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | cur\_price\_max | float | 最新价的过滤上限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | strike\_price\_min | float | 行使价的过滤下限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | strike\_price\_max | float | 行使价的过滤上限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | street\_min | float | 街货占比的过滤下限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>不传代表下限为 -∞  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。  <br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | street\_max | float | 街货占比的过滤上限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>不传代表上限为 +∞  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。  <br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | conversion\_min | float | 换股比率的过滤下限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | conversion\_max | float | 换股比率的过滤上限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | vol\_min | int | 成交量的过滤下限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>不传代表下限为 -∞ |
-        | vol\_max | int | 成交量的过滤上限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>不传代表上限为 +∞ |
-        | premium\_min | float | 溢价的过滤下限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>不传代表下限为 -∞  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。  <br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | premium\_max | float | 溢价的过滤上限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>不传代表上限为 +∞  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。  <br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | leverage\_ratio\_min | float | 杠杆比率的过滤下限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | leverage\_ratio\_max | float | 杠杆比率的过滤上限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>不传代表上限为 +∞ |
-        | delta\_min | float | 对冲值的过滤下限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>仅认购认沽支持此字段过滤  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | delta\_max | float | 对冲值的过滤上限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>仅认购认沽支持此字段过滤  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | implied\_min | float | 引伸波幅的过滤下限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>仅认购认沽支持此字段过滤  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | implied\_max | float | 引伸波幅的过滤上限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>仅认购认沽支持此字段过滤  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | recovery\_price\_min | float | 收回价的过滤下限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>仅牛熊证支持此字段过滤  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | recovery\_price\_max | float | 收回价的过滤上限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>仅牛熊证支持此字段过滤  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | price\_recovery\_ratio\_min | float | 正股距收回价的过滤下限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>仅牛熊证支持此字段过滤  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | price\_recovery\_ratio\_max | float | 正股距收回价的过滤上限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>仅牛熊证支持此字段过滤  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
+        | cur\_price\_min | float | 最新价的过滤下限<br>(ℹ️ 闭区间  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
+        | cur\_price\_max | float | 最新价的过滤上限<br>(ℹ️ 闭区间  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
+        | strike\_price\_min | float | 行使价的过滤下限<br>(ℹ️ 闭区间  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
+        | strike\_price\_max | float | 行使价的过滤上限<br>(ℹ️ 闭区间  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
+        | street\_min | float | 街货占比的过滤下限<br>(ℹ️ 闭区间  <br>不传代表下限为 -∞  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。  <br>精确到小数点后 3 位，超出部分会被舍弃) |
+        | street\_max | float | 街货占比的过滤上限<br>(ℹ️ 闭区间  <br>不传代表上限为 +∞  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。  <br>精确到小数点后 3 位，超出部分会被舍弃) |
+        | conversion\_min | float | 换股比率的过滤下限<br>(ℹ️ 闭区间  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
+        | conversion\_max | float | 换股比率的过滤上限<br>(ℹ️ 闭区间  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
+        | vol\_min | int | 成交量的过滤下限<br>(ℹ️ 闭区间  <br>不传代表下限为 -∞) |
+        | vol\_max | int | 成交量的过滤上限<br>(ℹ️ 闭区间  <br>不传代表上限为 +∞) |
+        | premium\_min | float | 溢价的过滤下限<br>(ℹ️ 闭区间  <br>不传代表下限为 -∞  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。  <br>精确到小数点后 3 位，超出部分会被舍弃) |
+        | premium\_max | float | 溢价的过滤上限<br>(ℹ️ 闭区间  <br>不传代表上限为 +∞  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。  <br>精确到小数点后 3 位，超出部分会被舍弃) |
+        | leverage\_ratio\_min | float | 杠杆比率的过滤下限<br>(ℹ️ 闭区间  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
+        | leverage\_ratio\_max | float | 杠杆比率的过滤上限<br>(ℹ️ 闭区间  <br>不传代表上限为 +∞) |
+        | delta\_min | float | 对冲值的过滤下限<br>(ℹ️ 闭区间  <br>仅认购认沽支持此字段过滤  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
+        | delta\_max | float | 对冲值的过滤上限<br>(ℹ️ 闭区间  <br>仅认购认沽支持此字段过滤  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
+        | implied\_min | float | 引伸波幅的过滤下限<br>(ℹ️ 闭区间  <br>仅认购认沽支持此字段过滤  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
+        | implied\_max | float | 引伸波幅的过滤上限<br>(ℹ️ 闭区间  <br>仅认购认沽支持此字段过滤  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
+        | recovery\_price\_min | float | 收回价的过滤下限<br>(ℹ️ 闭区间  <br>仅牛熊证支持此字段过滤  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
+        | recovery\_price\_max | float | 收回价的过滤上限<br>(ℹ️ 闭区间  <br>仅牛熊证支持此字段过滤  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
+        | price\_recovery\_ratio\_min | float | 正股距收回价的过滤下限<br>(ℹ️ 闭区间  <br>仅牛熊证支持此字段过滤  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
+        | price\_recovery\_ratio\_max | float | 正股距收回价的过滤上限<br>(ℹ️ 闭区间  <br>仅牛熊证支持此字段过滤  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
         
 
 *   **返回**
@@ -164,7 +164,7 @@
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
         | warrant\_data\_list | pd.DataFrame | 筛选后的窝轮数据 |
-        | last\_page | bool | 是否是最后一页<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>True：是最后一页  <br>False：不是最后一页 |
+        | last\_page | bool | 是否是最后一页<br>(ℹ️ True：是最后一页  <br>False：不是最后一页) |
         | all\_count | int | 筛选结果中的窝轮总数量 |
         
         *   warrant\_data\_list 返回的 pd dataframe 数据格式：
@@ -175,10 +175,10 @@
             | stock\_owner | str | 所属正股 |
             | type | [WrtType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#926) | 窝轮类型 |
             | issuer | [Issuer](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8363) | 发行人 |
-            | maturity\_time | str | 到期日<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd |
-            | list\_time | str | 上市时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd |
-            | last\_trade\_time | str | 最后交易日<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd |
-            | recovery\_price | float | 收回价<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅牛熊证支持此字段 |
+            | maturity\_time | str | 到期日<br>(ℹ️ 格式：yyyy-MM-dd) |
+            | list\_time | str | 上市时间<br>(ℹ️ 格式：yyyy-MM-dd) |
+            | last\_trade\_time | str | 最后交易日<br>(ℹ️ 格式：yyyy-MM-dd) |
+            | recovery\_price | float | 收回价<br>(ℹ️ 仅牛熊证支持此字段) |
             | conversion\_ratio | float | 换股比率 |
             | lot\_size | int | 每手数量 |
             | strike\_price | float | 行使价 |
@@ -194,24 +194,24 @@
             | volume | int | 成交量 |
             | turnover | float | 成交额 |
             | score | float | 综合评分 |
-            | premium | float | 溢价<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+            | premium | float | 溢价<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
             | break\_even\_point | float | 打和点 |
-            | leverage | float | 杠杆比率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>单位：倍 |
-            | ipop | float | 价内/价外<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | price\_recovery\_ratio | float | 正股距收回价<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅牛熊证支持此字段  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+            | leverage | float | 杠杆比率<br>(ℹ️ 单位：倍) |
+            | ipop | float | 价内/价外<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | price\_recovery\_ratio | float | 正股距收回价<br>(ℹ️ 仅牛熊证支持此字段  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
             | conversion\_price | float | 换股价 |
-            | street\_rate | float | 街货占比<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+            | street\_rate | float | 街货占比<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
             | street\_vol | int | 街货量 |
-            | amplitude | float | 振幅<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+            | amplitude | float | 振幅<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
             | issue\_size | int | 发行量 |
             | high\_price | float | 最高价 |
             | low\_price | float | 最低价 |
-            | implied\_volatility | float | 引伸波幅<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅认购认沽支持此字段 |
-            | delta | float | 对冲值<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅认购认沽支持此字段 |
-            | effective\_leverage | float | 有效杠杆<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅认购认沽支持此字段 |
-            | upper\_strike\_price | float | 上限价<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅界内证支持此字段 |
-            | lower\_strike\_price | float | 下限价<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅界内证支持此字段 |
-            | inline\_price\_status | [PriceType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6407) | 界内界外<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅界内证支持此字段 |
+            | implied\_volatility | float | 引伸波幅<br>(ℹ️ 仅认购认沽支持此字段) |
+            | delta | float | 对冲值<br>(ℹ️ 仅认购认沽支持此字段) |
+            | effective\_leverage | float | 有效杠杆<br>(ℹ️ 仅认购认沽支持此字段) |
+            | upper\_strike\_price | float | 上限价<br>(ℹ️ 仅界内证支持此字段) |
+            | lower\_strike\_price | float | 下限价<br>(ℹ️ 仅界内证支持此字段) |
+            | inline\_price\_status | [PriceType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6407) | 界内界外<br>(ℹ️ 仅界内证支持此字段) |
             
 *   **Example**
     
@@ -2858,38 +2858,38 @@
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
         | begin | int | 数据起始点 |
-        | num | int | 请求数据个数<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>最大 200 |
+        | num | int | 请求数据个数<br>(ℹ️ 最大 200) |
         | sort\_field | [SortField](https://openapi.futunn.com/futu-api-doc/quote/quote.html#2930) | 根据哪个字段排序 |
-        | ascend | bool | 排序方向<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>True：升序  <br>False：降序 |
-        | type\_list | list | 窝轮类型过滤列表<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>list 中元素类型是 [WrtType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#926) |
-        | issuer\_list | list | 发行人过滤列表<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>list 中元素类型是 [Issuer](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8363) |
+        | ascend | bool | 排序方向<br>(ℹ️ True：升序  <br>False：降序) |
+        | type\_list | list | 窝轮类型过滤列表<br>(ℹ️ list 中元素类型是 [WrtType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#926)) |
+        | issuer\_list | list | 发行人过滤列表<br>(ℹ️ list 中元素类型是 [Issuer](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8363)) |
         | maturity\_time\_min | str | 到期日过滤范围的开始时间 |
         | maturity\_time\_max | str | 到期日过滤范围的结束时间 |
         | ipo\_period | [IpoPeriod](https://openapi.futunn.com/futu-api-doc/quote/quote.html#9546) | 上市时段 |
-        | price\_type | [PriceType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6407) | 价内/价外<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>暂不支持界内证的界内外筛选 |
+        | price\_type | [PriceType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6407) | 价内/价外<br>(ℹ️ 暂不支持界内证的界内外筛选) |
         | status | [WarrantStatus](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6556) | 窝轮状态 |
-        | cur\_price\_min | float | 最新价的过滤下限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | cur\_price\_max | float | 最新价的过滤上限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | strike\_price\_min | float | 行使价的过滤下限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | strike\_price\_max | float | 行使价的过滤上限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | street\_min | float | 街货占比的过滤下限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>不传代表下限为 -∞  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。  <br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | street\_max | float | 街货占比的过滤上限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>不传代表上限为 +∞  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。  <br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | conversion\_min | float | 换股比率的过滤下限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | conversion\_max | float | 换股比率的过滤上限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | vol\_min | int | 成交量的过滤下限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>不传代表下限为 -∞ |
-        | vol\_max | int | 成交量的过滤上限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>不传代表上限为 +∞ |
-        | premium\_min | float | 溢价的过滤下限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>不传代表下限为 -∞  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。  <br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | premium\_max | float | 溢价的过滤上限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>不传代表上限为 +∞  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。  <br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | leverage\_ratio\_min | float | 杠杆比率的过滤下限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | leverage\_ratio\_max | float | 杠杆比率的过滤上限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>不传代表上限为 +∞ |
-        | delta\_min | float | 对冲值的过滤下限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>仅认购认沽支持此字段过滤  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | delta\_max | float | 对冲值的过滤上限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>仅认购认沽支持此字段过滤  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | implied\_min | float | 引伸波幅的过滤下限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>仅认购认沽支持此字段过滤  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | implied\_max | float | 引伸波幅的过滤上限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>仅认购认沽支持此字段过滤  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | recovery\_price\_min | float | 收回价的过滤下限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>仅牛熊证支持此字段过滤  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | recovery\_price\_max | float | 收回价的过滤上限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>仅牛熊证支持此字段过滤  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | price\_recovery\_ratio\_min | float | 正股距收回价的过滤下限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>仅牛熊证支持此字段过滤  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
-        | price\_recovery\_ratio\_max | float | 正股距收回价的过滤上限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>闭区间  <br>仅牛熊证支持此字段过滤  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃 |
+        | cur\_price\_min | float | 最新价的过滤下限<br>(ℹ️ 闭区间  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
+        | cur\_price\_max | float | 最新价的过滤上限<br>(ℹ️ 闭区间  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
+        | strike\_price\_min | float | 行使价的过滤下限<br>(ℹ️ 闭区间  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
+        | strike\_price\_max | float | 行使价的过滤上限<br>(ℹ️ 闭区间  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
+        | street\_min | float | 街货占比的过滤下限<br>(ℹ️ 闭区间  <br>不传代表下限为 -∞  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。  <br>精确到小数点后 3 位，超出部分会被舍弃) |
+        | street\_max | float | 街货占比的过滤上限<br>(ℹ️ 闭区间  <br>不传代表上限为 +∞  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。  <br>精确到小数点后 3 位，超出部分会被舍弃) |
+        | conversion\_min | float | 换股比率的过滤下限<br>(ℹ️ 闭区间  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
+        | conversion\_max | float | 换股比率的过滤上限<br>(ℹ️ 闭区间  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
+        | vol\_min | int | 成交量的过滤下限<br>(ℹ️ 闭区间  <br>不传代表下限为 -∞) |
+        | vol\_max | int | 成交量的过滤上限<br>(ℹ️ 闭区间  <br>不传代表上限为 +∞) |
+        | premium\_min | float | 溢价的过滤下限<br>(ℹ️ 闭区间  <br>不传代表下限为 -∞  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。  <br>精确到小数点后 3 位，超出部分会被舍弃) |
+        | premium\_max | float | 溢价的过滤上限<br>(ℹ️ 闭区间  <br>不传代表上限为 +∞  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%。  <br>精确到小数点后 3 位，超出部分会被舍弃) |
+        | leverage\_ratio\_min | float | 杠杆比率的过滤下限<br>(ℹ️ 闭区间  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
+        | leverage\_ratio\_max | float | 杠杆比率的过滤上限<br>(ℹ️ 闭区间  <br>不传代表上限为 +∞) |
+        | delta\_min | float | 对冲值的过滤下限<br>(ℹ️ 闭区间  <br>仅认购认沽支持此字段过滤  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
+        | delta\_max | float | 对冲值的过滤上限<br>(ℹ️ 闭区间  <br>仅认购认沽支持此字段过滤  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
+        | implied\_min | float | 引伸波幅的过滤下限<br>(ℹ️ 闭区间  <br>仅认购认沽支持此字段过滤  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
+        | implied\_max | float | 引伸波幅的过滤上限<br>(ℹ️ 闭区间  <br>仅认购认沽支持此字段过滤  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
+        | recovery\_price\_min | float | 收回价的过滤下限<br>(ℹ️ 闭区间  <br>仅牛熊证支持此字段过滤  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
+        | recovery\_price\_max | float | 收回价的过滤上限<br>(ℹ️ 闭区间  <br>仅牛熊证支持此字段过滤  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
+        | price\_recovery\_ratio\_min | float | 正股距收回价的过滤下限<br>(ℹ️ 闭区间  <br>仅牛熊证支持此字段过滤  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%  <br>不传代表下限为 -∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
+        | price\_recovery\_ratio\_max | float | 正股距收回价的过滤上限<br>(ℹ️ 闭区间  <br>仅牛熊证支持此字段过滤  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%  <br>不传代表上限为 +∞  <br>精确到小数点后 3 位，超出部分会被舍弃) |
         
 
 *   **返回**
@@ -2905,7 +2905,7 @@
         | 字段  | 类型  | 说明  |
         | --- | --- | --- |
         | warrant\_data\_list | pd.DataFrame | 筛选后的窝轮数据 |
-        | last\_page | bool | 是否是最后一页<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>True：是最后一页  <br>False：不是最后一页 |
+        | last\_page | bool | 是否是最后一页<br>(ℹ️ True：是最后一页  <br>False：不是最后一页) |
         | all\_count | int | 筛选结果中的窝轮总数量 |
         
         *   warrant\_data\_list 返回的 pd dataframe 数据格式：
@@ -2916,10 +2916,10 @@
             | stock\_owner | str | 所属正股 |
             | type | [WrtType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#926) | 窝轮类型 |
             | issuer | [Issuer](https://openapi.futunn.com/futu-api-doc/quote/quote.html#8363) | 发行人 |
-            | maturity\_time | str | 到期日<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd |
-            | list\_time | str | 上市时间<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd |
-            | last\_trade\_time | str | 最后交易日<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>格式：yyyy-MM-dd |
-            | recovery\_price | float | 收回价<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅牛熊证支持此字段 |
+            | maturity\_time | str | 到期日<br>(ℹ️ 格式：yyyy-MM-dd) |
+            | list\_time | str | 上市时间<br>(ℹ️ 格式：yyyy-MM-dd) |
+            | last\_trade\_time | str | 最后交易日<br>(ℹ️ 格式：yyyy-MM-dd) |
+            | recovery\_price | float | 收回价<br>(ℹ️ 仅牛熊证支持此字段) |
             | conversion\_ratio | float | 换股比率 |
             | lot\_size | int | 每手数量 |
             | strike\_price | float | 行使价 |
@@ -2935,24 +2935,24 @@
             | volume | int | 成交量 |
             | turnover | float | 成交额 |
             | score | float | 综合评分 |
-            | premium | float | 溢价<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+            | premium | float | 溢价<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
             | break\_even\_point | float | 打和点 |
-            | leverage | float | 杠杆比率<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>单位：倍 |
-            | ipop | float | 价内/价外<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
-            | price\_recovery\_ratio | float | 正股距收回价<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅牛熊证支持此字段  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+            | leverage | float | 杠杆比率<br>(ℹ️ 单位：倍) |
+            | ipop | float | 价内/价外<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
+            | price\_recovery\_ratio | float | 正股距收回价<br>(ℹ️ 仅牛熊证支持此字段  <br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
             | conversion\_price | float | 换股价 |
-            | street\_rate | float | 街货占比<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+            | street\_rate | float | 街货占比<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
             | street\_vol | int | 街货量 |
-            | amplitude | float | 振幅<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>该字段为百分比字段，默认不展示 %，如 20 实际对应 20% |
+            | amplitude | float | 振幅<br>(ℹ️ 该字段为百分比字段，默认不展示 %，如 20 实际对应 20%) |
             | issue\_size | int | 发行量 |
             | high\_price | float | 最高价 |
             | low\_price | float | 最低价 |
-            | implied\_volatility | float | 引伸波幅<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅认购认沽支持此字段 |
-            | delta | float | 对冲值<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅认购认沽支持此字段 |
+            | implied\_volatility | float | 引伸波幅<br>(ℹ️ 仅认购认沽支持此字段) |
+            | delta | float | 对冲值<br>(ℹ️ 仅认购认沽支持此字段) |
             | effective\_leverage | float | 有效杠杆 |
-            | upper\_strike\_price | float | 上限价<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅界内证支持此字段 |
-            | lower\_strike\_price | float | 下限价<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅界内证支持此字段 |
-            | inline\_price\_status | [PriceType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6407) | 界内界外<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅界内证支持此字段 |
+            | upper\_strike\_price | float | 上限价<br>(ℹ️ 仅界内证支持此字段) |
+            | lower\_strike\_price | float | 下限价<br>(ℹ️ 仅界内证支持此字段) |
+            | inline\_price\_status | [PriceType](https://openapi.futunn.com/futu-api-doc/quote/quote.html#6407) | 界内界外<br>(ℹ️ 仅界内证支持此字段) |
             
 *   **Example**
     

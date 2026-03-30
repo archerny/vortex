@@ -23,7 +23,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | code\_list | list | 股票代码列表<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅支持正股、指数  <br>list 中元素类型是 str |
+    | code\_list | list | 股票代码列表<br>(ℹ️ 仅支持正股、指数  <br>list 中元素类型是 str) |
     
 
 *   **返回**
@@ -42,7 +42,7 @@
         | name | str | 股票名称 |
         | plate\_code | str | 板块代码 |
         | plate\_name | str | 板块名字 |
-        | plate\_type | [Plate](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1362) | 板块类型<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>行业板块或概念板块 |
+        | plate\_type | [Plate](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1362) | 板块类型<br>(ℹ️ 行业板块或概念板块) |
         
 *   **Example**
     
@@ -1291,7 +1291,7 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | code\_list | list | 股票代码列表<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>仅支持正股、指数  <br>list 中元素类型是 str |
+    | code\_list | list | 股票代码列表<br>(ℹ️ 仅支持正股、指数  <br>list 中元素类型是 str) |
     
 
 *   **返回**
@@ -1310,7 +1310,7 @@
         | name | str | 股票名称 |
         | plate\_code | str | 板块代码 |
         | plate\_name | str | 板块名字 |
-        | plate\_type | [Plate](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1362) | 板块类型<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>行业板块或概念板块 |
+        | plate\_type | [Plate](https://openapi.futunn.com/futu-api-doc/quote/quote.html#1362) | 板块类型<br>(ℹ️ 行业板块或概念板块) |
         
 *   **Example**
     

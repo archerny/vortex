@@ -115,7 +115,7 @@
     | --- | --- | --- |
     | group\_name | str | 需要修改的自选股分组名称 |
     | op  | [ModifyUserSecurityOp](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3838) | 操作类型 |
-    | code\_list | list | 股票列表<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>list 中元素类型是 str |
+    | code\_list | list | 股票列表<br>(ℹ️ list 中元素类型是 str) |
     
 
 *   **返回**
@@ -1222,7 +1222,7 @@
     | --- | --- | --- |
     | group\_name | str | 需要修改的自选股分组名称 |
     | op  | [ModifyUserSecurityOp](https://openapi.futunn.com/futu-api-doc/quote/quote.html#3838) | 操作类型 |
-    | code\_list | list | 股票列表<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>list 中元素类型是 str |
+    | code\_list | list | 股票列表<br>(ℹ️ list 中元素类型是 str) |
     
 
 *   **返回**

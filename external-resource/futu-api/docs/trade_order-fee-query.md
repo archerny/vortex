@@ -111,10 +111,10 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | order\_id\_list | list | 订单号列表<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   每次请求最多查询 400 笔订单<br>*   list 内元素类型为 str |
+    | order\_id\_list | list | 订单号列表<br>(ℹ️ *   每次请求最多查询 400 笔订单<br>*   list 内元素类型为 str) |
     | trd\_env | [TrdEnv](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6374) | 交易环境 |
-    | acc\_id | int | 交易业务账户 ID<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准 |
-    | acc\_index | int | 交易业务账户列表中的账户序号<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户 |
+    | acc\_id | int | 交易业务账户 ID<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准) |
+    | acc\_index | int | 交易业务账户列表中的账户序号<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户) |
     
 
 *   **返回**
@@ -131,7 +131,7 @@
         | --- | --- | --- |
         | order\_id | str | 订单号 |
         | fee\_amount | float | 总费用 |
-        | fee\_details | list | 收费明细<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   格式：\[('收费项1', 收费项1的金额), ('收费项2', 收费项2的金额), ('收费项3', 收费项3的金额)……\]<br>*   常见的收费项包括：佣金、平台使用费、期权监管费、期权清算费、期权交收费、交收费、证监会规费、交易活动费 |
+        | fee\_details | list | 收费明细<br>(ℹ️ *   格式：\[('收费项1', 收费项1的金额), ('收费项2', 收费项2的金额), ('收费项3', 收费项3的金额)……\]<br>*   常见的收费项包括：佣金、平台使用费、期权监管费、期权清算费、期权交收费、交收费、证监会规费、交易活动费) |
         
 *   **Example**
     
@@ -1537,10 +1537,10 @@
     \
     | 参数  | 类型  | 说明  |\
     | --- | --- | --- |\
-    | order\_id\_list | list | 订单号列表<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   每次请求最多查询 400 笔订单<br>*   list 内元素类型为 str |\
+    | order\_id\_list | list | 订单号列表<br>(ℹ️ *   每次请求最多查询 400 笔订单<br>*   list 内元素类型为 str) |\
     | trd\_env | [TrdEnv](https://openapi.futunn.com/futu-api-doc/trade/trade.html#6374) | 交易环境 |\
-    | acc\_id | int | 交易业务账户 ID<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准 |\
-    | acc\_index | int | 交易业务账户列表中的账户序号<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户 |\
+    | acc\_id | int | 交易业务账户 ID<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0 ），以 acc\_id 指定的账户为准) |\
+    | acc\_index | int | 交易业务账户列表中的账户序号<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。acc\_index 会在新开立/注销账户时发生变动，导致您指定的账户与实际交易账户不一致。<br>*   acc\_index 默认为 0，表示指定第 1 个交易业务账户) |\
     \
 \
 *   **返回**\
@@ -1557,7 +1557,7 @@
         | --- | --- | --- |\
         | order\_id | str | 订单号 |\
         | fee\_amount | float | 总费用 |\
-        | fee\_details | list | 收费明细<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   格式：\[('收费项1', 收费项1的金额), ('收费项2', 收费项2的金额), ('收费项3', 收费项3的金额)……\]<br>*   常见的收费项包括：佣金、平台使用费、期权监管费、期权清算费、期权交收费、交收费、证监会规费、交易活动费 |\
+        | fee\_details | list | 收费明细<br>(ℹ️ *   格式：\[('收费项1', 收费项1的金额), ('收费项2', 收费项2的金额), ('收费项3', 收费项3的金额)……\]<br>*   常见的收费项包括：佣金、平台使用费、期权监管费、期权清算费、期权交收费、交收费、证监会规费、交易活动费) |\
         \
 *   **Example**\
     \

@@ -107,9 +107,9 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | clearing\_date | str | 清算日期<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   如需查询多日，需逐日请求<br>*   格式：yyyy-MM-dd，例如：“2017-06-20” |
+    | clearing\_date | str | 清算日期<br>(ℹ️ *   如需查询多日，需逐日请求<br>*   格式：yyyy-MM-dd，例如：“2017-06-20”) |
     | trd\_env | TrdEnv | 交易环境 |
-    | acc\_id | int | 交易业务账户 ID<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0），以 acc\_id 指定的账户为准 |
+    | acc\_id | int | 交易业务账户 ID<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0），以 acc\_id 指定的账户为准) |
     | acc\_index | int | 交易业务账户列表中的账户序号 |
     | cashflow\_direction | [CashFlowDirection](https://openapi.futunn.com/futu-api-doc/trade/trade.html#7573) | 筛选现金流方向 |
     
@@ -1315,9 +1315,9 @@
     
     | 参数  | 类型  | 说明  |
     | --- | --- | --- |
-    | clearing\_date | str | 清算日期<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   如需查询多日，需逐日请求<br>*   格式：yyyy-MM-dd，例如：“2017-06-20” |
+    | clearing\_date | str | 清算日期<br>(ℹ️ *   如需查询多日，需逐日请求<br>*   格式：yyyy-MM-dd，例如：“2017-06-20”) |
     | trd\_env | TrdEnv | 交易环境 |
-    | acc\_id | int | 交易业务账户 ID<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0），以 acc\_id 指定的账户为准 |
+    | acc\_id | int | 交易业务账户 ID<br>(ℹ️ *   acc\_id 和 acc\_index 都可用于指定交易业务账户，二选一即可，推荐使用 acc\_id。<br>*   当 acc\_id 传 0 时， 以 acc\_index 指定的账户为准<br>*   当 acc\_id 传 ID 号时（不为 0），以 acc\_id 指定的账户为准) |
     | acc\_index | int | 交易业务账户列表中的账户序号 |
     | cashflow\_direction | [CashFlowDirection](https://openapi.futunn.com/futu-api-doc/trade/trade.html#7573) | 筛选现金流方向 |
     

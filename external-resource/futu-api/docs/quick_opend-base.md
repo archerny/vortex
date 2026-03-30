@@ -43,20 +43,20 @@ OpenD 提供可视化和命令行两种运行方式，这里介绍操作比较�
 
 | 配置项 | 说明  |
 | --- | --- |
-| 监听地址 | API 协议监听地址<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>可选：  <br>*   127.0.0.1（监听来自本地的连接）<br>*   0.0.0.0（监听来自所有网卡的连接）<br>或填入本机某个网卡地址 |
+| 监听地址 | API 协议监听地址<br>(ℹ️ 可选：  <br>*   127.0.0.1（监听来自本地的连接）<br>*   0.0.0.0（监听来自所有网卡的连接）<br>或填入本机某个网卡地址) |
 | 监听端口 | API 协议监听端口 |
-| 日志级别 | OpenD 日志级别<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>可选：  <br>*   no（无日志）<br>*   debug（最详细）<br>*   info（次详细） |
-| 语言  | 中英语言<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>可选：  <br>*   简体中文<br>*   English |
-| 期货交易 API 时区 | 期货交易 API 时区<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>使用期货账户调用 **交易 API** 时，涉及的时间按照此时区规则 |
-| API 推送频率 | API 订阅数据推送频率控制<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   单位：毫秒<br>*   目前不包括 K 线和分时 |
+| 日志级别 | OpenD 日志级别<br>(ℹ️ 可选：  <br>*   no（无日志）<br>*   debug（最详细）<br>*   info（次详细）) |
+| 语言  | 中英语言<br>(ℹ️ 可选：  <br>*   简体中文<br>*   English) |
+| 期货交易 API 时区 | 期货交易 API 时区<br>(ℹ️ 使用期货账户调用 **交易 API** 时，涉及的时间按照此时区规则) |
+| API 推送频率 | API 订阅数据推送频率控制<br>(ℹ️ *   单位：毫秒<br>*   目前不包括 K 线和分时) |
 | Telnet 地址 | 远程操作命令监听地址 |
 | Telnet 端口 | 远程操作命令监听端口 |
 | 加密私钥路径 | API 协议 [RSA](https://openapi.futunn.com/futu-api-doc/qa/other.html#4601)<br> 加密私钥（PKCS#1）文件绝对路径 |
-| WebSocket 监听地址 | WebSocket 服务监听地址<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>可选：  <br>*   127.0.0.1（监听来自本地的连接）<br>*   0.0.0.0（监听来自所有网卡的连接） |
+| WebSocket 监听地址 | WebSocket 服务监听地址<br>(ℹ️ 可选：  <br>*   127.0.0.1（监听来自本地的连接）<br>*   0.0.0.0（监听来自所有网卡的连接）) |
 | WebSocket 端口 | WebSocket 服务监听端口 |
-| WebSocket 证书 | WebSocket 证书文件路径<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>不配置则不启用，需要和私钥同时配置 |
-| WebSocket 私钥 | WebSocket 证书私钥文件路径<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>私钥不可设置密码，不配置则不启用，需要和证书同时配置 |
-| WebSocket 鉴权密钥 | 密钥密文（32 位 MD5 加密 16 进制）<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>JavaScript 脚本连接时，用于判断是否可信连接 |
+| WebSocket 证书 | WebSocket 证书文件路径<br>(ℹ️ 不配置则不启用，需要和私钥同时配置) |
+| WebSocket 私钥 | WebSocket 证书私钥文件路径<br>(ℹ️ 私钥不可设置密码，不配置则不启用，需要和证书同时配置) |
+| WebSocket 鉴权密钥 | 密钥密文（32 位 MD5 加密 16 进制）<br>(ℹ️ JavaScript 脚本连接时，用于判断是否可信连接) |
 
 提示
 
@@ -116,20 +116,20 @@ OpenD 提供可视化和命令行两种运行方式，这里介绍操作比较�
 
 | 配置项 | 说明  |
 | --- | --- |
-| 监听地址 | API 协议监听地址<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>可选：  <br>*   127.0.0.1（监听来自本地的连接）<br>*   0.0.0.0（监听来自所有网卡的连接）<br>或填入本机某个网卡地址 |
+| 监听地址 | API 协议监听地址<br>(ℹ️ 可选：  <br>*   127.0.0.1（监听来自本地的连接）<br>*   0.0.0.0（监听来自所有网卡的连接）<br>或填入本机某个网卡地址) |
 | 监听端口 | API 协议监听端口 |
-| 日志级别 | OpenD 日志级别<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>可选：  <br>*   no（无日志）<br>*   debug（最详细）<br>*   info（次详细） |
-| 语言  | 中英语言<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>可选：  <br>*   简体中文<br>*   English |
-| 期货交易 API 时区 | 期货交易 API 时区<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>使用期货账户调用 **交易 API** 时，涉及的时间按照此时区规则 |
-| API 推送频率 | API 订阅数据推送频率控制<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   单位：毫秒<br>*   目前不包括 K 线和分时 |
+| 日志级别 | OpenD 日志级别<br>(ℹ️ 可选：  <br>*   no（无日志）<br>*   debug（最详细）<br>*   info（次详细）) |
+| 语言  | 中英语言<br>(ℹ️ 可选：  <br>*   简体中文<br>*   English) |
+| 期货交易 API 时区 | 期货交易 API 时区<br>(ℹ️ 使用期货账户调用 **交易 API** 时，涉及的时间按照此时区规则) |
+| API 推送频率 | API 订阅数据推送频率控制<br>(ℹ️ *   单位：毫秒<br>*   目前不包括 K 线和分时) |
 | Telnet 地址 | 远程操作命令监听地址 |
 | Telnet 端口 | 远程操作命令监听端口 |
 | 加密私钥路径 | API 协议 [RSA](https://openapi.futunn.com/futu-api-doc/qa/other.html#4601)<br> 加密私钥（PKCS#1）文件绝对路径 |
-| WebSocket 监听地址 | WebSocket 服务监听地址<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>可选：  <br>*   127.0.0.1（监听来自本地的连接）<br>*   0.0.0.0（监听来自所有网卡的连接） |
+| WebSocket 监听地址 | WebSocket 服务监听地址<br>(ℹ️ 可选：  <br>*   127.0.0.1（监听来自本地的连接）<br>*   0.0.0.0（监听来自所有网卡的连接）) |
 | WebSocket 端口 | WebSocket 服务监听端口 |
-| WebSocket 证书 | WebSocket 证书文件路径<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>不配置则不启用，需要和私钥同时配置 |
-| WebSocket 私钥 | WebSocket 证书私钥文件路径<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>私钥不可设置密码，不配置则不启用，需要和证书同时配置 |
-| WebSocket 鉴权密钥 | 密钥密文（32 位 MD5 加密 16 进制）<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>JavaScript 脚本连接时，用于判断是否可信连接 |
+| WebSocket 证书 | WebSocket 证书文件路径<br>(ℹ️ 不配置则不启用，需要和私钥同时配置) |
+| WebSocket 私钥 | WebSocket 证书私钥文件路径<br>(ℹ️ 私钥不可设置密码，不配置则不启用，需要和证书同时配置) |
+| WebSocket 鉴权密钥 | 密钥密文（32 位 MD5 加密 16 进制）<br>(ℹ️ JavaScript 脚本连接时，用于判断是否可信连接) |
 
 提示
 

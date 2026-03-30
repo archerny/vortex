@@ -37,28 +37,28 @@
 
 | 配置项 | 说明  |
 | --- | --- |
-| ip  | 监听地址<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>可填：*   127.0.0.1（监听来自本地的连接）<br>*   0.0.0.0（监听来自所有网卡的连接）<br>*   本机某个网卡地址<br>不设置则默认 127.0.0.1 |
-| api\_port | API 协议接收端口<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>不设置则默认 11111  <br>也可通过 [命令行启动参数](https://openapi.futunn.com/futu-api-doc/opend/opend-cmd.html#465)<br> 指定 |
-| login\_account | 登录帐号<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>支持平台ID、邮箱、手机号登录，可通过 [命令行启动参数](https://openapi.futunn.com/futu-api-doc/opend/opend-cmd.html#465)<br> 指定  <br>*   平台ID：输入牛牛号<br>*   邮箱：xxxx@xx.com 格式<br>*   手机号：区号+手机号，例 +86 xxxxxxxx |
-| login\_pwd | 登录密码明文<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   也可使用登录密码密文输入<br>*   也可通过 [命令行启动参数](https://openapi.futunn.com/futu-api-doc/opend/opend-cmd.html#465)<br>     指定 |
-| login\_pwd\_md5 | 登录密码密文（32 位 MD5 加密 16 进制）<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   如果密文明文都存在，则只使用密文<br>*   也可使用登录密码明文输入 |
-| lang | 中英语言<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>可填：  <br>*   chs：简体中文<br>*   en：英文 |
-| log\_level | OpenD 日志级别<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>可填：  <br>*   no（无日志）<br>*   debug（最详细）<br>*   info（次详细）<br>不设置则默认 info 级别 |
-| push\_proto\_type | 推送协议类型<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>推送类协议通过该配置决定包体格式，可填：*   0（pb 格式）<br>*   1（json 格式）<br>不设置则默认 pb 格式 |
-| qot\_push\_frequency | API 订阅数据推送频率控制<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   单位：毫秒<br>*   目前不包括 K 线和分时<br>*   不设置则默认不限频 |
-| telnet\_ip | 远程操作命令监听地址<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>不设置则默认 127.0.0.1 |
-| telnet\_port | 远程操作命令监听端口<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>不设置则不启用远程命令 |
-| rsa\_private\_key | API 协议 [RSA](https://openapi.futunn.com/futu-api-doc/qa/other.html#4601)<br> 加密私钥（PKCS#1）文件绝对路径<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>不设置则协议不加密 |
-| price\_reminder\_push | 是否接收到价提醒推送<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>可填：*   0：不接收<br>*   1：接收（需在脚本中设置到价提醒回调函数 [set\_handler](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#8035)<br>    ）<br>不设置则默认接收 |
-| auto\_hold\_quote\_right | 被踢后是否自动抢权限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>可填：*   0：否<br>*   1：是（OpenD 在行情权限被抢后，会自动抢回。如果 10 秒内再次被抢，则其他终端获得最高行情权限，OpenD 不会再抢）<br>不设置则默认自动抢权限 |
-| future\_trade\_api\_time\_zone | 期货交易 API 时区<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   使用期货账户调用 **交易 API** 时，涉及的时间按照此时区规则<br>*   也可通过 [命令行启动参数](https://openapi.futunn.com/futu-api-doc/opend/opend-cmd.html#465)<br>     指定 |
-| websocket\_ip | WebSocket 服务监听地址<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>可填：  <br>*   127.0.0.1（监听来自本地的连接）<br>*   0.0.0.0（监听来自所有网卡的连接）<br>不设置则默认 127.0.0.1 |
-| websocket\_port | WebSocket 服务监听端口<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>不设置则不启用 Websocket |
-| websocket\_key\_md5 | 密钥密文（32 位 MD5 加密 16 进制）<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>JavaScript 脚本连接时，用于判断是否可信连接 |
-| websocket\_private\_key | WebSocket 证书私钥文件路径<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   私钥不可设置密码<br>*   需要和证书同时配置<br>*   不配置则不启用 Websocket |
-| websocket\_cert | WebSocket 证书文件路径<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   需要和证书同时配置<br>*   不配置则不启用 Websocket |
-| pdt\_protection | 是否开启 防止被标记为日内交易者 的功能<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>**FUTU US 专用参数**  <br>可填：*   0：否<br>*   1：是（开启功能后，我们会在您将要被标记 PDT 时阻止您的下单，但不确保您一定不被标记。若您被标记 PDT，当您的账户权益小于$25000时，您将无法开仓。）<br>不设置则默认开启功能 |
-| dtcall\_confirmation | 是否开启 日内交易保证金追缴预警 的功能<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>**FUTU US 专用参数**  <br>可填：*   0：否<br>*   1：是（开启功能后，我们会在您即将开仓下单超出剩余日内交易购买力前阻止您的下单。提醒您当前开仓订单的市值大于您的剩余日内交易购买力，若您在今日平仓当前标的，您将会收到日内交易保证金追缴通知（Day-Trading Call），只能通过存入资金才能解除。）<br>不设置则默认开启功能 |
+| ip  | 监听地址<br>(ℹ️ 可填：*   127.0.0.1（监听来自本地的连接）<br>*   0.0.0.0（监听来自所有网卡的连接）<br>*   本机某个网卡地址<br>不设置则默认 127.0.0.1) |
+| api\_port | API 协议接收端口<br>(ℹ️ 不设置则默认 11111  <br>也可通过 [命令行启动参数](https://openapi.futunn.com/futu-api-doc/opend/opend-cmd.html#465)<br> 指定) |
+| login\_account | 登录帐号<br>(ℹ️ 支持平台ID、邮箱、手机号登录，可通过 [命令行启动参数](https://openapi.futunn.com/futu-api-doc/opend/opend-cmd.html#465)<br> 指定  <br>*   平台ID：输入牛牛号<br>*   邮箱：xxxx@xx.com 格式<br>*   手机号：区号+手机号，例 +86 xxxxxxxx) |
+| login\_pwd | 登录密码明文<br>(ℹ️ *   也可使用登录密码密文输入<br>*   也可通过 [命令行启动参数](https://openapi.futunn.com/futu-api-doc/opend/opend-cmd.html#465)<br>     指定) |
+| login\_pwd\_md5 | 登录密码密文（32 位 MD5 加密 16 进制）<br>(ℹ️ *   如果密文明文都存在，则只使用密文<br>*   也可使用登录密码明文输入) |
+| lang | 中英语言<br>(ℹ️ 可填：  <br>*   chs：简体中文<br>*   en：英文) |
+| log\_level | OpenD 日志级别<br>(ℹ️ 可填：  <br>*   no（无日志）<br>*   debug（最详细）<br>*   info（次详细）<br>不设置则默认 info 级别) |
+| push\_proto\_type | 推送协议类型<br>(ℹ️ 推送类协议通过该配置决定包体格式，可填：*   0（pb 格式）<br>*   1（json 格式）<br>不设置则默认 pb 格式) |
+| qot\_push\_frequency | API 订阅数据推送频率控制<br>(ℹ️ *   单位：毫秒<br>*   目前不包括 K 线和分时<br>*   不设置则默认不限频) |
+| telnet\_ip | 远程操作命令监听地址<br>(ℹ️ 不设置则默认 127.0.0.1) |
+| telnet\_port | 远程操作命令监听端口<br>(ℹ️ 不设置则不启用远程命令) |
+| rsa\_private\_key | API 协议 [RSA](https://openapi.futunn.com/futu-api-doc/qa/other.html#4601)<br> 加密私钥（PKCS#1）文件绝对路径<br>(ℹ️ 不设置则协议不加密) |
+| price\_reminder\_push | 是否接收到价提醒推送<br>(ℹ️ 可填：*   0：不接收<br>*   1：接收（需在脚本中设置到价提醒回调函数 [set\_handler](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#8035)<br>    ）<br>不设置则默认接收) |
+| auto\_hold\_quote\_right | 被踢后是否自动抢权限<br>(ℹ️ 可填：*   0：否<br>*   1：是（OpenD 在行情权限被抢后，会自动抢回。如果 10 秒内再次被抢，则其他终端获得最高行情权限，OpenD 不会再抢）<br>不设置则默认自动抢权限) |
+| future\_trade\_api\_time\_zone | 期货交易 API 时区<br>(ℹ️ *   使用期货账户调用 **交易 API** 时，涉及的时间按照此时区规则<br>*   也可通过 [命令行启动参数](https://openapi.futunn.com/futu-api-doc/opend/opend-cmd.html#465)<br>     指定) |
+| websocket\_ip | WebSocket 服务监听地址<br>(ℹ️ 可填：  <br>*   127.0.0.1（监听来自本地的连接）<br>*   0.0.0.0（监听来自所有网卡的连接）<br>不设置则默认 127.0.0.1) |
+| websocket\_port | WebSocket 服务监听端口<br>(ℹ️ 不设置则不启用 Websocket) |
+| websocket\_key\_md5 | 密钥密文（32 位 MD5 加密 16 进制）<br>(ℹ️ JavaScript 脚本连接时，用于判断是否可信连接) |
+| websocket\_private\_key | WebSocket 证书私钥文件路径<br>(ℹ️ *   私钥不可设置密码<br>*   需要和证书同时配置<br>*   不配置则不启用 Websocket) |
+| websocket\_cert | WebSocket 证书文件路径<br>(ℹ️ *   需要和证书同时配置<br>*   不配置则不启用 Websocket) |
+| pdt\_protection | 是否开启 防止被标记为日内交易者 的功能<br>(ℹ️ **FUTU US 专用参数**  <br>可填：*   0：否<br>*   1：是（开启功能后，我们会在您将要被标记 PDT 时阻止您的下单，但不确保您一定不被标记。若您被标记 PDT，当您的账户权益小于$25000时，您将无法开仓。）<br>不设置则默认开启功能) |
+| dtcall\_confirmation | 是否开启 日内交易保证金追缴预警 的功能<br>(ℹ️ **FUTU US 专用参数**  <br>可填：*   0：否<br>*   1：是（开启功能后，我们会在您即将开仓下单超出剩余日内交易购买力前阻止您的下单。提醒您当前开仓订单的市值大于您的剩余日内交易购买力，若您在今日平仓当前标的，您将会收到日内交易保证金追缴通知（Day-Trading Call），只能通过存入资金才能解除。）<br>不设置则默认开启功能) |
 
 提示
 
@@ -100,25 +100,25 @@
 
 | 配置项 | 说明  |
 | --- | --- |
-| login\_account | 登录帐号<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>也可通过配置文件指定 |
-| login\_pwd | 登录密码明文<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   也可使用登录密码密文输入<br>*   也可通过配置文件指定 |
-| login\_pwd\_md5 | 登录密码密文（32 位 MD5 加密 16 进制）<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   如果密文明文都存在，则只使用密文<br>*   也可使用登录密码明文输入 |
-| cfg\_file | OpenD 配置文件绝对路径<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>不设置则使用程序所在目录下的 OpenD.xml |
-| console | 是否显示控制台<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   0：不显示<br>*   1：显示<br>不设置则默认显示控制台 |
-| lang | 中英语言<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   chs：简体中文<br>*   en：英文 |
+| login\_account | 登录帐号<br>(ℹ️ 也可通过配置文件指定) |
+| login\_pwd | 登录密码明文<br>(ℹ️ *   也可使用登录密码密文输入<br>*   也可通过配置文件指定) |
+| login\_pwd\_md5 | 登录密码密文（32 位 MD5 加密 16 进制）<br>(ℹ️ *   如果密文明文都存在，则只使用密文<br>*   也可使用登录密码明文输入) |
+| cfg\_file | OpenD 配置文件绝对路径<br>(ℹ️ 不设置则使用程序所在目录下的 OpenD.xml) |
+| console | 是否显示控制台<br>(ℹ️ *   0：不显示<br>*   1：显示<br>不设置则默认显示控制台) |
+| lang | 中英语言<br>(ℹ️ *   chs：简体中文<br>*   en：英文) |
 | api\_ip | API 服务监听地址 |
 | api\_port | API 协议接收端口 |
 | help | 输出命令行启动参数，并退出程序 |
-| log\_level | OpenD 日志级别<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   no（无日志）<br>*   debug（最详细）<br>*   info（次详细） |
-| no\_monitor | 是否启动守护进程<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   0：启动<br>*   1：不启动 |
-| websocket\_ip | WebSocket 服务监听地址<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>可填：  <br>*   127.0.0.1（监听来自本地的连接）<br>*   0.0.0.0（监听来自所有网卡的连接） |
-| websocket\_port | WebSocket 服务监听端口<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>不设置则不启用 Websocket |
-| websocket\_private\_key | WebSocket 证书私钥文件路径<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   私钥不可设置密码<br>*   需要和证书同时配置<br>*   不配置则不启用 Websocket |
-| websocket\_cert | WebSocket 证书文件路径<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   需要和证书同时配置<br>*   不配置则不启用 Websocket |
-| websocket\_key\_md5 | 密钥密文（32 位 MD5 加密 16 进制）<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>JavaScript 脚本连接时，用于判断是否可信连接 |
-| price\_reminder\_push | 是否接收到价提醒推送<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>可填：*   0：不接收<br>*   1：接收（需在脚本中设置到价提醒回调函数 [set\_handler](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#8035)<br>    ）<br>不设置则默认接收 |
-| auto\_hold\_quote\_right | 被踢后是否自动抢权限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>可填：*   0：否<br>*   1：是（OpenD 在行情权限被抢后，会自动抢回。如果 10 秒内再次被抢，则其他终端获得最高行情权限，OpenD 不会再抢）<br>不设置则默认自动抢权限 |
-| future\_trade\_api\_time\_zone | 期货交易 API 时区<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>使用期货账户调用 **交易 API** 时，涉及的时间按照此时区规则 |
+| log\_level | OpenD 日志级别<br>(ℹ️ *   no（无日志）<br>*   debug（最详细）<br>*   info（次详细）) |
+| no\_monitor | 是否启动守护进程<br>(ℹ️ *   0：启动<br>*   1：不启动) |
+| websocket\_ip | WebSocket 服务监听地址<br>(ℹ️ 可填：  <br>*   127.0.0.1（监听来自本地的连接）<br>*   0.0.0.0（监听来自所有网卡的连接）) |
+| websocket\_port | WebSocket 服务监听端口<br>(ℹ️ 不设置则不启用 Websocket) |
+| websocket\_private\_key | WebSocket 证书私钥文件路径<br>(ℹ️ *   私钥不可设置密码<br>*   需要和证书同时配置<br>*   不配置则不启用 Websocket) |
+| websocket\_cert | WebSocket 证书文件路径<br>(ℹ️ *   需要和证书同时配置<br>*   不配置则不启用 Websocket) |
+| websocket\_key\_md5 | 密钥密文（32 位 MD5 加密 16 进制）<br>(ℹ️ JavaScript 脚本连接时，用于判断是否可信连接) |
+| price\_reminder\_push | 是否接收到价提醒推送<br>(ℹ️ 可填：*   0：不接收<br>*   1：接收（需在脚本中设置到价提醒回调函数 [set\_handler](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#8035)<br>    ）<br>不设置则默认接收) |
+| auto\_hold\_quote\_right | 被踢后是否自动抢权限<br>(ℹ️ 可填：*   0：否<br>*   1：是（OpenD 在行情权限被抢后，会自动抢回。如果 10 秒内再次被抢，则其他终端获得最高行情权限，OpenD 不会再抢）<br>不设置则默认自动抢权限) |
+| future\_trade\_api\_time\_zone | 期货交易 API 时区<br>(ℹ️ 使用期货账户调用 **交易 API** 时，涉及的时间按照此时区规则) |
 
 ### [#](https://openapi.futunn.com/futu-api-doc/opend/opend-cmd.html#495-2)
  第一步 下载
@@ -147,28 +147,28 @@
 
 | 配置项 | 说明  |
 | --- | --- |
-| ip  | 监听地址<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>可填：*   127.0.0.1（监听来自本地的连接）<br>*   0.0.0.0（监听来自所有网卡的连接）<br>*   本机某个网卡地址<br>不设置则默认 127.0.0.1 |
-| api\_port | API 协议接收端口<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>不设置则默认 11111  <br>也可通过 [命令行启动参数](https://openapi.futunn.com/futu-api-doc/opend/opend-cmd.html#465)<br> 指定 |
-| login\_account | 登录帐号<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>支持平台ID、邮箱、手机号登录，可通过 [命令行启动参数](https://openapi.futunn.com/futu-api-doc/opend/opend-cmd.html#465)<br> 指定  <br>*   平台ID：输入moomoo号<br>*   邮箱：xxxx@xx.com 格式<br>*   手机号：区号+手机号，例 +1 xxxxxxxx |
-| login\_pwd | 登录密码明文<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   也可使用登录密码密文输入<br>*   也可通过 [命令行启动参数](https://openapi.futunn.com/futu-api-doc/opend/opend-cmd.html#465)<br>     指定 |
-| login\_pwd\_md5 | 登录密码密文（32 位 MD5 加密 16 进制）<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   如果密文明文都存在，则只使用密文<br>*   也可使用登录密码明文输入 |
-| lang | 中英语言<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>可填：  <br>*   chs：简体中文<br>*   en：英文 |
-| log\_level | OpenD 日志级别<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>可填：  <br>*   no（无日志）<br>*   debug（最详细）<br>*   info（次详细）<br>不设置则默认 info 级别 |
-| push\_proto\_type | 推送协议类型<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>推送类协议通过该配置决定包体格式，可填：*   0（pb 格式）<br>*   1（json 格式）<br>不设置则默认 pb 格式 |
-| qot\_push\_frequency | API 订阅数据推送频率控制<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   单位：毫秒<br>*   目前不包括 K 线和分时<br>*   不设置则默认不限频 |
-| telnet\_ip | 远程操作命令监听地址<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>不设置则默认 127.0.0.1 |
-| telnet\_port | 远程操作命令监听端口<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>不设置则不启用远程命令 |
-| rsa\_private\_key | API 协议 [RSA](https://openapi.futunn.com/futu-api-doc/qa/other.html#4601)<br> 加密私钥（PKCS#1）文件绝对路径<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>不设置则协议不加密 |
-| price\_reminder\_push | 是否接收到价提醒推送<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>可填：*   0：不接收<br>*   1：接收（需在脚本中设置到价提醒回调函数 [set\_handler](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#8035)<br>    ）<br>不设置则默认接收 |
-| auto\_hold\_quote\_right | 被踢后是否自动抢权限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>可填：*   0：否<br>*   1：是（OpenD 在行情权限被抢后，会自动抢回。如果 10 秒内再次被抢，则其他终端获得最高行情权限，OpenD 不会再抢）<br>不设置则默认自动抢权限 |
-| future\_trade\_api\_time\_zone | 期货交易 API 时区<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   使用期货账户调用 **交易 API** 时，涉及的时间按照此时区规则<br>*   也可通过 [命令行启动参数](https://openapi.futunn.com/futu-api-doc/opend/opend-cmd.html#465)<br>     指定 |
-| websocket\_ip | WebSocket 服务监听地址<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>可填：  <br>*   127.0.0.1（监听来自本地的连接）<br>*   0.0.0.0（监听来自所有网卡的连接）<br>不设置则默认 127.0.0.1 |
-| websocket\_port | WebSocket 服务监听端口<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>不设置则不启用 Websocket |
-| websocket\_key\_md5 | 密钥密文（32 位 MD5 加密 16 进制）<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>JavaScript 脚本连接时，用于判断是否可信连接 |
-| websocket\_private\_key | WebSocket 证书私钥文件路径<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   私钥不可设置密码<br>*   需要和证书同时配置<br>*   不配置则不启用 Websocket |
-| websocket\_cert | WebSocket 证书文件路径<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   需要和证书同时配置<br>*   不配置则不启用 Websocket |
-| pdt\_protection | 是否开启 防止被标记为日内交易者 的功能<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>**FUTU US 专用参数**  <br>可填：*   0：否<br>*   1：是（开启功能后，我们会在您将要被标记 PDT 时阻止您的下单，但不确保您一定不被标记。若您被标记 PDT，当您的账户权益小于$25000时，您将无法开仓。）<br>不设置则默认开启功能 |
-| dtcall\_confirmation | 是否开启 日内交易保证金追缴预警 的功能<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>**FUTU US 专用参数**  <br>可填：*   0：否<br>*   1：是（开启功能后，我们会在您即将开仓下单超出剩余日内交易购买力前阻止您的下单。提醒您当前开仓订单的市值大于您的剩余日内交易购买力，若您在今日平仓当前标的，您将会收到日内交易保证金追缴通知（Day-Trading Call），只能通过存入资金才能解除。）<br>不设置则默认开启功能 |
+| ip  | 监听地址<br>(ℹ️ 可填：*   127.0.0.1（监听来自本地的连接）<br>*   0.0.0.0（监听来自所有网卡的连接）<br>*   本机某个网卡地址<br>不设置则默认 127.0.0.1) |
+| api\_port | API 协议接收端口<br>(ℹ️ 不设置则默认 11111  <br>也可通过 [命令行启动参数](https://openapi.futunn.com/futu-api-doc/opend/opend-cmd.html#465)<br> 指定) |
+| login\_account | 登录帐号<br>(ℹ️ 支持平台ID、邮箱、手机号登录，可通过 [命令行启动参数](https://openapi.futunn.com/futu-api-doc/opend/opend-cmd.html#465)<br> 指定  <br>*   平台ID：输入moomoo号<br>*   邮箱：xxxx@xx.com 格式<br>*   手机号：区号+手机号，例 +1 xxxxxxxx) |
+| login\_pwd | 登录密码明文<br>(ℹ️ *   也可使用登录密码密文输入<br>*   也可通过 [命令行启动参数](https://openapi.futunn.com/futu-api-doc/opend/opend-cmd.html#465)<br>     指定) |
+| login\_pwd\_md5 | 登录密码密文（32 位 MD5 加密 16 进制）<br>(ℹ️ *   如果密文明文都存在，则只使用密文<br>*   也可使用登录密码明文输入) |
+| lang | 中英语言<br>(ℹ️ 可填：  <br>*   chs：简体中文<br>*   en：英文) |
+| log\_level | OpenD 日志级别<br>(ℹ️ 可填：  <br>*   no（无日志）<br>*   debug（最详细）<br>*   info（次详细）<br>不设置则默认 info 级别) |
+| push\_proto\_type | 推送协议类型<br>(ℹ️ 推送类协议通过该配置决定包体格式，可填：*   0（pb 格式）<br>*   1（json 格式）<br>不设置则默认 pb 格式) |
+| qot\_push\_frequency | API 订阅数据推送频率控制<br>(ℹ️ *   单位：毫秒<br>*   目前不包括 K 线和分时<br>*   不设置则默认不限频) |
+| telnet\_ip | 远程操作命令监听地址<br>(ℹ️ 不设置则默认 127.0.0.1) |
+| telnet\_port | 远程操作命令监听端口<br>(ℹ️ 不设置则不启用远程命令) |
+| rsa\_private\_key | API 协议 [RSA](https://openapi.futunn.com/futu-api-doc/qa/other.html#4601)<br> 加密私钥（PKCS#1）文件绝对路径<br>(ℹ️ 不设置则协议不加密) |
+| price\_reminder\_push | 是否接收到价提醒推送<br>(ℹ️ 可填：*   0：不接收<br>*   1：接收（需在脚本中设置到价提醒回调函数 [set\_handler](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#8035)<br>    ）<br>不设置则默认接收) |
+| auto\_hold\_quote\_right | 被踢后是否自动抢权限<br>(ℹ️ 可填：*   0：否<br>*   1：是（OpenD 在行情权限被抢后，会自动抢回。如果 10 秒内再次被抢，则其他终端获得最高行情权限，OpenD 不会再抢）<br>不设置则默认自动抢权限) |
+| future\_trade\_api\_time\_zone | 期货交易 API 时区<br>(ℹ️ *   使用期货账户调用 **交易 API** 时，涉及的时间按照此时区规则<br>*   也可通过 [命令行启动参数](https://openapi.futunn.com/futu-api-doc/opend/opend-cmd.html#465)<br>     指定) |
+| websocket\_ip | WebSocket 服务监听地址<br>(ℹ️ 可填：  <br>*   127.0.0.1（监听来自本地的连接）<br>*   0.0.0.0（监听来自所有网卡的连接）<br>不设置则默认 127.0.0.1) |
+| websocket\_port | WebSocket 服务监听端口<br>(ℹ️ 不设置则不启用 Websocket) |
+| websocket\_key\_md5 | 密钥密文（32 位 MD5 加密 16 进制）<br>(ℹ️ JavaScript 脚本连接时，用于判断是否可信连接) |
+| websocket\_private\_key | WebSocket 证书私钥文件路径<br>(ℹ️ *   私钥不可设置密码<br>*   需要和证书同时配置<br>*   不配置则不启用 Websocket) |
+| websocket\_cert | WebSocket 证书文件路径<br>(ℹ️ *   需要和证书同时配置<br>*   不配置则不启用 Websocket) |
+| pdt\_protection | 是否开启 防止被标记为日内交易者 的功能<br>(ℹ️ **FUTU US 专用参数**  <br>可填：*   0：否<br>*   1：是（开启功能后，我们会在您将要被标记 PDT 时阻止您的下单，但不确保您一定不被标记。若您被标记 PDT，当您的账户权益小于$25000时，您将无法开仓。）<br>不设置则默认开启功能) |
+| dtcall\_confirmation | 是否开启 日内交易保证金追缴预警 的功能<br>(ℹ️ **FUTU US 专用参数**  <br>可填：*   0：否<br>*   1：是（开启功能后，我们会在您即将开仓下单超出剩余日内交易购买力前阻止您的下单。提醒您当前开仓订单的市值大于您的剩余日内交易购买力，若您在今日平仓当前标的，您将会收到日内交易保证金追缴通知（Day-Trading Call），只能通过存入资金才能解除。）<br>不设置则默认开启功能) |
 
 提示
 
@@ -210,25 +210,25 @@
 
 | 配置项 | 说明  |
 | --- | --- |
-| login\_account | 登录帐号<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>也可通过配置文件指定 |
-| login\_pwd | 登录密码明文<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   也可使用登录密码密文输入<br>*   也可通过配置文件指定 |
-| login\_pwd\_md5 | 登录密码密文（32 位 MD5 加密 16 进制）<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   如果密文明文都存在，则只使用密文<br>*   也可使用登录密码明文输入 |
-| cfg\_file | OpenD 配置文件绝对路径<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>不设置则使用程序所在目录下的 OpenD.xml |
-| console | 是否显示控制台<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   0：不显示<br>*   1：显示<br>不设置则默认显示控制台 |
-| lang | 中英语言<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   chs：简体中文<br>*   en：英文 |
+| login\_account | 登录帐号<br>(ℹ️ 也可通过配置文件指定) |
+| login\_pwd | 登录密码明文<br>(ℹ️ *   也可使用登录密码密文输入<br>*   也可通过配置文件指定) |
+| login\_pwd\_md5 | 登录密码密文（32 位 MD5 加密 16 进制）<br>(ℹ️ *   如果密文明文都存在，则只使用密文<br>*   也可使用登录密码明文输入) |
+| cfg\_file | OpenD 配置文件绝对路径<br>(ℹ️ 不设置则使用程序所在目录下的 OpenD.xml) |
+| console | 是否显示控制台<br>(ℹ️ *   0：不显示<br>*   1：显示<br>不设置则默认显示控制台) |
+| lang | 中英语言<br>(ℹ️ *   chs：简体中文<br>*   en：英文) |
 | api\_ip | API 服务监听地址 |
 | api\_port | API 协议接收端口 |
 | help | 输出命令行启动参数，并退出程序 |
-| log\_level | OpenD 日志级别<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   no（无日志）<br>*   debug（最详细）<br>*   info（次详细） |
-| no\_monitor | 是否启动守护进程<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   0：启动<br>*   1：不启动 |
-| websocket\_ip | WebSocket 服务监听地址<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>可填：  <br>*   127.0.0.1（监听来自本地的连接）<br>*   0.0.0.0（监听来自所有网卡的连接） |
-| websocket\_port | WebSocket 服务监听端口<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>不设置则不启用 Websocket |
-| websocket\_private\_key | WebSocket 证书私钥文件路径<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   私钥不可设置密码<br>*   需要和证书同时配置<br>*   不配置则不启用 Websocket |
-| websocket\_cert | WebSocket 证书文件路径<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>*   需要和证书同时配置<br>*   不配置则不启用 Websocket |
-| websocket\_key\_md5 | 密钥密文（32 位 MD5 加密 16 进制）<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>JavaScript 脚本连接时，用于判断是否可信连接 |
-| price\_reminder\_push | 是否接收到价提醒推送<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>可填：*   0：不接收<br>*   1：接收（需在脚本中设置到价提醒回调函数 [set\_handler](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#8035)<br>    ）<br>不设置则默认接收 |
-| auto\_hold\_quote\_right | 被踢后是否自动抢权限<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>可填：*   0：否<br>*   1：是（OpenD 在行情权限被抢后，会自动抢回。如果 10 秒内再次被抢，则其他终端获得最高行情权限，OpenD 不会再抢）<br>不设置则默认自动抢权限 |
-| future\_trade\_api\_time\_zone | 期货交易 API 时区<br><br>![](https://openapi.futunn.com/futu-api-doc/img/tip.png)<br><br>使用期货账户调用 **交易 API** 时，涉及的时间按照此时区规则 |
+| log\_level | OpenD 日志级别<br>(ℹ️ *   no（无日志）<br>*   debug（最详细）<br>*   info（次详细）) |
+| no\_monitor | 是否启动守护进程<br>(ℹ️ *   0：启动<br>*   1：不启动) |
+| websocket\_ip | WebSocket 服务监听地址<br>(ℹ️ 可填：  <br>*   127.0.0.1（监听来自本地的连接）<br>*   0.0.0.0（监听来自所有网卡的连接）) |
+| websocket\_port | WebSocket 服务监听端口<br>(ℹ️ 不设置则不启用 Websocket) |
+| websocket\_private\_key | WebSocket 证书私钥文件路径<br>(ℹ️ *   私钥不可设置密码<br>*   需要和证书同时配置<br>*   不配置则不启用 Websocket) |
+| websocket\_cert | WebSocket 证书文件路径<br>(ℹ️ *   需要和证书同时配置<br>*   不配置则不启用 Websocket) |
+| websocket\_key\_md5 | 密钥密文（32 位 MD5 加密 16 进制）<br>(ℹ️ JavaScript 脚本连接时，用于判断是否可信连接) |
+| price\_reminder\_push | 是否接收到价提醒推送<br>(ℹ️ 可填：*   0：不接收<br>*   1：接收（需在脚本中设置到价提醒回调函数 [set\_handler](https://openapi.futunn.com/futu-api-doc/ftapi/init.html#8035)<br>    ）<br>不设置则默认接收) |
+| auto\_hold\_quote\_right | 被踢后是否自动抢权限<br>(ℹ️ 可填：*   0：否<br>*   1：是（OpenD 在行情权限被抢后，会自动抢回。如果 10 秒内再次被抢，则其他终端获得最高行情权限，OpenD 不会再抢）<br>不设置则默认自动抢权限) |
+| future\_trade\_api\_time\_zone | 期货交易 API 时区<br>(ℹ️ 使用期货账户调用 **交易 API** 时，涉及的时间按照此时区规则) |
 
 ← [概述](https://openapi.futunn.com/futu-api-doc/opend/opend-intro.html) [运维命令](https://openapi.futunn.com/futu-api-doc/opend/opend-operate.html)
  →
