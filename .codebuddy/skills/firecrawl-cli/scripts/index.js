@@ -1202,7 +1202,7 @@ var require_command = __commonJS({
     "use strict";
     var EventEmitter3 = require("events").EventEmitter;
     var childProcess = require("child_process");
-    var path5 = require("path");
+    var path6 = require("path");
     var fs5 = require("fs");
     var process2 = require("process");
     var { Argument: Argument2, humanReadableArgName } = require_argument();
@@ -2215,9 +2215,9 @@ Expecting one of '${allowedValues.join("', '")}'`);
         let launchWithNode = false;
         const sourceExt = [".js", ".ts", ".tsx", ".mjs", ".cjs"];
         function findFile(baseDir, baseName) {
-          const localBin = path5.resolve(baseDir, baseName);
+          const localBin = path6.resolve(baseDir, baseName);
           if (fs5.existsSync(localBin)) return localBin;
-          if (sourceExt.includes(path5.extname(baseName))) return void 0;
+          if (sourceExt.includes(path6.extname(baseName))) return void 0;
           const foundExt = sourceExt.find(
             (ext) => fs5.existsSync(`${localBin}${ext}`)
           );
@@ -2235,17 +2235,17 @@ Expecting one of '${allowedValues.join("', '")}'`);
           } catch {
             resolvedScriptPath = this._scriptPath;
           }
-          executableDir = path5.resolve(
-            path5.dirname(resolvedScriptPath),
+          executableDir = path6.resolve(
+            path6.dirname(resolvedScriptPath),
             executableDir
           );
         }
         if (executableDir) {
           let localFile = findFile(executableDir, executableFile);
           if (!localFile && !subcommand._executableFile && this._scriptPath) {
-            const legacyName = path5.basename(
+            const legacyName = path6.basename(
               this._scriptPath,
-              path5.extname(this._scriptPath)
+              path6.extname(this._scriptPath)
             );
             if (legacyName !== this._name) {
               localFile = findFile(
@@ -2256,7 +2256,7 @@ Expecting one of '${allowedValues.join("', '")}'`);
           }
           executableFile = localFile || executableFile;
         }
-        launchWithNode = sourceExt.includes(path5.extname(executableFile));
+        launchWithNode = sourceExt.includes(path6.extname(executableFile));
         let proc;
         if (process2.platform !== "win32") {
           if (launchWithNode) {
@@ -3171,7 +3171,7 @@ Expecting one of '${allowedValues.join("', '")}'`);
        * @return {Command}
        */
       nameFromFilename(filename) {
-        this._name = path5.basename(filename, path5.extname(filename));
+        this._name = path6.basename(filename, path6.extname(filename));
         return this;
       }
       /**
@@ -3185,9 +3185,9 @@ Expecting one of '${allowedValues.join("', '")}'`);
        * @param {string} [path]
        * @return {(string|null|Command)}
        */
-      executableDir(path6) {
-        if (path6 === void 0) return this._executableDir;
-        this._executableDir = path6;
+      executableDir(path7) {
+        if (path7 === void 0) return this._executableDir;
+        this._executableDir = path7;
         return this;
       }
       /**
@@ -12404,11 +12404,11 @@ var require_mime_types = __commonJS({
       }
       return exts[0];
     }
-    function lookup(path5) {
-      if (!path5 || typeof path5 !== "string") {
+    function lookup(path6) {
+      if (!path6 || typeof path6 !== "string") {
         return false;
       }
-      var extension2 = extname("x." + path5).toLowerCase().substr(1);
+      var extension2 = extname("x." + path6).toLowerCase().substr(1);
       if (!extension2) {
         return false;
       }
@@ -13523,7 +13523,7 @@ var require_form_data = __commonJS({
     "use strict";
     var CombinedStream = require_combined_stream();
     var util4 = require("util");
-    var path5 = require("path");
+    var path6 = require("path");
     var http3 = require("http");
     var https2 = require("https");
     var parseUrl = require("url").parse;
@@ -13651,11 +13651,11 @@ var require_form_data = __commonJS({
     FormData3.prototype._getContentDisposition = function(value, options) {
       var filename;
       if (typeof options.filepath === "string") {
-        filename = path5.normalize(options.filepath).replace(/\\/g, "/");
+        filename = path6.normalize(options.filepath).replace(/\\/g, "/");
       } else if (options.filename || value && (value.name || value.path)) {
-        filename = path5.basename(options.filename || value && (value.name || value.path));
+        filename = path6.basename(options.filename || value && (value.name || value.path));
       } else if (value && value.readable && hasOwn(value, "httpVersion")) {
-        filename = path5.basename(value.client._httpMessage.path || "");
+        filename = path6.basename(value.client._httpMessage.path || "");
       }
       if (filename) {
         return 'filename="' + filename + '"';
@@ -15105,8 +15105,8 @@ var require_follow_redirects = __commonJS({
       }
       return parsed;
     }
-    function resolveUrl(relative, base) {
-      return useNativeURL ? new URL2(relative, base) : parseUrl(url2.resolve(base, relative));
+    function resolveUrl(relative2, base) {
+      return useNativeURL ? new URL2(relative2, base) : parseUrl(url2.resolve(base, relative2));
     }
     function validateUrl(input) {
       if (/^\[/.test(input.hostname) && !/^\[[:0-9a-f]+\]$/i.test(input.hostname)) {
@@ -15273,6 +15273,28 @@ var init_settings = __esm({
   }
 });
 
+// src/utils/cli-name.ts
+function getCliName() {
+  if (cachedCliName !== void 0) return cachedCliName;
+  const argv = process.argv;
+  if (argv.length >= 2) {
+    const scriptPath = argv[1];
+    const relativePath = path2.relative(process.cwd(), scriptPath);
+    const displayPath = !relativePath.startsWith("..") && !path2.isAbsolute(relativePath) ? relativePath : scriptPath;
+    cachedCliName = `node ${displayPath}`;
+  } else {
+    cachedCliName = "firecrawl";
+  }
+  return cachedCliName;
+}
+var path2, cachedCliName;
+var init_cli_name = __esm({
+  "src/utils/cli-name.ts"() {
+    "use strict";
+    path2 = __toESM(require("path"));
+  }
+});
+
 // src/utils/config.ts
 function initializeConfig(config = {}) {
   const storedSettings = loadSettings();
@@ -15319,19 +15341,19 @@ function validateConfig(apiKey) {
   const key = getApiKey(apiKey);
   if (!key) {
     throw new Error(
-      'API key is required. Set FIRECRAWL_API_KEY environment variable, use --api-key flag, or run "node bundle/index.cjs config" to configure.'
+      `API key is required. Set FIRECRAWL_API_KEY environment variable, use --api-key flag, or run "${getCliName()} config" to configure.`
     );
   }
   const url2 = getApiUrl();
   if (!url2) {
     throw new Error(
-      'API URL is required. Set FIRECRAWL_API_URL environment variable, use --api-url flag, or run "node bundle/index.cjs config" to configure.'
+      `API URL is required. Set FIRECRAWL_API_URL environment variable, use --api-url flag, or run "${getCliName()} config" to configure.`
     );
   }
   const dataDir = getDataDir();
   if (!dataDir) {
     throw new Error(
-      'Data directory is required. Set FIRECRAWL_DATA_DIR environment variable, use --data-dir flag, or run "node bundle/index.cjs config" to configure.'
+      `Data directory is required. Set FIRECRAWL_DATA_DIR environment variable, use --data-dir flag, or run "${getCliName()} config" to configure.`
     );
   }
 }
@@ -15340,6 +15362,7 @@ var init_config = __esm({
   "src/utils/config.ts"() {
     "use strict";
     init_settings();
+    init_cli_name();
     globalConfig = {};
   }
 });
@@ -15466,10 +15489,10 @@ function buildMissingConfigMessage() {
     '     export FIRECRAWL_DATA_DIR="/path/to/data"',
     "",
     "  2. Command-line flags:",
-    "     node bundle/index.cjs --api-key <key> --api-url <url> scrape <url>",
+    `     ${getCliName()} --api-key <key> --api-url <url> scrape <url>`,
     "",
     "  3. Config command (saves to settings file):",
-    "     node bundle/index.cjs config --api-key <key> --api-url <url> --data-dir <dir>",
+    `     ${getCliName()} config --api-key <key> --api-url <url> --data-dir <dir>`,
     "",
     `  Settings file: ${getConfigDirectoryPath()}/settings.json`
   ];
@@ -15490,6 +15513,7 @@ var init_auth = __esm({
     "use strict";
     init_settings();
     init_config();
+    init_cli_name();
   }
 });
 
@@ -16033,9 +16057,9 @@ function isVisitable(thing) {
 function removeBrackets(key) {
   return utils_default.endsWith(key, "[]") ? key.slice(0, -2) : key;
 }
-function renderKey(path5, key, dots) {
-  if (!path5) return key;
-  return path5.concat(key).map(function each(token, i) {
+function renderKey(path6, key, dots) {
+  if (!path6) return key;
+  return path6.concat(key).map(function each(token, i) {
     token = removeBrackets(token);
     return !dots && i ? "[" + token + "]" : token;
   }).join(dots ? "." : "");
@@ -16088,13 +16112,13 @@ function toFormData(obj, formData, options) {
     }
     return value;
   }
-  function defaultVisitor(value, key, path5) {
+  function defaultVisitor(value, key, path6) {
     let arr = value;
     if (utils_default.isReactNative(formData) && utils_default.isReactNativeBlob(value)) {
-      formData.append(renderKey(path5, key, dots), convertValue(value));
+      formData.append(renderKey(path6, key, dots), convertValue(value));
       return false;
     }
-    if (value && !path5 && typeof value === "object") {
+    if (value && !path6 && typeof value === "object") {
       if (utils_default.endsWith(key, "{}")) {
         key = metaTokens ? key : key.slice(0, -2);
         value = JSON.stringify(value);
@@ -16113,7 +16137,7 @@ function toFormData(obj, formData, options) {
     if (isVisitable(value)) {
       return true;
     }
-    formData.append(renderKey(path5, key, dots), convertValue(value));
+    formData.append(renderKey(path6, key, dots), convertValue(value));
     return false;
   }
   const stack = [];
@@ -16122,16 +16146,16 @@ function toFormData(obj, formData, options) {
     convertValue,
     isVisitable
   });
-  function build(value, path5) {
+  function build(value, path6) {
     if (utils_default.isUndefined(value)) return;
     if (stack.indexOf(value) !== -1) {
-      throw Error("Circular reference detected in " + path5.join("."));
+      throw Error("Circular reference detected in " + path6.join("."));
     }
     stack.push(value);
     utils_default.forEach(value, function each(el, key) {
-      const result = !(utils_default.isUndefined(el) || el === null) && visitor.call(formData, el, utils_default.isString(key) ? key.trim() : key, path5, exposedHelpers);
+      const result = !(utils_default.isUndefined(el) || el === null) && visitor.call(formData, el, utils_default.isString(key) ? key.trim() : key, path6, exposedHelpers);
       if (result === true) {
-        build(el, path5 ? path5.concat(key) : [key]);
+        build(el, path6 ? path6.concat(key) : [key]);
       }
     });
     stack.pop();
@@ -16343,7 +16367,7 @@ var platform_default = {
 // node_modules/.pnpm/axios@1.13.6/node_modules/axios/lib/helpers/toURLEncodedForm.js
 function toURLEncodedForm(data, options) {
   return toFormData_default(data, new platform_default.classes.URLSearchParams(), {
-    visitor: function(value, key, path5, helpers) {
+    visitor: function(value, key, path6, helpers) {
       if (platform_default.isNode && utils_default.isBuffer(value)) {
         this.append(key, value.toString("base64"));
         return false;
@@ -16373,11 +16397,11 @@ function arrayToObject(arr) {
   return obj;
 }
 function formDataToJSON(formData) {
-  function buildPath(path5, value, target, index) {
-    let name = path5[index++];
+  function buildPath(path6, value, target, index) {
+    let name = path6[index++];
     if (name === "__proto__") return true;
     const isNumericKey = Number.isFinite(+name);
-    const isLast = index >= path5.length;
+    const isLast = index >= path6.length;
     name = !name && utils_default.isArray(target) ? target.length : name;
     if (isLast) {
       if (utils_default.hasOwnProp(target, name)) {
@@ -16390,7 +16414,7 @@ function formDataToJSON(formData) {
     if (!target[name] || !utils_default.isObject(target[name])) {
       target[name] = [];
     }
-    const result = buildPath(path5, value, target[name], index);
+    const result = buildPath(path6, value, target[name], index);
     if (result && utils_default.isArray(target[name])) {
       target[name] = arrayToObject(target[name]);
     }
@@ -17771,9 +17795,9 @@ var http_default = isHttpAdapterSupported && function httpAdapter(config) {
       auth = urlUsername + ":" + urlPassword;
     }
     auth && headers.delete("authorization");
-    let path5;
+    let path6;
     try {
-      path5 = buildURL(
+      path6 = buildURL(
         parsed.pathname + parsed.search,
         config.params,
         config.paramsSerializer
@@ -17791,7 +17815,7 @@ var http_default = isHttpAdapterSupported && function httpAdapter(config) {
       false
     );
     const options = {
-      path: path5,
+      path: path6,
       method,
       headers: headers.toJSON(),
       agents: { http: config.httpAgent, https: config.httpsAgent },
@@ -18040,14 +18064,14 @@ var isURLSameOrigin_default = platform_default.hasStandardBrowserEnv ? /* @__PUR
 var cookies_default = platform_default.hasStandardBrowserEnv ? (
   // Standard browser envs support document.cookie
   {
-    write(name, value, expires, path5, domain, secure, sameSite) {
+    write(name, value, expires, path6, domain, secure, sameSite) {
       if (typeof document === "undefined") return;
       const cookie = [`${name}=${encodeURIComponent(value)}`];
       if (utils_default.isNumber(expires)) {
         cookie.push(`expires=${new Date(expires).toUTCString()}`);
       }
-      if (utils_default.isString(path5)) {
-        cookie.push(`path=${path5}`);
+      if (utils_default.isString(path6)) {
+        cookie.push(`path=${path6}`);
       }
       if (utils_default.isString(domain)) {
         cookie.push(`domain=${domain}`);
@@ -19730,8 +19754,8 @@ function getErrorMap() {
 
 // node_modules/.pnpm/zod@3.25.76/node_modules/zod/v3/helpers/parseUtil.js
 var makeIssue = (params) => {
-  const { data, path: path5, errorMaps, issueData } = params;
-  const fullPath = [...path5, ...issueData.path || []];
+  const { data, path: path6, errorMaps, issueData } = params;
+  const fullPath = [...path6, ...issueData.path || []];
   const fullIssue = {
     ...issueData,
     path: fullPath
@@ -19846,11 +19870,11 @@ var errorUtil;
 
 // node_modules/.pnpm/zod@3.25.76/node_modules/zod/v3/types.js
 var ParseInputLazyPath = class {
-  constructor(parent, value, path5, key) {
+  constructor(parent, value, path6, key) {
     this._cachedPath = [];
     this.parent = parent;
     this.data = value;
-    this._path = path5;
+    this._path = path6;
     this._key = key;
   }
   get path() {
@@ -25443,8 +25467,8 @@ var Watcher = class extends import_events2.EventEmitter {
   buildWsUrl() {
     const apiUrl = this.http.getApiUrl();
     const wsBase = apiUrl.replace(/^http/, "ws");
-    const path5 = this.kind === "crawl" ? `/v2/crawl/${this.jobId}` : `/v2/batch/scrape/${this.jobId}`;
-    return `${wsBase}${path5}`;
+    const path6 = this.kind === "crawl" ? `/v2/crawl/${this.jobId}` : `/v2/batch/scrape/${this.jobId}`;
+    return `${wsBase}${path6}`;
   }
   async start() {
     try {
@@ -27315,7 +27339,7 @@ function getClient(options) {
 
 // src/utils/output.ts
 var fs2 = __toESM(require("fs"));
-var path2 = __toESM(require("path"));
+var path3 = __toESM(require("path"));
 function shouldOutputJson(outputPath, jsonFlag) {
   if (jsonFlag) return true;
   if (outputPath && outputPath.toLowerCase().endsWith(".json")) {
@@ -27395,7 +27419,7 @@ function extractMultipleFormats(data, formats) {
 }
 function writeOutput(content, outputPath, silent = false) {
   if (outputPath) {
-    const dir = path2.dirname(outputPath);
+    const dir = path3.dirname(outputPath);
     if (dir && !fs2.existsSync(dir)) {
       fs2.mkdirSync(dir, { recursive: true });
     }
@@ -27498,6 +27522,7 @@ function getOrigin(url2) {
 
 // src/commands/scrape.ts
 init_config();
+init_cli_name();
 
 // src/commands/map.ts
 async function executeMap(options) {
@@ -27569,6 +27594,7 @@ var import_path = __toESM(require("path"));
 var import_package = __toESM(require_package2());
 init_auth();
 init_config();
+init_cli_name();
 init_settings();
 function getAuthSource() {
   if (process.env.FIRECRAWL_API_KEY) {
@@ -27679,7 +27705,7 @@ async function getLocalStatus() {
 function printDataDirStatus(localStatus, dim, reset) {
   if (!localStatus.dataDirConfigured) {
     console.log(
-      `  ${dim}Data dir:${reset} not configured ${dim}- run 'node bundle/index.cjs config' to set${reset}`
+      `  ${dim}Data dir:${reset} not configured ${dim}- run '${getCliName()} config' to set${reset}`
     );
   } else if (localStatus.dataDirExists) {
     console.log(
@@ -27710,9 +27736,7 @@ async function handleStatusCommand() {
     console.log(`  ${green}\u25CF${reset} Configured ${dim}${sourceLabel}${reset}`);
   } else {
     console.log(`  ${red}\u25CF${reset} Not configured`);
-    console.log(
-      `  ${dim}Run 'node bundle/index.cjs config' to configure${reset}`
-    );
+    console.log(`  ${dim}Run '${getCliName()} config' to configure${reset}`);
     console.log("");
     printDataDirStatus(localStatus, dim, reset);
     console.log("");
@@ -27839,14 +27863,14 @@ function urlToFilename(url2) {
 }
 async function handleMultiScrapeCommand(urls, options) {
   const fs5 = await import("fs");
-  const path5 = await import("path");
+  const path6 = await import("path");
   const dataDir = getDataDir();
   if (!dataDir) {
     throw new Error(
-      'Data directory is required. Run "node bundle/index.cjs config" to configure.'
+      `Data directory is required. Run "${getCliName()} config" to configure.`
     );
   }
-  const dir = path5.resolve(dataDir);
+  const dir = path6.resolve(dataDir);
   if (!fs5.existsSync(dir)) {
     fs5.mkdirSync(dir, { recursive: true });
   }
@@ -27868,7 +27892,7 @@ async function handleMultiScrapeCommand(urls, options) {
       return;
     }
     const filename = urlToFilename(url2);
-    const filepath = path5.join(dir, filename);
+    const filepath = path6.join(dir, filename);
     const content = result.data?.markdown || JSON.stringify(result.data);
     fs5.writeFileSync(filepath, content, "utf-8");
     process.stderr.write(`[${currentCount}/${total}] Saved: ${filepath}
@@ -27901,7 +27925,7 @@ function urlToNestedPath(url2, filename = "index.md") {
 async function handleAllScrapeCommand(siteUrl, options, allOptions = {}) {
   let { limit, yes, search: search2, includePaths, excludePaths, allowSubdomains } = allOptions;
   const fs5 = await import("fs");
-  const path5 = await import("path");
+  const path6 = await import("path");
   const mapUrl = getOrigin(siteUrl);
   process.stderr.write(`Mapping ${mapUrl}...
 `);
@@ -27970,10 +27994,10 @@ Found ${urls.length} pages to scrape (${maxConcurrency} at a time).`
   const dataDir = getDataDir();
   if (!dataDir) {
     throw new Error(
-      'Data directory is required. Run "node bundle/index.cjs config" to configure.'
+      `Data directory is required. Run "${getCliName()} config" to configure.`
     );
   }
-  const baseDir = path5.resolve(dataDir);
+  const baseDir = path6.resolve(dataDir);
   let completedCount = 0;
   let errorCount = 0;
   const total = urls.length;
@@ -27995,7 +28019,7 @@ Found ${urls.length} pages to scrape (${maxConcurrency} at a time).`
       formats.push("screenshot");
     }
     const dirPath = urlToNestedPath(url2, "").replace(/\/$/, "");
-    const dir = path5.join(baseDir, dirPath);
+    const dir = path6.join(baseDir, dirPath);
     if (!fs5.existsSync(dir)) {
       fs5.mkdirSync(dir, { recursive: true });
     }
@@ -28007,7 +28031,7 @@ Found ${urls.length} pages to scrape (${maxConcurrency} at a time).`
             const response = await fetch(result.data.screenshot);
             if (response.ok) {
               const buffer = Buffer.from(await response.arrayBuffer());
-              const filepath = path5.join(dir, "screenshot.png");
+              const filepath = path6.join(dir, "screenshot.png");
               fs5.writeFileSync(filepath, buffer);
               savedFiles.push(filepath);
             }
@@ -28016,37 +28040,37 @@ Found ${urls.length} pages to scrape (${maxConcurrency} at a time).`
         }
       } else if (fmt === "markdown") {
         if (result.data?.markdown) {
-          const filepath = path5.join(dir, "index.md");
+          const filepath = path6.join(dir, "index.md");
           fs5.writeFileSync(filepath, result.data.markdown, "utf-8");
           savedFiles.push(filepath);
         }
       } else if (fmt === "html" || fmt === "rawHtml") {
         const html = result.data?.html || result.data?.rawHtml;
         if (html) {
-          const filepath = path5.join(dir, "index.html");
+          const filepath = path6.join(dir, "index.html");
           fs5.writeFileSync(filepath, html, "utf-8");
           savedFiles.push(filepath);
         }
       } else if (fmt === "links") {
         if (Array.isArray(result.data?.links)) {
-          const filepath = path5.join(dir, "links.txt");
+          const filepath = path6.join(dir, "links.txt");
           fs5.writeFileSync(filepath, result.data.links.join("\n"), "utf-8");
           savedFiles.push(filepath);
         }
       } else if (fmt === "images") {
         if (Array.isArray(result.data?.images)) {
-          const filepath = path5.join(dir, "images.txt");
+          const filepath = path6.join(dir, "images.txt");
           fs5.writeFileSync(filepath, result.data.images.join("\n"), "utf-8");
           savedFiles.push(filepath);
         }
       } else if (fmt === "summary") {
         if (result.data?.summary) {
-          const filepath = path5.join(dir, "summary.md");
+          const filepath = path6.join(dir, "summary.md");
           fs5.writeFileSync(filepath, result.data.summary, "utf-8");
           savedFiles.push(filepath);
         }
       } else if (fmt === "json") {
-        const filepath = path5.join(dir, "index.json");
+        const filepath = path6.join(dir, "index.json");
         fs5.writeFileSync(
           filepath,
           JSON.stringify(result.data, null, 2),
@@ -28054,7 +28078,7 @@ Found ${urls.length} pages to scrape (${maxConcurrency} at a time).`
         );
         savedFiles.push(filepath);
       } else {
-        const filepath = path5.join(dir, "index.json");
+        const filepath = path6.join(dir, "index.json");
         fs5.writeFileSync(
           filepath,
           JSON.stringify(result.data, null, 2),
@@ -28099,12 +28123,14 @@ init_config();
 init_settings();
 init_config();
 init_auth();
+init_cli_name();
 async function configure(options = {}) {
   if (!options.apiKey && !options.apiUrl && !options.dataDir) {
     if (isAuthenticated()) {
       await viewConfig();
       console.log(
-        "To re-configure, run: node bundle/index.cjs config --api-key <key> --api-url <url> --data-dir <dir>\n"
+        `To re-configure, run: ${getCliName()} config --api-key <key> --api-url <url> --data-dir <dir>
+`
       );
       return;
     }
@@ -28113,11 +28139,13 @@ async function configure(options = {}) {
     );
     console.error("Usage:");
     console.error(
-      "  node bundle/index.cjs config --api-key <key> --api-url <url> --data-dir <dir>\n"
+      `  ${getCliName()} config --api-key <key> --api-url <url> --data-dir <dir>
+`
     );
     console.error("Example:");
     console.error(
-      "  node bundle/index.cjs config --api-key fc-xxx --api-url https://api.firecrawl.dev --data-dir /tmp/firecrawl\n"
+      `  ${getCliName()} config --api-key fc-xxx --api-url https://api.firecrawl.dev --data-dir /tmp/firecrawl
+`
     );
     process.exit(1);
   }
@@ -28130,7 +28158,8 @@ async function configure(options = {}) {
 `);
     console.error("All three options must be provided together:");
     console.error(
-      "  node bundle/index.cjs config --api-key <key> --api-url <url> --data-dir <dir>\n"
+      `  ${getCliName()} config --api-key <key> --api-url <url> --data-dir <dir>
+`
     );
     process.exit(1);
   }
@@ -28160,13 +28189,13 @@ async function viewConfig() {
     console.log(`Data Dir:  ${getDataDir() || "Not set"}`);
     console.log(`Config:    ${getConfigDirectoryPath()}`);
     console.log("\nCommands:");
-    console.log("  node bundle/index.cjs config       Re-configure");
-    console.log("  node bundle/index.cjs view-config  View configuration");
+    console.log(`  ${getCliName()} config       Re-configure`);
+    console.log(`  ${getCliName()} view-config  View configuration`);
   } else {
     console.log("Status: Not configured\n");
     console.log("Configure using:");
     console.log(
-      "  node bundle/index.cjs config --api-key <key> --api-url <url> --data-dir <dir>"
+      `  ${getCliName()} config --api-key <key> --api-url <url> --data-dir <dir>`
     );
   }
   console.log("");
@@ -28539,6 +28568,9 @@ async function handleSearchCommand(options) {
   writeOutput(outputContent, options.output, !!options.output);
 }
 
+// src/commands/agent.ts
+init_cli_name();
+
 // src/utils/spinner.ts
 var SPINNER_FRAMES = ["\u280B", "\u2819", "\u2839", "\u2838", "\u283C", "\u2834", "\u2826", "\u2827", "\u2807", "\u280F"];
 function createSpinner(initialMessage = "") {
@@ -28647,7 +28679,7 @@ async function checkAgentStatus(jobId, options) {
     spinner.stop();
     process.stderr.write("\n\nInterrupted. Agent may still be running.\n");
     process.stderr.write(
-      `Check status with: node bundle/index.cjs agent ${jobId}
+      `Check status with: ${getCliName()} agent ${jobId}
 
 `
     );
@@ -28748,7 +28780,7 @@ async function executeAgent(options) {
         spinner2.stop();
         process.stderr.write("\n\nInterrupted. Agent is still running.\n");
         process.stderr.write(
-          `Check status with: node bundle/index.cjs agent ${jobId}
+          `Check status with: ${getCliName()} agent ${jobId}
 
 `
         );
@@ -28890,14 +28922,18 @@ async function handleAgentCommand(options) {
   writeOutput(outputContent, options.output, !!options.output);
 }
 
+// src/commands/browser.ts
+init_cli_name();
+
 // src/utils/browser-session.ts
 var fs4 = __toESM(require("fs"));
-var path4 = __toESM(require("path"));
+var path5 = __toESM(require("path"));
 init_config();
+init_cli_name();
 function getSessionPath() {
   const dataDir = getDataDir();
   if (!dataDir) return null;
-  return path4.join(path4.resolve(dataDir), "browser-session.json");
+  return path5.join(path5.resolve(dataDir), "browser-session.json");
 }
 function ensureDataDir(dir) {
   if (!fs4.existsSync(dir)) {
@@ -28908,10 +28944,10 @@ function saveBrowserSession(session) {
   const sessionPath = getSessionPath();
   if (!sessionPath) {
     throw new Error(
-      'Data directory is not configured. Run "node bundle/index.cjs config" to set it up.'
+      `Data directory is not configured. Run "${getCliName()} config" to set it up.`
     );
   }
-  ensureDataDir(path4.dirname(sessionPath));
+  ensureDataDir(path5.dirname(sessionPath));
   fs4.writeFileSync(sessionPath, JSON.stringify(session, null, 2), "utf-8");
 }
 function loadBrowserSession() {
@@ -28940,7 +28976,8 @@ function getSessionId(overrideId) {
   const stored = loadBrowserSession();
   if (stored) return stored.id;
   throw new Error(
-    "No active browser session. Launch one with: node bundle/index.cjs browser launch-session\nOr specify a session ID with: --session <id>"
+    `No active browser session. Launch one with: ${getCliName()} browser launch-session
+Or specify a session ID with: --session <id>`
   );
 }
 
@@ -29030,7 +29067,7 @@ async function handleBrowserExecute(options) {
       console.error(
         `Error: Session ${sessionId} has expired or been destroyed.
 The session may have exceeded its TTL or been closed.
-Start a new session with: node bundle/index.cjs browser launch-session`
+Start a new session with: ${getCliName()} browser launch-session`
       );
       const stored = loadBrowserSession();
       if (stored && !options.session) {
@@ -29289,7 +29326,20 @@ function parseScrapeOptions(options) {
 
 // src/index.ts
 init_auth();
+init_cli_name();
 var import_package3 = __toESM(require_package2());
+{
+  const originalEmitWarning = process.emitWarning;
+  process.emitWarning = ((warning, ...args2) => {
+    if (typeof warning === "string" && warning.includes("url.parse()") && (args2[0] === "DeprecationWarning" || typeof args2[0] === "object" && args2[0] !== null && "code" in args2[0] && args2[0].code === "DEP0169")) {
+      return;
+    }
+    if (warning instanceof Error && warning.message.includes("url.parse()") && (warning.code === "DEP0169" || args2[0] === "DeprecationWarning")) {
+      return;
+    }
+    return originalEmitWarning.call(process, warning, ...args2);
+  });
+}
 initializeConfig();
 var AUTH_REQUIRED_COMMANDS = [
   "scrape",
@@ -29301,7 +29351,7 @@ var AUTH_REQUIRED_COMMANDS = [
   "browser"
 ];
 var program2 = new Command();
-program2.name("node bundle/index.cjs").description("CLI tool for Firecrawl web scraping").version(import_package3.default.version).option(
+program2.name(getCliName()).description("CLI tool for Firecrawl web scraping").version(import_package3.default.version).option(
   "-k, --api-key <key>",
   "Firecrawl API key (or set FIRECRAWL_API_KEY env var)"
 ).option("--api-url <url>", "API URL (or set FIRECRAWL_API_URL env var)").option("--status", "Show version, auth status, and concurrency").allowUnknownOption().hook("preAction", async (thisCommand, actionCommand) => {
@@ -29753,24 +29803,24 @@ function createBrowserCommand() {
     "after",
     `
 Shorthand (auto-launches session if needed):
-  $ node bundle/index.cjs browser "open https://example.com"
-  $ node bundle/index.cjs browser "snapshot"
-  $ node bundle/index.cjs browser "click @e5"
-  $ node bundle/index.cjs browser "scrape"
+  $ ${getCliName()} browser "open https://example.com"
+  $ ${getCliName()} browser "snapshot"
+  $ ${getCliName()} browser "click @e5"
+  $ ${getCliName()} browser "scrape"
 
 Explicit subcommands:
-  $ node bundle/index.cjs browser launch-session
-  $ node bundle/index.cjs browser execute "open https://example.com"
-  $ node bundle/index.cjs browser list active
-  $ node bundle/index.cjs browser close
+  $ ${getCliName()} browser launch-session
+  $ ${getCliName()} browser execute "open https://example.com"
+  $ ${getCliName()} browser list active
+  $ ${getCliName()} browser close
 
   By default, commands are sent to agent-browser (pre-installed in every sandbox).
   Use --python or --node to run Playwright code instead.
-  $ node bundle/index.cjs browser execute --python 'print(await page.title())'
-  $ node bundle/index.cjs browser execute --node 'await page.title()'
+  $ ${getCliName()} browser execute --python 'print(await page.title())'
+  $ ${getCliName()} browser execute --node 'await page.title()'
 
   See all agent-browser commands:
-  $ node bundle/index.cjs browser execute "--help"
+  $ ${getCliName()} browser execute "--help"
 `
   );
   browserCmd.command("launch-session").description(
@@ -29796,15 +29846,15 @@ Output:
   subsequent execute/close commands target it automatically.
 
   Tip: Use the shorthand to launch + execute in one step:
-    $ node bundle/index.cjs browser "open https://example.com"
+    $ ${getCliName()} browser "open https://example.com"
 
 Examples:
-  $ node bundle/index.cjs browser launch-session
-  $ node bundle/index.cjs browser launch-session --ttl 600
-  $ node bundle/index.cjs browser launch-session --ttl 300 --ttl-inactivity 60
-  $ node bundle/index.cjs browser launch-session --profile my-session
-  $ node bundle/index.cjs browser launch-session --profile my-session --no-save-changes
-  $ node bundle/index.cjs browser launch-session -o session.json --json
+  $ ${getCliName()} browser launch-session
+  $ ${getCliName()} browser launch-session --ttl 600
+  $ ${getCliName()} browser launch-session --ttl 300 --ttl-inactivity 60
+  $ ${getCliName()} browser launch-session --profile my-session
+  $ ${getCliName()} browser launch-session --profile my-session --no-save-changes
+  $ ${getCliName()} browser launch-session -o session.json --json
 `
   ).action(async (options) => {
     await handleBrowserLaunch({
@@ -29841,20 +29891,20 @@ How it works:
   You don't need to type "agent-browser" \u2014 it's added automatically.
 
 agent-browser examples (default):
-  $ node bundle/index.cjs browser execute "open https://example.com"
-  $ node bundle/index.cjs browser execute "snapshot"
-  $ node bundle/index.cjs browser execute "click @e5"
-  $ node bundle/index.cjs browser execute "scrape"
+  $ ${getCliName()} browser execute "open https://example.com"
+  $ ${getCliName()} browser execute "snapshot"
+  $ ${getCliName()} browser execute "click @e5"
+  $ ${getCliName()} browser execute "scrape"
 
   You can still pass the full command if you prefer:
-  $ node bundle/index.cjs browser execute "agent-browser snapshot"
+  $ ${getCliName()} browser execute "agent-browser snapshot"
 
   Use --bash for arbitrary bash commands (not just agent-browser):
-  $ node bundle/index.cjs browser execute --bash 'ls /tmp'
+  $ ${getCliName()} browser execute --bash 'ls /tmp'
 
 Python examples (use --python):
-  $ node bundle/index.cjs browser execute --python 'print(await page.title())'
-  $ node bundle/index.cjs browser execute --python '
+  $ ${getCliName()} browser execute --python 'print(await page.title())'
+  $ ${getCliName()} browser execute --python '
     await page.goto("https://news.ycombinator.com")
     title = await page.title()
     items = await page.query_selector_all(".titleline > a")
@@ -29863,10 +29913,10 @@ Python examples (use --python):
   '
 
 JavaScript examples (use --node):
-  $ node bundle/index.cjs browser execute --node 'await page.goto("https://example.com"); await page.title()'
+  $ ${getCliName()} browser execute --node 'await page.goto("https://example.com"); await page.title()'
 
 Target a specific session:
-  $ node bundle/index.cjs browser execute --session <id> "snapshot"
+  $ ${getCliName()} browser execute --session <id> "snapshot"
 
 Note: --python, --node, and --bash are mutually exclusive.
 `
@@ -29904,10 +29954,10 @@ Note: --python, --node, and --bash are mutually exclusive.
     "after",
     `
 Examples:
-  $ node bundle/index.cjs browser list
-  $ node bundle/index.cjs browser list active
-  $ node bundle/index.cjs browser list destroyed
-  $ node bundle/index.cjs browser list --json
+  $ ${getCliName()} browser list
+  $ ${getCliName()} browser list active
+  $ ${getCliName()} browser list destroyed
+  $ ${getCliName()} browser list --json
 `
   ).action(async (status, options) => {
     if (status && !["active", "destroyed"].includes(status)) {
@@ -29934,8 +29984,8 @@ Examples:
     "after",
     `
 Examples:
-  $ node bundle/index.cjs browser close
-  $ node bundle/index.cjs browser close --session <id>
+  $ ${getCliName()} browser close
+  $ ${getCliName()} browser close --session <id>
 `
   ).action(async (options) => {
     await handleBrowserClose({
@@ -29985,7 +30035,8 @@ async function main() {
     const { isAuthenticated: isAuthenticated2 } = await Promise.resolve().then(() => (init_auth(), auth_exports));
     if (!isAuthenticated2()) {
       console.log(
-        'Not configured. Run "node bundle/index.cjs config" or set environment variables first.\n'
+        `Not configured. Run "${getCliName()} config" or set environment variables first.
+`
       );
     }
     program2.outputHelp();
