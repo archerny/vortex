@@ -1,8 +1,8 @@
-# LongPort API 文档 - 下载与维护指南
+# Longbridge API 文档 - 下载与维护指南
 
 ## 概述
 
-本目录存放从 [LongPort OpenAPI 官方文档](https://open.longbridge.com/zh-CN/docs) 下载的离线 Markdown 文档，供项目内部引用。
+本目录存放从 [Longbridge OpenAPI 官方文档](https://open.longbridge.com/zh-CN/docs) 下载的离线 Markdown 文档，供项目内部引用。
 
 - **文档来源**: `https://open.longbridge.com/zh-CN/docs`
 - **文件数量**: 85 个 .md 文件（以实际下载结果为准）
@@ -67,15 +67,15 @@ https://open.longbridge.com/zh-CN/docs/{path}
 node scripts/index.js scrape \
   "https://open.longbridge.com/zh-CN/docs" \
   $AUTH \
-  -o .firecrawl/longport-docs-index.md
+  -o .firecrawl/longbridge-docs-index.md
 
 # 2. 从首页内容中提取所有文档 URL
 grep -o 'https://open\.longbridge\.com/zh-CN/docs[^)"#]*' \
-  .firecrawl/longport-docs-index.md \
-  | grep -v '#' | sort -u > .firecrawl/longport-urls.txt
+  .firecrawl/longbridge-docs-index.md \
+  | grep -v '#' | sort -u > .firecrawl/longbridge-urls.txt
 
 # 3. 检查发现的 URL 数量
-wc -l .firecrawl/longport-urls.txt
+wc -l .firecrawl/longbridge-urls.txt
 ```
 
 > 📌 长桥文档站使用 VitePress 框架，侧边栏链接在服务端渲染，所以可以直接从首页 HTML 中提取完整的链接列表。这比富途（VuePress SPA）的情况简单得多。
@@ -104,7 +104,7 @@ FIRECRAWL_DATA_DIR=<dataDir> node scripts/index.js scrape $AUTH \
 node scripts/index.js scrape \
   "https://open.longbridge.com/zh-CN/docs/<failed-page>" \
   $AUTH \
-  -o .firecrawl/longport-docs/<filename>.md
+  -o .firecrawl/longbridge-docs/<filename>.md
 ```
 
 > 💡 anti-bot 拦截是随机的，同一个 URL 重试通常就能成功。
@@ -116,6 +116,7 @@ node scripts/index.js scrape \
 1. **清理导航栏噪音**：去除 logo、搜索框、语言切换、Sidebar Navigation 列表、页面 TOC 目录等非正文内容
 2. **清理页脚导航**：去除 "上一页"/"下一页" 翻页链接
 3. **替换超链接**：将指向已下载文档的链接替换为本地相对路径
+4. **中文文件名翻译为英文**：如果下载的文档文件名包含中文，将文件名翻译为对应的英文（如 `期权工具.md` → `option-tools.md`），同时更新所有引用了该文件名的本地链接。中文文件名不利于统一管理和跨平台兼容。
 
 **导航栏清理策略**：
 
@@ -254,3 +255,4 @@ node scripts/index.js scrape \
 - [ ] 将已下载文档的交叉引用链接替换为本地相对路径
 - [ ] 验证替换结果：`grep -rl 'Sidebar Navigation' docs/` 应返回 0 结果
 - [ ] 验证替换结果：`grep -rl 'logo-without-title' docs/` 应返回 0 结果
+- [ ] 检查中文文件名：如有中文命名的文件，翻译为英文并更新所有引用链接
