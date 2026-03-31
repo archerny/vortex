@@ -58,6 +58,13 @@
             <optional>true</optional>
         </dependency>
 
+        <!-- Tiger Open API Java SDK -->
+        <dependency>
+            <groupId>io.github.tigerbrokers</groupId>
+            <artifactId>openapi-java-sdk</artifactId>
+            <version>2.4.7</version>
+        </dependency>
+
         <!-- Spring Boot Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

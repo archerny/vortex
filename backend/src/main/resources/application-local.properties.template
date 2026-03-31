@@ -11,6 +11,12 @@ spring.datasource.url=jdbc:postgresql://localhost:5432/ledgerdb
 spring.datasource.username=ledger
 spring.datasource.password=your_actual_password_here
 
+# 券商 API 凭证 - 老虎证券
+# 从老虎开放平台获取：https://developer.itigerup.com/profile
+broker.tiger.tiger-id=your_tiger_id_here
+broker.tiger.private-key=your_pkcs8_private_key_here
+broker.tiger.account=your_account_here
+
 # 可以在这里覆盖其他需要本地化的配置
 # 例如：
 # server.port=8081
