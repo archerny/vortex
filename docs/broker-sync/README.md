@@ -9,6 +9,8 @@
 | 文档 | 说明 | 状态 |
 |------|------|------|
 | [overall-design.md](./overall-design.md) | 总体方案设计（核心问题讨论与决策记录） | 方案讨论中 |
+| [tiger-sync-design.md](./tiger-sync-design.md) | 老虎证券同步方案（设计与实现记录） | Phase 1 已实现 |
+| [ibkr-flex-web-service-design.md](./ibkr-flex-web-service-design.md) | IBKR Flex Web Service 同步方案（讨论记录） | 方案讨论完成，待实现 |
 
 ---
 
