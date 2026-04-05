@@ -150,7 +150,49 @@ Portal 创建 Query 时可以选择 Period 预设（Last Business Day / Month to
 
 #### 4.3.3 交易记录模型 `IbkrTradeRecord`
 
-- 映射 Flex Query Trade Confirmation 字段（symbol、side、quantity、price、commission、tradeDate 等）
+Portal 配置了 37 个字段，以下是完整的字段列表、Portal 配置名与 XML 属性名的对应关系、Java 类型映射：
+
+| # | Portal 配置名 | XML 属性名 | Java 类型 | 说明 |
+|---|--------------|-----------|-----------|------|
+| 1 | ClientAccountID | `accountId` | `String` | 客户账户 ID |
+| 2 | AccountAlias | `acctAlias` | `String` | 账户别名（可为空） |
+| 3 | CurrencyPrimary | `currency` | `String` | 主币种（如 `USD`） |
+| 4 | AssetClass | `assetCategory` | `String` | 资产类别（`STK` / `OPT`） |
+| 5 | Symbol | `symbol` | `String` | 证券代码 |
+| 6 | Description | `description` | `String` | 证券描述 |
+| 7 | Conid | `conid` | `String` | IBKR 合约 ID（内部唯一标识） |
+| 8 | SecurityID | `securityID` | `String` | 证券 ID（如 ISIN，期权为空） |
+| 9 | SecurityIDType | `securityIDType` | `String` | 证券 ID 类型（如 `ISIN`，期权为空） |
+| 10 | Multiplier | `multiplier` | `String` | 合约乘数（股票为 `1`，期权为 `100`） |
+| 11 | Strike | `strike` | `String` | 行权价（仅期权，股票为空） |
+| 12 | Expiry | `expiry` | `String` | 到期日（仅期权，格式 `yyyyMMdd`） |
+| 13 | Put/Call | `putCall` | `String` | `C`（看涨）/ `P`（看跌），仅期权 |
+| 14 | TransactionType | `transactionType` | `String` | 交易类型：`ExchTrade`（交易所成交）/ `BookTrade`（簿记交易） |
+| 15 | TradeID | `tradeID` | `String` | 交易 ID |
+| 16 | OrderID | `orderID` | `String` | 订单 ID |
+| 17 | ExecID | `execID` | `String` | 执行 ID（BookTrade 可能为空） |
+| 18 | BrokerageOrderID | `brokerageOrderID` | `String` | 券商订单 ID（BookTrade 可能为空） |
+| 19 | OrderReference | `orderReference` | `String` | 订单参考（通常为空） |
+| 20 | OrderTime | `orderTime` | `String` | 下单时间（格式 `yyyyMMdd;HHmmss`） |
+| 21 | Date/Time | `dateTime` | `String` | 成交日期时间（格式 `yyyyMMdd;HHmmss`） |
+| 22 | SettleDate | `settleDate` | `String` | 结算日期（格式 `yyyyMMdd`） |
+| 23 | TradeDate | `tradeDate` | `String` | 交易日期（格式 `yyyyMMdd`） |
+| 24 | Exchange | `exchange` | `String` | 交易所（如 `DARK`、`DRCTEDGE`，期权行权为 `--`） |
+| 25 | Buy/Sell | `buySell` | `String` | 买卖方向：`BUY` / `SELL` |
+| 26 | Quantity | `quantity` | `String` | 数量（**卖出为负数**，如 `-2`） |
+| 27 | Price | `price` | `String` | 成交价格 |
+| 28 | Amount | `amount` | `String` | 成交金额 |
+| 29 | Proceeds | `proceeds` | `String` | 收入（买入为负，卖出为正） |
+| 30 | NetCash | `netCash` | `String` | 净现金流（含佣金和费用） |
+| 31 | Commission | `commission` | `String` | 佣金（通常为负数，如 `-0.37`） |
+| 32 | CommissionCurrency | `commissionCurrency` | `String` | 佣金币种 |
+| 33 | TradeCharge | `tradeCharge` | `String` | 交易费用（印花税等） |
+| 34 | Code | `code` | `String` | 交易代码标记，多值分号分隔（如 `O`、`C;Ep`、`A;C`） |
+| 35 | OrderType | `orderType` | `String` | 订单类型（如 `LMT`、`MKT`，BookTrade 可能为空） |
+| 36 | TraderID | `traderID` | `String` | 交易者 ID（通常为空） |
+| 37 | IsAPIOrder | `isAPIOrder` | `String` | 是否通过 API 下单（`Y` / `N`） |
+
+> **注**：Java 类型统一用 `String` 接收 XML 属性值，后续按需转换为 `BigDecimal`（金额/数量）、`LocalDate`（日期）等。期权专属字段（strike、expiry、putCall）在股票记录中为空字符串。
 
 #### 4.3.4 同步适配器 `IbkrSyncAdapter`
 
@@ -192,24 +234,87 @@ SendRequest 后轮询 GetStatement：
 ```xml
 <FlexQueryResponse queryName="..." type="TCF">
     <FlexStatements count="1">
-        <FlexStatement accountId="..." fromDate="..." toDate="...">
+        <FlexStatement accountId="U18316975" fromDate="20260101" toDate="20260331" period="" whenGenerated="20260405;124357">
             <TradeConfirms>
+                <!-- 三层嵌套：SymbolSummary（标的汇总）→ Order（订单汇总）→ TradeConfirm（逐笔成交） -->
+                <SymbolSummary ... settleDate="MULTI" tradeDate="MULTI" exchange="MULTI" ... />
+                <Order ... />
                 <TradeConfirm
-                    symbol="AAPL"
-                    buySell="BUY"
-                    quantity="100"
-                    price="150.00"
-                    commission="-1.00"
-                    tradeDate="20260301"
-                    currency="USD"
-                    ... />
+                    accountId="U18316975" acctAlias="" currency="USD"
+                    assetCategory="STK" symbol="AAPL" description="APPLE INC"
+                    conid="265598" securityID="US0378331005" securityIDType="ISIN"
+                    multiplier="1" strike="" expiry="" putCall=""
+                    transactionType="ExchTrade"
+                    tradeID="8856974303" orderID="4797726468"
+                    execID="0001f951.6970fa43.01.01"
+                    brokerageOrderID="02130ad4.0001f3aa.6970c818.0001"
+                    orderReference="" orderTime="20260121;111309"
+                    dateTime="20260121;111310" settleDate="20260122"
+                    tradeDate="20260121" exchange="DARK"
+                    buySell="BUY" quantity="100" price="247.41"
+                    amount="24741" proceeds="-24741"
+                    netCash="-24741.37025725"
+                    commission="-0.37025725" commissionCurrency="USD"
+                    tradeCharge="0" code="O" orderType="LMT"
+                    traderID="" isAPIOrder="N" />
             </TradeConfirms>
         </FlexStatement>
     </FlexStatements>
 </FlexQueryResponse>
 ```
 
-### 5.3 错误码
+### 5.3 样例数据分析（2026-04-06 基于实际 Flex Query 导出）
+
+基于实际导出的 Q1（2026-01-01 ~ 2026-03-31）样例 XML 文件分析：
+
+#### 数据概况
+
+| 指标 | 值 |
+|------|-----|
+| 日期范围 | `20260101` ~ `20260331`（Q1 整季度） |
+| TradeConfirm 总记录数 | 155 条 |
+| SymbolSummary（标的汇总）数 | 141 条 |
+| Order（订单级汇总）数 | 150 条 |
+
+#### 资产类型分布
+
+| 资产类型 | 记录数 | 占比 |
+|---------|-------|------|
+| `OPT`（期权） | 136 | 87.7% |
+| `STK`（股票） | 19 | 12.3% |
+
+#### transactionType 分布
+
+| 类型 | 记录数 | 说明 |
+|------|-------|------|
+| `ExchTrade` | 94 | 交易所成交（正常买卖） |
+| `BookTrade` | 61 | 簿记交易（期权行权/到期、内部调整等） |
+
+#### code 字段值分布
+
+| code 值 | 记录数 | 含义 |
+|---------|-------|------|
+| `O` | 82 | Opening trade（建仓） |
+| `C;Ep` | 41 | Closing trade + Expired position（期权到期平仓） |
+| `A;C` | 12 | Assigned + Closing（被行权平仓） |
+| `O;P` | 8 | Opening + Partial（部分建仓） |
+| `A;O` | 8 | Assigned + Opening（被行权建仓，如 Put 被行权获得股票） |
+| `C;P` | 2 | Closing + Partial（部分平仓） |
+| `C` | 2 | Closing trade（平仓） |
+
+> **注**：`code` 是多值字段，用分号 `;` 分隔，常见标记含义：`O`=Open、`C`=Close、`A`=Assigned、`Ep`=Expired、`P`=Partial
+
+#### 解析注意事项
+
+1. **三层嵌套结构**：`<TradeConfirms>` 下有 `SymbolSummary`（标的汇总）、`Order`（订单汇总）、`TradeConfirm`（逐笔成交）三种节点，**解析时只取 `<TradeConfirm>` 节点**，忽略 `SymbolSummary` 和 `Order`
+2. **卖出数量为负数**：`buySell="SELL"` 时 `quantity` 为负值（如 `-2`），`proceeds` 为正值
+3. **佣金为负数**：`commission` 通常为负值（如 `-0.37025725`），表示支出
+4. **期权 Symbol 格式特殊**：如 `AAPL  260130C00265000`（含空格填充），`description` 更可读：`AAPL 30JAN26 265 C`
+5. **BookTrade 字段可能为空**：期权行权/到期的 `BookTrade` 记录中，`execID`、`brokerageOrderID`、`orderTime`、`orderType` 等字段可能为空
+6. **日期时间格式**：`orderTime` 和 `dateTime` 使用 `yyyyMMdd;HHmmss` 格式（分号分隔日期和时间），`tradeDate`/`settleDate`/`expiry` 使用 `yyyyMMdd` 格式
+7. **exchange 字段**：期权行权/到期记录的 `exchange` 为 `--`（非交易所成交）
+
+### 5.4 错误码
 
 | 错误码 | 含义 | 处理方式 |
 |--------|------|---------|
@@ -221,7 +326,7 @@ SendRequest 后轮询 GetStatement：
 | 1018 | Too many requests (minute limit) | 等待后重试 |
 | 1019 | Statement generation in progress (retry later) | 等待后重试 |
 
-### 5.4 速率限制
+### 5.5 速率限制
 
 - 每个 Token 每秒最多 1 次请求
 - 每个 Token 每分钟最多 10 次请求
@@ -231,7 +336,7 @@ SendRequest 后轮询 GetStatement：
 
 ## 6. 待确认事项
 
-- [ ] Flex Query 模板具体需要哪些字段（需要对照 `SyncResult` 的数据模型）
+- [x] ~~Flex Query 模板具体需要哪些字段~~ → **已确认 37 个字段**，详见 4.3.3 节完整字段映射表
 - [ ] XML 解析方案选型：DOM 解析 vs SAX 解析 vs JAXB
 - [ ] Token 存储方式：当前 properties 文件 vs 后续数据库存储
 - [ ] 是否需要支持 Activity Flex Query（除 Trade Confirmation 外的其他报告类型）
