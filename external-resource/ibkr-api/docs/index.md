@@ -28,6 +28,18 @@ Interactive Brokers' complete API documentation encompassing the Web API, Trader
 *   [ProtoBuf Reference](./tws-api/protobuf-reference.md)
 *   [TWS API Changelog](./tws-api/tws-api-changelog.md)
 
+### Flex Queries & Flex Web Service
+
+*   [Flex Queries](./flex/flex-queries.md)
+*   [Enable Flex Web Service](./flex/flex-web-service.md)
+*   [Configure Flex Web Service (v3 API)](./flex/flex-web-service-v3.md)
+*   [Flex Web Service v3 Error Codes](./flex/flex-web-service-v3-error-codes.md)
+*   [Create Activity Flex Query](./flex/create-activity-flex-query.md)
+*   [Create Trade Confirmation Flex Query](./flex/create-trade-confirmation-flex-query.md)
+*   [Run a Flex Query](./flex/run-flex-query.md)
+*   [View, Edit, Delete Flex Queries](./flex/view-edit-delete-flex-queries.md)
+*   [Delivery Settings](./flex/delivery-settings-flex.md)
+
 ### Excel
 
 *   [Excel ActiveX](https://www.interactivebrokers.com/campus/ibkr-api-page/excel-activex/)

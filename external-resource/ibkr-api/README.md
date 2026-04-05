@@ -13,6 +13,7 @@
 ```
 scripts/
 ├── convert_twsapi_html.py          # TWS API 专属：HTML→Markdown 转换器（BeautifulSoup）
+├── clean_ibkr_flex.py              # Flex 文档专属：IBKR Guides 页面噪音清理器
 docs/
 ├── index.md                        # 总目录导航（所有 API 类型的入口）
 ├── general/                        # 通用文档（所有 API 类型共享）
@@ -32,6 +33,16 @@ docs/
 │   ├── twsapi-doc.md
 │   ├── twsapi-ref.md
 │   └── protobuf-reference.md
+├── flex/                           # Flex Queries & Flex Web Service（报表查询）
+│   ├── flex-queries.md
+│   ├── flex-web-service.md
+│   ├── flex-web-service-v3.md
+│   ├── flex-web-service-v3-error-codes.md
+│   ├── create-activity-flex-query.md
+│   ├── create-trade-confirmation-flex-query.md
+│   ├── run-flex-query.md
+│   ├── view-edit-delete-flex-queries.md
+│   └── delivery-settings-flex.md
 └── third-party/                    # 第三方集成
     ├── third-party-connections.md
     ├── prospective-integrations.md
@@ -47,6 +58,7 @@ IBKR 提供多种 API 接入方式：
 | **General** | 通用文档（合约、订单类型、市场数据订阅等，所有 API 共享） | `general/` | ✅ |
 | **Web API** | 现代 RESTful API，功能最全（交易、账户管理、市场数据） | `web-api/` | ✅ |
 | **TWS API** | 面向 Trader Workstation 的 Socket API（Python/Java/C++/C#/VB） | `tws-api/` | ✅ |
+| **Flex Queries** | Flex Query 报表查询 & Flex Web Service API（历史交易、活动报表） | `flex/` | ✅ |
 | **Third-Party** | 第三方平台集成（TradingView 等） | `third-party/` | ✅ |
 | **FIX API** | 机构级 FIX 协议接口 | — | ❌ |
 | **Excel API** | Excel 集成（ActiveX/DDE/RTD） | — | ❌ |
@@ -108,6 +120,27 @@ https://www.interactivebrokers.com/campus/ibkr-api-page/{page-slug}/
 - `ibkr-api-home` → 命名为 `index.md`（首页，放在 `docs/` 根目录）
 - `webapi-ref.md` 原始 Swagger 页面无法抓取，改为从 OpenAPI JSON 自动生成 API 端点概览表
 - `openapi-spec.json` 直接从 `https://api.ibkr.com/gw/api/v3/api-docs` 下载
+
+#### Flex Queries 文档（来源：IBKR Guides，非 IBKR Campus）
+
+Flex Queries 文档不属于 IBKR Campus API 页面体系，而是来自 IBKR Guides（`ibkrguides.com`）Client Portal 用户指南。因此 URL 和命名规则不同：
+
+```
+https://www.ibkrguides.com/clientportal/performanceandstatements/{page-slug}.htm
+→ docs/flex/{page-slug}.md
+```
+
+| URL 路径 | 本地路径 | 说明 |
+|----------|---------|------|
+| `/performanceandstatements/flex.htm` | `flex/flex-queries.md` | Flex Queries 总览 |
+| `/performanceandstatements/flex-web-service.htm` | `flex/flex-web-service.md` | 启用 Flex Web Service |
+| `/performanceandstatements/flex3.htm` | `flex/flex-web-service-v3.md` | Flex Web Service v3 配置与 API 调用（**核心文档**） |
+| `/performanceandstatements/flex3error.htm` | `flex/flex-web-service-v3-error-codes.md` | Flex Web Service v3 错误码 |
+| `/performanceandstatements/activityflex.htm` | `flex/create-activity-flex-query.md` | 创建 Activity Flex Query |
+| `/performanceandstatements/tradeflex.htm` | `flex/create-trade-confirmation-flex-query.md` | 创建 Trade Confirmation Flex Query |
+| `/performanceandstatements/runflex.htm` | `flex/run-flex-query.md` | 运行 Flex Query |
+| `/performanceandstatements/editflextemplate.htm` | `flex/view-edit-delete-flex-queries.md` | 查看/编辑/删除 Flex Query 模板 |
+| `/performanceandstatements/deliverysettingsflex.htm` | `flex/delivery-settings-flex.md` | Flex Query 投递设置 |
 
 ---
 
@@ -499,6 +532,57 @@ TWS API 文档的 EnlighterJS 代码高亮导致 Firecrawl 输出存在代码三
 
 **解决方案**：链接替换逻辑中引入 `dir_name`（当前文件目录）和 `target_dir`（目标文件目录），动态计算 `./`、`../` 等相对路径前缀。
 
+### 4.9 Flex Queries 文档来源不同于其他 API 文档
+
+**问题**：初始下载时只覆盖了 IBKR Campus（`interactivebrokers.com/campus/ibkr-api-page/`）上的 API 文档（General、Web API、TWS API、Third-Party），遗漏了 **Flex Queries / Flex Web Service** 的完整文档。实际使用中在仓库内搜索 `Flex Web Service`、`SendRequest`、`fd/td` 等关键词时发现本地完全没有 Flex 相关资料，需要反复查在线文档。
+
+**根因**：Flex Queries 文档不在 IBKR Campus API 文档体系中，而是属于 **IBKR Guides**（`ibkrguides.com`）Client Portal 用户指南的一部分。路径为 `ibkrguides.com/clientportal/performanceandstatements/flex*.htm`。这两套文档体系（Campus vs Guides）来源域名、URL 结构、页面模板完全不同，初次整理时容易遗漏。
+
+**解决方案**：
+1. 从 IBKR Guides 站点（`ibkrguides.com`）补充下载 Flex 相关的全部 9 个页面
+2. 存放在 `docs/flex/` 子目录下
+3. 后处理脚本需要单独适配 IBKR Guides 的页面结构（头部噪音标记为 `You are here:` 而非 `SHARE Facebook`，尾部有 IB 全球子公司法律声明）
+
+**经验总结**：
+- IBKR 的文档分散在多个站点（Campus、Guides、ibkrguides.com、interactivebrokers.com 等），不能只抓一个站点就认为覆盖完整
+- **Flex Web Service 是 IBKR 唯一的"无需中间件、纯 HTTP 调用"的报表查询接口**，对本项目的 broker sync 功能至关重要
+- 当发现仓库内搜索某个 API 关键词"完全没有结果"时，应先检查是否是**文档源站点遗漏**，而非"IBKR 没有提供这部分文档"
+
+**Flex 文档的下载命令参考**：
+```bash
+# 使用 firecrawl-cli 批量抓取（并行）
+node scripts/index.js scrape "https://www.ibkrguides.com/clientportal/performanceandstatements/flex.htm" -o .firecrawl/ibkr-flex-overview.md &
+node scripts/index.js scrape "https://www.ibkrguides.com/clientportal/performanceandstatements/flex-web-service.htm" -o .firecrawl/ibkr-flex-web-service.md &
+node scripts/index.js scrape "https://www.ibkrguides.com/clientportal/performanceandstatements/flex3.htm" -o .firecrawl/ibkr-flex-v3.md &
+node scripts/index.js scrape "https://www.ibkrguides.com/clientportal/performanceandstatements/flex3error.htm" -o .firecrawl/ibkr-flex-v3-error.md &
+node scripts/index.js scrape "https://www.ibkrguides.com/clientportal/performanceandstatements/activityflex.htm" -o .firecrawl/ibkr-flex-activity.md &
+node scripts/index.js scrape "https://www.ibkrguides.com/clientportal/performanceandstatements/tradeflex.htm" -o .firecrawl/ibkr-flex-trade.md &
+node scripts/index.js scrape "https://www.ibkrguides.com/clientportal/performanceandstatements/runflex.htm" -o .firecrawl/ibkr-flex-run.md &
+node scripts/index.js scrape "https://www.ibkrguides.com/clientportal/performanceandstatements/editflextemplate.htm" -o .firecrawl/ibkr-flex-edit.md &
+node scripts/index.js scrape "https://www.ibkrguides.com/clientportal/performanceandstatements/deliverysettingsflex.htm" -o .firecrawl/ibkr-flex-delivery.md &
+wait
+```
+
+**Flex 文档后处理要点**（与 Campus 文档不同）：
+- 头部标记：找 `You are here:` 行，删除该行及其上方所有导航内容
+- 尾部标记：找 `[Interactive Brokers LLC` 开头的行，删除该行及其下方所有法律声明
+- 交叉引用：Flex 文档之间互相引用使用 `ibkrguides.com` 域名 URL，需替换为 `./` 本地相对路径
+
+**Flex 文档后处理脚本**：`scripts/clean_ibkr_flex.py`
+
+该脚本封装了上述 Flex 文档的全部清理逻辑（头部导航、法律页脚、UI 噪音、交叉引用替换、空行收缩）。当需要重新抓取 Flex 文档时，运行：
+
+```bash
+# 从仓库根目录执行（使用默认路径：.firecrawl/ → docs/flex/）
+python3 external-resource/ibkr-api/scripts/clean_ibkr_flex.py
+
+# 或指定自定义的源目录和目标目录
+python3 external-resource/ibkr-api/scripts/clean_ibkr_flex.py \
+    --src .firecrawl --dst external-resource/ibkr-api/docs/flex
+```
+
+脚本会读取 `--src` 目录下 9 个 Firecrawl 原始输出文件（如 `ibkr-flex-overview.md`、`ibkr-flex-v3.md` 等），清理后写入 `--dst` 目录并重命名为规范文件名（如 `flex-queries.md`、`flex-web-service-v3.md` 等）。
+
 ---
 
 ## 5. 文档内容概览
@@ -540,6 +624,22 @@ TWS API 文档的 EnlighterJS 代码高亮导致 Firecrawl 输出存在代码三
 | `prospective-integrations.md` | 潜在集成说明 |
 | `tradingview.md` | TradingView 集成详细文档 |
 
+### Flex Queries & Flex Web Service（`flex/`）
+
+> **文档来源**：[IBKR Guides](https://www.ibkrguides.com/clientportal/performanceandstatements/flex.htm)（Client Portal 用户指南），不同于上面各类 API 来自 IBKR Campus。
+
+| 文件 | 说明 |
+|------|------|
+| `flex-queries.md` | Flex Queries 总览（功能定义、与标准报表区别、历史数据范围） |
+| `flex-web-service.md` | 启用 Flex Web Service（Token 生成、过期设置、IP 白名单） |
+| `flex-web-service-v3.md` | **核心文档** — Flex Web Service v3 API 调用详解：`SendRequest` / `GetStatement` 两步 HTTP 请求、`fd/td` 日期覆盖参数（`yyyymmdd`）、`p` 周期覆盖参数、XML 响应格式、`ReferenceCode` 语义 |
+| `flex-web-service-v3-error-codes.md` | Flex Web Service v3 完整错误码列表（1001-1021），含速率限制说明 |
+| `create-activity-flex-query.md` | 创建 Activity Flex Query（活动报表查询模板） |
+| `create-trade-confirmation-flex-query.md` | 创建 Trade Confirmation Flex Query（交易确认查询模板） |
+| `run-flex-query.md` | 在 Client Portal 中手动运行 Flex Query |
+| `view-edit-delete-flex-queries.md` | 查看、编辑和删除 Flex Query 模板 |
+| `delivery-settings-flex.md` | 配置 Flex Query 的自动投递设置（FTP、Email 等） |
+
 ### 服务器环境（Web API）
 
 | 环境 | 地址 |
@@ -565,6 +665,10 @@ TWS API 文档的 EnlighterJS 代码高亮导致 Firecrawl 输出存在代码三
 - [ ] **⚠️ TWS API 文档**：使用 `scripts/convert_twsapi_html.py` 从原始 HTML 直接转换（无需通用后处理）
   ```bash
   python3 scripts/convert_twsapi_html.py .firecrawl/twsapi-raw.html docs/tws-api/twsapi-doc.md
+  ```
+- [ ] **⚠️ Flex 文档**：使用 `scripts/clean_ibkr_flex.py` 清理 IBKR Guides 页面噪音（无需通用后处理）
+  ```bash
+  python3 external-resource/ibkr-api/scripts/clean_ibkr_flex.py --src .firecrawl --dst external-resource/ibkr-api/docs/flex
   ```
 - [ ] **其他文档**：清理头部导航噪音（IBKR Campus 完整侧边栏菜单）
 - [ ] **⚠️ 检查是否有页面缺少 `SHARE` 标记行**（如首页），对这些页面单独处理
