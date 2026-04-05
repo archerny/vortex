@@ -27,7 +27,7 @@
 |------|----------|------|---------------|
 | 富途证券 | HK | 未启用 | ✅ 有（[OpenD + OpenAPI](https://openapi.futunn.com/)） |
 | 老虎证券 | NZ | 启用 | ✅ 有（[Tiger Open API](https://quant.itigerup.com/openapi/zh/python/overview/introduction.html)） |
-| 盈透证券 (IBKR) | US | 启用 | ✅ 有（[Client Portal API / TWS API](https://www.interactivebrokers.com/en/trading/ib-api.php)） |
+| 盈透证券 (IBKR) | US | 启用 | ✅ 有（[Flex Web Service / Client Portal API / TWS API](https://www.interactivebrokers.com/en/trading/ib-api.php)） |
 | 嘉信证券 | US | 启用 | ⚠️ 有限（[Schwab API](https://developer.schwab.com/)，偏向市场数据） |
 | 第一证券 | US | 未启用 | ❌ 无官方 API |
 
@@ -63,6 +63,7 @@
 - **通过券商官方 OpenAPI 直连获取数据**，不做 CSV/文件导入（管理数据麻烦）
 - CSV/Excel 导入方案暂不考虑，后续如有无 API 的券商再重新评估
 - 老虎证券使用 Tiger Open API（REST 方式）
+- IBKR 已明确选用 **Flex Web Service**，用于首次历史回补和后续周期性同步
 - 后续其他券商也优先使用各自的 OpenAPI
 
 #### 2.2 各券商 API 特性调研
@@ -73,11 +74,11 @@
 |------|---------|---------|----------------|---------|---------|
 | 富途证券 | REST + 长连接 | AppID + AppSecret | 待调研 | 待调研 | 待调研 |
 | 老虎证券 | REST | App Key + Token | 待调研 | 待调研 | 待调研 |
-| 盈透证券 | REST (Client Portal) / Socket (TWS) | OAuth / 本地网关 | 待调研 | 待调研 | 待调研 |
+| 盈透证券 | Flex Web Service | Token + Query ID | ✅ 可用于历史回补与周期性同步 | Trade Confirmation / Flex 报表 | 每秒 1 次、每分钟 10 次（per token） |
 
 **需要讨论**：
 - [ ] 每个券商的 API 具体能提供哪些数据？交易记录的字段是否完整？
-- [ ] 是否需要维护一个中间人网关？（比如盈透的 Client Portal API 需要本地运行一个网关程序）
+- [ ] IBKR 是否需要在后续支持 Flex Query 之外的其他接入方式（如 Client Portal API / TWS API）？
 
 ---
 
@@ -366,7 +367,7 @@ com.localledger
         │   └── TigerOrderRecord.java   ← 老虎证券专属原始模型
         └── ibkr/                       ← 后续：盈透证券
         │   ├── IbkrSyncAdapter.java
-        │   └── IbkrExecutionRecord.java
+        │   └── IbkrTradeRecord.java
         └── futu/                       ← 后续：富途证券
         └── schwab/                     ← 后续：嘉信证券
 ```

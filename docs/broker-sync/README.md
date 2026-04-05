@@ -10,7 +10,7 @@
 |------|------|------|
 | [overall-design.md](./overall-design.md) | 总体方案设计（核心问题讨论与决策记录） | 方案讨论中 |
 | [tiger-sync-design.md](./tiger-sync-design.md) | 老虎证券同步方案（设计与实现记录） | Phase 1 已实现 |
-| [ibkr-flex-web-service-design.md](./ibkr-flex-web-service-design.md) | IBKR Flex Web Service 同步方案（讨论记录） | 方案讨论完成，待实现 |
+| [ibkr-flex-web-service-design.md](./ibkr-flex-web-service-design.md) | IBKR Flex Web Service 同步方案（讨论记录） | Flex-only 方案已确定，待实现 |
 
 ---
 
@@ -24,8 +24,8 @@
 
 | 阶段 | 范围 | 关键能力 | 状态 |
 |------|------|---------|------|
-| **Phase 1** | 老虎证券 + 手动触发 + 日志输出 | 跑通基本流程、核对原始数据 | 🚧 进行中 |
-| **Phase 2** | 多券商适配 + 去重机制 + 同步日志 + 入库 | 生产可用 | 📋 待规划 |
+| **Phase 1** | 老虎证券 + 手动触发 + 日志输出 | 跑通基本流程、核对原始数据 | ✅ 已完成 |
+| **Phase 2** | IBKR 适配 + 多券商适配 + 去重机制 + 同步日志 + 入库 | 生产可用（IBKR 方案详见 [ibkr-flex-web-service-design.md](./ibkr-flex-web-service-design.md)） | 📋 待规划 |
 | **Phase 3** | 自动同步 + 冲突处理 + 前端交互 | 完整体验 | 📋 待规划 |
 
 ## 涉及的券商
@@ -33,6 +33,6 @@
 | 券商 | 优先级 | API 类型 | 适配器 |
 |------|--------|---------|--------|
 | 老虎证券 | Phase 1 | Tiger Open API (REST) | `TigerSyncAdapter` |
-| 盈透证券 (IBKR) | Phase 2+ | Client Portal API / TWS API | `IbkrSyncAdapter` |
+| 盈透证券 (IBKR) | Phase 2+ | Flex Web Service | `IbkrSyncAdapter` |
 | 嘉信证券 | Phase 2+ | Schwab API | `SchwabSyncAdapter` |
 | 富途证券 | Phase 2+ | OpenD + OpenAPI | `FutuSyncAdapter` |
