@@ -17,6 +17,12 @@ broker.tiger.tiger-id=your_tiger_id_here
 broker.tiger.private-key=your_pkcs8_private_key_here
 broker.tiger.account=your_account_here
 
+# 券商 API 凭证 - 盈透证券 IBKR
+# Flex Web Service Token：从 IBKR 账户管理 → 报告 → Flex Queries → 配置令牌获取
+broker.ibkr.flex-token=your_flex_token_here
+# Trade Confirm 查询的 Query ID：创建 Flex Query 后获得的数字 ID
+broker.ibkr.trade-confirm-query-id=your_query_id_here
+
 # 可以在这里覆盖其他需要本地化的配置
 # 例如：
 # server.port=8081
