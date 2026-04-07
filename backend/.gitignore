@@ -8,3 +8,6 @@ target/
 *.iml
 .vscode/
 *.log
+
+# 测试资源中的个人数据
+src/test/resources/ibkr-flex-trade-confirms.xml
