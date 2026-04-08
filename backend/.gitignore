@@ -1,17 +1,9 @@
-target/
-*.class
-*.jar
-*.war
-*.ear
-.DS_Store
-.idea/
-*.iml
-.vscode/
-*.log
+# Backend-specific ignores
+# (Common rules like *.class, target/, IDE, logs are in root .gitignore)
 
 # Local/dev configuration files with sensitive credentials
 src/main/resources/application-local.properties
 src/main/resources/application-dev.properties
 
-# 测试资源中的个人数据
+# Test resources containing personal data
 src/test/resources/ibkr-flex-trade-confirms.xml

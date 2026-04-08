@@ -1,8 +1,8 @@
-node_modules
-dist
+# Frontend-specific ignores
+# (Common rules like node_modules/, dist/, IDE, logs are in root .gitignore)
+
+# Vite SSR build output
 dist-ssr
+
+# Local env files (e.g. .env.local)
 *.local
-.DS_Store
-.vscode
-.idea
-*.log
