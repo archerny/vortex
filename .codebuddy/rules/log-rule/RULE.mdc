@@ -1,0 +1,10 @@
+---
+description: Log language rule — Chinese is not allowed in log messages
+alwaysApply: true
+enabled: true
+---
+
+## Log Generate Rule
+
+- Logging in Chinese is **not** permitted.
+- All log messages (including `log.info`, `log.warn`, `log.error`, `log.debug`) must be written in **English**.
