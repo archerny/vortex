@@ -1,11 +1,39 @@
 import React from 'react';
-import { Card, Statistic, Row, Col, Table } from 'antd';
-import { statistics, investmentData } from '../constants/mockData';
+import { Card, Statistic, Row, Col, Table, Empty } from 'antd';
 import { RiseOutlined, FallOutlined } from '@ant-design/icons';
 import { Tag, Space, Button } from 'antd';
 import { useAmountVisibility } from '../contexts/AmountVisibilityContext';
 
-// 投资记录表格列定义（需要 amountVisible 参数）
+// Investment statistics placeholder (to be replaced with real API data)
+const statistics = [
+  {
+    title: '总投资金额',
+    value: 0,
+    prefix: '¥',
+    valueStyle: { color: '#999' },
+  },
+  {
+    title: '当前市值',
+    value: 0,
+    prefix: '¥',
+    valueStyle: { color: '#999' },
+  },
+  {
+    title: '总盈亏',
+    value: 0,
+    prefix: '¥',
+    valueStyle: { color: '#999' },
+  },
+  {
+    title: '收益率',
+    value: 0,
+    suffix: '%',
+    precision: 2,
+    valueStyle: { color: '#999' },
+  },
+];
+
+// Table column definitions (requires amountVisible parameter)
 const getColumns = (amountVisible) => [
   {
     title: '名称',
@@ -88,7 +116,7 @@ const Dashboard = () => {
 
   return (
     <>
-      {/* 统计卡片 */}
+      {/* Statistics cards */}
       <Row gutter={16} style={{ marginBottom: 24 }}>
         {statistics.map((stat, index) => (
           <Col span={6} key={index}>
@@ -106,12 +134,13 @@ const Dashboard = () => {
         ))}
       </Row>
 
-      {/* 投资记录表格 */}
+      {/* Investment records table */}
       <Card title="最近投资记录">
         <Table 
           columns={columns} 
-          dataSource={investmentData} 
+          dataSource={[]} 
           pagination={{ pageSize: 5 }}
+          locale={{ emptyText: <Empty description="暂无投资记录" /> }}
         />
       </Card>
     </>
