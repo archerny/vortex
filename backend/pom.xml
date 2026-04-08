@@ -45,6 +45,12 @@
             <scope>runtime</scope>
         </dependency>
 
+        <!-- Flyway Database Migration -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
+
         <!-- HikariCP 连接池 (Spring Boot 默认已包含) -->
         <dependency>
             <groupId>com.zaxxer</groupId>
