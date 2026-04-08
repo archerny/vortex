@@ -9,5 +9,9 @@ target/
 .vscode/
 *.log
 
+# Local/dev configuration files with sensitive credentials
+src/main/resources/application-local.properties
+src/main/resources/application-dev.properties
+
 # 测试资源中的个人数据
 src/test/resources/ibkr-flex-trade-confirms.xml
