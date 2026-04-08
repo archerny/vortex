@@ -1,0 +1,54 @@
+---
+description: Git commit message convention — Conventional Commits format
+alwaysApply: true
+enabled: true
+---
+
+# Git Commit Message Convention
+
+All git commit messages in this project **MUST** follow the [Conventional Commits](https://www.conventionalcommits.org/) specification.
+
+## Format
+
+```
+<type>[optional scope]: <description>
+
+[optional body]
+
+[optional footer(s)]
+```
+
+## Rules
+
+1. **Language**: Commit messages MUST be written in **English only**. No Chinese characters allowed anywhere in the message (type, scope, description, body, or footer).
+
+2. **Type** (required): One of the following:
+   - `feat` — A new feature
+   - `fix` — A bug fix
+   - `docs` — Documentation only changes
+   - `style` — Changes that do not affect the meaning of the code (white-space, formatting, etc.)
+   - `refactor` — A code change that neither fixes a bug nor adds a feature
+   - `perf` — A performance improvement
+   - `test` — Adding or updating tests
+   - `build` — Changes to the build system or external dependencies
+   - `ci` — Changes to CI configuration files and scripts
+   - `chore` — Other changes that don't modify src or test files
+   - `revert` — Reverts a previous commit
+
+3. **Scope** (optional): A noun describing the section of the codebase (e.g., `backend`, `frontend`, `docs`, `deploy`, `api`, `db`).
+
+4. **Description** (required): A short summary in imperative mood, lowercase, no period at the end.
+
+5. **Breaking changes**: Indicated by `!` after type/scope or `BREAKING CHANGE:` in the footer.
+
+## Examples
+
+```
+feat(backend): add dividend record import from broker API
+fix(frontend): correct account balance calculation display
+chore: remove legacy template files
+refactor(backend): simplify Spring profile configuration
+docs: update config loading mechanism in README
+test(backend): add unit tests for trade record service
+feat!: drop support for legacy CSV import format
+```

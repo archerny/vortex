@@ -1,0 +1,53 @@
+---
+description: No global side effects — never modify the user's global environment
+alwaysApply: true
+enabled: true
+---
+
+# No Global Side Effects — Never Modify the User's Global Environment
+
+**This is a HARD rule. No exceptions.**
+
+## Problem
+
+AI agents sometimes run commands that modify the user's global system environment — installing packages globally, creating global symlinks, or altering global configs. These changes persist beyond the project, can break other projects, and are hard to undo. The user may not even notice the change until something else breaks.
+
+## The Rule
+
+**NEVER execute commands that modify the user's global environment. All operations must be scoped to the project directory.**
+
+### Forbidden commands (non-exhaustive)
+
+| Category | Forbidden | Use instead |
+|----------|-----------|-------------|
+| Node.js | `npm install -g`, `npm link`, `yarn global add` | `npx`, project-local `node_modules/.bin/` |
+| Python | `pip install` (without venv), `pip install --user`, `pip install --break-system-packages` | `python -m venv` in `/tmp` + local pip install |
+| Java | Modifying global Maven `settings.xml` | Project-local Maven wrapper (`mvnw`) |
+| System | `brew install`, `apt install`, `sudo` anything | Ask the user to install manually if needed |
+| Shell | Modifying `~/.bashrc`, `~/.zshrc`, `~/.profile` | Project-local `.env` or scripts |
+| Git | `git config --global` | `git config --local` (repo-scoped) |
+| Misc | Writing to `/usr/local/`, `$HOME/.config/` (unless project-specific) | Project-local directories |
+
+### What IS allowed
+
+- Installing project dependencies: `npm install` (local), `pip install` inside a venv
+- Running project-local binaries: `./mvnw`, `npx`, `node dist/index.js`
+- Reading global state: `which java`, `node --version`, `echo $PATH` (read-only is fine)
+
+### When a global tool is genuinely needed
+
+If the task truly requires a global tool that isn't installed:
+
+1. **Tell the user** what's needed and why
+2. **Show them the exact command** they would run
+3. **Wait for them to run it themselves**
+4. **NEVER run it for them**
+
+## Anti-patterns (DO NOT do these)
+
+- ❌ Running `npm install -g my-package` to make a command available
+- ❌ Running `pip install requests` outside a virtual environment
+- ❌ Running `pip install --break-system-packages` to bypass venv requirement
+- ❌ Running `brew install` or `apt-get install` anything
+- ❌ Modifying `~/.gitconfig` or `~/.npmrc` without explicit user request
+- ❌ Adding entries to `~/.bashrc` or `~/.zshrc`

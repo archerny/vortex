@@ -1,0 +1,57 @@
+---
+description: Git commit approval — always ask before committing
+alwaysApply: true
+enabled: true
+---
+
+# Git Commit Approval — Always Ask Before Committing
+
+**This is a HARD rule. No exceptions.**
+
+## Problem
+
+AI agents sometimes execute `git commit` and `git push` immediately after making code changes, without asking the user for permission. This removes the user's opportunity to review changes, adjust commit messages, reorder commits, or decide not to commit at all. Even when the user says "commit and push," the agent should confirm the exact scope and message before executing.
+
+## The Rule
+
+**NEVER execute `git commit`, `git push`, or any combination thereof without FIRST asking the user for explicit approval.**
+
+### Required workflow
+
+1. **Make the code/doc changes** — Edit files, create files, etc.
+2. **Show what you've done** — Briefly summarize the changes.
+3. **ASK the user** — "Ready to commit?" or similar. Wait for the user's response.
+4. **Only after explicit approval** — Execute `git add`, `git commit`, `git push`.
+
+### What counts as "explicit approval"
+
+- ✅ User says "提交" / "commit" / "push" / "提交并推送" / "好的，提交吧"
+- ✅ User's original request explicitly includes commit/push (e.g., "改完后提交并 push")
+- ❌ Silence or no response — do NOT assume approval
+- ❌ User says "改一下文档" — this is a change request, NOT a commit request
+- ❌ AI decides "this is a small change, I'll just commit it" — size does not matter
+
+### Scope of this rule
+
+This applies to ALL git write operations:
+
+- `git commit` (with any flags)
+- `git push` (to any remote/branch)
+- `git tag` (creating tags)
+- `git merge` (merging branches)
+- `git rebase` (rewriting history)
+- `git stash drop` (discarding stashed changes)
+- Any destructive or irreversible git operation
+
+This does NOT apply to read-only git operations (these are always safe):
+
+- `git status`, `git log`, `git diff`, `git branch`, `git show`
+- `git stash list`, `git remote -v`, `git rev-parse`
+
+## Anti-patterns (DO NOT do these)
+
+- ❌ Creating a rule file and immediately running `git commit` + `git push` without asking
+- ❌ User says "更新一下文档" → AI edits the file AND commits it in one go
+- ❌ Finishing a multi-step task and auto-committing each step
+- ❌ Assuming "提交并 push" from a PREVIOUS message still applies to NEW changes
+- ❌ Batching commit + push into the same tool call sequence as the file edits, leaving no gap for user review
