@@ -58,19 +58,7 @@ COMMENT ON COLUMN brokers.created_at IS '创建时间';
 COMMENT ON COLUMN brokers.updated_at IS '更新时间';
 
 -- ============================================
--- 3. 插入初始券商数据（如果不存在则插入，已存在则跳过）
--- ============================================
-INSERT INTO brokers (broker_name, country, description, is_active) 
-VALUES 
-('富途证券', 'HK', '港美股互联网券商', FALSE),
-('老虎证券', 'NZ', '港美股互联网券商', TRUE),
-('盈透证券', 'US', '美国本土综合券商', TRUE),
-('嘉信证券', 'US', '美国本土综合券商', TRUE),
-('第一证券', 'US', '美国本土华人券商', FALSE)
-ON CONFLICT (broker_name) DO NOTHING;
-
--- ============================================
--- 4. 创建出入金记录表
+-- 3. 创建出入金记录表
 -- ============================================
 CREATE TABLE IF NOT EXISTS cash_flow_records (
     id BIGSERIAL PRIMARY KEY,
@@ -116,7 +104,7 @@ COMMENT ON COLUMN cash_flow_records.updated_at IS '更新时间';
 
 
 -- ============================================
--- 5. 创建更新时间触发器
+-- 4. 创建更新时间触发器
 -- ============================================
 
 -- 创建更新时间函数（CREATE OR REPLACE 天然幂等）

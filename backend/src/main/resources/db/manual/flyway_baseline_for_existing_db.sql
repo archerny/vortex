@@ -25,7 +25,7 @@ CREATE INDEX flyway_schema_history_s_idx ON flyway_schema_history (success);
 
 -- 2. Mark all existing migrations as already applied
 INSERT INTO flyway_schema_history (installed_rank, version, description, type, script, checksum, installed_by, installed_on, execution_time, success) VALUES
-(1,  '1',  'create cash flow tables',                       'SQL', 'V1__create_cash_flow_tables.sql',                          1319016967,  'ledger', now(), 0, true),
+(1,  '1',  'create cash flow tables',                       'SQL', 'V1__create_cash_flow_tables.sql',                          824766323,   'ledger', now(), 0, true),
 (2,  '2',  'add bank field',                                'SQL', 'V2__add_bank_field.sql',                                   2001915993,  'ledger', now(), 0, true),
 (3,  '3',  'create trade records',                          'SQL', 'V3__create_trade_records.sql',                              1097347788,  'ledger', now(), 0, true),
 (4,  '4',  'create tags',                                   'SQL', 'V4__create_tags.sql',                                      -579939356,  'ledger', now(), 0, true),
