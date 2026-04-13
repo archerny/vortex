@@ -1,0 +1,429 @@
+# 券商同步 — 数据持久化设计文档
+
+> **创建日期**：2026-04-13  
+> **最后更新**：2026-04-13  
+> **状态**：方案已确认，待实现  
+> **关联**：[overall-design.md](./overall-design.md) | [ibkr-flex-web-service-design.md](./ibkr-flex-web-service-design.md)  
+> **前置**：Phase 1（API 获取 + 日志输出）已完成
+
+---
+
+## 一、背景与目标
+
+Phase 1 已跑通「券商 API → 解析 → 日志输出」的基本流程，数据正确性已通过日志核对验证。本文档设计 **Phase 2 的数据持久化方案**：将从券商拉取的交易数据安全地存入数据库。
+
+**核心原则**：
+
+1. **不污染正式数据** — 同步数据先写入暂存表（staged table），确认后再导入 `trade_records`
+2. **按券商独立暂存** — 各券商 API 返回结构差异大，每个券商一张暂存表，字段 1:1 对应各自专属内存模型
+3. **暂存表存解析后的结构化数据** — 不存原始 raw_data，XML 解析失败则整个批次失败
+4. **暂存表字段使用 VARCHAR** — 保持数据无损，不做类型转换
+5. **暂存粒度为 Order（订单级）** — `trade_records` 记录的是用户感知的"一次下单"，对应 IBKR 的 `<Order>` 节点，而非 `<TradeConfirm>` 执行明细
+
+---
+
+## 二、关键设计决策
+
+| # | 决策项 | 结论 | 理由 |
+|---|--------|------|------|
+| 1 | 导入策略 | **两阶段：暂存 → 导入** | 防止数据污染，便于管理中间状态、人工审核、冲突处理 |
+| 2 | 暂存表设计 | **按券商独立一张表** | 各券商返回字段差异大，通用表会导致大量无意义的 NULL 列或 JSONB 混杂 |
+| 3 | 暂存表字段类型 | **统一 VARCHAR** | 保持与券商原始数据一致，不做类型转换，数据无损 |
+| 4 | 暂存表数据内容 | **解析后的结构化数据** | 不存原始 raw_data；解析失败则整个批次标记为 FAILED |
+| 5 | `trade_trigger` 是否新增 `BROKER_SYNC` | **否，不新增** | `trade_trigger` 描述的是"交易为什么发生"（手动下单 / 期权行权 / 市场事件），与"记录来源"无关。同步导入的记录根据交易实际业务含义设置 `trade_trigger`（大部分为 `MANUAL`，期权行权记录为 `OPTION`） |
+| 6 | 如何区分手动录入 vs 同步导入 | **通过 `external_id` 判断** | `external_id IS NULL` → 手动录入；`external_id IS NOT NULL` → 券商同步导入 |
+| 7 | 是否冗余 `external_broker` 字段 | **是** | 光有 `external_id` 无法知道去哪张暂存表关联；`external_broker` + `external_id` 构成有意义的复合标识，避免 JOIN `broker_sync_batches` 才能拿到券商来源 |
+| 8 | IBKR 暂存粒度 | **Order（订单级），非 TradeConfirm（执行明细）** | 系统核心关注的是用户感知层面——"我下了一笔单买了 100 股 AAPL"，而不是底层的部分成交明细。Order 节点已包含聚合后的数量、加权均价、总佣金等完整信息，足以直接导入 `trade_records` |
+| 9 | Order 中不持久化 `exchange` 和 `code` | **是** | 经 155 条 TradeConfirm / 150 条 Order 实际数据验证，`exchange` 和 `code` 在 Order 级别始终为空（仅 TradeConfirm 有值）。这两个字段属于执行明细信息，对用户感知层面的交易记录无意义，暂存表和 `trade_records` 均不包含 |
+
+---
+
+## 三、数据库变更概览
+
+本方案涉及 **4 项数据库变更**：
+
+| 变更 | 类型 | 说明 |
+|------|------|------|
+| `broker_sync_batches` | 新建表 | 通用同步批次元信息表 |
+| `ibkr_staged_orders` | 新建表 | IBKR 核心暂存表（Order 粒度，1:1 对应 `IbkrOrderRecord`） |
+| `ibkr_staged_trade_confirms` | 新建表（可选） | IBKR 执行明细附表（TradeConfirm 粒度，用于审计/对账，非必须） |
+| `trade_records` 扩展 | 新增字段 | 新增 `external_id`、`external_broker`、`sync_batch_id` 三个字段 |
+
+---
+
+## 四、表结构详细设计
+
+### 4.1 `broker_sync_batches` — 通用同步批次表
+
+记录每次同步操作的元信息，所有券商共用。
+
+| 列名 | 类型 | 约束 | 说明 |
+|------|------|------|------|
+| `id` | BIGSERIAL | PK | 主键 |
+| `broker_name` | VARCHAR(50) | NOT NULL | 券商标识（如 `ibkr`、`tiger`） |
+| `sync_date_from` | DATE | NOT NULL | 同步数据的起始日期 |
+| `sync_date_to` | DATE | NOT NULL | 同步数据的结束日期 |
+| `total_count` | INTEGER | NOT NULL DEFAULT 0 | 同步记录总数 |
+| `imported_count` | INTEGER | NOT NULL DEFAULT 0 | 已导入正式表的数量 |
+| `skipped_count` | INTEGER | NOT NULL DEFAULT 0 | 跳过的数量（重复记录等） |
+| `failed_count` | INTEGER | NOT NULL DEFAULT 0 | 失败的数量 |
+| `status` | VARCHAR(32) | NOT NULL | 批次状态（见下方状态枚举） |
+| `error_message` | TEXT | | 批次级错误信息 |
+| `started_at` | TIMESTAMP | | 同步开始时间 |
+| `completed_at` | TIMESTAMP | | 同步完成时间 |
+| `created_at` | TIMESTAMP | NOT NULL DEFAULT NOW() | 创建时间 |
+| `updated_at` | TIMESTAMP | NOT NULL DEFAULT NOW() | 更新时间 |
+
+#### 批次状态枚举
+
+| 状态 | 含义 |
+|------|------|
+| `PENDING` | 数据已写入暂存表，等待导入 |
+| `IMPORTING` | 正在导入到 `trade_records` |
+| `COMPLETED` | 导入完成 |
+| `FAILED` | 同步或导入失败 |
+
+#### 索引
+
+| 索引 | 列 | 说明 |
+|------|-----|------|
+| `idx_sync_batches_broker_name` | `broker_name` | 按券商筛选批次 |
+| `idx_sync_batches_status` | `status` | 按状态筛选批次 |
+
+---
+
+### 4.2 `ibkr_staged_orders` — IBKR 核心暂存表（Order 粒度）
+
+字段 1:1 对应 `IbkrOrderRecord.java`，**不包含 `exchange` 和 `code`**（Order 级别始终为空，无持久化价值）。全部使用 VARCHAR 类型存储。另加暂存管理字段和审计字段。
+
+> **设计依据**：`trade_records` 记录的是用户感知的"一次下单操作"，对应 IBKR 的 `<Order>` 节点。Order 节点已包含聚合后的成交数量、加权均价、总佣金等完整业务字段，足以直接映射到 `trade_records`。
+
+#### 暂存管理字段
+
+| 列名 | 类型 | 约束 | 说明 |
+|------|------|------|------|
+| `id` | BIGSERIAL | PK | 主键 |
+| `batch_id` | BIGINT | NOT NULL, FK→`broker_sync_batches.id` | 所属同步批次 |
+| `status` | VARCHAR(32) | NOT NULL DEFAULT 'PENDING' | 记录状态（见下方状态枚举） |
+| `imported_trade_id` | BIGINT | | 导入成功后关联的 `trade_records.id`，用于反向追溯 |
+| `error_message` | TEXT | | 记录级错误信息（转换失败、冲突等的详细说明） |
+
+#### IBKR Order 数据字段（28 个，全部 VARCHAR(255)）
+
+| # | 列名 | 对应 `IbkrOrderRecord` 字段 | 说明 |
+|---|------|------------------------------|------|
+| 1 | `account_id` | `accountId` | IBKR 账户 ID |
+| 2 | `acct_alias` | `acctAlias` | 账户别名 |
+| 3 | `currency` | `currency` | 币种 |
+| 4 | `asset_category` | `assetCategory` | 资产类别：STK / OPT / FUT / CASH / FUND |
+| 5 | `symbol` | `symbol` | 证券代码 |
+| 6 | `description` | `description` | 证券描述 |
+| 7 | `conid` | `conid` | IBKR 合约 ID |
+| 8 | `security_id` | `securityID` | 证券 ID（ISIN） |
+| 9 | `security_id_type` | `securityIDType` | 证券 ID 类型 |
+| 10 | `multiplier` | `multiplier` | 合约乘数 |
+| 11 | `strike` | `strike` | 行权价（仅期权） |
+| 12 | `expiry` | `expiry` | 到期日（仅期权） |
+| 13 | `put_call` | `putCall` | 期权类型：C / P |
+| 14 | `order_id` | `orderID` | 订单 ID（**IBKR 订单唯一标识，用作去重键**） |
+| 15 | `order_time` | `orderTime` | 下单时间（BookTrade 为空） |
+| 16 | `date_time` | `dateTime` | 成交时间（订单级汇总） |
+| 17 | `settle_date` | `settleDate` | 交割日期 |
+| 18 | `trade_date` | `tradeDate` | 交易日期 |
+| 19 | `buy_sell` | `buySell` | 买卖方向：BUY / SELL |
+| 20 | `order_type` | `orderType` | 订单类型（BookTrade 为空） |
+| 21 | `is_api_order` | `isAPIOrder` | 是否通过 API 下单：Y / N |
+| 22 | `quantity` | `quantity` | 成交数量（聚合值，卖出为负数） |
+| 23 | `price` | `price` | 成交均价（加权平均） |
+| 24 | `amount` | `amount` | 成交金额（聚合值） |
+| 25 | `proceeds` | `proceeds` | 收入/支出（聚合值） |
+| 26 | `net_cash` | `netCash` | 净现金流（聚合值） |
+| 27 | `commission` | `commission` | 佣金（聚合值，通常为负数） |
+| 28 | `commission_currency` | `commissionCurrency` | 佣金币种 |
+| 29 | `trade_charge` | `tradeCharge` | 交易附加费（聚合值） |
+| 30 | `trader_id` | `traderID` | 交易员 ID |
+
+> **不包含的字段**：`exchange`（Order 级别始终为空）、`code`（Order 级别始终为空）。这两个字段仅在 TradeConfirm 执行明细中有值，属于底层成交细节，不在用户感知层面的订单记录中体现。
+
+#### 审计字段
+
+| 列名 | 类型 | 约束 | 说明 |
+|------|------|------|------|
+| `created_at` | TIMESTAMP | NOT NULL DEFAULT NOW() | 创建时间 |
+| `updated_at` | TIMESTAMP | NOT NULL DEFAULT NOW() | 更新时间 |
+
+#### 暂存记录状态枚举
+
+| 状态 | 含义 |
+|------|------|
+| `PENDING` | 待处理，等待导入到 `trade_records` |
+| `IMPORTED` | 已成功导入到 `trade_records`，`imported_trade_id` 已填充 |
+| `SKIPPED` | 跳过（重复记录，`trade_records` 中已存在对应的 `external_id`） |
+| `CONFLICT` | 与已有记录存在冲突（字段不一致），需人工介入 |
+| `FAILED` | 转换或导入失败（如字段映射异常），详见 `error_message` |
+
+#### 状态流转
+
+```
+PENDING → IMPORTED    （成功导入到 trade_records）
+PENDING → SKIPPED     （重复记录，已存在）
+PENDING → CONFLICT    （与已有记录存在冲突）
+PENDING → FAILED      （转换/导入失败）
+```
+
+#### 索引与约束
+
+| 类型 | 列 | 说明 |
+|------|-----|------|
+| UNIQUE | `order_id` | IBKR orderID 唯一，防止同一笔订单重复写入暂存表 |
+| INDEX | `batch_id` | 按批次查询暂存记录 |
+| INDEX | `status` | 按状态筛选暂存记录 |
+| FK | `batch_id` → `broker_sync_batches.id` | 外键关联批次 |
+
+---
+
+### 4.3 `ibkr_staged_trade_confirms` — IBKR 执行明细附表（可选）
+
+> **定位**：这是一张**可选的附表**，用于存储 TradeConfirm 粒度的执行明细。主要用途是审计、对账、以及未来需要精确到每笔成交时的数据源。**不参与 `trade_records` 的导入流程**。
+>
+> **实现优先级**：低。可在核心暂存表 `ibkr_staged_orders` 及导入流程完成后再考虑。
+
+字段 1:1 对应 `IbkrTradeConfirm.java` 的 37 个字段，全部使用 VARCHAR 类型存储。
+
+#### 管理字段
+
+| 列名 | 类型 | 约束 | 说明 |
+|------|------|------|------|
+| `id` | BIGSERIAL | PK | 主键 |
+| `batch_id` | BIGINT | NOT NULL, FK→`broker_sync_batches.id` | 所属同步批次 |
+
+#### IBKR TradeConfirm 数据字段（37 个，全部 VARCHAR(255)）
+
+| # | 列名 | 对应 `IbkrTradeConfirm` 字段 | 说明 |
+|---|------|------------------------------|------|
+| 1 | `account_id` | `accountId` | IBKR 账户 ID |
+| 2 | `acct_alias` | `acctAlias` | 账户别名 |
+| 3 | `currency` | `currency` | 币种 |
+| 4 | `asset_category` | `assetCategory` | 资产类别 |
+| 5 | `symbol` | `symbol` | 证券代码 |
+| 6 | `description` | `description` | 证券描述 |
+| 7 | `conid` | `conid` | IBKR 合约 ID |
+| 8 | `security_id` | `securityID` | 证券 ID（ISIN） |
+| 9 | `security_id_type` | `securityIDType` | 证券 ID 类型 |
+| 10 | `multiplier` | `multiplier` | 合约乘数 |
+| 11 | `strike` | `strike` | 行权价（仅期权） |
+| 12 | `expiry` | `expiry` | 到期日（仅期权） |
+| 13 | `put_call` | `putCall` | 期权类型：C / P |
+| 14 | `transaction_type` | `transactionType` | 交易类型：ExchTrade / BookTrade |
+| 15 | `trade_id` | `tradeID` | 成交确认 ID（**IBKR 全局唯一**） |
+| 16 | `order_id` | `orderID` | 所属订单 ID（关联 `ibkr_staged_orders.order_id`） |
+| 17 | `exec_id` | `execID` | 执行 ID（交易所分配） |
+| 18 | `brokerage_order_id` | `brokerageOrderID` | 券商内部订单 ID |
+| 19 | `order_reference` | `orderReference` | 订单引用 |
+| 20 | `order_time` | `orderTime` | 下单时间 |
+| 21 | `date_time` | `dateTime` | 成交时间 |
+| 22 | `settle_date` | `settleDate` | 交割日期 |
+| 23 | `trade_date` | `tradeDate` | 交易日期 |
+| 24 | `exchange` | `exchange` | 成交交易所（如 DARK、DRCTEDGE、MEMX 等） |
+| 25 | `buy_sell` | `buySell` | 买卖方向 |
+| 26 | `quantity` | `quantity` | 成交数量（单笔执行） |
+| 27 | `price` | `price` | 成交价格（单笔执行） |
+| 28 | `amount` | `amount` | 成交金额（单笔执行） |
+| 29 | `proceeds` | `proceeds` | 收入/支出 |
+| 30 | `net_cash` | `netCash` | 净现金流 |
+| 31 | `commission` | `commission` | 佣金（单笔执行） |
+| 32 | `commission_currency` | `commissionCurrency` | 佣金币种 |
+| 33 | `trade_charge` | `tradeCharge` | 交易附加费 |
+| 34 | `code` | `code` | 交易代码标记（O/C/P/A/Ep，多值分号分隔） |
+| 35 | `order_type` | `orderType` | 订单类型 |
+| 36 | `trader_id` | `traderID` | 交易员 ID |
+| 37 | `is_api_order` | `isAPIOrder` | 是否通过 API 下单 |
+
+#### 审计字段
+
+| 列名 | 类型 | 约束 | 说明 |
+|------|------|------|------|
+| `created_at` | TIMESTAMP | NOT NULL DEFAULT NOW() | 创建时间 |
+| `updated_at` | TIMESTAMP | NOT NULL DEFAULT NOW() | 更新时间 |
+
+#### 索引与约束
+
+| 类型 | 列 | 说明 |
+|------|-----|------|
+| UNIQUE | `trade_id` | IBKR tradeID 全局唯一 |
+| INDEX | `batch_id` | 按批次查询 |
+| INDEX | `order_id` | 按订单关联查询（关联 `ibkr_staged_orders`） |
+| FK | `batch_id` → `broker_sync_batches.id` | 外键关联批次 |
+
+---
+
+### 4.4 `trade_records` 扩展字段
+
+在现有 `trade_records` 表上新增 3 个字段，用于关联同步来源信息。
+
+| 新增列名 | 类型 | 约束 | 说明 |
+|---------|------|------|------|
+| `external_id` | VARCHAR(100) | | 券商原始订单 ID（IBKR 的 `orderID`、Tiger 的 `orderId` 等），`NULL` 表示手动录入 |
+| `external_broker` | VARCHAR(50) | | 来源券商标识（如 `ibkr`、`tiger`），与 `external_id` 配对使用，`NULL` 表示手动录入 |
+| `sync_batch_id` | BIGINT | FK→`broker_sync_batches.id` | 关联同步批次，`NULL` 表示手动录入 |
+
+> **注意**：IBKR 场景下 `external_id` 存储的是 `orderID`（Order 级别唯一标识），而非 `tradeID`（TradeConfirm 级别唯一标识），因为 `trade_records` 的粒度是 Order。
+
+#### `trade_trigger` 不做改动
+
+`trade_trigger` 描述的是"交易为什么发生"（`MANUAL` / `OPTION` / `MARKET_EVENT`），是交易本身的业务属性，与"记录来源"无关。
+
+**同步导入时 `trade_trigger` 的设置规则**：
+
+| 同步进来的交易类型 | `trade_trigger` | 说明 |
+|------------------|----------------|------|
+| 用户主动下单的股票/ETF/期权买卖 | `MANUAL` | 交易本身是用户手动下单的 |
+| 期权到期/行权/被指派 | `OPTION` | 交易由期权事件触发 |
+| 拆股/代码变更等市场事件 | `MARKET_EVENT` | 交易由市场事件触发 |
+
+**区分数据来源的方式**：
+
+```
+external_id IS NULL     → 手动录入到平台的记录
+external_id IS NOT NULL → 券商同步导入的记录
+```
+
+#### 索引与约束
+
+| 类型 | 列 | 说明 |
+|------|-----|------|
+| UNIQUE (partial) | `(external_broker, external_id) WHERE external_id IS NOT NULL` | 防止同一券商的同一笔订单重复导入 |
+| INDEX | `sync_batch_id` | 按批次查询导入的记录 |
+| FK | `sync_batch_id` → `broker_sync_batches.id` | 外键关联批次 |
+
+---
+
+## 五、整体数据流
+
+```
+券商 API 响应 (JSON/XML)
+    ↓ 反序列化 + 解析
+券商专属内存模型 (如 IbkrOrderRecord)
+    ↓ 写入暂存表
+券商专属暂存表 (如 ibkr_staged_orders)          batch 状态: PENDING
+    ↓ 字段映射 + 类型转换 + 去重校验
+    ↓ 每条记录独立处理，状态更新为 IMPORTED / SKIPPED / CONFLICT / FAILED
+trade_records（正式表）                          batch 状态: COMPLETED
+    ↓
+    设置 external_id = orderID, external_broker = 'ibkr', sync_batch_id
+    设置 trade_trigger 为交易实际业务含义（MANUAL / OPTION / MARKET_EVENT）
+```
+
+---
+
+## 六、ER 关系图
+
+```
+broker_sync_batches (1) ──── (N) ibkr_staged_orders         ← 核心：导入 trade_records 的数据源
+        │                          │
+        │                          │ order_id 关联（可选）
+        │                          │
+        │               (1) ──── (N) ibkr_staged_trade_confirms  ← 可选：执行明细附表
+        │
+        │ (1)
+        │
+        └──── (N) trade_records (通过 sync_batch_id 关联)
+
+ibkr_staged_orders.imported_trade_id ──── trade_records.id (可选反向关联)
+
+trade_records.(external_broker + external_id) ←→ ibkr_staged_orders.order_id
+```
+
+---
+
+## 七、Order vs TradeConfirm 字段对比与设计依据
+
+基于实际 XML 数据（150 条 Order / 155 条 TradeConfirm）的逐字段验证结果：
+
+### 7.1 Order 级别字段完整性
+
+Order 节点已包含导入 `trade_records` 所需的**全部关键业务字段**：
+
+| 字段类别 | 状态 | 说明 |
+|---------|------|------|
+| 日期字段（tradeDate, settleDate, dateTime） | ✅ 始终有值 | 实测 Order 级别从不出现 MULTI，MULTI 仅出现在 SymbolSummary 层 |
+| 数量与价格（quantity, price） | ✅ 始终有值 | Order 已包含聚合后的总数量和加权均价 |
+| 金额字段（amount, proceeds, netCash） | ✅ 始终有值 | 聚合值 |
+| 佣金（commission, commissionCurrency, tradeCharge） | ✅ 始终有值 | 聚合后的总佣金 |
+| 合约信息（symbol, conid, assetCategory 等） | ✅ 始终有值 | 与 TradeConfirm 一致 |
+| 期权字段（strike, expiry, putCall） | ✅ 期权有值 | 与 TradeConfirm 一致 |
+| 订单信息（orderID, buySell） | ✅ 始终有值 | — |
+| orderTime, orderType | ⚠️ BookTrade 为空 | 正常行为：期权到期/行权等无下单动作 |
+| isAPIOrder | ⚠️ 始终为空 | Order 级别不返回此值，非关键字段 |
+
+### 7.2 不纳入暂存表的字段
+
+| 字段 | Order 级别 | TradeConfirm 级别 | 不纳入的原因 |
+|------|-----------|------------------|------------|
+| `exchange` | 始终为空 | 有值（DARK, DRCTEDGE, MEMX 等） | 属于执行细节，对用户感知层面无意义 |
+| `code` | 始终为空 | 有值（O, C, C;P, O;P, A;C 等） | 属于执行细节，`trade_trigger` 的判定可通过 Order 的 `transactionType` + 上下文推断 |
+
+### 7.3 TradeConfirm 独有字段（仅在附表中存在）
+
+| 字段 | 说明 |
+|------|------|
+| `tradeID` | 成交确认 ID（全局唯一） |
+| `execID` | 执行 ID（交易所分配） |
+| `brokerageOrderID` | 券商内部订单 ID |
+| `orderReference` | 订单引用 |
+| `transactionType` | ExchTrade / BookTrade |
+
+---
+
+## 八、后续扩展
+
+### 8.1 新增券商暂存表
+
+当接入新券商（如 Tiger、Schwab）时，只需新建对应的暂存表：
+
+```
+tiger_staged_orders             → 字段 1:1 对应 TigerOrderRecord
+schwab_staged_orders            → 字段 1:1 对应 SchwabTradeRecord
+```
+
+`broker_sync_batches` 表通用，无需修改。`trade_records` 扩展字段也通用（`external_broker` 区分来源，`external_id` 存各券商的订单 ID）。
+
+### 8.2 Flyway 迁移脚本
+
+实现时需要编写以下 Flyway 迁移脚本（按当前版本号顺序）：
+
+| 脚本 | 内容 |
+|------|------|
+| `V19__create_broker_sync_batches.sql` | 创建 `broker_sync_batches` 表 |
+| `V20__create_ibkr_staged_orders.sql` | 创建 `ibkr_staged_orders` 表 |
+| `V21__create_ibkr_staged_trade_confirms.sql` | 创建 `ibkr_staged_trade_confirms` 表（可选，可延后） |
+| `V22__add_external_fields_to_trade_records.sql` | 为 `trade_records` 新增 `external_id`、`external_broker`、`sync_batch_id` 字段 |
+
+> 注：版本号需在实现时根据实际最新版本号确定。
+
+### 8.3 JPA Entity 与 Repository
+
+实现时需新建：
+
+| 类 | 说明 |
+|----|------|
+| `BrokerSyncBatch` (Entity) | 对应 `broker_sync_batches` 表 |
+| `BrokerSyncBatchRepository` | 批次表的 Repository |
+| `IbkrStagedOrder` (Entity) | 对应 `ibkr_staged_orders` 表 |
+| `IbkrStagedOrderRepository` | IBKR 核心暂存表的 Repository |
+| `IbkrStagedTradeConfirm` (Entity)（可选） | 对应 `ibkr_staged_trade_confirms` 表 |
+| `IbkrStagedTradeConfirmRepository`（可选） | IBKR 明细附表的 Repository |
+| `TradeRecord` (Entity 扩展) | 新增 `externalId`、`externalBroker`、`syncBatchId` 字段 |
+
+---
+
+## 九、待后续讨论
+
+以下事项不在本文档范围内，留到实现阶段或后续设计中讨论：
+
+- [ ] 暂存表 → `trade_records` 的字段映射细节（`IbkrOrderRecord` 的 30 个字段如何映射到 `TradeRecord` 的 20+ 个字段）
+- [ ] 导入时的冲突处理策略（与已有手动录入数据的冲突检测和解决方式）
+- [ ] 是否需要"同步预览"功能（在正式导入前展示待导入数据供用户确认）
+- [ ] 批次导入的事务策略（整个批次一个事务 vs 逐条独立事务）
+- [ ] 暂存表数据的清理策略（保留多久、是否归档）
+- [ ] Order 的 `transactionType` 判断逻辑（如何根据 Order 上下文推断 `trade_trigger` 值，不依赖 TradeConfirm 的 `code` 字段）

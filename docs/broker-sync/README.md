@@ -11,6 +11,7 @@
 | [overall-design.md](./overall-design.md) | 总体方案设计（核心问题讨论与决策记录） | 方案讨论中 |
 | [tiger-sync-design.md](./tiger-sync-design.md) | 老虎证券同步方案（设计与实现记录） | Phase 1 已实现 |
 | [ibkr-flex-web-service-design.md](./ibkr-flex-web-service-design.md) | IBKR Flex Web Service 同步方案（讨论记录） | Flex-only 方案已确定，待实现 |
+| [data-persistence-design.md](./data-persistence-design.md) | 数据持久化设计（Order 暂存表 + 批次表 + 可选明细附表 + trade_records 扩展） | 方案已确认，待实现 |
 
 ---
 
