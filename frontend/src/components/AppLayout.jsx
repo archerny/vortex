@@ -16,6 +16,7 @@ import Settings from '../pages/Settings';
 import StrategyManagement from '../pages/StrategyManagement';
 import TradeAnomalyAnalysis from '../pages/analysis/TradeAnomalyAnalysis';
 import MarketEvents from '../pages/market-events/MarketEvents';
+import SyncManagement from '../pages/sync/SyncManagement';
 import { AmountVisibilityProvider, useAmountVisibility } from '../contexts/AmountVisibilityContext';
 import { TradeEditableProvider } from '../contexts/TradeEditableContext';
 import { PageHeaderProvider } from '../contexts/PageHeaderContext';
@@ -137,6 +138,8 @@ const AppLayout = () => {
         return <TradeAnomalyAnalysis />;
       case '9':
         return <MarketEvents />;
+      case '10':
+        return <SyncManagement />;
       default:
         return <Dashboard />;
     }

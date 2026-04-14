@@ -13,6 +13,7 @@ import {
   StockOutlined,
   ExperimentOutlined,
   FundOutlined,
+  CloudSyncOutlined,
 } from '@ant-design/icons';
 
 // 菜单 key 与 URL hash 路径的映射
@@ -24,6 +25,7 @@ export const menuKeyToPath = {
   '7': 'strategy',
   '8': 'anomaly',
   '9': 'market-events',
+  '10': 'sync-management',
   '4-1': 'profit-stock',
   '4-2': 'profit-strategy',
   '4-3': 'profit-account',
@@ -43,6 +45,7 @@ export const menuKeyToParent = {
   '7': 'trade',
   '8': 'trade',
   '9': 'trade',
+  '10': 'trade',
   '4-1': 'profit',
   '4-2': 'profit',
   '4-3': 'profit',
@@ -79,6 +82,11 @@ export const menuItems = [
         key: '9',
         icon: React.createElement(AlertOutlined),
         label: '市场异动事件',
+      },
+      {
+        key: '10',
+        icon: React.createElement(CloudSyncOutlined),
+        label: '同步管理',
       },
     ],
   },

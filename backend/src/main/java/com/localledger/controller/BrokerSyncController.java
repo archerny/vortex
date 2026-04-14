@@ -1,5 +1,7 @@
 package com.localledger.controller;
 
+import com.localledger.entity.BrokerSyncBatch;
+import com.localledger.service.BrokerSyncBatchService;
 import com.localledger.sync.core.BrokerSyncService;
 import com.localledger.sync.core.SyncRequest;
 import com.localledger.sync.core.SyncResult;
@@ -14,21 +16,25 @@ import java.util.Map;
 /**
  * 券商同步控制器
  *
- * 提供手动触发券商交易记录同步的 REST API。
- * Phase 1 不做前端，通过 curl / Postman 等工具直接调用。
+ * 提供手动触发券商交易记录同步的 REST API，以及同步批次查询接口。
  *
  * 接口列表：
- * - POST /api/broker-sync/trigger        触发同步
- * - GET  /api/broker-sync/brokers        查询支持的券商列表
+ * - POST /api/broker-sync/trigger            触发同步
+ * - GET  /api/broker-sync/brokers            查询支持的券商列表
+ * - GET  /api/broker-sync/batches            查询同步批次列表（支持筛选）
+ * - GET  /api/broker-sync/batches/{id}       查询单个批次详情
  */
 @RestController
 @RequestMapping("/api/broker-sync")
 public class BrokerSyncController {
 
     private final BrokerSyncService brokerSyncService;
+    private final BrokerSyncBatchService batchService;
 
-    public BrokerSyncController(BrokerSyncService brokerSyncService) {
+    public BrokerSyncController(BrokerSyncService brokerSyncService,
+                                BrokerSyncBatchService batchService) {
         this.brokerSyncService = brokerSyncService;
+        this.batchService = batchService;
     }
 
     /**
@@ -70,6 +76,42 @@ public class BrokerSyncController {
     public ResponseEntity<Map<String, Object>> getSupportedBrokers() {
         List<String> brokers = brokerSyncService.getSupportedBrokers();
         return buildSuccessResponse("查询成功", brokers);
+    }
+
+    /**
+     * 查询同步批次列表
+     *
+     * GET /api/broker-sync/batches
+     * GET /api/broker-sync/batches?brokerName=ibkr
+     * GET /api/broker-sync/batches?status=COMPLETED
+     * GET /api/broker-sync/batches?brokerName=ibkr&status=COMPLETED
+     *
+     * @param brokerName optional broker name filter
+     * @param status     optional status filter (PENDING, IMPORTING, COMPLETED, FAILED)
+     * @return list of sync batches
+     */
+    @GetMapping("/batches")
+    public ResponseEntity<Map<String, Object>> listBatches(
+            @RequestParam(required = false) String brokerName,
+            @RequestParam(required = false) String status) {
+        List<BrokerSyncBatch> batches = batchService.listBatches(brokerName, status);
+        return buildSuccessResponse("Query successful", batches);
+    }
+
+    /**
+     * 查询单个同步批次详情
+     *
+     * GET /api/broker-sync/batches/{id}
+     *
+     * @param id batch ID
+     * @return batch details or 404
+     */
+    @GetMapping("/batches/{id}")
+    public ResponseEntity<Map<String, Object>> getBatchById(@PathVariable Long id) {
+        return batchService.findById(id)
+                .map(batch -> buildSuccessResponse("Query successful", batch))
+                .orElse(buildErrorResponse(HttpStatus.NOT_FOUND,
+                        String.format("Sync batch not found: id=%d", id)));
     }
 
     // ============ 响应构建工具方法 ============

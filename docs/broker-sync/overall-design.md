@@ -446,6 +446,7 @@ com.localledger
 - **Phase 1 不做前端交互**，暂时不需要前端页面
 - 同步功能通过 REST API（`POST /api/broker-sync/trigger`）直接触发，使用 curl / Postman 等工具调用即可
 - 后续如需前端交互，再按需添加
+- ✅ **已新增「同步管理」子菜单页面**（2026-04-13）：在「交易管理」一级菜单下新增「同步管理」子菜单，展示 `broker_sync_batches` 历史同步批次记录，支持按券商/状态筛选。后端新增 `GET /api/broker-sync/batches` 和 `GET /api/broker-sync/batches/{id}` 接口
 
 ---
 

@@ -392,12 +392,12 @@ schwab_staged_orders            → 字段 1:1 对应 SchwabTradeRecord
 
 实现时需要编写以下 Flyway 迁移脚本（按当前版本号顺序）：
 
-| 脚本 | 内容 |
-|------|------|
-| `V19__create_broker_sync_batches.sql` | 创建 `broker_sync_batches` 表 |
-| `V20__create_ibkr_staged_orders.sql` | 创建 `ibkr_staged_orders` 表 |
-| `V21__create_ibkr_staged_trade_confirms.sql` | 创建 `ibkr_staged_trade_confirms` 表（可选，可延后） |
-| `V22__add_external_fields_to_trade_records.sql` | 为 `trade_records` 新增 `external_id`、`external_broker`、`sync_batch_id` 字段 |
+| 脚本 | 内容 | 状态 |
+|------|------|------|
+| `V19__create_broker_sync_batches.sql` | 创建 `broker_sync_batches` 表 | ✅ 已完成 |
+| `V20__create_ibkr_staged_orders.sql` | 创建 `ibkr_staged_orders` 表 | 📋 待实现 |
+| `V21__create_ibkr_staged_trade_confirms.sql` | 创建 `ibkr_staged_trade_confirms` 表（可选，可延后） | 📋 待实现 |
+| `V22__add_external_fields_to_trade_records.sql` | 为 `trade_records` 新增 `external_id`、`external_broker`、`sync_batch_id` 字段 | 📋 待实现 |
 
 > 注：版本号需在实现时根据实际最新版本号确定。
 
@@ -405,15 +405,15 @@ schwab_staged_orders            → 字段 1:1 对应 SchwabTradeRecord
 
 实现时需新建：
 
-| 类 | 说明 |
-|----|------|
-| `BrokerSyncBatch` (Entity) | 对应 `broker_sync_batches` 表 |
-| `BrokerSyncBatchRepository` | 批次表的 Repository |
-| `IbkrStagedOrder` (Entity) | 对应 `ibkr_staged_orders` 表 |
-| `IbkrStagedOrderRepository` | IBKR 核心暂存表的 Repository |
-| `IbkrStagedTradeConfirm` (Entity)（可选） | 对应 `ibkr_staged_trade_confirms` 表 |
-| `IbkrStagedTradeConfirmRepository`（可选） | IBKR 明细附表的 Repository |
-| `TradeRecord` (Entity 扩展) | 新增 `externalId`、`externalBroker`、`syncBatchId` 字段 |
+| 类 | 说明 | 状态 |
+|----|------|------|
+| `BrokerSyncBatch` (Entity) | 对应 `broker_sync_batches` 表 | ✅ 已完成 |
+| `BrokerSyncBatchRepository` | 批次表的 Repository | ✅ 已完成 |
+| `IbkrStagedOrder` (Entity) | 对应 `ibkr_staged_orders` 表 | 📋 待实现 |
+| `IbkrStagedOrderRepository` | IBKR 核心暂存表的 Repository | 📋 待实现 |
+| `IbkrStagedTradeConfirm` (Entity)（可选） | 对应 `ibkr_staged_trade_confirms` 表 | 📋 待实现 |
+| `IbkrStagedTradeConfirmRepository`（可选） | IBKR 明细附表的 Repository | 📋 待实现 |
+| `TradeRecord` (Entity 扩展) | 新增 `externalId`、`externalBroker`、`syncBatchId` 字段 | 📋 待实现 |
 
 ---
 
