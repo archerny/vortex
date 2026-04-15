@@ -43,7 +43,7 @@ const CashFlow = () => {
         message.error(result.message || '查询出入金记录失败');
       }
     } catch (error) {
-      console.error('查询出入金记录失败:', error);
+      console.error('Failed to fetch cash flow records:', error);
       message.error('查询出入金记录失败，请检查后端服务是否启动');
     } finally {
       setLoading(false);
@@ -58,7 +58,7 @@ const CashFlow = () => {
         setBrokerList(result.data || []);
       }
     } catch (error) {
-      console.error('查询券商列表失败:', error);
+      console.error('Failed to fetch broker list:', error);
     }
   };
 
@@ -177,7 +177,7 @@ const CashFlow = () => {
             message.error(result.message || '新增出入金记录失败');
           }
         } catch (error) {
-          console.error('新增出入金记录失败:', error);
+          console.error('Failed to create cash flow record:', error);
           const errorMsg = error.response?.data?.message || '新增失败，请稍后重试';
           message.error(errorMsg);
         } finally {
@@ -185,7 +185,7 @@ const CashFlow = () => {
         }
       })
       .catch((errorInfo) => {
-        console.log('表单验证失败:', errorInfo);
+        console.log('Form validation failed:', errorInfo);
       });
   };
 

@@ -27,7 +27,7 @@ const StrategyManagement = () => {
         message.error(result.message || '查询策略数据失败');
       }
     } catch (error) {
-      console.error('查询策略数据失败:', error);
+      console.error('Failed to fetch strategy data:', error);
       message.error('查询策略数据失败，请检查后端服务是否启动');
     } finally {
       setLoading(false);
@@ -137,7 +137,7 @@ const StrategyManagement = () => {
         message.error(result.message || '删除策略失败');
       }
     } catch (error) {
-      console.error('删除策略失败:', error);
+      console.error('Failed to delete strategy:', error);
       const errorMsg = error.response?.data?.message || '删除策略失败，请稍后重试';
       message.error(errorMsg);
     }
@@ -172,7 +172,7 @@ const StrategyManagement = () => {
           setEditingStrategy(null);
           form.resetFields();
         } catch (error) {
-          console.error('操作失败:', error);
+          console.error('Operation failed:', error);
           const errorMsg = error.response?.data?.message || '操作失败，请稍后重试';
           message.error(errorMsg);
         } finally {
@@ -180,7 +180,7 @@ const StrategyManagement = () => {
         }
       })
       .catch((errorInfo) => {
-        console.log('表单验证失败:', errorInfo);
+        console.log('Form validation failed:', errorInfo);
       });
   };
 

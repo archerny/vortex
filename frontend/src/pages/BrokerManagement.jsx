@@ -42,7 +42,7 @@ const BrokerManagement = () => {
         message.error(result.message || '查询券商数据失败');
       }
     } catch (error) {
-      console.error('查询券商数据失败:', error);
+      console.error('Failed to fetch broker data:', error);
       message.error('查询券商数据失败，请检查后端服务是否启动');
     } finally {
       setLoading(false);
@@ -179,7 +179,7 @@ const BrokerManagement = () => {
           setEditingBroker(null);
           form.resetFields();
         } catch (error) {
-          console.error('操作失败:', error);
+          console.error('Operation failed:', error);
           const errorMsg = error.response?.data?.message || '操作失败，请稍后重试';
           message.error(errorMsg);
         } finally {
@@ -187,7 +187,7 @@ const BrokerManagement = () => {
         }
       })
       .catch((errorInfo) => {
-        console.log('表单验证失败:', errorInfo);
+        console.log('Form validation failed:', errorInfo);
       });
   };
 

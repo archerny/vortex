@@ -75,11 +75,11 @@ public class CashFlowRecordService {
     public CashFlowRecord create(CashFlowRecord record) {
         // 校验券商是否存在
         if (!brokerRepository.existsById(record.getBrokerId())) {
-            throw new IllegalArgumentException("券商不存在, ID: " + record.getBrokerId());
+            throw new IllegalArgumentException("Broker not found, ID: " + record.getBrokerId());
         }
         // 校验金额必须大于0
         if (record.getAmount() == null || record.getAmount().signum() <= 0) {
-            throw new IllegalArgumentException("金额必须大于0");
+            throw new IllegalArgumentException("Amount must be greater than 0");
         }
         return cashFlowRecordRepository.save(record);
     }
@@ -90,7 +90,7 @@ public class CashFlowRecordService {
     @Transactional
     public void softDelete(Long id) {
         CashFlowRecord record = cashFlowRecordRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("出入金记录不存在, ID: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Cash flow record not found, ID: " + id));
         record.setIsDeleted(true);
         cashFlowRecordRepository.save(record);
     }

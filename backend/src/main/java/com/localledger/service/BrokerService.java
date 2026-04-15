@@ -74,7 +74,7 @@ public class BrokerService {
     @Transactional
     public Broker create(Broker broker) {
         if (brokerRepository.existsByBrokerName(broker.getBrokerName())) {
-            throw new IllegalArgumentException("券商名称已存在: " + broker.getBrokerName());
+            throw new IllegalArgumentException("Broker name already exists: " + broker.getBrokerName());
         }
         return brokerRepository.save(broker);
     }
@@ -85,12 +85,12 @@ public class BrokerService {
     @Transactional
     public Broker update(Long id, Broker brokerData) {
         Broker existing = brokerRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("券商不存在, ID: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Broker not found, ID: " + id));
 
         // 如果修改了名称，需要检查新名称是否已存在
         if (!existing.getBrokerName().equals(brokerData.getBrokerName())
                 && brokerRepository.existsByBrokerName(brokerData.getBrokerName())) {
-            throw new IllegalArgumentException("券商名称已存在: " + brokerData.getBrokerName());
+            throw new IllegalArgumentException("Broker name already exists: " + brokerData.getBrokerName());
         }
 
         existing.setBrokerName(brokerData.getBrokerName());
@@ -109,7 +109,7 @@ public class BrokerService {
     @Transactional
     public void delete(Long id) {
         if (!brokerRepository.existsById(id)) {
-            throw new IllegalArgumentException("券商不存在, ID: " + id);
+            throw new IllegalArgumentException("Broker not found, ID: " + id);
         }
         brokerRepository.deleteById(id);
     }

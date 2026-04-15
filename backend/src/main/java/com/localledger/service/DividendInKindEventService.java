@@ -98,7 +98,7 @@ public class DividendInKindEventService {
     @Transactional
     public DividendInKindEvent update(Long id, DividendInKindEvent eventData) {
         DividendInKindEvent existing = dividendInKindEventRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("实物分红事件不存在, ID: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Dividend-in-kind event not found, ID: " + id));
 
         // 记录旧值，用于确定受影响范围
         String oldSymbol = existing.getSymbol();
@@ -139,7 +139,7 @@ public class DividendInKindEventService {
     @Transactional
     public void delete(Long id) {
         DividendInKindEvent existing = dividendInKindEventRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("实物分红事件不存在, ID: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Dividend-in-kind event not found, ID: " + id));
         existing.setIsDeleted(true);
         existing.setProcessed(false);
         existing.setProcessedAt(null);

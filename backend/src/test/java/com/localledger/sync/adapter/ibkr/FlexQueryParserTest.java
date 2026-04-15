@@ -48,13 +48,13 @@ class FlexQueryParserTest {
         assertTrue(result.getTradeConfirmCount() > 0, "应解析到至少一条 TradeConfirm 记录");
 
         System.out.println("========================================");
-        System.out.println("解析结果概要: " + result);
+        System.out.println("Parse result summary: " + result);
         System.out.println("========================================");
 
         // ====== 打印所有 Order 记录 ======
         List<IbkrOrderRecord> orders = result.getOrders();
         System.out.println();
-        System.out.println("============ Order 记录（共 " + orders.size() + " 条）============");
+        System.out.println("============ Order records (total: " + orders.size() + ") ============");
         for (int i = 0; i < orders.size(); i++) {
             System.out.printf("[Order %d] %s%n", i + 1, orders.get(i));
         }
@@ -62,7 +62,7 @@ class FlexQueryParserTest {
         // ====== 打印所有 TradeConfirm 记录 ======
         List<IbkrTradeConfirm> tradeConfirms = result.getTradeConfirms();
         System.out.println();
-        System.out.println("============ TradeConfirm 记录（共 " + tradeConfirms.size() + " 条）============");
+        System.out.println("============ TradeConfirm records (total: " + tradeConfirms.size() + ") ============");
         for (int i = 0; i < tradeConfirms.size(); i++) {
             System.out.printf("[TradeConfirm %d] %s%n", i + 1, tradeConfirms.get(i));
         }
@@ -165,7 +165,7 @@ class FlexQueryParserTest {
         assertTrue(bookTrade.isBookTrade());
         assertFalse(bookTrade.isExchangeTrade());
 
-        System.out.println("BookTrade 示例: " + bookTrade);
+        System.out.println("BookTrade example: " + bookTrade);
     }
 
     @Test

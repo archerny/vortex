@@ -47,7 +47,7 @@ const AnomalyAnalysisTab = () => {
         message.error(res.message || '核对失败');
       }
     } catch (error) {
-      console.error('核对失败:', error);
+      console.error('Verification failed:', error);
       message.error('核对请求失败，请检查后端服务');
     } finally {
       setLoading(false);

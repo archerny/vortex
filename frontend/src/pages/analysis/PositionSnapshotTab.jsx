@@ -36,7 +36,7 @@ const PositionSnapshotTab = () => {
           setBrokerList(result.data || []);
         }
       } catch (error) {
-        console.error('查询券商列表失败:', error);
+        console.error('Failed to fetch broker list:', error);
       }
     };
     loadBrokers();
@@ -65,7 +65,7 @@ const PositionSnapshotTab = () => {
         message.error(res.message || '查询持仓失败');
       }
     } catch (error) {
-      console.error('查询持仓失败:', error);
+      console.error('Failed to fetch positions:', error);
       message.error('查询持仓失败，请检查后端服务');
     } finally {
       setPositionLoading(false);

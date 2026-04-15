@@ -36,7 +36,7 @@ const DividendInKindTab = () => {
         message.error(result.message || '查询实物分红事件失败');
       }
     } catch (error) {
-      console.error('查询实物分红事件失败:', error);
+      console.error('Failed to fetch dividend-in-kind events:', error);
       message.error('查询失败，请检查后端服务');
     } finally {
       setLoading(false);
@@ -170,7 +170,7 @@ const DividendInKindTab = () => {
         setIsModalOpen(false);
         form.resetFields();
       } catch (error) {
-        console.error('操作失败:', error);
+        console.error('Operation failed:', error);
         message.error(error.response?.data?.message || '操作失败');
       } finally {
         setSubmitting(false);

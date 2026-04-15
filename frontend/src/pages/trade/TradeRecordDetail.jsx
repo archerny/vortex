@@ -131,7 +131,7 @@ const TradeRecordDetail = ({ recordId, onBack }) => {
           }
         }
       } catch (error) {
-        console.error('获取触发源期权交易失败:', error);
+        console.error('Failed to fetch trigger source option trade:', error);
       }
       // 降级：如果请求失败，仍按原逻辑只展示 triggerRefId 对应的记录
       return allRecords.filter((r) => r.id === triggerRefId);
@@ -180,7 +180,7 @@ const TradeRecordDetail = ({ recordId, onBack }) => {
         message.error(recordsResult.message || '查询交易记录失败');
       }
     } catch (error) {
-      console.error('加载详情失败:', error);
+      console.error('Failed to load trade record detail:', error);
       message.error('加载详情失败，请检查后端服务');
     } finally {
       setLoading(false);
@@ -267,9 +267,9 @@ const TradeRecordDetail = ({ recordId, onBack }) => {
       }
     } catch (error) {
       if (error.errorFields) {
-        console.error('表单验证失败:', error);
+        console.error('Form validation failed:', error);
       } else {
-        console.error('更新交易记录失败:', error);
+        console.error('Failed to update trade record:', error);
         const errorMsg = error.response?.data?.message || '更新失败，请稍后重试';
         message.error(errorMsg);
       }
@@ -289,7 +289,7 @@ const TradeRecordDetail = ({ recordId, onBack }) => {
         message.error(result.message || '删除失败');
       }
     } catch (error) {
-      console.error('删除交易记录失败:', error);
+      console.error('Failed to delete trade record:', error);
       const errorMsg = error.response?.data?.message || '删除失败，请稍后重试';
       message.error(errorMsg);
     }

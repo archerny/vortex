@@ -69,7 +69,7 @@ const AppLayout = () => {
       }
     } catch (error) {
       setBackendStatus('连接失败');
-      console.error('后端连接失败:', error);
+      console.error('Failed to connect to backend:', error);
     }
   };
 

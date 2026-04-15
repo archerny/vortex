@@ -95,7 +95,7 @@ public class StockSplitEventService {
     @Transactional
     public StockSplitEvent update(Long id, StockSplitEvent eventData) {
         StockSplitEvent existing = stockSplitEventRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("拆股事件不存在, ID: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Stock split event not found, ID: " + id));
 
         // 记录旧值，用于确定受影响范围
         String oldSymbol = existing.getSymbol();
@@ -128,7 +128,7 @@ public class StockSplitEventService {
     @Transactional
     public void delete(Long id) {
         StockSplitEvent existing = stockSplitEventRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("拆股事件不存在, ID: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Stock split event not found, ID: " + id));
         existing.setIsDeleted(true);
         existing.setProcessed(false);
         existing.setProcessedAt(null);
@@ -168,7 +168,7 @@ public class StockSplitEventService {
             }
         } else {
             log.error("Failed to auto-fill stock split event: no trade record found for symbol='{}', aborting to prevent dirty data", querySymbol);
-            throw new IllegalArgumentException("未找到证券代码 '" + querySymbol + "' 的交易记录，无法自动填充币种和证券名称，请先录入该证券的交易记录");
+            throw new IllegalArgumentException("No trade record found for symbol '" + querySymbol + "', cannot auto-fill currency and symbol name. Please create a trade record for this symbol first.");
         }
     }
 }

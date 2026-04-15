@@ -113,7 +113,7 @@ public class SymbolChangeEventService {
     @Transactional
     public SymbolChangeEvent update(Long id, SymbolChangeEvent eventData) {
         SymbolChangeEvent existing = symbolChangeEventRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("代码变更事件不存在, ID: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Symbol change event not found, ID: " + id));
 
         // 记录旧值，用于确定受影响范围
         String oldOldSymbol = existing.getOldSymbol();
@@ -150,7 +150,7 @@ public class SymbolChangeEventService {
     @Transactional
     public void delete(Long id) {
         SymbolChangeEvent existing = symbolChangeEventRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("代码变更事件不存在, ID: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Symbol change event not found, ID: " + id));
         existing.setIsDeleted(true);
         existing.setProcessed(false);
         existing.setProcessedAt(null);
@@ -189,7 +189,7 @@ public class SymbolChangeEventService {
             }
         } else {
             log.error("Failed to auto-fill symbol change event: no trade record found for oldSymbol='{}', aborting to prevent dirty data", event.getOldSymbol());
-            throw new IllegalArgumentException("未找到证券代码 '" + event.getOldSymbol() + "' 的交易记录，无法自动填充币种和证券名称，请先录入该证券的交易记录");
+            throw new IllegalArgumentException("No trade record found for symbol '" + event.getOldSymbol() + "', cannot auto-fill currency and symbol name. Please create a trade record for this symbol first.");
         }
     }
 }

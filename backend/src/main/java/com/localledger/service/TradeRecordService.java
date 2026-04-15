@@ -131,25 +131,25 @@ public class TradeRecordService {
     public TradeRecord create(TradeRecord record) {
         // 校验券商是否存在
         if (!brokerRepository.existsById(record.getBrokerId())) {
-            throw new IllegalArgumentException("券商不存在, ID: " + record.getBrokerId());
+            throw new IllegalArgumentException("Broker not found, ID: " + record.getBrokerId());
         }
         // 校验底层证券代码不能为空
         if (record.getUnderlyingSymbol() == null || record.getUnderlyingSymbol().trim().isEmpty()) {
-            throw new IllegalArgumentException("底层证券代码不能为空，用于关联分析期权与正股收益");
+            throw new IllegalArgumentException("Underlying symbol is required for correlating option and stock profit analysis");
         }
         // 校验策略是否存在（如果指定了策略）
         if (record.getStrategyId() != null) {
             if (!strategyRepository.existsById(record.getStrategyId())) {
-                throw new IllegalArgumentException("策略不存在, ID: " + record.getStrategyId());
+                throw new IllegalArgumentException("Strategy not found, ID: " + record.getStrategyId());
             }
         }
         // 校验数量必须大于0
         if (record.getQuantity() == null || record.getQuantity() <= 0) {
-            throw new IllegalArgumentException("交易数量必须大于0");
+            throw new IllegalArgumentException("Trade quantity must be greater than 0");
         }
         // 校验价格不能为负
         if (record.getPrice() == null || record.getPrice().signum() < 0) {
-            throw new IllegalArgumentException("成交价格不能为负数");
+            throw new IllegalArgumentException("Trade price cannot be negative");
         }
         // 如果未指定交易触发来源，默认为手动交易
         if (record.getTradeTrigger() == null) {
@@ -177,16 +177,16 @@ public class TradeRecordService {
     public TradeRecord update(Long id, TradeRecord recordData) {
         TradeRecord existing = tradeRecordRepository.findById(id)
                 .filter(r -> !r.getIsDeleted())
-                .orElseThrow(() -> new IllegalArgumentException("交易记录不存在, ID: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Trade record not found, ID: " + id));
 
         // 校验券商是否存在
         if (!brokerRepository.existsById(recordData.getBrokerId())) {
-            throw new IllegalArgumentException("券商不存在, ID: " + recordData.getBrokerId());
+            throw new IllegalArgumentException("Broker not found, ID: " + recordData.getBrokerId());
         }
         // 校验策略是否存在（如果指定了策略）
         if (recordData.getStrategyId() != null) {
             if (!strategyRepository.existsById(recordData.getStrategyId())) {
-                throw new IllegalArgumentException("策略不存在, ID: " + recordData.getStrategyId());
+                throw new IllegalArgumentException("Strategy not found, ID: " + recordData.getStrategyId());
             }
         }
 
@@ -233,35 +233,35 @@ public class TradeRecordService {
 
         if (trigger == TradeTrigger.MANUAL) {
             if (refId != null && refId != 0L) {
-                throw new IllegalArgumentException("手动交易的 trigger_ref_id 应为 0");
+                throw new IllegalArgumentException("Manual trade trigger_ref_id should be 0");
             }
             if (refType != null && refType != TriggerRefType.NONE) {
-                throw new IllegalArgumentException("手动交易的 trigger_ref_type 应为 NONE");
+                throw new IllegalArgumentException("Manual trade trigger_ref_type should be NONE");
             }
         } else if (trigger == TradeTrigger.MARKET_EVENT) {
             if (refId == null || refId == 0L) {
-                throw new IllegalArgumentException("市场事件触发的交易必须关联到具体的事件记录（trigger_ref_id 不能为 0）");
+                throw new IllegalArgumentException("Market event triggered trade must reference a specific event record (trigger_ref_id cannot be 0)");
             }
             if (refType == null || refType == TriggerRefType.NONE) {
-                throw new IllegalArgumentException("市场事件触发的交易必须指明关联的事件类型（trigger_ref_type 不能为 NONE）");
+                throw new IllegalArgumentException("Market event triggered trade must specify the associated event type (trigger_ref_type cannot be NONE)");
             }
             // 市场事件的 trigger_ref_type 应为三种市场事件子类型之一
             if (refType != TriggerRefType.STOCK_SPLIT
                     && refType != TriggerRefType.SYMBOL_CHANGE
                     && refType != TriggerRefType.DIVIDEND_IN_KIND) {
-                throw new IllegalArgumentException("市场事件的 trigger_ref_type 应为 STOCK_SPLIT / SYMBOL_CHANGE / DIVIDEND_IN_KIND 之一");
+                throw new IllegalArgumentException("Market event trigger_ref_type must be one of STOCK_SPLIT / SYMBOL_CHANGE / DIVIDEND_IN_KIND");
             }
         } else if (trigger == TradeTrigger.OPTION) {
             // OPTION 场景：trigger_ref_type 必须为三种期权子类型之一
             if (refType != TriggerRefType.OPTION_EXPIRE
                     && refType != TriggerRefType.OPTION_EXERCISE
                     && refType != TriggerRefType.OPTION_ASSIGNED) {
-                throw new IllegalArgumentException("期权触发的交易 trigger_ref_type 应为 OPTION_EXPIRE / OPTION_EXERCISE / OPTION_ASSIGNED 之一");
+                throw new IllegalArgumentException("Option triggered trade trigger_ref_type must be one of OPTION_EXPIRE / OPTION_EXERCISE / OPTION_ASSIGNED");
             }
             // 期权到期时，price 和 amount 应为 0
             if (refType == TriggerRefType.OPTION_EXPIRE) {
                 if (record.getPrice() != null && record.getPrice().signum() != 0) {
-                    throw new IllegalArgumentException("期权到期的成交价格应为 0");
+                    throw new IllegalArgumentException("Option expiration trade price should be 0");
                 }
             }
         }
@@ -289,7 +289,7 @@ public class TradeRecordService {
     @Transactional
     public void softDelete(Long id) {
         TradeRecord record = tradeRecordRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("交易记录不存在, ID: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Trade record not found, ID: " + id));
         record.setIsDeleted(true);
         tradeRecordRepository.save(record);
     }

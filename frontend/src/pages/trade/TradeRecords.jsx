@@ -41,7 +41,7 @@ const TradeRecords = () => {
         setStatistics(result.data);
       }
     } catch (error) {
-      console.error('查询统计数据失败:', error);
+      console.error('Failed to fetch trade statistics:', error);
     }
   };
 
@@ -60,7 +60,7 @@ const TradeRecords = () => {
         message.error(result.message || '查询交易记录失败');
       }
     } catch (error) {
-      console.error('查询交易记录失败:', error);
+      console.error('Failed to fetch trade records:', error);
       message.error('查询交易记录失败，请检查后端服务是否启动');
     } finally {
       setLoading(false);
@@ -79,7 +79,7 @@ const TradeRecords = () => {
         setBrokerMap(map);
       }
     } catch (error) {
-      console.error('查询券商列表失败:', error);
+      console.error('Failed to fetch broker list:', error);
     }
   };
 
@@ -95,7 +95,7 @@ const TradeRecords = () => {
         setStrategyMap(map);
       }
     } catch (error) {
-      console.error('查询策略列表失败:', error);
+      console.error('Failed to fetch strategy list:', error);
     }
   };
 
@@ -185,9 +185,9 @@ const TradeRecords = () => {
       }
     } catch (error) {
       if (error.errorFields) {
-        console.error('表单验证失败:', error);
+        console.error('Form validation failed:', error);
       } else {
-        console.error('新增交易记录失败:', error);
+        console.error('Failed to create trade record:', error);
         const errorMsg = error.response?.data?.message || '新增交易记录失败，请稍后重试';
         message.error(errorMsg);
       }
