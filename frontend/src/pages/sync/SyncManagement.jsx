@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Table, Tag, Select, Space, Typography, Tooltip, Card, Button, message } from 'antd';
-import { ReloadOutlined, CloudSyncOutlined } from '@ant-design/icons';
+import { Table, Tag, Select, Space, Typography, Tooltip, Card, Button, message, Modal, DatePicker, Form } from 'antd';
+import { ReloadOutlined, CloudSyncOutlined, PlusOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
-import { fetchSyncBatches } from '../../services/brokerSyncApi';
+import { fetchSyncBatches, triggerSync, fetchSupportedBrokers } from '../../services/brokerSyncApi';
 
 dayjs.extend(duration);
 
@@ -19,6 +19,12 @@ const SyncManagement = () => {
   const [batches, setBatches] = useState([]);
   const [loading, setLoading] = useState(false);
   const [filters, setFilters] = useState({ brokerName: undefined, status: undefined });
+
+  // New sync modal state
+  const [modalOpen, setModalOpen] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [brokerOptions, setBrokerOptions] = useState([]);
+  const [form] = Form.useForm();
 
   const loadBatches = useCallback(async () => {
     setLoading(true);
@@ -39,6 +45,57 @@ const SyncManagement = () => {
   useEffect(() => {
     loadBatches();
   }, [loadBatches]);
+
+  // Load supported brokers when modal opens
+  const openModal = async () => {
+    setModalOpen(true);
+    try {
+      const result = await fetchSupportedBrokers();
+      const brokers = (result.data || []).map((name) => ({
+        label: name.toUpperCase(),
+        value: name,
+      }));
+      setBrokerOptions(brokers);
+    } catch (error) {
+      console.error('Failed to load supported brokers:', error);
+      message.error('加载券商列表失败');
+    }
+  };
+
+  // Submit sync trigger
+  const handleSyncSubmit = async () => {
+    try {
+      const values = await form.validateFields();
+      setSubmitting(true);
+
+      const payload = { brokerName: values.brokerName };
+      if (values.dateRange && values.dateRange.length === 2) {
+        payload.startTime = values.dateRange[0].format('YYYY-MM-DD');
+        payload.endTime = values.dateRange[1].format('YYYY-MM-DD');
+      }
+
+      const result = await triggerSync(payload);
+      if (result.status === 'SUCCESS') {
+        message.success('同步任务已提交，请稍后刷新查看结果');
+        setModalOpen(false);
+        form.resetFields();
+        loadBatches();
+      } else {
+        message.error(result.message || '提交同步任务失败');
+      }
+    } catch (error) {
+      if (error.response?.data?.message) {
+        message.error(error.response.data.message);
+      } else if (error.errorFields) {
+        // Form validation error, do nothing
+      } else {
+        console.error('Sync trigger failed:', error);
+        message.error('同步请求失败');
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   // 状态标签颜色映射
   const statusTagColor = {
@@ -209,9 +266,14 @@ const SyncManagement = () => {
           <CloudSyncOutlined style={{ marginRight: 8 }} />
           同步管理
         </Title>
-        <Button icon={<ReloadOutlined />} onClick={loadBatches} loading={loading}>
-          刷新
-        </Button>
+        <Space>
+          <Button type="primary" icon={<PlusOutlined />} onClick={openModal}>
+            新建同步
+          </Button>
+          <Button icon={<ReloadOutlined />} onClick={loadBatches} loading={loading}>
+            刷新
+          </Button>
+        </Space>
       </div>
 
       <Card size="small" style={{ marginBottom: 16 }}>
@@ -264,6 +326,41 @@ const SyncManagement = () => {
         scroll={{ x: 1400 }}
         size="middle"
       />
+
+      <Modal
+        title="新建同步任务"
+        open={modalOpen}
+        onCancel={() => {
+          setModalOpen(false);
+          form.resetFields();
+        }}
+        onOk={handleSyncSubmit}
+        confirmLoading={submitting}
+        okText="开始同步"
+        cancelText="取消"
+        destroyOnClose
+      >
+        <Form form={form} layout="vertical" style={{ marginTop: 16 }}>
+          <Form.Item
+            name="brokerName"
+            label="券商"
+            rules={[{ required: true, message: '请选择券商' }]}
+          >
+            <Select
+              placeholder="请选择券商"
+              options={brokerOptions}
+              loading={brokerOptions.length === 0}
+            />
+          </Form.Item>
+          <Form.Item
+            name="dateRange"
+            label="日期范围"
+            rules={[{ required: true, message: '请选择日期范围' }]}
+          >
+            <DatePicker.RangePicker style={{ width: '100%' }} />
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 };
