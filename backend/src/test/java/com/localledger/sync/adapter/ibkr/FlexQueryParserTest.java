@@ -69,7 +69,7 @@ class FlexQueryParserTest {
 
         System.out.println();
         System.out.println("========================================");
-        System.out.printf("合计: %d 条 Order, %d 条 TradeConfirm%n", orders.size(), tradeConfirms.size());
+        System.out.printf("Total: %d Orders, %d TradeConfirms%n", orders.size(), tradeConfirms.size());
         System.out.println("========================================");
     }
 

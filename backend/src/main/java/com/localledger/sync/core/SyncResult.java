@@ -35,8 +35,8 @@ public class SyncResult {
         result.brokerName = brokerName;
         result.totalRecords = totalRecords;
         result.durationMs = durationMs;
-        result.message = String.format("同步完成：从 %s 获取到 %d 条订单记录，耗时 %d ms",
-                brokerName, totalRecords, durationMs);
+        result.message = String.format("Sync completed: fetched %d order records from %s in %d ms",
+                totalRecords, brokerName, durationMs);
         return result;
     }
 
@@ -46,7 +46,7 @@ public class SyncResult {
         result.brokerName = brokerName;
         result.totalRecords = 0;
         result.durationMs = durationMs;
-        result.message = String.format("同步失败 [%s]：%s（耗时 %d ms）",
+        result.message = String.format("Sync failed [%s]: %s (took %d ms)",
                 brokerName, errorMessage, durationMs);
         return result;
     }

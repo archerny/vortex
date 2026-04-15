@@ -114,7 +114,7 @@ public class BrokerSyncController {
     @GetMapping("/brokers")
     public ResponseEntity<Map<String, Object>> getSupportedBrokers() {
         List<String> brokers = brokerSyncService.getSupportedBrokers();
-        return buildSuccessResponse("查询成功", brokers);
+        return buildSuccessResponse("Query successful", brokers);
     }
 
     /**

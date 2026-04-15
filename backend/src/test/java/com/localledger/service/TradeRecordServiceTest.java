@@ -118,7 +118,7 @@ class TradeRecordServiceTest {
             IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
                     () -> tradeRecordService.create(record));
 
-            assertTrue(ex.getMessage().contains("券商不存在"));
+            assertTrue(ex.getMessage().contains("Broker not found"));
         }
 
         @Test
@@ -131,7 +131,7 @@ class TradeRecordServiceTest {
             IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
                     () -> tradeRecordService.create(record));
 
-            assertTrue(ex.getMessage().contains("底层证券代码不能为空"));
+            assertTrue(ex.getMessage().contains("Underlying symbol is required"));
         }
 
         @Test
@@ -144,7 +144,7 @@ class TradeRecordServiceTest {
             IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
                     () -> tradeRecordService.create(record));
 
-            assertTrue(ex.getMessage().contains("交易数量必须大于0"));
+            assertTrue(ex.getMessage().contains("Trade quantity must be greater than 0"));
         }
 
         @Test
@@ -157,7 +157,7 @@ class TradeRecordServiceTest {
             IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
                     () -> tradeRecordService.create(record));
 
-            assertTrue(ex.getMessage().contains("成交价格不能为负数"));
+            assertTrue(ex.getMessage().contains("Trade price cannot be negative"));
         }
 
         @Test
@@ -171,7 +171,7 @@ class TradeRecordServiceTest {
             IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
                     () -> tradeRecordService.create(record));
 
-            assertTrue(ex.getMessage().contains("策略不存在"));
+            assertTrue(ex.getMessage().contains("Strategy not found"));
         }
     }
 
@@ -207,7 +207,7 @@ class TradeRecordServiceTest {
             IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
                     () -> tradeRecordService.create(record));
 
-            assertTrue(ex.getMessage().contains("手动交易的 trigger_ref_id 应为 0"));
+            assertTrue(ex.getMessage().contains("Manual trade trigger_ref_id should be 0"));
         }
 
         @Test
@@ -222,7 +222,7 @@ class TradeRecordServiceTest {
             IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
                     () -> tradeRecordService.create(record));
 
-            assertTrue(ex.getMessage().contains("trigger_ref_id 不能为 0"));
+            assertTrue(ex.getMessage().contains("trigger_ref_id cannot be 0"));
         }
 
         @Test
@@ -237,7 +237,7 @@ class TradeRecordServiceTest {
             IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
                     () -> tradeRecordService.create(record));
 
-            assertTrue(ex.getMessage().contains("trigger_ref_type 不能为 NONE"));
+            assertTrue(ex.getMessage().contains("trigger_ref_type cannot be NONE"));
         }
 
         @Test
@@ -281,7 +281,7 @@ class TradeRecordServiceTest {
             IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
                     () -> tradeRecordService.create(record));
 
-            assertTrue(ex.getMessage().contains("期权到期的成交价格应为 0"));
+            assertTrue(ex.getMessage().contains("Option expiration trade price should be 0"));
         }
     }
 
@@ -315,7 +315,7 @@ class TradeRecordServiceTest {
             IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
                     () -> tradeRecordService.softDelete(999L));
 
-            assertTrue(ex.getMessage().contains("交易记录不存在"));
+            assertTrue(ex.getMessage().contains("Trade record not found"));
         }
     }
 
@@ -359,7 +359,7 @@ class TradeRecordServiceTest {
             IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
                     () -> tradeRecordService.update(999L, buildValidStockRecord()));
 
-            assertTrue(ex.getMessage().contains("交易记录不存在"));
+            assertTrue(ex.getMessage().contains("Trade record not found"));
         }
     }
 }
