@@ -1,10 +1,94 @@
 ---
-description: Log language rule — Chinese is not allowed in log messages
+description: Critical rule — All log messages, exception messages, and diagnostic output MUST be in English. Chinese is strictly forbidden.
+globs: **/*.java,**/*.js,**/*.jsx,**/*.ts,**/*.tsx
 alwaysApply: true
 enabled: true
 ---
 
-## Log Generate Rule
+# English-Only Logging & Exception Messages
 
-- Logging in Chinese is **not** permitted.
-- All log messages (including `log.info`, `log.warn`, `log.error`, `log.debug`) must be written in **English**.
+**This is a HARD rule. No exceptions.**
+
+## Problem
+
+Chinese characters in log messages, exception messages, and diagnostic output cause problems:
+- Log aggregation and search tools may not handle CJK characters well
+- Non-Chinese-speaking contributors cannot understand logs
+- Inconsistent language in logs makes debugging harder
+- Exception messages shown in API responses become unreadable to international consumers
+
+## The Rule
+
+**ALL human-readable text in log statements, exception messages, and diagnostic output MUST be written in English. Chinese (or any other non-ASCII language) is strictly forbidden.**
+
+### Scope — What MUST be in English
+
+| Category | Patterns covered | Example |
+|----------|-----------------|---------|
+| **Backend logging** | `log.info()`, `log.warn()`, `log.error()`, `log.debug()`, `log.trace()` | `log.error("Failed to fetch broker")` ✅ |
+| **Frontend console** | `console.log()`, `console.warn()`, `console.error()`, `console.info()`, `console.debug()` | `console.error('Failed to load data:', error)` ✅ |
+| **Exception messages** | `new IllegalArgumentException(msg)`, `new RuntimeException(msg)`, `throw new ...Exception(msg)` | `throw new IllegalArgumentException("Broker not found, ID: " + id)` ✅ |
+| **Test output** | `System.out.println()`, `System.err.println()` | `System.out.println("Parse result summary: " + result)` ✅ |
+| **Assertion messages** | `assertEquals(msg, ...)`, `assertTrue(msg, ...)`, `assertThat(...).describedAs(msg)` | `assertEquals("Expected 3 records", 3, list.size())` ✅ |
+
+### What is NOT covered (Chinese is acceptable here)
+
+- **UI-facing text**: User-facing labels, tooltips, `message.success()`, `message.error()`, `Modal.confirm()` content — these are i18n concerns, not logging
+- **Code comments**: Internal code comments may be in Chinese (though English is preferred)
+- **Documentation**: Markdown docs, README, etc.
+
+## Examples
+
+### ❌ Forbidden
+
+```java
+// Backend
+log.error("查询券商数据失败: {}", id);
+throw new IllegalArgumentException("券商不存在, ID: " + id);
+System.out.println("解析结果概要: " + result);
+```
+
+```javascript
+// Frontend
+console.error('查询交易记录失败:', error);
+console.log('表单验证失败:', errorInfo);
+```
+
+### ✅ Correct
+
+```java
+// Backend
+log.error("Failed to fetch broker data: {}", id);
+throw new IllegalArgumentException("Broker not found, ID: " + id);
+System.out.println("Parse result summary: " + result);
+```
+
+```javascript
+// Frontend
+console.error('Failed to fetch trade records:', error);
+console.log('Form validation failed:', errorInfo);
+```
+
+## Enforcement
+
+When writing or reviewing code:
+
+1. **Before committing** — Mentally scan all new/modified log/exception statements for non-English text
+2. **During code review** — Any Chinese text in log/exception messages is a **blocking** issue
+3. **When refactoring** — If you encounter existing Chinese log/exception messages, fix them in the same commit
+
+## Quick Reference — Common Translations
+
+| Chinese pattern | English replacement |
+|----------------|-------------------|
+| `xxx不存在` | `xxx not found` |
+| `xxx已存在` | `xxx already exists` |
+| `查询xxx失败` | `Failed to fetch xxx` |
+| `操作失败` | `Operation failed` |
+| `xxx不能为空` | `xxx is required` / `xxx cannot be empty` |
+| `xxx必须大于0` | `xxx must be greater than 0` |
+| `xxx不能为负数` | `xxx cannot be negative` |
+| `表单验证失败` | `Form validation failed` |
+| `删除xxx失败` | `Failed to delete xxx` |
+| `新增xxx失败` | `Failed to create xxx` |
+| `更新xxx失败` | `Failed to update xxx` |
