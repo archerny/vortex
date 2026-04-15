@@ -8,6 +8,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
+import org.springframework.stereotype.Component;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.InputStream;
@@ -43,6 +45,7 @@ import java.io.StringReader;
  * - 忽略 {@code <SymbolSummary>} 节点（汇总数据可从明细聚合）
  * - 所有字段以 String 形式原样保留，业务转换交给模型类的方法
  */
+@Component
 public class FlexQueryParser {
 
     private static final Logger logger = LoggerFactory.getLogger(FlexQueryParser.class);
@@ -68,7 +71,7 @@ public class FlexQueryParser {
         } catch (FlexQueryParseException e) {
             throw e;
         } catch (Exception e) {
-            throw new FlexQueryParseException("解析 Flex Query XML 失败: " + e.getMessage(), e);
+            throw new FlexQueryParseException("Failed to parse Flex Query XML: " + e.getMessage(), e);
         }
     }
 
@@ -92,7 +95,7 @@ public class FlexQueryParser {
         } catch (FlexQueryParseException e) {
             throw e;
         } catch (Exception e) {
-            throw new FlexQueryParseException("解析 Flex Query XML 输入流失败: " + e.getMessage(), e);
+            throw new FlexQueryParseException("Failed to parse Flex Query XML from InputStream: " + e.getMessage(), e);
         }
     }
 
@@ -112,7 +115,7 @@ public class FlexQueryParser {
         // 解析 <FlexStatement>
         NodeList statementNodes = root.getElementsByTagName("FlexStatement");
         if (statementNodes.getLength() == 0) {
-            logger.warn("[FlexQueryParser] XML 中未找到 FlexStatement 节点");
+            logger.warn("[FlexQueryParser] FlexStatement node not found in XML");
             return result;
         }
 
@@ -125,7 +128,7 @@ public class FlexQueryParser {
         // 解析 <TradeConfirms> 下的子节点
         NodeList tradeConfirmsNodes = statement.getElementsByTagName("TradeConfirms");
         if (tradeConfirmsNodes.getLength() == 0) {
-            logger.warn("[FlexQueryParser] XML 中未找到 TradeConfirms 节点");
+            logger.warn("[FlexQueryParser] TradeConfirms node not found in XML");
             return result;
         }
 
@@ -159,13 +162,13 @@ public class FlexQueryParser {
                     symbolSummaryCount++;
                     break;
                 default:
-                    logger.debug("[FlexQueryParser] 忽略未知节点: {}", tagName);
+                    logger.debug("[FlexQueryParser] Ignoring unknown node: {}", tagName);
                     break;
             }
         }
 
-        logger.info("[FlexQueryParser] 解析完成 - 账户: {}, 范围: {} ~ {}, " +
-                        "Order: {} 条, TradeConfirm: {} 条, SymbolSummary: {} 条（已忽略）",
+        logger.info("[FlexQueryParser] Parse complete - account: {}, range: {} ~ {}, " +
+                        "orders: {}, tradeConfirms: {}, symbolSummaries: {} (ignored)",
                 result.getAccountId(), result.getFromDate(), result.getToDate(),
                 orderCount, tradeConfirmCount, symbolSummaryCount);
 

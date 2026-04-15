@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
  * 从 application.properties / application-local.properties 中读取配置：
  * - broker.ibkr.flex-token
  * - broker.ibkr.trade-confirm-query-id
+ * - broker.ibkr.base-url（可选，默认为 IBKR Flex Web Service 正式地址）
  */
 @Component
 @ConfigurationProperties(prefix = "broker.ibkr")
@@ -19,6 +20,9 @@ public class IbkrFlexQueryProperties {
 
     /** Trade Confirm 类型 Flex Query 的 ID */
     private String tradeConfirmQueryId;
+
+    /** Flex Web Service Base URL（带默认值，可通过配置覆盖） */
+    private String baseUrl = "https://ndcdyn.interactivebrokers.com/AccountManagement/FlexWebService";
 
     // ============ Getters and Setters ============
 
@@ -36,6 +40,14 @@ public class IbkrFlexQueryProperties {
 
     public void setTradeConfirmQueryId(String tradeConfirmQueryId) {
         this.tradeConfirmQueryId = tradeConfirmQueryId;
+    }
+
+    public String getBaseUrl() {
+        return baseUrl;
+    }
+
+    public void setBaseUrl(String baseUrl) {
+        this.baseUrl = baseUrl;
     }
 
     /**

@@ -35,7 +35,7 @@ public class BrokerSyncService {
         this.adapterMap = adapters.stream()
                 .collect(Collectors.toMap(BrokerSyncAdapter::getBrokerName, Function.identity()));
 
-        logger.info("[BrokerSync] 已注册 {} 个券商适配器: {}",
+        logger.info("[BrokerSync] Registered {} broker adapter(s): {}",
                 adapterMap.size(), adapterMap.keySet());
     }
 
@@ -48,20 +48,20 @@ public class BrokerSyncService {
     public SyncResult sync(SyncRequest request) {
         String brokerName = request.getBrokerName();
 
-        logger.info("[BrokerSync] 收到同步请求: {}", request);
+        logger.info("[BrokerSync] Received sync request: {}", request);
 
-        // 查找适配器
+        // Find adapter
         BrokerSyncAdapter adapter = adapterMap.get(brokerName);
         if (adapter == null) {
-            String errorMsg = String.format("不支持的券商: %s，当前支持: %s", brokerName, adapterMap.keySet());
+            String errorMsg = String.format("Unsupported broker: %s, available: %s", brokerName, adapterMap.keySet());
             logger.warn("[BrokerSync] {}", errorMsg);
             return SyncResult.failure(brokerName, errorMsg, 0);
         }
 
-        // 执行同步
-        logger.info("[BrokerSync] 使用 {} 适配器开始同步...", brokerName);
+        // Execute sync
+        logger.info("[BrokerSync] Starting sync with {} adapter...", brokerName);
         SyncResult result = adapter.sync(request);
-        logger.info("[BrokerSync] 同步完成: {}", result);
+        logger.info("[BrokerSync] Sync completed: {}", result);
 
         return result;
     }

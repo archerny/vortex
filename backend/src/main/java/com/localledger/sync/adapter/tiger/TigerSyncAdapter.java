@@ -63,19 +63,20 @@ public class TigerSyncAdapter implements BrokerSyncAdapter {
 
         // 1. 检查配置
         if (!tigerApiProperties.isConfigured()) {
-            logger.error("[TigerSync] 老虎证券 API 凭证未配置，请在 application-local.properties 中设置 broker.tiger.* 配置项");
-            return SyncResult.failure(getBrokerName(), "API 凭证未配置", System.currentTimeMillis() - startMs);
+            logger.error("[TigerSync] Tiger API credentials not configured. " +
+                    "Please set broker.tiger.* properties in application-local.properties");
+            return SyncResult.failure(getBrokerName(), "API credentials not configured", System.currentTimeMillis() - startMs);
         }
 
         try {
             // 2. 初始化客户端
             TigerHttpClient client = createClient();
-            logger.info("[TigerSync] Tiger API 客户端初始化成功，账户: {}", tigerApiProperties.getAccount());
+            logger.info("[TigerSync] Tiger API client initialized, account: {}", tigerApiProperties.getAccount());
 
             // 3. 确定时间范围
             LocalDate endDate = resolveEndDate(request);
             LocalDate startDate = resolveStartDate(request, endDate);
-            logger.info("[TigerSync] 同步时间范围: {} ~ {}", startDate, endDate);
+            logger.info("[TigerSync] Sync date range: {} ~ {}", startDate, endDate);
 
             // 4. 分段查询（90 天限制）
             List<TigerOrderRecord> allRecords = fetchOrdersInWindows(client, startDate, endDate);
@@ -88,7 +89,7 @@ public class TigerSyncAdapter implements BrokerSyncAdapter {
 
         } catch (Exception e) {
             long durationMs = System.currentTimeMillis() - startMs;
-            logger.error("[TigerSync] 同步过程中发生异常", e);
+            logger.error("[TigerSync] Sync failed with exception", e);
             return SyncResult.failure(getBrokerName(), e.getMessage(), durationMs);
         }
     }
@@ -145,10 +146,10 @@ public class TigerSyncAdapter implements BrokerSyncAdapter {
                 windowEnd = endDate;
             }
 
-            logger.info("[TigerSync] 查询窗口: {} ~ {}", windowStart, windowEnd);
+            logger.info("[TigerSync] Fetching window: {} ~ {}", windowStart, windowEnd);
             List<TigerOrderRecord> windowRecords = fetchFilledOrders(client, windowStart, windowEnd);
             allRecords.addAll(windowRecords);
-            logger.info("[TigerSync] 窗口 {} ~ {} 获取到 {} 条记录", windowStart, windowEnd, windowRecords.size());
+            logger.info("[TigerSync] Window {} ~ {} returned {} records", windowStart, windowEnd, windowRecords.size());
 
             windowStart = windowEnd;
         }
@@ -175,13 +176,13 @@ public class TigerSyncAdapter implements BrokerSyncAdapter {
 
             if (response == null || !response.isSuccess()) {
                 String errorMsg = response != null ? response.getMessage() : "response is null";
-                logger.warn("[TigerSync] API 调用失败: {}", errorMsg);
+                logger.warn("[TigerSync] API call failed: {}", errorMsg);
                 return records;
             }
 
             BatchOrderItem orderItem = response.getItem();
             if (orderItem == null || orderItem.getOrders() == null) {
-                logger.info("[TigerSync] 该时间窗口内无成交订单");
+                logger.info("[TigerSync] No filled orders in this window");
                 return records;
             }
 
@@ -191,7 +192,7 @@ public class TigerSyncAdapter implements BrokerSyncAdapter {
             }
 
         } catch (Exception e) {
-            logger.error("[TigerSync] 查询 {} ~ {} 时发生异常: {}", startDate, endDate, e.getMessage(), e);
+            logger.error("[TigerSync] Exception while querying {} ~ {}: {}", startDate, endDate, e.getMessage(), e);
         }
 
         return records;
@@ -259,7 +260,7 @@ public class TigerSyncAdapter implements BrokerSyncAdapter {
             try {
                 record.setStrike(new BigDecimal(order.getStrike()));
             } catch (NumberFormatException e) {
-                logger.warn("[TigerSync] 无法解析 strike 值: {}", order.getStrike());
+                logger.warn("[TigerSync] Failed to parse strike value: {}", order.getStrike());
             }
         }
         if (order.getRight() != null) {
@@ -283,13 +284,13 @@ public class TigerSyncAdapter implements BrokerSyncAdapter {
      * 逐条打印订单记录，用于与券商平台核对原始数据
      */
     private void logRecords(List<TigerOrderRecord> records) {
-        logger.info("[TigerSync] ====== 同步结果：共 {} 条已成交订单 ======", records.size());
+        logger.info("[TigerSync] ====== Sync result: {} filled orders total ======", records.size());
 
         for (int i = 0; i < records.size(); i++) {
             TigerOrderRecord record = records.get(i);
             logger.info("[TigerSync] [{}] {}", i + 1, record);
         }
 
-        logger.info("[TigerSync] ====== 日志输出完毕 ======");
+        logger.info("[TigerSync] ====== Log output complete ======");
     }
 }
