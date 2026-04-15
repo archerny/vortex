@@ -133,9 +133,11 @@
 - [ ] 是否需要支持指定时间范围的手动同步？
 
 **已决策**：
-- **通过 REST API 手动触发**：提供一个 HTTP 接口，每调用一次就触发完整的同步逻辑。暂不做前端按钮和定时任务
+- **通过 REST API 手动触发**：提供一个 HTTP 接口触发同步。~~暂不做前端按钮和定时任务~~ → 已在同步管理页面新增「新建同步」按钮（2026-04-14）
   - 接口路径：`POST /api/broker-sync/trigger`
   - Controller 放在现有的 `controller/` 包中（统一管理，不在 `sync` 包内），如 `controller/BrokerSyncController.java`
+  - **触发同步时自动创建 `BrokerSyncBatch` 记录**，跟踪批次状态（PENDING → IMPORTING → COMPLETED/FAILED），`totalCount` 取自 `SyncResult.totalRecords`
+  - ✅ **异步执行**（2026-04-14）：Controller 创建 batch 后立即返回，实际同步逻辑由 `BrokerSyncAsyncExecutor` 在独立线程池中异步执行，避免 HTTP 请求长时间阻塞（详见问题 7 决策 6）
 - Phase 1 核心逻辑包括：数据获取（调用券商 API）→ 反序列化为券商专属模型 → **日志输出**（在券商专属模型层打印日志，供核对原始数据）
 - **暂不做统一模型转换**：先聚焦于 API 对接和券商原始数据的获取与验证，统一模型（`BrokerTradeRecord`）的定义和映射逻辑留到后续阶段
 - **暂不入库**：当前数据库中为真实数据，不能被污染。同步过来的数据先通过打印日志的方式输出，方便后续核对验证。确认数据准确无误后，再接入入库逻辑
@@ -310,7 +312,7 @@
 **需要讨论**：
 - [x] 是否采用适配器模式（Adapter Pattern）来屏蔽各券商 API 差异？
 - [ ] 同步日志/历史是否需要持久化？
-- [ ] 是否需要引入消息队列或异步处理？（考虑到是个人项目，可能不需要）
+- [x] 是否需要引入消息队列或异步处理？（考虑到是个人项目，可能不需要）→ **需要异步处理**，详见下方决策 7
 
 **已决策**：
 
@@ -347,17 +349,20 @@
 ```
 com.localledger
 ├── controller/          ← Web 层（现有）
-│   └── BrokerSyncController.java  ← 同步触发 API（新增，统一放在 controller 包）
+│   └── BrokerSyncController.java  ← 同步触发 API（统一放在 controller 包）
 ├── service/             ← Web 业务层（现有）
+│   └── BrokerSyncBatchService.java  ← 批次 CRUD + 状态变更方法
 ├── entity/              ← 数据库实体（现有）
 ├── dto/                 ← 数据传输对象（现有）
 ├── repository/          ← 数据访问层（现有）
 ├── config/              ← 配置（现有）
+│   └── AsyncConfig.java             ← @EnableAsync + syncTaskExecutor 线程池（新增）
 │
-└── sync/                              ← 独立的同步模块（新增）
+└── sync/                              ← 独立的同步模块
     ├── core/
     │   ├── BrokerSyncAdapter.java     ← 统一适配器接口
     │   ├── BrokerSyncService.java     ← 核心同步编排逻辑
+    │   ├── BrokerSyncAsyncExecutor.java ← @Async 异步执行器（新增，独立 Bean）
     │   └── SyncRequest.java           ← 同步请求参数
     ├── model/
     │   └── BrokerTradeRecord.java     ← 系统统一中间模型（后续阶段实现）
@@ -365,14 +370,70 @@ com.localledger
         └── tiger/
         │   ├── TigerSyncAdapter.java   ← 老虎证券适配器实现
         │   └── TigerOrderRecord.java   ← 老虎证券专属原始模型
-        └── ibkr/                       ← 后续：盈透证券
+        └── ibkr/                       ← ✅ 盈透证券（Phase 1 已实现：API 调通 → 日志输出）
         │   ├── IbkrSyncAdapter.java
-        │   └── IbkrTradeRecord.java
+        │   ├── IbkrFlexClient.java
+        │   ├── IbkrFlexQueryProperties.java
+        │   ├── FlexQueryParser.java
+        │   ├── FlexQueryParseResult.java
+        │   ├── IbkrOrderRecord.java
+        │   └── IbkrTradeConfirm.java
         └── futu/                       ← 后续：富途证券
         └── schwab/                     ← 后续：嘉信证券
 ```
 
-**6. Phase 1 实现范围**
+**6. 同步触发异步化架构**（2026-04-14 决策）
+
+同步任务从前端触发后，后端**不在 HTTP 请求生命周期内同步阻塞等待**，而是立即返回并在后台异步执行。
+
+**问题背景**：IBKR Flex Query 需要 SendRequest → 轮询 GetStatement，耗时可能数十秒，同步阻塞会导致前端弹窗卡死。
+
+**架构设计**：
+
+```
+前端点击「开始同步」
+    ↓ POST /api/broker-sync/trigger
+Controller:
+    ① 参数校验
+    ② 创建 BrokerSyncBatch 记录 (status=PENDING)
+    ③ 提交异步任务（不等待）
+    ④ 立即返回 batch 信息
+    ↓
+前端收到响应 → 关闭弹窗 → 刷新列表（看到 PENDING 记录）
+    ↓
+后台异步线程:
+    ⑤ 标记 batch 为 IMPORTING
+    ⑥ 调用 BrokerSyncService.sync() 执行实际同步
+    ⑦ 根据结果更新 batch 为 COMPLETED / FAILED
+    ↓
+前端通过列表刷新查看最终状态
+```
+
+**关键组件**：
+
+| 组件 | 职责 | 说明 |
+|------|------|------|
+| `AsyncConfig` | `@EnableAsync` + 线程池定义 | 独立配置类，不污染启动类 |
+| `BrokerSyncAsyncExecutor` | `@Async` 异步执行器 | 独立 Bean，解决 Spring AOP 代理限制 |
+| `BrokerSyncBatchService` | 批次状态变更方法 | `markAsImporting()` / `markAsCompleted()` / `markAsFailed()`，每个方法独立 `@Transactional` |
+| `BrokerSyncController` | 提交任务 + 立即返回 | 不再包含同步执行逻辑 |
+
+**线程池配置**（`syncTaskExecutor`）：
+
+| 参数 | 值 | 说明 |
+|------|-----|------|
+| corePoolSize | 2 | 核心线程数 |
+| maxPoolSize | 4 | 最大线程数 |
+| queueCapacity | 10 | 队列容量 |
+| threadNamePrefix | `sync-` | 线程名前缀，便于日志排查 |
+| rejectedHandler | 记录错误 | 队列满时拒绝并记录，不默默丢弃 |
+
+**异常安全保证**：
+- 异步方法内 **全覆盖 try-catch**，任何异常（包括 RuntimeException）都保证 batch 最终被标记为 FAILED
+- 每次状态变更都是**独立事务**（短事务），避免长事务问题
+- 即使 `markAsFailed` 本身也失败（极端情况），仍有日志记录
+
+**7. Phase 1 实现范围**
 
 | 组件 | Phase 1 是否实现 | 说明 |
 |------|-----------------|------|
@@ -447,6 +508,7 @@ com.localledger
 - 同步功能通过 REST API（`POST /api/broker-sync/trigger`）直接触发，使用 curl / Postman 等工具调用即可
 - 后续如需前端交互，再按需添加
 - ✅ **已新增「同步管理」子菜单页面**（2026-04-13）：在「交易管理」一级菜单下新增「同步管理」子菜单，展示 `broker_sync_batches` 历史同步批次记录，支持按券商/状态筛选。后端新增 `GET /api/broker-sync/batches` 和 `GET /api/broker-sync/batches/{id}` 接口
+- ✅ **已新增「新建同步」功能**（2026-04-14）：在同步管理页面增加「新建同步」按钮，弹出 Modal 选择券商和日期范围后触发同步。后端异步执行同步任务——提交后立即关闭弹窗并刷新列表，用户通过列表刷新查看任务状态（PENDING → IMPORTING → COMPLETED/FAILED）
 
 ---
 
@@ -482,7 +544,7 @@ com.localledger
 | 问题 4：同步策略 | **REST API 手动触发**（`POST /api/broker-sync/trigger`），Controller 放在现有 `controller/` 包统一管理；核心流程：获取→反序列化为券商专属模型→**日志输出**；暂不做统一模型转换，暂不入库 | 2026-03-14 |
 | 问题 5：数据映射 | **`tradeTrigger` 不新增 `BROKER_SYNC`**，同步记录根据交易实际含义设置；通过 `external_id` 区分数据来源。其他映射细节待定 | 2026-04-13 |
 | 问题 6：凭证管理 | **放在配置文件中管理**，复用 `application-local.properties` 机制，与数据库密码保持一致的管理方式，不做过多复杂设计 | 2026-03-14 |
-| 问题 7：系统架构 | **适配器模式 + sync 独立包**；每个券商有专属原始模型，日志在专属模型层打印；统一中间模型后续再实现。**数据模型扩展已决策**：新建 `broker_sync_batches`（通用批次表）+ `ibkr_staged_orders`（IBKR 核心暂存表，Order 粒度）+ `ibkr_staged_trade_confirms`（可选明细附表），`trade_records` 新增 `external_id`/`external_broker`/`sync_batch_id`，详见 [data-persistence-design.md](./data-persistence-design.md) | 2026-04-13 |
+| 问题 7：系统架构 | **适配器模式 + sync 独立包**；每个券商有专属原始模型，日志在专属模型层打印；统一中间模型后续再实现。**异步执行架构**：同步任务通过 `@Async` + 独立线程池异步执行，Controller 提交后立即返回，`BrokerSyncAsyncExecutor` 负责后台执行和状态更新。**数据模型扩展已决策**：新建 `broker_sync_batches`（通用批次表）+ `ibkr_staged_orders`（IBKR 核心暂存表，Order 粒度）+ `ibkr_staged_trade_confirms`（可选明细附表），`trade_records` 新增 `external_id`/`external_broker`/`sync_batch_id`，详见 [data-persistence-design.md](./data-persistence-design.md) | 2026-04-14 |
 | 问题 8：冲突处理 | **Phase 1 不存在冲突**：仅日志输出不入库，不会与已有数据冲突；冲突处理逻辑留到入库阶段再设计 | 2026-03-14 |
-| 问题 9：前端交互 | **Phase 1 不做前端**，通过 REST API 直接触发同步，使用 curl / Postman 调用 | 2026-03-14 |
+| 问题 9：前端交互 | ~~Phase 1 不做前端~~ → 已新增「同步管理」页面（批次列表+筛选，2026-04-13）和「新建同步」功能（选券商+日期范围触发同步，2026-04-14），通过 REST API 触发同步 | 2026-04-14 |
 | 问题 10：MVP 范围 | 待定 | - |

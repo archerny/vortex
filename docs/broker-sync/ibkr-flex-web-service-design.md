@@ -1,7 +1,7 @@
 # IBKR Flex Web Service 同步方案（讨论记录）
 
-> **状态**: 方案讨论完成，方案已收敛为 Flex-only，待实现  
-> **日期**: 2026-03-31  
+> **状态**: ✅ Phase 1 已实现（API 调通 → 日志输出），待真实环境验证  
+> **日期**: 2026-04-14  
 > **关联**: [overall-design.md](./overall-design.md)  
 > **总体规划对应**: 本文档的 Phase 1 对应总体规划（README.md）中的 **Phase 2**（多券商适配阶段）
 
@@ -43,6 +43,8 @@ Step 2: GET /GetStatement?t={token}&q={referenceCode}&v=3
 ```
 
 **Base URL**: `https://ndcdyn.interactivebrokers.com/AccountManagement/FlexWebService`
+
+> **异步执行**：上述两步 HTTP 请求耗时可能数十秒（含轮询等待），因此同步任务在后台异步线程中执行。前端提交同步请求后 Controller 立即返回 batch 信息（status=PENDING），实际的 Flex Query 调用由 `BrokerSyncAsyncExecutor` 在独立线程池中完成。详见 [overall-design.md 问题 7 决策 6](./overall-design.md)。
 
 ### 阶段三：解析报告数据
 
@@ -135,20 +137,27 @@ Portal 创建 Query 时可以选择 Period 预设（Last Business Day / Month to
 
 ### 4.3 Phase 1 实现计划（与 Tiger 对齐：API 调通 → 日志输出）
 
-#### 4.3.1 配置属性类 `IbkrFlexApiProperties`
+#### 4.3.1 ✅ 配置属性类 `IbkrFlexQueryProperties`
 
-- `ibkr.flex.token` — Flex Web Service Token
-- `ibkr.flex.query-id` — Trade Confirmation Query ID
-- `ibkr.flex.base-url` — Base URL（默认 `https://ndcdyn.interactivebrokers.com/AccountManagement/FlexWebService`）
+- `broker.ibkr.flex-token` — Flex Web Service Token
+- `broker.ibkr.trade-confirm-query-id` — Trade Confirmation Query ID
+- `broker.ibkr.base-url` — Base URL（默认 `https://ndcdyn.interactivebrokers.com/AccountManagement/FlexWebService`）
 
-#### 4.3.2 Flex Web Service HTTP 客户端 `IbkrFlexClient`
+> 实现文件：`sync/adapter/ibkr/IbkrFlexQueryProperties.java`
 
-- `sendRequest(token, queryId)` → 解析 XML → 返回 ReferenceCode
-- `getStatement(token, referenceCode)` → 返回原始报告内容
-- 内置重试逻辑（处理 1019 "generation in progress" 错误）
+#### 4.3.2 ✅ Flex Web Service HTTP 客户端 `IbkrFlexClient`
+
+- `fetchReport(fromDate, toDate)` → 组合 SendRequest + GetStatement 两步请求
+- `sendRequest(token, queryId, fromDate, toDate)` → 解析 XML → 返回 ReferenceCode
+- `pollGetStatement(token, referenceCode)` → 轮询直到报告就绪
+- 内置重试逻辑（处理 1003/1019 "generation in progress" 错误）
+- 内置 rate limiter（每两次请求之间至少间隔 1.1 秒）
 - 必须设置 `User-Agent` header
+- 完整的错误码处理（1003/1004/1005/1006/1012/1018/1019）
 
-#### 4.3.3 交易记录模型 `IbkrTradeRecord`
+> 实现文件：`sync/adapter/ibkr/IbkrFlexClient.java`（2026-04-14 实现）
+
+#### 4.3.3 ✅ 交易记录模型（Order + TradeConfirm 双层）
 
 Portal 配置了 37 个字段，以下是完整的字段列表、Portal 配置名与 XML 属性名的对应关系、Java 类型映射：
 
@@ -194,18 +203,20 @@ Portal 配置了 37 个字段，以下是完整的字段列表、Portal 配置�
 
 > **注**：Java 类型统一用 `String` 接收 XML 属性值，后续按需转换为 `BigDecimal`（金额/数量）、`LocalDate`（日期）等。期权专属字段（strike、expiry、putCall）在股票记录中为空字符串。
 
-#### 4.3.4 同步适配器 `IbkrSyncAdapter`
+#### 4.3.4 ✅ 同步适配器 `IbkrSyncAdapter`
 
 - 实现 `BrokerSyncAdapter` 接口
 - `getBrokerName()` → `"ibkr"`
 - `sync(SyncRequest)` → 调用 FlexClient → 解析 XML 报告 → 日志输出
 - **分段请求**：当 `SyncRequest` 的日期范围超过 365 天时，自动按 ≤365 天的窗口拆分为多次请求，逐段调用 FlexClient 并汇总结果（与 Tiger 适配器中 `fetchOrdersInWindows()` 的 90 天窗口拆分逻辑类似）
-- **速率限制**：内置 rate limiter，确保请求频率不超过每秒 1 次、每分钟 10 次（per token）。分段请求和两步请求（SendRequest + GetStatement）都会消耗配额，rate limiter 需统一管控。遇到 1006/1018 错误码时自动等待后重试
+- **速率限制**：由 `IbkrFlexClient` 内部统一管控 rate limiter，确保请求频率不超过每秒 1 次
 
-#### 4.3.5 配置更新
+> 实现文件：`sync/adapter/ibkr/IbkrSyncAdapter.java`（2026-04-14 实现）
 
-- `application.properties` 添加占位配置
-- `application-local.properties.template` 添加模板
+#### 4.3.5 ✅ 配置更新
+
+- `application.properties` 添加占位配置（含 `base-url`）
+- `application-local.properties` 已有真实凭证
 
 ---
 
