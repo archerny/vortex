@@ -451,7 +451,7 @@ Controller:
 |---------|------|------|
 | `broker_sync_batches` | 通用同步批次元信息表 | ✅ 需要，记录每次同步的起止日期、记录数、状态等 |
 | `ibkr_staged_orders` | IBKR 核心暂存表（Order 粒度，两阶段导入的中间存储） | ✅ 需要，按券商独立一张暂存表，粒度为订单级 |
-| `ibkr_staged_trade_confirms` | IBKR 执行明细附表（可选，用于审计/对账） | ⚠️ 可选，非核心流程必须 |
+| `ibkr_staged_trade_confirms` | IBKR 执行明细附表（用于审计/对账） | ✅ 已实现 |
 | `trade_records.external_id` | 券商原始订单 ID（IBKR 的 `orderID`），用于去重和区分数据来源 | ✅ 需要，`NULL` 表示手动录入 |
 | `trade_records.external_broker` | 来源券商标识，与 `external_id` 配对 | ✅ 需要，方便关联查询对应券商暂存表 |
 | `trade_records.sync_batch_id` | 同步批次 ID，用于追溯 | ✅ 需要，FK→`broker_sync_batches` |
@@ -544,7 +544,7 @@ Controller:
 | 问题 4：同步策略 | **REST API 手动触发**（`POST /api/broker-sync/trigger`），Controller 放在现有 `controller/` 包统一管理；核心流程：获取→反序列化为券商专属模型→**日志输出**；暂不做统一模型转换，暂不入库 | 2026-03-14 |
 | 问题 5：数据映射 | **`tradeTrigger` 不新增 `BROKER_SYNC`**，同步记录根据交易实际含义设置；通过 `external_id` 区分数据来源。其他映射细节待定 | 2026-04-13 |
 | 问题 6：凭证管理 | **放在配置文件中管理**，复用 `application-local.properties` 机制，与数据库密码保持一致的管理方式，不做过多复杂设计 | 2026-03-14 |
-| 问题 7：系统架构 | **适配器模式 + sync 独立包**；每个券商有专属原始模型，日志在专属模型层打印；统一中间模型后续再实现。**异步执行架构**：同步任务通过 `@Async` + 独立线程池异步执行，Controller 提交后立即返回，`BrokerSyncAsyncExecutor` 负责后台执行和状态更新。**数据模型扩展已决策**：新建 `broker_sync_batches`（通用批次表）+ `ibkr_staged_orders`（IBKR 核心暂存表，Order 粒度）+ `ibkr_staged_trade_confirms`（可选明细附表），`trade_records` 新增 `external_id`/`external_broker`/`sync_batch_id`，详见 [data-persistence-design.md](./data-persistence-design.md) | 2026-04-14 |
+| 问题 7：系统架构 | **适配器模式 + sync 独立包**；每个券商有专属原始模型，日志在专属模型层打印；统一中间模型后续再实现。**异步执行架构**：同步任务通过 `@Async` + 独立线程池异步执行，Controller 提交后立即返回，`BrokerSyncAsyncExecutor` 负责后台执行和状态更新。**数据模型扩展已完成**：新建 `broker_sync_batches`（通用批次表）+ `ibkr_staged_orders`（IBKR 核心暂存表，Order 粒度）+ `ibkr_staged_trade_confirms`（明细附表），`trade_records` 新增 `external_id`/`external_broker`/`sync_batch_id`，详见 [data-persistence-design.md](./data-persistence-design.md) | 2026-04-15 |
 | 问题 8：冲突处理 | **Phase 1 不存在冲突**：仅日志输出不入库，不会与已有数据冲突；冲突处理逻辑留到入库阶段再设计 | 2026-03-14 |
 | 问题 9：前端交互 | ~~Phase 1 不做前端~~ → 已新增「同步管理」页面（批次列表+筛选，2026-04-13）和「新建同步」功能（选券商+日期范围触发同步，2026-04-14），通过 REST API 触发同步 | 2026-04-14 |
 | 问题 10：MVP 范围 | 待定 | - |

@@ -46,7 +46,7 @@ Phase 1 已跑通「券商 API → 解析 → 日志输出」的基本流程，�
 |------|------|------|
 | `broker_sync_batches` | 新建表 | 通用同步批次元信息表 |
 | `ibkr_staged_orders` | 新建表 | IBKR 核心暂存表（Order 粒度，1:1 对应 `IbkrOrderRecord`） |
-| `ibkr_staged_trade_confirms` | 新建表（可选） | IBKR 执行明细附表（TradeConfirm 粒度，用于审计/对账，非必须） |
+| `ibkr_staged_trade_confirms` | 新建表 | IBKR 执行明细附表（TradeConfirm 粒度，用于审计/对账） |
 | `trade_records` 扩展 | 新增字段 | 新增 `external_id`、`external_broker`、`sync_batch_id` 三个字段 |
 
 ---
@@ -182,11 +182,9 @@ PENDING → FAILED      （转换/导入失败）
 
 ---
 
-### 4.3 `ibkr_staged_trade_confirms` — IBKR 执行明细附表（可选）
+### 4.3 `ibkr_staged_trade_confirms` — IBKR 执行明细附表
 
-> **定位**：这是一张**可选的附表**，用于存储 TradeConfirm 粒度的执行明细。主要用途是审计、对账、以及未来需要精确到每笔成交时的数据源。**不参与 `trade_records` 的导入流程**。
->
-> **实现优先级**：低。可在核心暂存表 `ibkr_staged_orders` 及导入流程完成后再考虑。
+> **定位**：这是一张**审计附表**，用于存储 TradeConfirm 粒度的执行明细。主要用途是审计、对账、以及未来需要精确到每笔成交时的数据源。**不参与 `trade_records` 的导入流程**。
 
 字段 1:1 对应 `IbkrTradeConfirm.java` 的 37 个字段，全部使用 VARCHAR 类型存储。
 
@@ -395,11 +393,9 @@ schwab_staged_orders            → 字段 1:1 对应 SchwabTradeRecord
 | 脚本 | 内容 | 状态 |
 |------|------|------|
 | `V19__create_broker_sync_batches.sql` | 创建 `broker_sync_batches` 表 | ✅ 已完成 |
-| `V20__create_ibkr_staged_orders.sql` | 创建 `ibkr_staged_orders` 表 | 📋 待实现 |
-| `V21__create_ibkr_staged_trade_confirms.sql` | 创建 `ibkr_staged_trade_confirms` 表（可选，可延后） | 📋 待实现 |
-| `V22__add_external_fields_to_trade_records.sql` | 为 `trade_records` 新增 `external_id`、`external_broker`、`sync_batch_id` 字段 | 📋 待实现 |
-
-> 注：版本号需在实现时根据实际最新版本号确定。
+| `V20__create_ibkr_staged_orders.sql` | 创建 `ibkr_staged_orders` 表 | ✅ 已完成 |
+| `V21__create_ibkr_staged_trade_confirms.sql` | 创建 `ibkr_staged_trade_confirms` 表 | ✅ 已完成 |
+| `V22__add_external_fields_to_trade_records.sql` | 为 `trade_records` 新增 `external_id`、`external_broker`、`sync_batch_id` 字段 | ✅ 已完成 |
 
 ### 8.3 JPA Entity 与 Repository
 
@@ -409,11 +405,11 @@ schwab_staged_orders            → 字段 1:1 对应 SchwabTradeRecord
 |----|------|------|
 | `BrokerSyncBatch` (Entity) | 对应 `broker_sync_batches` 表 | ✅ 已完成 |
 | `BrokerSyncBatchRepository` | 批次表的 Repository | ✅ 已完成 |
-| `IbkrStagedOrder` (Entity) | 对应 `ibkr_staged_orders` 表 | 📋 待实现 |
-| `IbkrStagedOrderRepository` | IBKR 核心暂存表的 Repository | 📋 待实现 |
-| `IbkrStagedTradeConfirm` (Entity)（可选） | 对应 `ibkr_staged_trade_confirms` 表 | 📋 待实现 |
-| `IbkrStagedTradeConfirmRepository`（可选） | IBKR 明细附表的 Repository | 📋 待实现 |
-| `TradeRecord` (Entity 扩展) | 新增 `externalId`、`externalBroker`、`syncBatchId` 字段 | 📋 待实现 |
+| `IbkrStagedOrder` (Entity) | 对应 `ibkr_staged_orders` 表 | ✅ 已完成 |
+| `IbkrStagedOrderRepository` | IBKR 核心暂存表的 Repository | ✅ 已完成 |
+| `IbkrStagedTradeConfirm` (Entity) | 对应 `ibkr_staged_trade_confirms` 表 | ✅ 已完成 |
+| `IbkrStagedTradeConfirmRepository` | IBKR 明细附表的 Repository | ✅ 已完成 |
+| `TradeRecord` (Entity 扩展) | 新增 `externalId`、`externalBroker`、`syncBatchId` 字段 | ✅ 已完成 |
 
 ---
 

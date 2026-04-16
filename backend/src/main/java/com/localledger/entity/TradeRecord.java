@@ -146,6 +146,24 @@ public class TradeRecord extends BaseEntity {
     @Column(name = "is_deleted")
     private Boolean isDeleted = false;
 
+    /**
+     * 券商原始订单 ID（如 IBKR 的 orderID），NULL 表示手动录入
+     */
+    @Column(name = "external_id", length = 100)
+    private String externalId;
+
+    /**
+     * 来源券商标识（如 ibkr、tiger），NULL 表示手动录入
+     */
+    @Column(name = "external_broker", length = 50)
+    private String externalBroker;
+
+    /**
+     * 关联同步批次 ID（FK → broker_sync_batches.id），NULL 表示手动录入
+     */
+    @Column(name = "sync_batch_id")
+    private Long syncBatchId;
+
     // ============ Constructors ============
 
     public TradeRecord() {
@@ -305,6 +323,30 @@ public class TradeRecord extends BaseEntity {
         this.isDeleted = isDeleted;
     }
 
+    public String getExternalId() {
+        return externalId;
+    }
+
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
+    }
+
+    public String getExternalBroker() {
+        return externalBroker;
+    }
+
+    public void setExternalBroker(String externalBroker) {
+        this.externalBroker = externalBroker;
+    }
+
+    public Long getSyncBatchId() {
+        return syncBatchId;
+    }
+
+    public void setSyncBatchId(Long syncBatchId) {
+        this.syncBatchId = syncBatchId;
+    }
+
     @Override
     public String toString() {
         return "TradeRecord{" +
@@ -326,6 +368,9 @@ public class TradeRecord extends BaseEntity {
                 ", triggerRefId=" + triggerRefId +
                 ", triggerRefType=" + triggerRefType +
                 ", isDeleted=" + isDeleted +
+                ", externalId='" + externalId + '\'' +
+                ", externalBroker='" + externalBroker + '\'' +
+                ", syncBatchId=" + syncBatchId +
                 '}';
     }
 }

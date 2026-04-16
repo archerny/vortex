@@ -317,7 +317,7 @@ SendRequest 后轮询 GetStatement：
 
 #### 解析注意事项
 
-1. **三层嵌套结构**：`<TradeConfirms>` 下有 `SymbolSummary`（标的汇总）、`Order`（订单汇总）、`TradeConfirm`（逐笔成交）三种节点。**解析时取 `<Order>` 节点作为核心数据源**（对应 `ibkr_staged_orders`），`<TradeConfirm>` 节点作为可选明细（对应 `ibkr_staged_trade_confirms`），忽略 `SymbolSummary`
+1. **三层嵌套结构**：`<TradeConfirms>` 下有 `SymbolSummary`（标的汇总）、`Order`（订单汇总）、`TradeConfirm`（逐笔成交）三种节点。**解析时取 `<Order>` 节点作为核心数据源**（对应 `ibkr_staged_orders`），`<TradeConfirm>` 节点作为明细（对应 `ibkr_staged_trade_confirms`），忽略 `SymbolSummary`
 2. **卖出数量为负数**：`buySell="SELL"` 时 `quantity` 为负值（如 `-2`），`proceeds` 为正值
 3. **佣金为负数**：`commission` 通常为负值（如 `-0.37025725`），表示支出
 4. **期权 Symbol 格式特殊**：如 `AAPL  260130C00265000`（含空格填充），`description` 更可读：`AAPL 30JAN26 265 C`
