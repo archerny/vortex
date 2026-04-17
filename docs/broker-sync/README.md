@@ -12,6 +12,24 @@
 | [tiger-sync-design.md](./tiger-sync-design.md) | 老虎证券同步方案（设计与实现记录） | Phase 1 已实现 |
 | [ibkr-flex-web-service-design.md](./ibkr-flex-web-service-design.md) | IBKR Flex Web Service 同步方案（讨论记录） | ✅ Phase 1 已实现（API + 解析 + 异步执行 + 前端管理） |
 | [data-persistence-design.md](./data-persistence-design.md) | 数据持久化设计（Order 暂存表 + 批次表 + 明细附表 + trade_records 扩展） | ✅ 数据库变更已完成（Flyway V20-V22 + Entity + Repository） |
+| [import-consistency-design.md](./import-consistency-design.md) | 数据一致性与中断恢复设计（事务策略 + 状态机 + 失败分类 + Resume 机制） | 方案已确认，待实现 |
+| [broker-code-design.md](./broker-code-design.md) | Broker Code 关联与同步器注册发现（brokerName→brokerCode 重命名 + brokers 表关联 + 前端发现机制） | 方案已确认，待实现 |
+
+---
+
+## 开放问题快速索引
+
+> **最后整理**：2026-04-17
+
+所有待讨论问题已汇总到 [data-persistence-design.md § 九、开放问题与待后续讨论](./data-persistence-design.md#九开放问题与待后续讨论)，按三级优先级分类：
+
+| 级别 | 数量 | 含义 |
+|------|------|------|
+| 🔥 编码前必须解决 | 5 个（O-1 ~ O-5） | 不解决会卡住导入逻辑实现 |
+| 📦 可后续再说 | 7 个（D-1 ~ D-7） | 不阻塞当前编码 |
+| ✅ 已解决 | 4 个（R-1 ~ R-4） | 归档留痕 |
+
+> 其他文档中的零散待讨论项（如 `overall-design.md` 的 40+ 个早期问题、`tiger-sync-design.md` 和 `ibkr-flex-web-service-design.md` 中的增强项）已在 D-3 ~ D-7 中归纳引用，不重复列举。
 
 ---
 
