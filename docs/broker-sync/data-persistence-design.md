@@ -1,7 +1,7 @@
 # 券商同步 — 数据持久化设计文档
 
 > **创建日期**：2026-04-13  
-> **最后更新**：2026-04-17  
+> **最后更新**：2026-04-18  
 > **状态**：方案已确认，待实现  
 > **关联**：[overall-design.md](./overall-design.md) | [ibkr-flex-web-service-design.md](./ibkr-flex-web-service-design.md) | [broker-code-design.md](./broker-code-design.md)  
 > **前置**：Phase 1（API 获取 + 日志输出）已完成
@@ -417,19 +417,13 @@ schwab_staged_orders            → 字段 1:1 对应 SchwabTradeRecord
 
 ## 九、开放问题与待后续讨论
 
-> **最后整理**：2026-04-17
+> **最后整理**：2026-04-18
 
 以下事项按优先级分为三级：**🔥 编码前必须解决**（不解决会卡住实现）、**📦 可后续再说**（不阻塞当前编码）、**✅ 已解决**（归档留痕）。
 
 ### 🔥 编码前必须解决（直接影响导入逻辑实现）
 
-| # | 问题 | 说明 | 关联 |
-|---|------|------|------|
-| O-1 | **暂存表 → `trade_records` 字段映射** | `IbkrOrderRecord` 的 30 个字段如何映射到 `TradeRecord` 的 20+ 个字段，哪些直接对应、哪些需要转换、哪些忽略 | `IbkrImportService` 的核心逻辑 |
-| O-2 | **BookTrade 的 `tradeTrigger` 判定** | 期权到期/行权/被指派产生的 BookTrade，如何根据 Order 上下文推断 `trade_trigger` 值（`OPTION` vs `MANUAL`）。关键：Order 级别没有 `transactionType` 和 `code` 字段 | 字段映射的前置决策 |
-| O-3 | **期权 symbol 格式转换** | IBKR 期权 symbol 如 `AAPL  260130C00265000` 含空格填充，如何转换为系统内的标准格式 | 字段映射中 `symbol` 的处理规则 |
-| O-4 | **导入时的冲突处理策略** | 如果 `trade_records` 中已有手动录入的记录，同步导入遇到"可能是同一笔"的记录时怎么办。当前去重仅靠 `(external_broker, external_id)` 唯一索引，但手动录入的记录没有 `external_id`，无法识别"同一笔交易" | 决定 `CONFLICT` 状态的触发条件 |
-| O-5 | **前端对 `PARTIAL` / `INTERRUPTED` 状态的交互设计** | Resume 按钮放在哪、部分失败的记录如何展示、是否支持逐条查看失败原因 | 前端实现的前置决策，详见 [import-consistency-design.md](./import-consistency-design.md) |
+_（当前无待解决项，所有阻塞性问题已解决）_
 
 ### 📦 可后续再说（不阻塞当前编码）
 
@@ -451,3 +445,83 @@ schwab_staged_orders            → 字段 1:1 对应 SchwabTradeRecord
 | R-2 | `brokerId` 查找策略 | `brokers` 表新增 `broker_code` 列，通过 `findByBrokerCode()` 直接查找，详见 [broker-code-design.md](./broker-code-design.md) |
 | R-3 | ETF 识别 | `assetCategory = STK` 时统一默认为 `STOCK`，历史 ETF 数据通过 V23 迁移为 STOCK（ETF 枚举值保留） |
 | R-4 | `trade_trigger` 是否新增 `BROKER_SYNC` | **否**，`trade_trigger` 描述"交易为什么发生"，不描述"记录来源"。通过 `external_id IS NULL` 区分手动/同步 |
+| R-5 | BookTrade 的 `tradeTrigger` 判定（原 O-2） | 通过 `orderTime` + `orderType` 为空识别 BookTrade，再查关联 TradeConfirm 的 `code` 字段判定具体期权事件类型。详见 [booktrade-trigger-mapping-design.md](./booktrade-trigger-mapping-design.md) |
+| R-6 | 期权 symbol 格式转换（原 O-3） | **无需额外设计**。IBKR 暂存表已存 `strike`、`expiry`、`putCall` 为独立字段，导入时直接拼接为系统格式 `{underlying}-{expiry}-{putCall}{strike}`（如 `AAPL-20260130-C265`），无需解析 OCC 填充格式 |
+| R-7 | 暂存表 → `trade_records` 字段映射（原 O-1） | **已完成完整映射规范**，详见下方「附录 A：O-1 字段映射规范」 |
+| R-8 | 导入时的冲突处理策略（原 O-4） | **不做手动记录冲突匹配**。系统假设不存在手动录入的历史记录，去重仅依赖 `(external_broker, external_id)` 唯一索引。已有相同 `external_id` → SKIPPED。`CONFLICT` 状态仅保留为理论预留，当前不会触发 |
+| R-9 | 前端状态交互设计（原 O-5） | **已在 [import-consistency-design.md](./import-consistency-design.md) 完整定义**。`INTERRUPTED` → Resume 按钮（复用原 batch 完整重跑）；`FAILED` → 重新同步按钮（创建新 batch）；`PARTIAL` → 仅展示失败详情，不提供重试（数据问题重试无意义） |
+
+---
+
+## 附录 A：O-1 字段映射规范
+
+> **确认日期**：2026-04-18  
+> **适用范围**：`ibkr_staged_orders` → `trade_records` 的字段映射，即 `IbkrImportService` 的核心转换逻辑
+
+### A.1 直接映射（简单转换）
+
+| # | `trade_records` 字段 | 类型 | ← 源 | 转换规则 |
+|---|---------------------|------|-------|---------|
+| 1 | `trade_date` | `LocalDate` | `trade_date` | `LocalDate.parse(value, "yyyyMMdd")` |
+| 2 | `broker_id` | `Long` | — | 通过 `brokers.broker_code = 'ibkr'` 查找，导入批次级别缓存一次 |
+| 3 | `currency` | `Currency` (enum) | `currency` | `"USD"` → `USD`，`"HKD"` → `HKD` |
+| 4 | `trade_type` | `TradeType` (enum) | `buy_sell` | `"BUY"` → `BUY`，`"SELL"` → `SELL` |
+| 5 | `quantity` | `Integer` | `quantity` | `abs(Integer.parseInt(value))`（IBKR 卖出为负数，系统始终存正数） |
+| 6 | `price` | `BigDecimal` | `price` | `new BigDecimal(value)` |
+| 7 | `amount` | `BigDecimal` | `amount` | `new BigDecimal(value).abs()`（IBKR 带符号，系统存正数） |
+| 8 | `fee` | `BigDecimal` | `commission` + `trade_charge` | `abs(commission) + abs(tradeCharge)`（两个都是负数或零，取绝对值后相加。经验证 IBKR 仅有此两项费用字段，无遗漏） |
+| 9 | `external_id` | `String` | `order_id` | 直接赋值 |
+| 10 | `external_broker` | `String` | — | 固定值 `"ibkr"` |
+| 11 | `sync_batch_id` | `Long` | — | 当前批次的 `broker_sync_batches.id` |
+| 12 | `is_deleted` | `Boolean` | — | 固定值 `false` |
+
+### A.2 需要逻辑判断的映射
+
+| # | `trade_records` 字段 | 类型 | 转换规则 |
+|---|---------------------|------|---------|
+| 13 | `asset_type` | `AssetType` (enum) | `"STK"` → `STOCK`；`"OPT"` + `putCall="C"` → `OPTION_CALL`；`"OPT"` + `putCall="P"` → `OPTION_PUT` |
+| 14 | `symbol` | `String` | **STK**：`symbol.trim()`（如 `AAPL`）<br>**OPT**：`{underlying}-{expiry}-{putCall}{normalizedStrike}`<br>示例：`AAPL-20260130-C265`，`TSM-20260320-P320` |
+| 15 | `underlying_symbol` | `String` | **STK**：与 `symbol` 相同（`symbol.trim()`）<br>**OPT**：从 `description` 字段提取第一个空格前的 token（如 `"AAPL 30JAN26 265 C"` → `"AAPL"`） |
+| 16 | `name` | `String` | 直接取 `description` 完整值（如 `"APPLE INC"`、`"TSM 20MAR26 320 P"`） |
+| 17 | `trade_trigger` | `TradeTrigger` (enum) | 按 [booktrade-trigger-mapping-design.md](./booktrade-trigger-mapping-design.md) 判定：<br>`orderTime` 非空 → `MANUAL`<br>`orderTime` 为空（BookTrade）→ 查关联 TradeConfirm `code` → `OPTION` |
+| 18 | `trigger_ref_type` | `TriggerRefType` (enum) | 随 `trade_trigger` 一起判定（MANUAL → `NONE`，BookTrade 按 code 映射到具体类型） |
+| 19 | `trigger_ref_id` | `Long` | 初始为 `0`；STK 侧 BookTrade 在批次导入完成后回填对应期权 trade_records.id |
+| 20 | `strategy_id` | `Long` (nullable) | 固定为 `null`（同步导入无法自动关联策略） |
+
+### A.3 期权 symbol 拼接细节
+
+```java
+// 1. 提取 underlying：从 description 的第一个空格前取得
+String underlying = description.split("\\s+")[0]; // "AAPL 30JAN26 265 C" → "AAPL"
+
+// 2. 标准化 strike：去除尾部零
+String normalizedStrike = new BigDecimal(strike).stripTrailingZeros().toPlainString();
+// "265" → "265", "265.00" → "265", "17.50" → "17.5"
+
+// 3. 拼接系统格式 symbol
+String optionSymbol = underlying + "-" + expiry + "-" + putCall + normalizedStrike;
+// "AAPL" + "-" + "20260130" + "-" + "C" + "265" = "AAPL-20260130-C265"
+```
+
+### A.4 不映射到 `trade_records` 的暂存字段
+
+| `ibkr_staged_orders` 字段 | 不映射原因 |
+|--------------------------|-----------|
+| `account_id` | 仅用于 IBKR 内部标识，系统通过 `broker_id` 表达 |
+| `acct_alias` | 仅用于 IBKR 内部标识 |
+| `conid` | IBKR 合约唯一 ID，系统不需要 |
+| `security_id` | ISIN 号，系统不需要 |
+| `security_id_type` | 与 security_id 配对，系统不需要 |
+| `multiplier` | 期权乘数，用于 BookTrade 回填阶段的数量比例匹配（不存入 trade_records） |
+| `strike` | 仅用于拼接 `symbol`，不单独存储 |
+| `expiry` | 仅用于拼接 `symbol`，不单独存储 |
+| `put_call` | 仅用于判断 `asset_type` 和拼接 `symbol` |
+| `order_time` | 仅用于 BookTrade 识别（不存入 trade_records） |
+| `date_time` | 订单级汇总成交时间，系统以 `trade_date` 为准 |
+| `settle_date` | 交割日期，系统当前不关注 |
+| `order_type` | 仅用于 BookTrade 识别 |
+| `is_api_order` | 下单渠道信息，对交易记录无意义 |
+| `proceeds` | 与 amount 冗余（反向符号），不需要 |
+| `net_cash` | = proceeds - commission，不需要 |
+| `commission_currency` | 当前系统不支持多币种佣金，且 IBKR 佣金币种通常与交易币种一致 |
+| `trader_id` | 交易员 ID，个人用户场景无意义 |
