@@ -2,10 +2,12 @@ package com.localledger.service;
 
 import com.localledger.entity.BrokerSyncBatch;
 import com.localledger.repository.BrokerSyncBatchRepository;
+import com.localledger.sync.core.SyncResult;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -19,8 +21,15 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /**
- * BrokerSyncBatchService 单元测试
- * 覆盖列表查询（各种筛选组合）和单条查询逻辑
+ * BrokerSyncBatchService unit tests.
+ *
+ * Covers:
+ * - listBatches (various filter combinations)
+ * - findById
+ * - createBatch
+ * - save
+ * - Status lifecycle: markAsProcessing, updatePhase, markAsCompleted,
+ *   markAsPartial, markAsFailed, markAsInterrupted
  */
 @ExtendWith(MockitoExtension.class)
 class BrokerSyncBatchServiceTest {
@@ -31,12 +40,12 @@ class BrokerSyncBatchServiceTest {
     @InjectMocks
     private BrokerSyncBatchService batchService;
 
-    // ============ 辅助方法 ============
+    // ============ Helper methods ============
 
-    private BrokerSyncBatch buildBatch(Long id, String brokerName, String status) {
+    private BrokerSyncBatch buildBatch(Long id, String brokerCode, String status) {
         BrokerSyncBatch batch = new BrokerSyncBatch();
         batch.setId(id);
-        batch.setBrokerName(brokerName);
+        batch.setBrokerCode(brokerCode);
         batch.setStatus(status);
         batch.setSyncDateFrom(LocalDate.of(2026, 1, 1));
         batch.setSyncDateTo(LocalDate.of(2026, 1, 31));
@@ -48,14 +57,14 @@ class BrokerSyncBatchServiceTest {
     }
 
     // ========================================================
-    // 列表查询测试
+    // List batches
     // ========================================================
     @Nested
-    @DisplayName("查询同步批次列表")
+    @DisplayName("listBatches()")
     class ListBatchesTest {
 
         @Test
-        @DisplayName("无筛选条件 - 应查询全部记录")
+        @DisplayName("no filters — should query all records")
         void listWithNoFilters_shouldCallFindAll() {
             List<BrokerSyncBatch> expected = Arrays.asList(
                     buildBatch(1L, "ibkr", "COMPLETED"),
@@ -67,13 +76,13 @@ class BrokerSyncBatchServiceTest {
 
             assertEquals(2, result.size());
             verify(batchRepository).findAllByOrderByStartedAtDesc();
-            verify(batchRepository, never()).findByBrokerNameOrderByStartedAtDesc(anyString());
+            verify(batchRepository, never()).findByBrokerCodeOrderByStartedAtDesc(anyString());
             verify(batchRepository, never()).findByStatusOrderByStartedAtDesc(anyString());
-            verify(batchRepository, never()).findByBrokerNameAndStatusOrderByStartedAtDesc(anyString(), anyString());
+            verify(batchRepository, never()).findByBrokerCodeAndStatusOrderByStartedAtDesc(anyString(), anyString());
         }
 
         @Test
-        @DisplayName("空字符串筛选条件 - 应等效于无筛选")
+        @DisplayName("blank filters — should act as no filters")
         void listWithBlankFilters_shouldCallFindAll() {
             when(batchRepository.findAllByOrderByStartedAtDesc()).thenReturn(List.of());
 
@@ -83,20 +92,20 @@ class BrokerSyncBatchServiceTest {
         }
 
         @Test
-        @DisplayName("仅按券商名称筛选 - 应调用 findByBrokerName")
-        void listByBrokerNameOnly_shouldCallFindByBrokerName() {
+        @DisplayName("brokerCode only — should call findByBrokerCode")
+        void listByBrokerCodeOnly_shouldCallFindByBrokerCode() {
             List<BrokerSyncBatch> expected = List.of(buildBatch(1L, "ibkr", "COMPLETED"));
-            when(batchRepository.findByBrokerNameOrderByStartedAtDesc("ibkr")).thenReturn(expected);
+            when(batchRepository.findByBrokerCodeOrderByStartedAtDesc("ibkr")).thenReturn(expected);
 
             List<BrokerSyncBatch> result = batchService.listBatches("ibkr", null);
 
             assertEquals(1, result.size());
-            assertEquals("ibkr", result.get(0).getBrokerName());
-            verify(batchRepository).findByBrokerNameOrderByStartedAtDesc("ibkr");
+            assertEquals("ibkr", result.get(0).getBrokerCode());
+            verify(batchRepository).findByBrokerCodeOrderByStartedAtDesc("ibkr");
         }
 
         @Test
-        @DisplayName("仅按状态筛选 - 应调用 findByStatus")
+        @DisplayName("status only — should call findByStatus")
         void listByStatusOnly_shouldCallFindByStatus() {
             List<BrokerSyncBatch> expected = List.of(
                     buildBatch(1L, "ibkr", "FAILED"),
@@ -112,24 +121,24 @@ class BrokerSyncBatchServiceTest {
         }
 
         @Test
-        @DisplayName("同时按券商和状态筛选 - 应调用 findByBrokerNameAndStatus")
-        void listByBrokerNameAndStatus_shouldCallCombinedMethod() {
+        @DisplayName("brokerCode and status — should call combined method")
+        void listByBrokerCodeAndStatus_shouldCallCombinedMethod() {
             List<BrokerSyncBatch> expected = List.of(buildBatch(1L, "ibkr", "COMPLETED"));
-            when(batchRepository.findByBrokerNameAndStatusOrderByStartedAtDesc("ibkr", "COMPLETED"))
+            when(batchRepository.findByBrokerCodeAndStatusOrderByStartedAtDesc("ibkr", "COMPLETED"))
                     .thenReturn(expected);
 
             List<BrokerSyncBatch> result = batchService.listBatches("ibkr", "COMPLETED");
 
             assertEquals(1, result.size());
-            assertEquals("ibkr", result.get(0).getBrokerName());
+            assertEquals("ibkr", result.get(0).getBrokerCode());
             assertEquals("COMPLETED", result.get(0).getStatus());
-            verify(batchRepository).findByBrokerNameAndStatusOrderByStartedAtDesc("ibkr", "COMPLETED");
+            verify(batchRepository).findByBrokerCodeAndStatusOrderByStartedAtDesc("ibkr", "COMPLETED");
         }
 
         @Test
-        @DisplayName("查询结果为空 - 应返回空列表")
+        @DisplayName("no results — should return empty list")
         void listWithNoResults_shouldReturnEmptyList() {
-            when(batchRepository.findByBrokerNameOrderByStartedAtDesc("unknown")).thenReturn(List.of());
+            when(batchRepository.findByBrokerCodeOrderByStartedAtDesc("unknown")).thenReturn(List.of());
 
             List<BrokerSyncBatch> result = batchService.listBatches("unknown", null);
 
@@ -139,14 +148,14 @@ class BrokerSyncBatchServiceTest {
     }
 
     // ========================================================
-    // 单条查询测试
+    // Find by ID
     // ========================================================
     @Nested
-    @DisplayName("查询单个同步批次")
+    @DisplayName("findById()")
     class FindByIdTest {
 
         @Test
-        @DisplayName("ID存在 - 应返回批次")
+        @DisplayName("existing ID — should return present")
         void findExistingBatch_shouldReturnPresent() {
             BrokerSyncBatch batch = buildBatch(1L, "ibkr", "COMPLETED");
             when(batchRepository.findById(1L)).thenReturn(Optional.of(batch));
@@ -155,17 +164,176 @@ class BrokerSyncBatchServiceTest {
 
             assertTrue(result.isPresent());
             assertEquals(1L, result.get().getId());
-            assertEquals("ibkr", result.get().getBrokerName());
+            assertEquals("ibkr", result.get().getBrokerCode());
         }
 
         @Test
-        @DisplayName("ID不存在 - 应返回空")
+        @DisplayName("non-existing ID — should return empty")
         void findNonExistentBatch_shouldReturnEmpty() {
             when(batchRepository.findById(999L)).thenReturn(Optional.empty());
 
             Optional<BrokerSyncBatch> result = batchService.findById(999L);
 
             assertFalse(result.isPresent());
+        }
+    }
+
+    // ========================================================
+    // Create batch
+    // ========================================================
+    @Nested
+    @DisplayName("createBatch()")
+    class CreateBatchTest {
+
+        @Test
+        @DisplayName("should create batch with PENDING status and provided dates")
+        void shouldCreateBatchWithDates() {
+            LocalDate from = LocalDate.of(2026, 1, 1);
+            LocalDate to = LocalDate.of(2026, 3, 31);
+
+            when(batchRepository.save(any(BrokerSyncBatch.class))).thenAnswer(invocation -> {
+                BrokerSyncBatch b = invocation.getArgument(0);
+                b.setId(100L);
+                return b;
+            });
+
+            BrokerSyncBatch result = batchService.createBatch("ibkr", from, to);
+
+            assertEquals("ibkr", result.getBrokerCode());
+            assertEquals("PENDING", result.getStatus());
+            assertEquals(from, result.getSyncDateFrom());
+            assertEquals(to, result.getSyncDateTo());
+            assertEquals(0, result.getTotalCount());
+            assertEquals(0, result.getImportedCount());
+            assertEquals(0, result.getSkippedCount());
+            assertEquals(0, result.getFailedCount());
+        }
+
+        @Test
+        @DisplayName("should default dates to today when null")
+        void shouldDefaultDatesToToday() {
+            when(batchRepository.save(any(BrokerSyncBatch.class))).thenAnswer(invocation -> {
+                BrokerSyncBatch b = invocation.getArgument(0);
+                b.setId(101L);
+                return b;
+            });
+
+            BrokerSyncBatch result = batchService.createBatch("tiger", null, null);
+
+            assertEquals(LocalDate.now(), result.getSyncDateFrom());
+            assertEquals(LocalDate.now(), result.getSyncDateTo());
+        }
+    }
+
+    // ========================================================
+    // Status lifecycle
+    // ========================================================
+    @Nested
+    @DisplayName("Status lifecycle transitions")
+    class StatusLifecycleTest {
+
+        @Test
+        @DisplayName("markAsProcessing should set status and phase")
+        void markAsProcessingShouldSetStatusAndPhase() {
+            BrokerSyncBatch batch = buildBatch(1L, "ibkr", "PENDING");
+            when(batchRepository.findById(1L)).thenReturn(Optional.of(batch));
+            when(batchRepository.save(any())).thenReturn(batch);
+
+            batchService.markAsProcessing(1L, "FETCHING");
+
+            assertEquals("PROCESSING", batch.getStatus());
+            assertEquals("FETCHING", batch.getPhase());
+            assertNotNull(batch.getStartedAt());
+        }
+
+        @Test
+        @DisplayName("updatePhase should only change phase")
+        void updatePhaseShouldOnlyChangePhase() {
+            BrokerSyncBatch batch = buildBatch(1L, "ibkr", "PROCESSING");
+            batch.setPhase("FETCHING");
+            when(batchRepository.findById(1L)).thenReturn(Optional.of(batch));
+            when(batchRepository.save(any())).thenReturn(batch);
+
+            batchService.updatePhase(1L, "IMPORTING");
+
+            assertEquals("PROCESSING", batch.getStatus()); // unchanged
+            assertEquals("IMPORTING", batch.getPhase());
+        }
+
+        @Test
+        @DisplayName("markAsCompleted should set counts and clear phase")
+        void markAsCompletedShouldSetCounts() {
+            BrokerSyncBatch batch = buildBatch(1L, "ibkr", "PROCESSING");
+            batch.setPhase("IMPORTING");
+            when(batchRepository.findById(1L)).thenReturn(Optional.of(batch));
+            when(batchRepository.save(any())).thenReturn(batch);
+
+            SyncResult result = SyncResult.success("ibkr", 100, 85, 10, 5, 3000);
+            batchService.markAsCompleted(1L, result);
+
+            assertEquals("COMPLETED", batch.getStatus());
+            assertNull(batch.getPhase());
+            assertEquals(100, batch.getTotalCount());
+            assertEquals(85, batch.getImportedCount());
+            assertEquals(10, batch.getSkippedCount());
+            assertEquals(5, batch.getFailedCount());
+            assertNotNull(batch.getCompletedAt());
+        }
+
+        @Test
+        @DisplayName("markAsPartial should set PARTIAL status and counts")
+        void markAsPartialShouldSetPartialStatus() {
+            BrokerSyncBatch batch = buildBatch(1L, "ibkr", "PROCESSING");
+            when(batchRepository.findById(1L)).thenReturn(Optional.of(batch));
+            when(batchRepository.save(any())).thenReturn(batch);
+
+            SyncResult result = SyncResult.success("ibkr", 100, 80, 10, 10, 3000);
+            batchService.markAsPartial(1L, result);
+
+            assertEquals("PARTIAL", batch.getStatus());
+            assertNull(batch.getPhase());
+            assertEquals(100, batch.getTotalCount());
+            assertEquals(10, batch.getFailedCount());
+        }
+
+        @Test
+        @DisplayName("markAsFailed should set error message and clear phase")
+        void markAsFailedShouldSetErrorMessage() {
+            BrokerSyncBatch batch = buildBatch(1L, "ibkr", "PROCESSING");
+            batch.setPhase("FETCHING");
+            when(batchRepository.findById(1L)).thenReturn(Optional.of(batch));
+            when(batchRepository.save(any())).thenReturn(batch);
+
+            batchService.markAsFailed(1L, "API timeout");
+
+            assertEquals("FAILED", batch.getStatus());
+            assertNull(batch.getPhase());
+            assertEquals("API timeout", batch.getErrorMessage());
+            assertNotNull(batch.getCompletedAt());
+        }
+
+        @Test
+        @DisplayName("markAsInterrupted should preserve phase for diagnostics")
+        void markAsInterruptedShouldPreservePhase() {
+            BrokerSyncBatch batch = buildBatch(1L, "ibkr", "PROCESSING");
+            batch.setPhase("STAGING");
+            when(batchRepository.findById(1L)).thenReturn(Optional.of(batch));
+            when(batchRepository.save(any())).thenReturn(batch);
+
+            batchService.markAsInterrupted(1L, "Application restarted");
+
+            assertEquals("INTERRUPTED", batch.getStatus());
+            assertEquals("STAGING", batch.getPhase()); // preserved!
+            assertEquals("Application restarted", batch.getErrorMessage());
+        }
+
+        @Test
+        @DisplayName("markAsProcessing should throw for non-existent batch")
+        void markAsProcessingShouldThrowForMissingBatch() {
+            when(batchRepository.findById(999L)).thenReturn(Optional.empty());
+
+            assertThrows(IllegalArgumentException.class,
+                    () -> batchService.markAsProcessing(999L, "FETCHING"));
         }
     }
 }

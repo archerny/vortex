@@ -16,9 +16,12 @@ import org.springframework.stereotype.Service;
  *
  * <h3>Exception safety</h3>
  * The {@link #execute} method guarantees that the batch record will
- * <strong>never</strong> be left in an intermediate state (e.g. IMPORTING
+ * <strong>never</strong> be left in an intermediate state (e.g. PROCESSING
  * forever).  Any unhandled exception is caught and the batch is marked
  * as FAILED with the error message.
+ *
+ * <h3>Status lifecycle</h3>
+ * PENDING → PROCESSING (phase=FETCHING) → adapter.sync() → COMPLETED / PARTIAL / FAILED
  */
 @Service
 public class BrokerSyncAsyncExecutor {
@@ -39,9 +42,10 @@ public class BrokerSyncAsyncExecutor {
      *
      * <p>Lifecycle:
      * <ol>
-     *   <li>Mark batch as IMPORTING (independent transaction)</li>
+     *   <li>Mark batch as PROCESSING with phase=FETCHING</li>
+     *   <li>Inject batchId into the request so adapters can reference the batch</li>
      *   <li>Delegate to {@link BrokerSyncService#sync(SyncRequest)}</li>
-     *   <li>Mark batch as COMPLETED or FAILED based on the result</li>
+     *   <li>Mark batch as COMPLETED, PARTIAL, or FAILED based on the result</li>
      * </ol>
      *
      * @param batchId the persisted batch ID (must already exist in DB)
@@ -49,27 +53,37 @@ public class BrokerSyncAsyncExecutor {
      */
     @Async("syncTaskExecutor")
     public void execute(Long batchId, SyncRequest request) {
-        logger.info("Async sync started: batchId={}, broker={}", batchId, request.getBrokerName());
+        logger.info("Async sync started: batchId={}, broker={}", batchId, request.getBrokerCode());
 
         try {
-            // Step 1: Mark as IMPORTING
-            batchService.markAsImporting(batchId);
+            // Step 1: Mark as PROCESSING (phase=FETCHING)
+            batchService.markAsProcessing(batchId, "FETCHING");
 
-            // Step 2: Execute the actual sync (may take seconds to minutes)
+            // Step 2: Inject batchId into request so adapters can reference the batch
+            request.setBatchId(batchId);
+
+            // Step 3: Execute the actual sync (may take seconds to minutes)
             SyncResult result = brokerSyncService.sync(request);
 
-            // Step 3: Update batch based on result
+            // Step 4: Update batch based on result
             if (result.isSuccess()) {
-                batchService.markAsCompleted(batchId, result);
-                logger.info("Async sync completed: batchId={}, totalRecords={}",
-                        batchId, result.getTotalRecords());
+                if (result.getFailedCount() > 0) {
+                    // Some records failed → PARTIAL
+                    batchService.markAsPartial(batchId, result);
+                    logger.warn("Async sync partial: batchId={}, total={}, imported={}, failed={}",
+                            batchId, result.getTotalRecords(), result.getImportedCount(), result.getFailedCount());
+                } else {
+                    batchService.markAsCompleted(batchId, result);
+                    logger.info("Async sync completed: batchId={}, total={}, imported={}, skipped={}",
+                            batchId, result.getTotalRecords(), result.getImportedCount(), result.getSkippedCount());
+                }
             } else {
                 batchService.markAsFailed(batchId, result.getMessage());
                 logger.warn("Async sync failed: batchId={}, message={}",
                         batchId, result.getMessage());
             }
         } catch (Exception e) {
-            // Catch-all: ensure batch is never stuck in IMPORTING
+            // Catch-all: ensure batch is never stuck in PROCESSING
             logger.error("Unexpected error during async sync: batchId={}", batchId, e);
             try {
                 batchService.markAsFailed(batchId,

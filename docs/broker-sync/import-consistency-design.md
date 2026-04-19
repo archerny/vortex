@@ -1,10 +1,10 @@
 # 券商同步 — 数据一致性与中断恢复设计文档
 
 > **创建日期**：2026-04-16  
-> **最后更新**：2026-04-17  
-> **状态**：方案已确认，待实现  
+> **最后更新**：2026-04-18  
+> **状态**：✅ 已实现（逐条独立事务 + 幂等去重 + 两级状态模型 + SyncBatchRecoveryRunner + Resume 端点 + 前端恢复按钮）  
 > **关联**：[data-persistence-design.md](./data-persistence-design.md) | [overall-design.md](./overall-design.md) | [broker-code-design.md](./broker-code-design.md)  
-> **前置**：Phase 2 数据库变更已完成（V19-V22 + Entity + Repository），导入逻辑待实现
+> **前置**：Phase 2 数据库变更已完成（V19-V24 + Entity + Repository）
 
 ---
 
@@ -358,7 +358,7 @@ resumeSync(batchId):
 
 | 变更 | 说明 | Flyway 脚本 |
 |------|------|------------|
-| `broker_sync_batches` 新增 `phase` 列 | `VARCHAR(32)`，可空 | V23（编号待定） |
+| `broker_sync_batches` 新增 `phase` 列 | `VARCHAR(32)`，可空 | V24 |
 | `broker_sync_batches.status` 枚举扩展 | 新增 `PROCESSING`、`PARTIAL`、`INTERRUPTED`；`IMPORTING` 改为 `PROCESSING` | 注释更新，无 DDL 变更（VARCHAR 字段） |
 
 > **注意**：如果已有数据中存在 `status = 'IMPORTING'` 的记录，需要在 Flyway 脚本中做数据迁移：`UPDATE broker_sync_batches SET status = 'PROCESSING' WHERE status = 'IMPORTING'`

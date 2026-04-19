@@ -53,7 +53,7 @@ public class TigerSyncAdapter implements BrokerSyncAdapter {
     }
 
     @Override
-    public String getBrokerName() {
+    public String getBrokerCode() {
         return "tiger";
     }
 
@@ -65,7 +65,7 @@ public class TigerSyncAdapter implements BrokerSyncAdapter {
         if (!tigerApiProperties.isConfigured()) {
             logger.error("[TigerSync] Tiger API credentials not configured. " +
                     "Please set broker.tiger.* properties in application-local.properties");
-            return SyncResult.failure(getBrokerName(), "API credentials not configured", System.currentTimeMillis() - startMs);
+            return SyncResult.failure(getBrokerCode(), "API credentials not configured", System.currentTimeMillis() - startMs);
         }
 
         try {
@@ -85,12 +85,12 @@ public class TigerSyncAdapter implements BrokerSyncAdapter {
             logRecords(allRecords);
 
             long durationMs = System.currentTimeMillis() - startMs;
-            return SyncResult.success(getBrokerName(), allRecords.size(), durationMs);
+            return SyncResult.success(getBrokerCode(), allRecords.size(), durationMs);
 
         } catch (Exception e) {
             long durationMs = System.currentTimeMillis() - startMs;
             logger.error("[TigerSync] Sync failed with exception", e);
-            return SyncResult.failure(getBrokerName(), e.getMessage(), durationMs);
+            return SyncResult.failure(getBrokerCode(), e.getMessage(), durationMs);
         }
     }
 

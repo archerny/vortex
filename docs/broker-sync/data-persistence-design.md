@@ -2,7 +2,7 @@
 
 > **创建日期**：2026-04-13  
 > **最后更新**：2026-04-18  
-> **状态**：方案已确认，待实现  
+> **状态**：✅ 已实现（DB 迁移 V19-V24 + Entity + Repository + IbkrStagingService + IbkrImportService + IbkrSyncAdapter 全链路）  
 > **关联**：[overall-design.md](./overall-design.md) | [ibkr-flex-web-service-design.md](./ibkr-flex-web-service-design.md) | [broker-code-design.md](./broker-code-design.md)  
 > **前置**：Phase 1（API 获取 + 日志输出）已完成
 
@@ -396,8 +396,8 @@ schwab_staged_orders            → 字段 1:1 对应 SchwabTradeRecord
 | `V20__create_ibkr_staged_orders.sql` | 创建 `ibkr_staged_orders` 表 | ✅ 已完成 |
 | `V21__create_ibkr_staged_trade_confirms.sql` | 创建 `ibkr_staged_trade_confirms` 表 | ✅ 已完成 |
 | `V22__add_external_fields_to_trade_records.sql` | 为 `trade_records` 新增 `external_id`、`external_broker`、`sync_batch_id` 字段 | ✅ 已完成 |
-| `V23__migrate_etf_to_stock_for_sync_consistency.sql` | 将现有 `asset_type = 'ETF'` 的记录统一迁移为 `STOCK`，确保同步导入一致性检查不报错（ETF 枚举值保留） | ✅ 已完成 |
-| `V24__add_broker_code_and_rename_batch_broker_name.sql` | `brokers` 新增 `broker_code` 列（UNIQUE 部分索引）+ `broker_sync_batches.broker_name` → `broker_code` 改名 | 📋 待实现，详见 [broker-code-design.md](./broker-code-design.md) |
+| `V23__add_broker_code_and_rename_batch_broker_name.sql` | `brokers` 新增 `broker_code` 列（UNIQUE 部分索引）+ `broker_sync_batches.broker_name` → `broker_code` 改名 | ✅ 已完成，详见 [broker-code-design.md](./broker-code-design.md) |
+| `V24__add_phase_and_expand_batch_status.sql` | `broker_sync_batches` 新增 `phase` 列 + `status` 枚举扩展（PROCESSING/PARTIAL/INTERRUPTED） | ✅ 已完成，详见 [import-consistency-design.md](./import-consistency-design.md) |
 
 ### 8.3 JPA Entity 与 Repository
 
@@ -443,7 +443,7 @@ _（当前无待解决项，所有阻塞性问题已解决）_
 |---|------|---------|
 | R-1 | 批次导入事务策略 | **逐条独立事务 + 幂等**，详见 [import-consistency-design.md](./import-consistency-design.md) |
 | R-2 | `brokerId` 查找策略 | `brokers` 表新增 `broker_code` 列，通过 `findByBrokerCode()` 直接查找，详见 [broker-code-design.md](./broker-code-design.md) |
-| R-3 | ETF 识别 | `assetCategory = STK` 时统一默认为 `STOCK`，历史 ETF 数据通过 V23 迁移为 STOCK（ETF 枚举值保留） |
+| R-3 | ETF 识别 | `assetCategory = STK` 时统一默认为 `STOCK`，历史 ETF 数据已由用户手动修正为 STOCK（ETF 枚举值保留） |
 | R-4 | `trade_trigger` 是否新增 `BROKER_SYNC` | **否**，`trade_trigger` 描述"交易为什么发生"，不描述"记录来源"。通过 `external_id IS NULL` 区分手动/同步 |
 | R-5 | BookTrade 的 `tradeTrigger` 判定（原 O-2） | 通过 `orderTime` + `orderType` 为空识别 BookTrade，再查关联 TradeConfirm 的 `code` 字段判定具体期权事件类型。详见 [booktrade-trigger-mapping-design.md](./booktrade-trigger-mapping-design.md) |
 | R-6 | 期权 symbol 格式转换（原 O-3） | **无需额外设计**。IBKR 暂存表已存 `strike`、`expiry`、`putCall` 为独立字段，导入时直接拼接为系统格式 `{underlying}-{expiry}-{putCall}{strike}`（如 `AAPL-20260130-C265`），无需解析 OCC 填充格式 |

@@ -17,10 +17,10 @@ import java.time.LocalDateTime;
 public class BrokerSyncBatch extends BaseEntity {
 
     /**
-     * 券商标识（如 ibkr、tiger）
+     * 券商技术标识（如 ibkr、tiger）
      */
-    @Column(name = "broker_name", nullable = false, length = 50)
-    private String brokerName;
+    @Column(name = "broker_code", nullable = false, length = 50)
+    private String brokerCode;
 
     /**
      * 同步数据的起始日期
@@ -59,10 +59,17 @@ public class BrokerSyncBatch extends BaseEntity {
     private Integer failedCount = 0;
 
     /**
-     * 批次状态：PENDING-待处理, IMPORTING-导入中, COMPLETED-已完成, FAILED-失败
+     * 批次主状态：PENDING, PROCESSING, COMPLETED, PARTIAL, FAILED, INTERRUPTED
      */
     @Column(name = "status", nullable = false, length = 32)
     private String status;
+
+    /**
+     * 子阶段：FETCHING, STAGING, IMPORTING。仅 PROCESSING 时有意义。
+     * INTERRUPTED 时保留中断时的值用于诊断。
+     */
+    @Column(name = "phase", length = 32)
+    private String phase;
 
     /**
      * 批次级错误信息
@@ -89,12 +96,12 @@ public class BrokerSyncBatch extends BaseEntity {
 
     // ============ Getters and Setters ============
 
-    public String getBrokerName() {
-        return brokerName;
+    public String getBrokerCode() {
+        return brokerCode;
     }
 
-    public void setBrokerName(String brokerName) {
-        this.brokerName = brokerName;
+    public void setBrokerCode(String brokerCode) {
+        this.brokerCode = brokerCode;
     }
 
     public LocalDate getSyncDateFrom() {
@@ -177,11 +184,19 @@ public class BrokerSyncBatch extends BaseEntity {
         this.completedAt = completedAt;
     }
 
+    public String getPhase() {
+        return phase;
+    }
+
+    public void setPhase(String phase) {
+        this.phase = phase;
+    }
+
     @Override
     public String toString() {
         return "BrokerSyncBatch{" +
                 "id=" + getId() +
-                ", brokerName='" + brokerName + '\'' +
+                ", brokerCode='" + brokerCode + '\'' +
                 ", syncDateFrom=" + syncDateFrom +
                 ", syncDateTo=" + syncDateTo +
                 ", totalCount=" + totalCount +
@@ -189,6 +204,7 @@ public class BrokerSyncBatch extends BaseEntity {
                 ", skippedCount=" + skippedCount +
                 ", failedCount=" + failedCount +
                 ", status='" + status + '\'' +
+                ", phase='" + phase + '\'' +
                 ", startedAt=" + startedAt +
                 ", completedAt=" + completedAt +
                 '}';

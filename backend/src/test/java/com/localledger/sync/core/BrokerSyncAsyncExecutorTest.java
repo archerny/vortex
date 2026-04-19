@@ -17,11 +17,13 @@ import static org.mockito.Mockito.*;
  * Unit tests for {@link BrokerSyncAsyncExecutor}.
  *
  * Covers:
- * - Successful sync: PENDING → IMPORTING → COMPLETED
- * - Failed sync (adapter returns failure): PENDING → IMPORTING → FAILED
- * - Exception during sync: PENDING → IMPORTING → FAILED (catch-all)
+ * - Successful sync: PENDING → PROCESSING(FETCHING) → COMPLETED
+ * - Partial sync: some records failed → PARTIAL
+ * - Failed sync (adapter returns failure): PENDING → PROCESSING → FAILED
+ * - Exception during sync: PENDING → PROCESSING → FAILED (catch-all)
  * - Exception during markAsFailed: logged but not re-thrown
  * - Correct invocation order of lifecycle methods
+ * - batchId injection into SyncRequest
  */
 @ExtendWith(MockitoExtension.class)
 class BrokerSyncAsyncExecutorTest {
@@ -36,31 +38,32 @@ class BrokerSyncAsyncExecutorTest {
     private BrokerSyncAsyncExecutor asyncExecutor;
 
     @Nested
-    @DisplayName("execute() - successful sync")
+    @DisplayName("execute() - successful sync (all imported)")
     class SuccessfulSyncTest {
 
         @Test
-        @DisplayName("should transition PENDING → IMPORTING → COMPLETED on success")
+        @DisplayName("should transition PENDING → PROCESSING → COMPLETED on success")
         void shouldCompleteSuccessfully() {
             Long batchId = 1L;
             SyncRequest request = new SyncRequest("ibkr");
-            SyncResult successResult = SyncResult.success("ibkr", 100, 2000);
+            SyncResult successResult = SyncResult.success("ibkr", 100, 90, 10, 0, 2000);
 
             when(brokerSyncService.sync(request)).thenReturn(successResult);
 
             asyncExecutor.execute(batchId, request);
 
             InOrder inOrder = inOrder(batchService, brokerSyncService);
-            inOrder.verify(batchService).markAsImporting(batchId);
+            inOrder.verify(batchService).markAsProcessing(batchId, "FETCHING");
             inOrder.verify(brokerSyncService).sync(request);
             inOrder.verify(batchService).markAsCompleted(batchId, successResult);
 
             verify(batchService, never()).markAsFailed(anyLong(), anyString());
+            verify(batchService, never()).markAsPartial(anyLong(), any());
         }
 
         @Test
-        @DisplayName("should pass SyncResult to markAsCompleted for record count tracking")
-        void shouldPassResultToMarkAsCompleted() {
+        @DisplayName("should inject batchId into request before sync")
+        void shouldInjectBatchIdIntoRequest() {
             Long batchId = 42L;
             SyncRequest request = new SyncRequest("tiger");
             SyncResult result = SyncResult.success("tiger", 200, 5000);
@@ -69,7 +72,29 @@ class BrokerSyncAsyncExecutorTest {
 
             asyncExecutor.execute(batchId, request);
 
+            assertEquals(42L, request.getBatchId());
             verify(batchService).markAsCompleted(42L, result);
+        }
+    }
+
+    @Nested
+    @DisplayName("execute() - partial sync (some records failed)")
+    class PartialSyncTest {
+
+        @Test
+        @DisplayName("should transition to PARTIAL when failedCount > 0")
+        void shouldMarkAsPartialWhenSomeRecordsFailed() {
+            Long batchId = 10L;
+            SyncRequest request = new SyncRequest("ibkr");
+            SyncResult partialResult = SyncResult.success("ibkr", 100, 85, 10, 5, 3000);
+
+            when(brokerSyncService.sync(request)).thenReturn(partialResult);
+
+            asyncExecutor.execute(batchId, request);
+
+            verify(batchService).markAsPartial(batchId, partialResult);
+            verify(batchService, never()).markAsCompleted(anyLong(), any());
+            verify(batchService, never()).markAsFailed(anyLong(), anyString());
         }
     }
 
@@ -78,7 +103,7 @@ class BrokerSyncAsyncExecutorTest {
     class AdapterFailureTest {
 
         @Test
-        @DisplayName("should transition PENDING → IMPORTING → FAILED when adapter returns failure")
+        @DisplayName("should transition PENDING → PROCESSING → FAILED when adapter returns failure")
         void shouldMarkAsFailedOnAdapterFailure() {
             Long batchId = 2L;
             SyncRequest request = new SyncRequest("ibkr");
@@ -89,11 +114,12 @@ class BrokerSyncAsyncExecutorTest {
             asyncExecutor.execute(batchId, request);
 
             InOrder inOrder = inOrder(batchService, brokerSyncService);
-            inOrder.verify(batchService).markAsImporting(batchId);
+            inOrder.verify(batchService).markAsProcessing(batchId, "FETCHING");
             inOrder.verify(brokerSyncService).sync(request);
             inOrder.verify(batchService).markAsFailed(batchId, failResult.getMessage());
 
             verify(batchService, never()).markAsCompleted(anyLong(), any());
+            verify(batchService, never()).markAsPartial(anyLong(), any());
         }
     }
 
@@ -111,7 +137,7 @@ class BrokerSyncAsyncExecutorTest {
 
             asyncExecutor.execute(batchId, request);
 
-            verify(batchService).markAsImporting(batchId);
+            verify(batchService).markAsProcessing(batchId, "FETCHING");
             verify(batchService).markAsFailed(eq(batchId), contains("Network error"));
             verify(batchService, never()).markAsCompleted(anyLong(), any());
         }
@@ -147,22 +173,22 @@ class BrokerSyncAsyncExecutorTest {
     }
 
     @Nested
-    @DisplayName("execute() - markAsImporting exception")
-    class MarkAsImportingExceptionTest {
+    @DisplayName("execute() - markAsProcessing exception")
+    class MarkAsProcessingExceptionTest {
 
         @Test
-        @DisplayName("should mark as FAILED if markAsImporting throws (batch not found)")
-        void shouldHandleMarkAsImportingFailure() {
+        @DisplayName("should mark as FAILED if markAsProcessing throws (batch not found)")
+        void shouldHandleMarkAsProcessingFailure() {
             Long batchId = 99L;
             SyncRequest request = new SyncRequest("ibkr");
 
             doThrow(new IllegalArgumentException("Batch not found: 99"))
-                    .when(batchService).markAsImporting(batchId);
+                    .when(batchService).markAsProcessing(batchId, "FETCHING");
 
             // The catch-all should handle this
             assertDoesNotThrow(() -> asyncExecutor.execute(batchId, request));
 
-            // sync should NOT be called since markAsImporting failed
+            // sync should NOT be called since markAsProcessing failed
             verify(brokerSyncService, never()).sync(any());
         }
     }

@@ -7,8 +7,8 @@ const BASE_URL = '/api/broker-sync';
  * GET /api/broker-sync/batches
  *
  * @param {Object} params - 筛选参数
- * @param {string} [params.brokerName] - 券商名称筛选
- * @param {string} [params.status] - 状态筛选 (PENDING, IMPORTING, COMPLETED, FAILED)
+ * @param {string} [params.brokerCode] - 券商标识筛选
+ * @param {string} [params.status] - 状态筛选 (PENDING, PROCESSING, COMPLETED, PARTIAL, FAILED, INTERRUPTED)
  */
 export const fetchSyncBatches = async (params = {}) => {
   const response = await axios.get(`${BASE_URL}/batches`, { params });
@@ -31,7 +31,7 @@ export const fetchSyncBatchById = async (id) => {
  * POST /api/broker-sync/trigger
  *
  * @param {Object} data - 同步请求参数
- * @param {string} data.brokerName - 券商标识 (如 ibkr, tiger)
+ * @param {string} data.brokerCode - 券商技术标识 (如 ibkr, tiger)
  * @param {string} [data.startTime] - 起始日期 (yyyy-MM-dd)
  * @param {string} [data.endTime] - 截止日期 (yyyy-MM-dd)
  */
@@ -43,8 +43,22 @@ export const triggerSync = async (data) => {
 /**
  * 查询支持的券商列表
  * GET /api/broker-sync/brokers
+ *
+ * @returns {Promise<{data: Array<{brokerCode: string, brokerName: string, country: string, brokerId: number}>}>}
  */
 export const fetchSupportedBrokers = async () => {
   const response = await axios.get(`${BASE_URL}/brokers`);
+  return response.data;
+};
+
+/**
+ * 恢复中断/失败/部分完成的同步批次
+ * POST /api/broker-sync/batches/{id}/resume
+ *
+ * @param {number} id - 批次 ID
+ * @returns {Promise<{status: string, message: string, data: object}>}
+ */
+export const resumeSync = async (id) => {
+  const response = await axios.post(`${BASE_URL}/batches/${id}/resume`);
   return response.data;
 };

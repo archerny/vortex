@@ -4,15 +4,21 @@ package com.localledger.sync.core;
  * 同步请求参数
  *
  * 封装触发一次券商同步所需的参数。
- * Phase 1 仅支持指定券商名称，后续可扩展时间范围、证券类型等过滤条件。
+ * Phase 2 新增 batchId，供适配器在 staging/importing 阶段引用批次记录。
  */
 public class SyncRequest {
 
     /**
-     * 券商名称标识，用于匹配对应的适配器
+     * 券商技术标识符，用于匹配对应的适配器
      * 如 "tiger"、"ibkr"、"futu" 等
      */
-    private String brokerName;
+    private String brokerCode;
+
+    /**
+     * 关联的同步批次 ID（由 BrokerSyncAsyncExecutor 在调用 sync 前设置）
+     * 适配器通过此 ID 更新 phase、关联 staging/import 记录
+     */
+    private Long batchId;
 
     /**
      * 同步的起始时间（可选），格式如 "2025-01-01" 或毫秒时间戳
@@ -31,24 +37,32 @@ public class SyncRequest {
     public SyncRequest() {
     }
 
-    public SyncRequest(String brokerName) {
-        this.brokerName = brokerName;
+    public SyncRequest(String brokerCode) {
+        this.brokerCode = brokerCode;
     }
 
-    public SyncRequest(String brokerName, String startTime, String endTime) {
-        this.brokerName = brokerName;
+    public SyncRequest(String brokerCode, String startTime, String endTime) {
+        this.brokerCode = brokerCode;
         this.startTime = startTime;
         this.endTime = endTime;
     }
 
     // ============ Getters and Setters ============
 
-    public String getBrokerName() {
-        return brokerName;
+    public String getBrokerCode() {
+        return brokerCode;
     }
 
-    public void setBrokerName(String brokerName) {
-        this.brokerName = brokerName;
+    public void setBrokerCode(String brokerCode) {
+        this.brokerCode = brokerCode;
+    }
+
+    public Long getBatchId() {
+        return batchId;
+    }
+
+    public void setBatchId(Long batchId) {
+        this.batchId = batchId;
     }
 
     public String getStartTime() {
@@ -70,7 +84,8 @@ public class SyncRequest {
     @Override
     public String toString() {
         return "SyncRequest{" +
-                "brokerName='" + brokerName + '\'' +
+                "brokerCode='" + brokerCode + '\'' +
+                ", batchId=" + batchId +
                 ", startTime='" + startTime + '\'' +
                 ", endTime='" + endTime + '\'' +
                 '}';

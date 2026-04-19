@@ -10,16 +10,17 @@ import static org.junit.jupiter.api.Assertions.*;
  * Unit tests for {@link SyncResult}.
  *
  * Covers:
- * - success() static factory method
- * - failure() static factory method
+ * - success() 3-parameter factory method (Phase 1 style)
+ * - success() 6-parameter factory method (Phase 2 style with import counts)
+ * - failure() factory method
  * - Field getters/setters
  * - toString() output
  */
 class SyncResultTest {
 
     @Nested
-    @DisplayName("success() factory method")
-    class SuccessFactoryTest {
+    @DisplayName("success() 3-param factory method (Phase 1)")
+    class SuccessFactory3ParamTest {
 
         @Test
         @DisplayName("should create a success result with correct fields")
@@ -27,13 +28,16 @@ class SyncResultTest {
             SyncResult result = SyncResult.success("ibkr", 150, 2500);
 
             assertTrue(result.isSuccess());
-            assertEquals("ibkr", result.getBrokerName());
+            assertEquals("ibkr", result.getBrokerCode());
             assertEquals(150, result.getTotalRecords());
             assertEquals(2500, result.getDurationMs());
+            // importedCount/skippedCount/failedCount default to 0
+            assertEquals(0, result.getImportedCount());
+            assertEquals(0, result.getSkippedCount());
+            assertEquals(0, result.getFailedCount());
             assertNotNull(result.getMessage());
             assertTrue(result.getMessage().contains("ibkr"));
             assertTrue(result.getMessage().contains("150"));
-            assertTrue(result.getMessage().contains("2500"));
         }
 
         @Test
@@ -42,7 +46,7 @@ class SyncResultTest {
             SyncResult result = SyncResult.success("tiger", 0, 100);
 
             assertTrue(result.isSuccess());
-            assertEquals("tiger", result.getBrokerName());
+            assertEquals("tiger", result.getBrokerCode());
             assertEquals(0, result.getTotalRecords());
             assertEquals(100, result.getDurationMs());
         }
@@ -60,6 +64,38 @@ class SyncResultTest {
     }
 
     @Nested
+    @DisplayName("success() 6-param factory method (Phase 2)")
+    class SuccessFactory6ParamTest {
+
+        @Test
+        @DisplayName("should create a success result with import counts")
+        void shouldCreateSuccessResultWithCounts() {
+            SyncResult result = SyncResult.success("ibkr", 100, 85, 10, 5, 3000);
+
+            assertTrue(result.isSuccess());
+            assertEquals("ibkr", result.getBrokerCode());
+            assertEquals(100, result.getTotalRecords());
+            assertEquals(85, result.getImportedCount());
+            assertEquals(10, result.getSkippedCount());
+            assertEquals(5, result.getFailedCount());
+            assertEquals(3000, result.getDurationMs());
+            assertTrue(result.getMessage().contains("imported=85"));
+            assertTrue(result.getMessage().contains("skipped=10"));
+            assertTrue(result.getMessage().contains("failed=5"));
+        }
+
+        @Test
+        @DisplayName("should handle all-skipped scenario")
+        void shouldHandleAllSkipped() {
+            SyncResult result = SyncResult.success("ibkr", 50, 0, 50, 0, 1000);
+
+            assertTrue(result.isSuccess());
+            assertEquals(0, result.getImportedCount());
+            assertEquals(50, result.getSkippedCount());
+        }
+    }
+
+    @Nested
     @DisplayName("failure() factory method")
     class FailureFactoryTest {
 
@@ -69,7 +105,7 @@ class SyncResultTest {
             SyncResult result = SyncResult.failure("ibkr", "Connection timeout", 5000);
 
             assertFalse(result.isSuccess());
-            assertEquals("ibkr", result.getBrokerName());
+            assertEquals("ibkr", result.getBrokerCode());
             assertEquals(0, result.getTotalRecords());
             assertEquals(5000, result.getDurationMs());
             assertNotNull(result.getMessage());
@@ -84,7 +120,7 @@ class SyncResultTest {
             SyncResult result = SyncResult.failure("futu", "", 0);
 
             assertFalse(result.isSuccess());
-            assertEquals("futu", result.getBrokerName());
+            assertEquals("futu", result.getBrokerCode());
             assertEquals(0, result.getTotalRecords());
         }
 
@@ -110,8 +146,11 @@ class SyncResultTest {
             SyncResult result = new SyncResult();
 
             assertFalse(result.isSuccess());
-            assertNull(result.getBrokerName());
+            assertNull(result.getBrokerCode());
             assertEquals(0, result.getTotalRecords());
+            assertEquals(0, result.getImportedCount());
+            assertEquals(0, result.getSkippedCount());
+            assertEquals(0, result.getFailedCount());
             assertNull(result.getMessage());
             assertEquals(0, result.getDurationMs());
         }
@@ -121,14 +160,20 @@ class SyncResultTest {
         void settersShouldWork() {
             SyncResult result = new SyncResult();
             result.setSuccess(true);
-            result.setBrokerName("tiger");
+            result.setBrokerCode("tiger");
             result.setTotalRecords(42);
+            result.setImportedCount(30);
+            result.setSkippedCount(10);
+            result.setFailedCount(2);
             result.setMessage("custom message");
             result.setDurationMs(9999);
 
             assertTrue(result.isSuccess());
-            assertEquals("tiger", result.getBrokerName());
+            assertEquals("tiger", result.getBrokerCode());
             assertEquals(42, result.getTotalRecords());
+            assertEquals(30, result.getImportedCount());
+            assertEquals(10, result.getSkippedCount());
+            assertEquals(2, result.getFailedCount());
             assertEquals("custom message", result.getMessage());
             assertEquals(9999, result.getDurationMs());
         }
@@ -148,6 +193,9 @@ class SyncResultTest {
             assertTrue(str.contains("ibkr"));
             assertTrue(str.contains("totalRecords=10"));
             assertTrue(str.contains("durationMs=500"));
+            assertTrue(str.contains("importedCount="));
+            assertTrue(str.contains("skippedCount="));
+            assertTrue(str.contains("failedCount="));
         }
     }
 }

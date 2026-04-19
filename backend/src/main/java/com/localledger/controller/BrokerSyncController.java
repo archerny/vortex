@@ -3,6 +3,7 @@ package com.localledger.controller;
 import com.localledger.entity.BrokerSyncBatch;
 import com.localledger.service.BrokerSyncBatchService;
 import com.localledger.sync.core.BrokerSyncAsyncExecutor;
+import com.localledger.sync.core.BrokerSyncInfo;
 import com.localledger.sync.core.BrokerSyncService;
 import com.localledger.sync.core.SyncRequest;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,7 @@ import java.util.Map;
  *
  * Endpoints:
  * - POST /api/broker-sync/trigger            Submit a sync task (async)
+ * - POST /api/broker-sync/batches/{id}/resume Resume an interrupted/failed/partial batch
  * - GET  /api/broker-sync/brokers            Supported brokers
  * - GET  /api/broker-sync/batches            Batch list (filterable)
  * - GET  /api/broker-sync/batches/{id}       Single batch detail
@@ -34,6 +36,10 @@ import java.util.Map;
 public class BrokerSyncController {
 
     private static final Logger logger = LoggerFactory.getLogger(BrokerSyncController.class);
+
+    /** Batch statuses that allow resume */
+    private static final java.util.Set<String> RESUMABLE_STATUSES =
+            java.util.Set.of("INTERRUPTED", "PARTIAL", "FAILED");
 
     private final BrokerSyncService brokerSyncService;
     private final BrokerSyncBatchService batchService;
@@ -56,22 +62,20 @@ public class BrokerSyncController {
      *
      * POST /api/broker-sync/trigger
      *
-     * @param request sync parameters (brokerName required; startTime/endTime optional)
+     * @param request sync parameters (brokerCode required; startTime/endTime optional)
      * @return batch info with status=PENDING
      */
     @PostMapping("/trigger")
     public ResponseEntity<Map<String, Object>> triggerSync(@RequestBody SyncRequest request) {
         // Step 1: Parameter validation
-        if (request.getBrokerName() == null || request.getBrokerName().isBlank()) {
-            return buildErrorResponse(HttpStatus.BAD_REQUEST, "brokerName is required");
+        if (request.getBrokerCode() == null || request.getBrokerCode().isBlank()) {
+            return buildErrorResponse(HttpStatus.BAD_REQUEST, "brokerCode is required");
         }
 
         // Validate that the broker is supported before creating a batch
-        List<String> supported = brokerSyncService.getSupportedBrokers();
-        if (!supported.contains(request.getBrokerName())) {
+        if (!brokerSyncService.isSupported(request.getBrokerCode())) {
             return buildErrorResponse(HttpStatus.BAD_REQUEST,
-                    String.format("Unsupported broker: %s, available: %s",
-                            request.getBrokerName(), supported));
+                    String.format("Unsupported broker: %s", request.getBrokerCode()));
         }
 
         // Step 2: Parse optional date range
@@ -80,15 +84,75 @@ public class BrokerSyncController {
 
         // Step 3: Create batch record (PENDING) — committed immediately
         BrokerSyncBatch batch = batchService.createBatch(
-                request.getBrokerName(), syncDateFrom, syncDateTo);
+                request.getBrokerCode(), syncDateFrom, syncDateTo);
 
         // Step 4: Submit async execution (non-blocking)
         asyncExecutor.execute(batch.getId(), request);
         logger.info("Sync task submitted: batchId={}, broker={}",
-                batch.getId(), request.getBrokerName());
+                batch.getId(), request.getBrokerCode());
 
         // Step 5: Return immediately
         return buildSuccessResponse("Sync task submitted", batch);
+    }
+
+    /**
+     * Resume a previously interrupted, partially completed, or failed sync batch.
+     *
+     * Reconstructs a SyncRequest from the existing batch record and resubmits
+     * it to the async executor.  Because staging and import are both idempotent,
+     * the full sync flow is safe to re-execute: already-staged orders will be
+     * skipped, and already-imported records won't be duplicated.
+     *
+     * POST /api/broker-sync/batches/{id}/resume
+     *
+     * @param id the batch ID to resume
+     * @return batch info with status=PENDING (re-queued)
+     */
+    @PostMapping("/batches/{id}/resume")
+    public ResponseEntity<Map<String, Object>> resumeSync(@PathVariable Long id) {
+        // Step 1: Fetch batch
+        var batchOpt = batchService.findById(id);
+        if (batchOpt.isEmpty()) {
+            return buildErrorResponse(HttpStatus.NOT_FOUND,
+                    String.format("Sync batch not found: id=%d", id));
+        }
+
+        BrokerSyncBatch batch = batchOpt.get();
+
+        // Step 2: Validate status is resumable
+        if (!RESUMABLE_STATUSES.contains(batch.getStatus())) {
+            return buildErrorResponse(HttpStatus.BAD_REQUEST,
+                    String.format("Batch %d is in %s status, only INTERRUPTED/PARTIAL/FAILED batches can be resumed",
+                            id, batch.getStatus()));
+        }
+
+        // Step 3: Validate broker adapter is still available
+        if (!brokerSyncService.isSupported(batch.getBrokerCode())) {
+            return buildErrorResponse(HttpStatus.BAD_REQUEST,
+                    String.format("Broker adapter '%s' is no longer available", batch.getBrokerCode()));
+        }
+
+        // Step 4: Reconstruct SyncRequest from batch
+        SyncRequest request = new SyncRequest();
+        request.setBrokerCode(batch.getBrokerCode());
+        request.setStartTime(batch.getSyncDateFrom().toString());
+        request.setEndTime(batch.getSyncDateTo().toString());
+        // batchId will be set by asyncExecutor before calling sync
+
+        // Step 5: Reset batch to PENDING for re-execution (save previousPhase for logging)
+        String previousPhase = batch.getPhase();
+        batch.setStatus("PENDING");
+        batch.setPhase(null);
+        batch.setErrorMessage(null);
+        batch.setCompletedAt(null);
+        batchService.save(batch);
+
+        // Step 6: Submit async execution (non-blocking)
+        asyncExecutor.execute(batch.getId(), request);
+        logger.info("Sync batch resumed: batchId={}, broker={}, previousPhase={}",
+                id, batch.getBrokerCode(), previousPhase);
+
+        return buildSuccessResponse("Sync batch resumed", batch);
     }
 
     /**
@@ -107,13 +171,15 @@ public class BrokerSyncController {
     }
 
     /**
-     * 查询支持的券商列表
+     * List supported brokers with structured info.
      *
      * GET /api/broker-sync/brokers
+     *
+     * @return list of BrokerSyncInfo (brokerCode, brokerName, country, brokerId)
      */
     @GetMapping("/brokers")
     public ResponseEntity<Map<String, Object>> getSupportedBrokers() {
-        List<String> brokers = brokerSyncService.getSupportedBrokers();
+        List<BrokerSyncInfo> brokers = brokerSyncService.getSupportedBrokerInfos();
         return buildSuccessResponse("Query successful", brokers);
     }
 
@@ -121,19 +187,19 @@ public class BrokerSyncController {
      * 查询同步批次列表
      *
      * GET /api/broker-sync/batches
-     * GET /api/broker-sync/batches?brokerName=ibkr
+     * GET /api/broker-sync/batches?brokerCode=ibkr
      * GET /api/broker-sync/batches?status=COMPLETED
-     * GET /api/broker-sync/batches?brokerName=ibkr&status=COMPLETED
+     * GET /api/broker-sync/batches?brokerCode=ibkr&status=COMPLETED
      *
-     * @param brokerName optional broker name filter
-     * @param status     optional status filter (PENDING, IMPORTING, COMPLETED, FAILED)
+     * @param brokerCode optional broker code filter
+     * @param status     optional status filter (PENDING, PROCESSING, COMPLETED, PARTIAL, FAILED, INTERRUPTED)
      * @return list of sync batches
      */
     @GetMapping("/batches")
     public ResponseEntity<Map<String, Object>> listBatches(
-            @RequestParam(required = false) String brokerName,
+            @RequestParam(required = false) String brokerCode,
             @RequestParam(required = false) String status) {
-        List<BrokerSyncBatch> batches = batchService.listBatches(brokerName, status);
+        List<BrokerSyncBatch> batches = batchService.listBatches(brokerCode, status);
         return buildSuccessResponse("Query successful", batches);
     }
 

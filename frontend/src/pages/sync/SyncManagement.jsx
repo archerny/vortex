@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Table, Tag, Select, Space, Typography, Tooltip, Card, Button, message, Modal, DatePicker, Form } from 'antd';
-import { ReloadOutlined, CloudSyncOutlined, PlusOutlined } from '@ant-design/icons';
+import { ReloadOutlined, CloudSyncOutlined, PlusOutlined, RedoOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
-import { fetchSyncBatches, triggerSync, fetchSupportedBrokers } from '../../services/brokerSyncApi';
+import { fetchSyncBatches, triggerSync, fetchSupportedBrokers, resumeSync } from '../../services/brokerSyncApi';
 
 dayjs.extend(duration);
 
@@ -18,7 +18,7 @@ const { Title, Text } = Typography;
 const SyncManagement = () => {
   const [batches, setBatches] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [filters, setFilters] = useState({ brokerName: undefined, status: undefined });
+  const [filters, setFilters] = useState({ brokerCode: undefined, status: undefined });
 
   // New sync modal state
   const [modalOpen, setModalOpen] = useState(false);
@@ -30,7 +30,7 @@ const SyncManagement = () => {
     setLoading(true);
     try {
       const params = {};
-      if (filters.brokerName) params.brokerName = filters.brokerName;
+      if (filters.brokerCode) params.brokerCode = filters.brokerCode;
       if (filters.status) params.status = filters.status;
       const result = await fetchSyncBatches(params);
       setBatches(result.data || []);
@@ -51,9 +51,9 @@ const SyncManagement = () => {
     setModalOpen(true);
     try {
       const result = await fetchSupportedBrokers();
-      const brokers = (result.data || []).map((name) => ({
-        label: name.toUpperCase(),
-        value: name,
+      const brokers = (result.data || []).map((info) => ({
+        label: info.brokerName || info.brokerCode.toUpperCase(),
+        value: info.brokerCode,
       }));
       setBrokerOptions(brokers);
     } catch (error) {
@@ -68,7 +68,7 @@ const SyncManagement = () => {
       const values = await form.validateFields();
       setSubmitting(true);
 
-      const payload = { brokerName: values.brokerName };
+      const payload = { brokerCode: values.brokerCode };
       if (values.dateRange && values.dateRange.length === 2) {
         payload.startTime = values.dateRange[0].format('YYYY-MM-DD');
         payload.endTime = values.dateRange[1].format('YYYY-MM-DD');
@@ -97,20 +97,47 @@ const SyncManagement = () => {
     }
   };
 
+  // Resume an interrupted / failed / partial batch
+  const handleResume = async (batchId) => {
+    try {
+      const result = await resumeSync(batchId);
+      if (result.status === 'SUCCESS') {
+        message.success('同步任务已恢复，请稍后刷新查看结果');
+        loadBatches();
+      } else {
+        message.error(result.message || '恢复同步任务失败');
+      }
+    } catch (error) {
+      if (error.response?.data?.message) {
+        message.error(error.response.data.message);
+      } else {
+        console.error('Resume sync failed:', error);
+        message.error('恢复同步请求失败');
+      }
+    }
+  };
+
+  // 可恢复的状态集合
+  const resumableStatuses = new Set(['INTERRUPTED', 'PARTIAL', 'FAILED']);
+
   // 状态标签颜色映射
   const statusTagColor = {
     PENDING: 'blue',
-    IMPORTING: 'orange',
+    PROCESSING: 'orange',
     COMPLETED: 'green',
+    PARTIAL: 'gold',
     FAILED: 'red',
+    INTERRUPTED: 'volcano',
   };
 
   // 状态中文映射
   const statusLabel = {
     PENDING: '待处理',
-    IMPORTING: '导入中',
+    PROCESSING: '处理中',
     COMPLETED: '已完成',
+    PARTIAL: '部分完成',
     FAILED: '失败',
+    INTERRUPTED: '已中断',
   };
 
   // 券商标签颜色映射
@@ -152,12 +179,12 @@ const SyncManagement = () => {
     },
     {
       title: '券商',
-      dataIndex: 'brokerName',
-      key: 'brokerName',
+      dataIndex: 'brokerCode',
+      key: 'brokerCode',
       width: 100,
-      render: (name) => (
-        <Tag color={brokerTagColor[name] || 'default'}>
-          {name ? name.toUpperCase() : '-'}
+      render: (code) => (
+        <Tag color={brokerTagColor[code] || 'default'}>
+          {code ? code.toUpperCase() : '-'}
         </Tag>
       ),
     },
@@ -214,11 +241,13 @@ const SyncManagement = () => {
       title: '状态',
       dataIndex: 'status',
       key: 'status',
-      width: 90,
-      render: (status) => (
-        <Tag color={statusTagColor[status] || 'default'}>
-          {statusLabel[status] || status}
-        </Tag>
+      width: 100,
+      render: (status, record) => (
+        <Tooltip title={record.phase ? `阶段: ${record.phase}` : undefined}>
+          <Tag color={statusTagColor[status] || 'default'}>
+            {statusLabel[status] || status}
+          </Tag>
+        </Tooltip>
       ),
     },
     {
@@ -257,6 +286,25 @@ const SyncManagement = () => {
           '-'
         ),
     },
+    {
+      title: '操作',
+      key: 'action',
+      width: 90,
+      fixed: 'right',
+      render: (_, record) =>
+        resumableStatuses.has(record.status) ? (
+          <Tooltip title="恢复同步（幂等，可安全重试）">
+            <Button
+              type="link"
+              size="small"
+              icon={<RedoOutlined />}
+              onClick={() => handleResume(record.id)}
+            >
+              恢复
+            </Button>
+          </Tooltip>
+        ) : null,
+    },
   ];
 
   return (
@@ -284,8 +332,8 @@ const SyncManagement = () => {
               allowClear
               placeholder="全部券商"
               style={{ width: 140 }}
-              value={filters.brokerName}
-              onChange={(value) => setFilters((prev) => ({ ...prev, brokerName: value }))}
+              value={filters.brokerCode}
+              onChange={(value) => setFilters((prev) => ({ ...prev, brokerCode: value }))}
               options={[
                 { label: 'IBKR', value: 'ibkr' },
                 { label: 'Tiger', value: 'tiger' },
@@ -304,9 +352,11 @@ const SyncManagement = () => {
               onChange={(value) => setFilters((prev) => ({ ...prev, status: value }))}
               options={[
                 { label: '待处理', value: 'PENDING' },
-                { label: '导入中', value: 'IMPORTING' },
+                { label: '处理中', value: 'PROCESSING' },
                 { label: '已完成', value: 'COMPLETED' },
+                { label: '部分完成', value: 'PARTIAL' },
                 { label: '失败', value: 'FAILED' },
+                { label: '已中断', value: 'INTERRUPTED' },
               ]}
             />
           </Space>
@@ -323,7 +373,7 @@ const SyncManagement = () => {
           showSizeChanger: true,
           showTotal: (total) => `共 ${total} 条`,
         }}
-        scroll={{ x: 1400 }}
+        scroll={{ x: 1500 }}
         size="middle"
       />
 
@@ -342,7 +392,7 @@ const SyncManagement = () => {
       >
         <Form form={form} layout="vertical" style={{ marginTop: 16 }}>
           <Form.Item
-            name="brokerName"
+            name="brokerCode"
             label="券商"
             rules={[{ required: true, message: '请选择券商' }]}
           >

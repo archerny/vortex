@@ -1,5 +1,7 @@
 package com.localledger.sync.core;
 
+import com.localledger.entity.Broker;
+import com.localledger.repository.BrokerRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -7,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -15,27 +18,31 @@ import static org.mockito.Mockito.*;
  * Unit tests for {@link BrokerSyncService}.
  *
  * Covers:
- * - Adapter routing (dispatches to the correct adapter based on brokerName)
+ * - Adapter routing (dispatches to the correct adapter based on brokerCode)
  * - Unsupported broker handling (returns failure result)
- * - getSupportedBrokers() listing
+ * - getSupportedBrokerInfos() with and without matching broker records
+ * - isSupported() check
  * - Empty adapter list edge case
  */
 class BrokerSyncServiceTest {
 
     private BrokerSyncAdapter ibkrAdapter;
     private BrokerSyncAdapter tigerAdapter;
+    private BrokerRepository brokerRepository;
 
     @BeforeEach
     void setUp() {
         ibkrAdapter = mock(BrokerSyncAdapter.class);
-        when(ibkrAdapter.getBrokerName()).thenReturn("ibkr");
+        when(ibkrAdapter.getBrokerCode()).thenReturn("ibkr");
 
         tigerAdapter = mock(BrokerSyncAdapter.class);
-        when(tigerAdapter.getBrokerName()).thenReturn("tiger");
+        when(tigerAdapter.getBrokerCode()).thenReturn("tiger");
+
+        brokerRepository = mock(BrokerRepository.class);
     }
 
     private BrokerSyncService createService(BrokerSyncAdapter... adapters) {
-        return new BrokerSyncService(List.of(adapters));
+        return new BrokerSyncService(List.of(adapters), brokerRepository);
     }
 
     @Nested
@@ -43,7 +50,7 @@ class BrokerSyncServiceTest {
     class SyncRoutingTest {
 
         @Test
-        @DisplayName("should route to IBKR adapter when brokerName is 'ibkr'")
+        @DisplayName("should route to IBKR adapter when brokerCode is 'ibkr'")
         void shouldRouteToIbkrAdapter() {
             SyncResult expectedResult = SyncResult.success("ibkr", 100, 1000);
             SyncRequest request = new SyncRequest("ibkr");
@@ -59,7 +66,7 @@ class BrokerSyncServiceTest {
         }
 
         @Test
-        @DisplayName("should route to Tiger adapter when brokerName is 'tiger'")
+        @DisplayName("should route to Tiger adapter when brokerCode is 'tiger'")
         void shouldRouteToTigerAdapter() {
             SyncResult expectedResult = SyncResult.success("tiger", 50, 800);
             SyncRequest request = new SyncRequest("tiger");
@@ -83,7 +90,7 @@ class BrokerSyncServiceTest {
             SyncResult result = service.sync(request);
 
             assertFalse(result.isSuccess());
-            assertEquals("futu", result.getBrokerName());
+            assertEquals("futu", result.getBrokerCode());
             assertTrue(result.getMessage().contains("Unsupported broker"));
             assertTrue(result.getMessage().contains("futu"));
             verify(ibkrAdapter, never()).sync(any());
@@ -101,65 +108,97 @@ class BrokerSyncServiceTest {
             SyncResult result = service.sync(request);
 
             assertFalse(result.isSuccess());
-            assertEquals("ibkr", result.getBrokerName());
+            assertEquals("ibkr", result.getBrokerCode());
             assertTrue(result.getMessage().contains("API timeout"));
         }
     }
 
     @Nested
-    @DisplayName("getSupportedBrokers()")
-    class GetSupportedBrokersTest {
+    @DisplayName("getSupportedBrokerInfos()")
+    class GetSupportedBrokerInfosTest {
 
         @Test
-        @DisplayName("should return all registered broker names")
-        void shouldReturnAllBrokerNames() {
-            BrokerSyncService service = createService(ibkrAdapter, tigerAdapter);
-            List<String> brokers = service.getSupportedBrokers();
+        @DisplayName("should return info for adapters with matching broker records")
+        void shouldReturnInfoForMatchingBrokers() {
+            Broker ibkrBroker = new Broker("盈透证券", "US");
+            ibkrBroker.setId(1L);
+            ibkrBroker.setBrokerCode("ibkr");
+            when(brokerRepository.findByBrokerCode("ibkr")).thenReturn(Optional.of(ibkrBroker));
 
-            assertEquals(2, brokers.size());
-            assertTrue(brokers.contains("ibkr"));
-            assertTrue(brokers.contains("tiger"));
+            Broker tigerBroker = new Broker("老虎证券", "US");
+            tigerBroker.setId(2L);
+            tigerBroker.setBrokerCode("tiger");
+            when(brokerRepository.findByBrokerCode("tiger")).thenReturn(Optional.of(tigerBroker));
+
+            BrokerSyncService service = createService(ibkrAdapter, tigerAdapter);
+            List<BrokerSyncInfo> infos = service.getSupportedBrokerInfos();
+
+            assertEquals(2, infos.size());
+        }
+
+        @Test
+        @DisplayName("should skip adapters without matching broker records")
+        void shouldSkipAdaptersWithoutBrokerRecord() {
+            Broker ibkrBroker = new Broker("盈透证券", "US");
+            ibkrBroker.setId(1L);
+            ibkrBroker.setBrokerCode("ibkr");
+            when(brokerRepository.findByBrokerCode("ibkr")).thenReturn(Optional.of(ibkrBroker));
+            when(brokerRepository.findByBrokerCode("tiger")).thenReturn(Optional.empty());
+
+            BrokerSyncService service = createService(ibkrAdapter, tigerAdapter);
+            List<BrokerSyncInfo> infos = service.getSupportedBrokerInfos();
+
+            assertEquals(1, infos.size());
+            assertEquals("ibkr", infos.get(0).getBrokerCode());
         }
 
         @Test
         @DisplayName("should return empty list when no adapters registered")
         void shouldReturnEmptyListWhenNoAdapters() {
-            BrokerSyncService service = new BrokerSyncService(Collections.emptyList());
-            List<String> brokers = service.getSupportedBrokers();
+            BrokerSyncService service = new BrokerSyncService(Collections.emptyList(), brokerRepository);
+            List<BrokerSyncInfo> infos = service.getSupportedBrokerInfos();
 
-            assertNotNull(brokers);
-            assertTrue(brokers.isEmpty());
-        }
-
-        @Test
-        @DisplayName("returned list should be immutable")
-        void returnedListShouldBeImmutable() {
-            BrokerSyncService service = createService(ibkrAdapter);
-            List<String> brokers = service.getSupportedBrokers();
-
-            assertThrows(UnsupportedOperationException.class, () -> brokers.add("futu"));
+            assertNotNull(infos);
+            assertTrue(infos.isEmpty());
         }
     }
 
     @Nested
-    @DisplayName("Constructor - adapter registration")
-    class ConstructorTest {
+    @DisplayName("isSupported()")
+    class IsSupportedTest {
 
         @Test
-        @DisplayName("should register single adapter")
-        void shouldRegisterSingleAdapter() {
-            BrokerSyncService service = createService(ibkrAdapter);
-
-            assertEquals(1, service.getSupportedBrokers().size());
-            assertTrue(service.getSupportedBrokers().contains("ibkr"));
+        @DisplayName("should return true for registered broker")
+        void shouldReturnTrueForRegistered() {
+            BrokerSyncService service = createService(ibkrAdapter, tigerAdapter);
+            assertTrue(service.isSupported("ibkr"));
+            assertTrue(service.isSupported("tiger"));
         }
 
         @Test
-        @DisplayName("should register multiple adapters")
-        void shouldRegisterMultipleAdapters() {
-            BrokerSyncService service = createService(ibkrAdapter, tigerAdapter);
+        @DisplayName("should return false for unregistered broker")
+        void shouldReturnFalseForUnregistered() {
+            BrokerSyncService service = createService(ibkrAdapter);
+            assertFalse(service.isSupported("futu"));
+        }
+    }
 
-            assertEquals(2, service.getSupportedBrokers().size());
+    @Nested
+    @DisplayName("getAdapter()")
+    class GetAdapterTest {
+
+        @Test
+        @DisplayName("should return adapter for registered broker")
+        void shouldReturnAdapter() {
+            BrokerSyncService service = createService(ibkrAdapter);
+            assertNotNull(service.getAdapter("ibkr"));
+        }
+
+        @Test
+        @DisplayName("should return null for unregistered broker")
+        void shouldReturnNullForUnregistered() {
+            BrokerSyncService service = createService(ibkrAdapter);
+            assertNull(service.getAdapter("futu"));
         }
     }
 }

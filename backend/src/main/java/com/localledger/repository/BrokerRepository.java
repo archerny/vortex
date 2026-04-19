@@ -17,6 +17,11 @@ public interface BrokerRepository extends BaseRepository<Broker, Long> {
     Optional<Broker> findByBrokerName(String brokerName);
 
     /**
+     * 根据券商技术标识查询（用于同步适配器关联）
+     */
+    Optional<Broker> findByBrokerCode(String brokerCode);
+
+    /**
      * 根据是否启用状态查询
      */
     List<Broker> findByIsActive(Boolean isActive);

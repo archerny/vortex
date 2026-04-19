@@ -21,9 +21,9 @@ public interface BrokerSyncBatchRepository extends JpaRepository<BrokerSyncBatch
     List<BrokerSyncBatch> findAllByOrderByStartedAtDesc();
 
     /**
-     * Find batches by broker name, ordered by startedAt descending.
+     * Find batches by broker code, ordered by startedAt descending.
      */
-    List<BrokerSyncBatch> findByBrokerNameOrderByStartedAtDesc(String brokerName);
+    List<BrokerSyncBatch> findByBrokerCodeOrderByStartedAtDesc(String brokerCode);
 
     /**
      * Find batches by status, ordered by startedAt descending.
@@ -31,7 +31,12 @@ public interface BrokerSyncBatchRepository extends JpaRepository<BrokerSyncBatch
     List<BrokerSyncBatch> findByStatusOrderByStartedAtDesc(String status);
 
     /**
-     * Find batches by broker name and status, ordered by startedAt descending.
+     * Find batches by broker code and status, ordered by startedAt descending.
      */
-    List<BrokerSyncBatch> findByBrokerNameAndStatusOrderByStartedAtDesc(String brokerName, String status);
+    List<BrokerSyncBatch> findByBrokerCodeAndStatusOrderByStartedAtDesc(String brokerCode, String status);
+
+    /**
+     * Find batches by status (for recovery scanning).
+     */
+    List<BrokerSyncBatch> findByStatus(String status);
 }

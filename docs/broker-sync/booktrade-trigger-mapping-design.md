@@ -2,7 +2,7 @@
 
 > **创建日期**：2026-04-18  
 > **最后更新**：2026-04-18  
-> **状态**：方案已确认，待实现  
+> **状态**：✅ 已实现（IbkrImportService: BookTrade 判定 + code 解析 + triggerRefId 回填 + STK 侧语义匹配 + 歧义消解）  
 > **关联**：[data-persistence-design.md](./data-persistence-design.md) | [trade-trigger-design.md](../trade-trigger-design.md) | [trade-type-refactor-discussion.md](../trade-type-refactor-discussion.md) | [ibkr-flex-web-service-design.md](./ibkr-flex-web-service-design.md)  
 > **解决问题**：[data-persistence-design.md § O-2](./data-persistence-design.md#九开放问题与待后续讨论)（BookTrade 的 `tradeTrigger` 判定）
 

@@ -135,4 +135,52 @@ public interface TradeRecordRepository extends BaseRepository<TradeRecord, Long>
      * 用于自动填充市场事件中的 currency 和 name 等字段
      */
     Optional<TradeRecord> findFirstBySymbolAndIsDeletedFalseOrderByTradeDateDesc(String symbol);
+
+    // ============ 券商同步相关查询方法 ============
+
+    /**
+     * Check if a trade record exists with the given external broker and external ID.
+     * Used for deduplication during sync import.
+     */
+    boolean existsByExternalBrokerAndExternalId(String externalBroker, String externalId);
+
+    /**
+     * Find STK-side BookTrade records that need trigger_ref_id back-fill.
+     * These are records where:
+     * - sync_batch_id matches the current batch
+     * - trade_trigger = OPTION
+     * - trigger_ref_type is OPTION_ASSIGNED or OPTION_EXERCISE
+     * - trigger_ref_id = 0 (not yet back-filled)
+     * - asset_type = STOCK
+     * - not deleted
+     */
+    @Query("SELECT t FROM TradeRecord t WHERE t.syncBatchId = :batchId " +
+            "AND t.tradeTrigger = :trigger " +
+            "AND t.triggerRefType IN (:refTypes) " +
+            "AND t.triggerRefId = 0 " +
+            "AND t.assetType = :assetType " +
+            "AND t.isDeleted = false")
+    List<TradeRecord> findStkSideBookTradesNeedingBackfill(
+            @Param("batchId") Long batchId,
+            @Param("trigger") TradeTrigger trigger,
+            @Param("refTypes") List<TriggerRefType> refTypes,
+            @Param("assetType") AssetType assetType);
+
+    /**
+     * Find OPT-side BookTrade records for trigger_ref_id matching.
+     * Used to find the OPT-side counterpart of a STK-side BookTrade.
+     */
+    @Query("SELECT t FROM TradeRecord t WHERE t.tradeTrigger = :trigger " +
+            "AND t.triggerRefType = :refType " +
+            "AND t.triggerRefId = 0 " +
+            "AND t.assetType IN (:assetTypes) " +
+            "AND t.underlyingSymbol = :underlyingSymbol " +
+            "AND t.tradeDate = :tradeDate " +
+            "AND t.isDeleted = false")
+    List<TradeRecord> findOptSideBookTradesForMatching(
+            @Param("trigger") TradeTrigger trigger,
+            @Param("refType") TriggerRefType refType,
+            @Param("assetTypes") List<AssetType> assetTypes,
+            @Param("underlyingSymbol") String underlyingSymbol,
+            @Param("tradeDate") LocalDate tradeDate);
 }

@@ -1,10 +1,10 @@
 # Broker Code 关联与同步器注册发现 — 设计文档
 
 > **创建日期**：2026-04-17  
-> **最后更新**：2026-04-17  
-> **状态**：方案已确认，待实现  
+> **最后更新**：2026-04-18  
+> **状态**：✅ 已实现（全链路 brokerName→brokerCode 重命名 + BrokerSyncInfo DTO + brokers 表关联 + 前端动态发现）  
 > **关联**：[data-persistence-design.md](./data-persistence-design.md) | [import-consistency-design.md](./import-consistency-design.md) | [overall-design.md](./overall-design.md)  
-> **前置**：Phase 2 数据库变更已完成（V19-V23 + Entity + Repository），导入逻辑待实现
+> **前置**：Phase 2 数据库变更已完成（V19-V24 + Entity + Repository）
 
 ---
 
@@ -90,7 +90,7 @@ COMMENT ON COLUMN broker_sync_batches.broker_code IS 'Broker technical identifie
 
 | 脚本 | 内容 |
 |------|------|
-| `V24__add_broker_code_and_rename_batch_broker_name.sql` | `brokers` 新增 `broker_code` 列 + `broker_sync_batches.broker_name` → `broker_code` |
+| `V23__add_broker_code_and_rename_batch_broker_name.sql` | `brokers` 新增 `broker_code` 列 + `broker_sync_batches.broker_name` → `broker_code` |
 
 ---
 
