@@ -1,7 +1,22 @@
 # 实物分红 Tab 重构方案
 
 > 创建日期：2026-03-14
-> 状态：待实施
+> 状态：✅ 已实施（2026-03-14）；部分内容已于 2026-04-21 被后续重构推翻
+
+---
+
+## ⚠️ 重要说明（2026-04-21 更新）
+
+本文档中涉及「自动回填 / 用户填写 `dividendSymbolName`、`underlyingSymbolName`」的所有条款
+已被后续重构 **《删除交易记录与市场事件中的「证券名称」字段》** 推翻，具体变化：
+
+- `DividendInKindEvent` 已删除 `underlyingSymbolName` 与 `dividendSymbolName` 字段。
+- `autoFillFromExistingTradeRecord()` **仅保留 `currency` 自动填充**，不再处理任何名称字段。
+- 前端表单不再提供「分红证券名称」输入项；表格不再展示「底层证券名称」、「分红证券名称」两列。
+
+详见：[`drop-symbol-name-fields.md`](./drop-symbol-name-fields.md)
+
+本文档其余部分（分红比例整数化设计、编辑/删除功能移除、Modal 简化等）**仍然有效**。
 
 ---
 

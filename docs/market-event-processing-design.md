@@ -29,7 +29,6 @@
 
 `BaseMarketEvent` 公共字段：
 - `symbol` - 涉及的证券代码
-- `symbolName` - 证券名称
 - `currency` - 所属市场币种
 - `eventDate` - 事件生效日期
 - `description` - 事件描述/备注
