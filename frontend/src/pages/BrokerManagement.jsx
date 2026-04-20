@@ -19,6 +19,13 @@ const countryMap = {
   NZ: { label: '新西兰', color: 'cyan' },
 };
 
+// 券商技术标识符选项（用于关联同步适配器；留空表示纯手动录入的券商）
+// label 与 value 保持一致，展示为底层 code，便于与同步适配器 key 对应
+const brokerCodeOptions = [
+  { label: 'ibkr', value: 'ibkr' },
+  { label: 'tiger', value: 'tiger' },
+];
+
 const BrokerManagement = () => {
   const [brokerData, setBrokerData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -61,6 +68,18 @@ const BrokerManagement = () => {
       dataIndex: 'brokerName',
       key: 'brokerName',
       render: (text) => <span style={{ fontWeight: 'bold' }}>{text}</span>,
+    },
+    {
+      title: '券商代码',
+      dataIndex: 'brokerCode',
+      key: 'brokerCode',
+      width: 120,
+      render: (code) =>
+        code ? (
+          <Tag color="geekblue">{code}</Tag>
+        ) : (
+          <span style={{ color: '#999' }}>-</span>
+        ),
     },
     {
       title: '国家/地区',
@@ -127,6 +146,7 @@ const BrokerManagement = () => {
     setEditingBroker(record);
     form.setFieldsValue({
       brokerName: record.brokerName,
+      brokerCode: record.brokerCode,
       isActive: record.isActive,
       country: record.country,
       description: record.description,
@@ -262,6 +282,20 @@ const BrokerManagement = () => {
             <Select
               placeholder="请选择所属国家/地区"
               options={countryOptions}
+              showSearch
+              optionFilterProp="label"
+            />
+          </Form.Item>
+
+          <Form.Item
+            label="券商代码"
+            name="brokerCode"
+            tooltip="用于关联同步适配器（如 IBKR、Tiger）。若为手动录入的券商，留空即可。"
+          >
+            <Select
+              placeholder="请选择券商代码（选填，留空表示手动录入）"
+              options={brokerCodeOptions}
+              allowClear
               showSearch
               optionFilterProp="label"
             />
