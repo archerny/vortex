@@ -1,0 +1,186 @@
+package com.vortex.repository;
+
+import com.vortex.entity.TradeRecord;
+import com.vortex.entity.enums.AssetType;
+import com.vortex.entity.enums.Currency;
+import com.vortex.entity.enums.TradeTrigger;
+import com.vortex.entity.enums.TriggerRefType;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * 交易记录 Repository 接口
+ * 提供交易记录表的数据访问方法
+ */
+public interface TradeRecordRepository extends BaseRepository<TradeRecord, Long> {
+
+    /**
+     * 查询所有未删除的交易记录（按ID倒序）
+     */
+    List<TradeRecord> findByIsDeletedFalseOrderByIdDesc();
+
+    /**
+     * 查询所有未删除的交易记录（按交易日期倒序）
+     */
+    List<TradeRecord> findByIsDeletedFalseOrderByTradeDateDesc();
+
+    /**
+     * 根据券商ID查询未删除的交易记录
+     */
+    List<TradeRecord> findByBrokerIdAndIsDeletedFalseOrderByTradeDateDesc(Long brokerId);
+
+    /**
+     * 根据证券类型查询未删除的交易记录
+     */
+    List<TradeRecord> findByAssetTypeAndIsDeletedFalseOrderByTradeDateDesc(AssetType assetType);
+
+    /**
+     * 根据策略ID查询未删除的交易记录
+     */
+    List<TradeRecord> findByStrategyIdAndIsDeletedFalseOrderByTradeDateDesc(Long strategyId);
+
+    /**
+     * 根据底层证券代码查询未删除的交易记录（精确匹配）
+     */
+    List<TradeRecord> findByUnderlyingSymbolAndIsDeletedFalseOrderByTradeDateDesc(String underlyingSymbol);
+
+    /**
+     * 根据证券代码模糊查询未删除的交易记录
+     */
+    List<TradeRecord> findBySymbolContainingIgnoreCaseAndIsDeletedFalseOrderByTradeDateDesc(String symbol);
+
+    /**
+     * 根据日期范围查询未删除的交易记录
+     */
+    List<TradeRecord> findByTradeDateBetweenAndIsDeletedFalseOrderByTradeDateDesc(LocalDate startDate, LocalDate endDate);
+
+    // ============ 统计查询方法 ============
+
+    /**
+     * 统计未删除记录总数
+     */
+    long countByIsDeletedFalse();
+
+    /**
+     * 按证券类型统计未删除记录数
+     */
+    long countByAssetTypeAndIsDeletedFalse(AssetType assetType);
+
+    /**
+     * 按币种统计未删除记录的交易费用总和
+     */
+    @Query("SELECT COALESCE(SUM(t.fee), 0) FROM TradeRecord t WHERE t.currency = :currency AND t.isDeleted = false")
+    BigDecimal sumFeeByIsDeletedFalseAndCurrency(@Param("currency") Currency currency);
+
+    /**
+     * 统计未删除记录中不同底层证券代码的数量（去重计数）
+     */
+    @Query("SELECT COUNT(DISTINCT t.underlyingSymbol) FROM TradeRecord t WHERE t.isDeleted = false")
+    long countDistinctUnderlyingSymbol();
+
+    /**
+     * 查询 Top N 最常交易的底层证券（按交易次数降序）
+     * 返回结果为 Object[]，其中 [0] 是 underlyingSymbol，[1] 是交易次数
+     */
+    @Query("SELECT t.underlyingSymbol, COUNT(t) as cnt FROM TradeRecord t WHERE t.isDeleted = false AND t.underlyingSymbol IS NOT NULL GROUP BY t.underlyingSymbol ORDER BY cnt DESC")
+    List<Object[]> findTopTradedSymbols();
+
+    /**
+     * 查询截止某日期的所有未删除交易记录（按交易日期正序，方便按时间顺序计算持仓）
+     */
+    List<TradeRecord> findByTradeDateLessThanEqualAndIsDeletedFalseOrderByTradeDateAsc(LocalDate date);
+
+    /**
+     * 查询截止某日期、指定券商的所有未删除交易记录（按交易日期正序）
+     */
+    List<TradeRecord> findByTradeDateLessThanEqualAndBrokerIdAndIsDeletedFalseOrderByTradeDateAsc(LocalDate date, Long brokerId);
+
+    // ============ 触发来源相关查询方法 ============
+
+    /**
+     * 根据触发关联ID和关联类型查询未删除的交易记录
+     * 用于查找某个市场事件/期权生成的所有交易记录
+     */
+    List<TradeRecord> findByTriggerRefIdAndTriggerRefTypeAndIsDeletedFalse(Long triggerRefId, TriggerRefType triggerRefType);
+
+    /**
+     * 根据交易触发来源查询未删除的交易记录
+     */
+    List<TradeRecord> findByTradeTriggerAndIsDeletedFalseOrderByTradeDateDesc(TradeTrigger tradeTrigger);
+
+    /**
+     * 根据触发关联类型和关联ID列表查询未删除的交易记录
+     * 用于级联重算时，批量查找多个市场事件生成的所有系统交易记录
+     */
+    List<TradeRecord> findByTriggerRefTypeAndTriggerRefIdInAndIsDeletedFalse(TriggerRefType triggerRefType, java.util.Collection<Long> triggerRefIds);
+
+    /**
+     * 批量删除指定触发类型和触发ID列表关联的交易记录（物理删除）
+     * 用于级联重算时清理旧的系统交易记录
+     */
+    @org.springframework.data.jpa.repository.Modifying
+    @Query("DELETE FROM TradeRecord t WHERE t.triggerRefType = :refType AND t.triggerRefId IN :refIds")
+    void deleteByTriggerRefTypeAndTriggerRefIdIn(
+        @Param("refType") TriggerRefType refType,
+        @Param("refIds") java.util.Collection<Long> refIds
+    );
+
+    /**
+     * 根据证券代码查询最近一条未删除的交易记录
+     * 用于自动填充市场事件中的 currency 和 name 等字段
+     */
+    Optional<TradeRecord> findFirstBySymbolAndIsDeletedFalseOrderByTradeDateDesc(String symbol);
+
+    // ============ 券商同步相关查询方法 ============
+
+    /**
+     * Check if a trade record exists with the given external broker and external ID.
+     * Used for deduplication during sync import.
+     */
+    boolean existsByExternalBrokerAndExternalId(String externalBroker, String externalId);
+
+    /**
+     * Find STK-side BookTrade records that need trigger_ref_id back-fill.
+     * These are records where:
+     * - sync_batch_id matches the current batch
+     * - trade_trigger = OPTION
+     * - trigger_ref_type is OPTION_ASSIGNED or OPTION_EXERCISE
+     * - trigger_ref_id = 0 (not yet back-filled)
+     * - asset_type = STOCK
+     * - not deleted
+     */
+    @Query("SELECT t FROM TradeRecord t WHERE t.syncBatchId = :batchId " +
+            "AND t.tradeTrigger = :trigger " +
+            "AND t.triggerRefType IN (:refTypes) " +
+            "AND t.triggerRefId = 0 " +
+            "AND t.assetType = :assetType " +
+            "AND t.isDeleted = false")
+    List<TradeRecord> findStkSideBookTradesNeedingBackfill(
+            @Param("batchId") Long batchId,
+            @Param("trigger") TradeTrigger trigger,
+            @Param("refTypes") List<TriggerRefType> refTypes,
+            @Param("assetType") AssetType assetType);
+
+    /**
+     * Find OPT-side BookTrade records for trigger_ref_id matching.
+     * Used to find the OPT-side counterpart of a STK-side BookTrade.
+     */
+    @Query("SELECT t FROM TradeRecord t WHERE t.tradeTrigger = :trigger " +
+            "AND t.triggerRefType = :refType " +
+            "AND t.triggerRefId = 0 " +
+            "AND t.assetType IN (:assetTypes) " +
+            "AND t.underlyingSymbol = :underlyingSymbol " +
+            "AND t.tradeDate = :tradeDate " +
+            "AND t.isDeleted = false")
+    List<TradeRecord> findOptSideBookTradesForMatching(
+            @Param("trigger") TradeTrigger trigger,
+            @Param("refType") TriggerRefType refType,
+            @Param("assetTypes") List<AssetType> assetTypes,
+            @Param("underlyingSymbol") String underlyingSymbol,
+            @Param("tradeDate") LocalDate tradeDate);
+}

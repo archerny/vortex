@@ -88,7 +88,7 @@ BrokerTradeRecord (系统统一模型)    ← sync 模块的统一输出模型
 ## 3. 包结构
 
 ```
-com.localledger
+com.vortex
 ├── controller/
 │   └── BrokerSyncController.java          ← REST API 入口
 └── sync/

@@ -121,7 +121,7 @@ curl http://localhost:8080/api/db-test
 
 ```
 backend/
-├── src/main/java/com/localledger/
+├── src/main/java/com/vortex/
 │   ├── config/
 │   │   └── DatabaseConfig.java          # 数据库配置类
 │   ├── entity/

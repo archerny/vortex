@@ -1,8 +1,8 @@
 #!/bin/bash
 # ============================================================
-# Local Ledger 后端构建脚本
+# Vortex 后端构建脚本
 # 技术栈：Spring Boot 3.2.0 + Java 17 + Maven
-# 产物：backend-1.0.0.jar
+# 产物：vortex-backend-1.0.0.jar
 # ============================================================
 
 set -e
@@ -19,7 +19,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 BACKEND_DIR="$PROJECT_ROOT/backend"
 OUTPUT_DIR="$SCRIPT_DIR/output/backend"
-JAR_NAME="backend-1.0.0.jar"
+JAR_NAME="vortex-backend-1.0.0.jar"
 
 # ---------- 可选参数 ----------
 SKIP_TESTS=false
@@ -84,7 +84,7 @@ fi
 
 echo ""
 echo -e "${CYAN}========================================${NC}"
-echo -e "${CYAN}  Local Ledger 后端构建${NC}"
+echo -e "${CYAN}  Vortex 后端构建${NC}"
 echo -e "${CYAN}========================================${NC}"
 echo ""
 
@@ -153,15 +153,15 @@ cp "$JAR_PATH" "$OUTPUT_DIR/"
 # 生成启动脚本
 cat > "$OUTPUT_DIR/start.sh" << 'STARTUP_EOF'
 #!/bin/bash
-# Local Ledger 后端启动脚本
+# Vortex 后端启动脚本
 # 用法: ./start.sh [profile]
 #   profile: Spring Boot Profile 名称（默认: local）
 
 PROFILE="${1:-local}"
-JAR_NAME="backend-1.0.0.jar"
+JAR_NAME="vortex-backend-1.0.0.jar"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-echo "启动 Local Ledger 后端服务..."
+echo "启动 Vortex 后端服务..."
 echo "  Profile: $PROFILE"
 echo "  JAR:     $JAR_NAME"
 echo ""
@@ -175,7 +175,7 @@ log_step "Step 5/5 - 打包压缩"
 
 PACKAGE_DIR="$SCRIPT_DIR/output"
 TIMESTAMP=$(date +%Y%m%d%H%M%S)
-ARCHIVE_NAME="local-ledger-backend-${TIMESTAMP}"
+ARCHIVE_NAME="vortex-backend-${TIMESTAMP}"
 
 cd "$PACKAGE_DIR"
 

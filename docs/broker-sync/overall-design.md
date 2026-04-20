@@ -7,7 +7,7 @@
 
 ## 一、背景
 
-当前 Local Ledger 系统中的所有交易记录均由用户手动录入（`trade_trigger = MANUAL`）。随着交易频次增加，手动录入效率低下且容易出错。
+当前 Vortex 系统中的所有交易记录均由用户手动录入（`trade_trigger = MANUAL`）。随着交易频次增加，手动录入效率低下且容易出错。
 
 **目标**：实现从券商平台 API 自动同步个人交易记录到系统中，减少人工操作，提升数据准确性。
 
@@ -268,7 +268,7 @@
 
 **需要讨论**：
 - [ ] 是否所有券商都能从后端直连？
-- [ ] 盈透证券的 Client Portal API 需要运行一个独立的 Java 网关，如何与 Local Ledger 集成？
+- [ ] 盈透证券的 Client Portal API 需要运行一个独立的 Java 网关，如何与 Vortex 集成？
 
 ---
 
@@ -347,7 +347,7 @@
 **5. 包结构**
 
 ```
-com.localledger
+com.vortex
 ├── controller/          ← Web 层（现有）
 │   └── BrokerSyncController.java  ← 同步触发 API（统一放在 controller 包）
 ├── service/             ← Web 业务层（现有）

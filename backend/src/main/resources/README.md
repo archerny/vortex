@@ -46,7 +46,7 @@ mvn spring-boot:run -Dspring-boot.run.profiles=dev
 
 | Aspect             | local (production-like)         | dev (development/test)          |
 |--------------------|---------------------------------|---------------------------------|
-| Database           | `ledgerdb` (real data)          | `local_ledger_test` (test data) |
+| Database           | `ledgerdb` (real data)          | `vtxdev` (test data)            |
 | JPA ddl-auto       | `validate` (check only, never modify) | `validate` (same as local) |
 | Schema management  | Flyway auto-migration           | Flyway auto-migration           |
 | Broker credentials | Real API tokens                 | Empty (not needed)              |

@@ -358,5 +358,5 @@ SendRequest 后轮询 GetStatement：
 ## 7. 参考资料
 
 - IBKR Flex Web Service 官方文档：项目 `external-resource/ibkr-api/` 目录下的相关文件
-- Tiger 适配器实现：`backend/src/main/java/com/localledger/sync/adapter/tiger/TigerSyncAdapter.java`
-- 同步核心接口：`backend/src/main/java/com/localledger/sync/core/BrokerSyncAdapter.java`
+- Tiger 适配器实现：`backend/src/main/java/com/vortex/sync/adapter/tiger/TigerSyncAdapter.java`
+- 同步核心接口：`backend/src/main/java/com/vortex/sync/core/BrokerSyncAdapter.java`

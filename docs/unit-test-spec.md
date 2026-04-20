@@ -76,7 +76,7 @@ entityManager.persist(entity);
 ### 测试目录结构
 
 ```
-backend/src/test/java/com/localledger/
+backend/src/test/java/com/vortex/
 └── service/
     ├── TradeVerificationServiceTest.java
     ├── TradeRecordServiceTest.java

@@ -1,6 +1,6 @@
-# Local Ledger
+# Vortex
 
-A personal investment portfolio management system designed for individual investors who trade across multiple brokers and markets. Local Ledger provides a unified platform to manage trade records, cash flows, position snapshots, and market events — with the goal of accurate profit & loss analysis.
+A personal investment portfolio management system designed for individual investors who trade across multiple brokers and markets. Vortex provides a unified platform to manage trade records, cash flows, position snapshots, and market events — with the goal of accurate profit & loss analysis.
 
 ## Features
 
@@ -135,11 +135,11 @@ cd frontend && npm test
 ## Project Structure
 
 ```
-local-ledger/
+vortex/
 ├── backend/                            # Spring Boot backend
 │   ├── pom.xml                         # Maven config
 │   └── src/
-│       ├── main/java/com/localledger/
+│       ├── main/java/com/vortex/
 │       │   ├── Application.java        # Main entry point
 │       │   ├── config/                 # Configuration (Async, Database)
 │       │   ├── controller/             # REST controllers

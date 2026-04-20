@@ -1,4 +1,4 @@
-# Local Ledger Frontend
+# Vortex Frontend
 
 A frontend application for managing investment profit and loss.
 

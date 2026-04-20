@@ -1,7 +1,7 @@
 {
-  "name": "local-ledger-frontend",
+  "name": "vortex-frontend",
   "version": "1.0.0",
-  "description": "投资盈亏管理系统前端",
+  "description": "Vortex - 投资盈亏管理系统前端",
   "private": true,
   "scripts": {
     "dev": "vite",

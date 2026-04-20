@@ -1,4 +1,4 @@
-# Local Ledger Backend - 本地配置指南
+# Vortex Backend - 本地配置指南
 
 ## 📝 本地开发环境配置说明
 
@@ -46,7 +46,7 @@ mvn spring-boot:run -Dspring-boot.run.profiles=local
     "type": "java",
     "name": "Application",
     "request": "launch",
-    "mainClass": "com.localledger.Application",
+    "mainClass": "com.vortex.Application",
     "env": {
       "SPRING_PROFILES_ACTIVE": "local"
     }
@@ -55,7 +55,7 @@ mvn spring-boot:run -Dspring-boot.run.profiles=local
 
 **方式三：JAR 包启动**
 ```bash
-java -jar target/backend-1.0.0.jar --spring.profiles.active=local
+java -jar target/vortex-backend-1.0.0.jar --spring.profiles.active=local
 ```
 
 ---

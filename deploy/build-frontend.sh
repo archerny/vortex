@@ -1,6 +1,6 @@
 #!/bin/bash
 # ============================================================
-# Local Ledger 前端构建脚本
+# Vortex 前端构建脚本
 # 技术栈：React 18 + Vite 5 + Ant Design 5
 # 产物：dist/ 静态文件目录
 # ============================================================
@@ -83,7 +83,7 @@ fi
 
 echo ""
 echo -e "${CYAN}========================================${NC}"
-echo -e "${CYAN}  Local Ledger 前端构建${NC}"
+echo -e "${CYAN}  Vortex 前端构建${NC}"
 echo -e "${CYAN}========================================${NC}"
 echo ""
 
@@ -167,7 +167,7 @@ log_step "Step 5/5 - 打包压缩"
 
 PACKAGE_DIR="$SCRIPT_DIR/output"
 TIMESTAMP=$(date +%Y%m%d%H%M%S)
-ARCHIVE_NAME="local-ledger-frontend-${TIMESTAMP}"
+ARCHIVE_NAME="vortex-frontend-${TIMESTAMP}"
 
 cd "$PACKAGE_DIR"
 

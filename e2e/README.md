@@ -1,6 +1,6 @@
 # End-to-End Tests
 
-This directory contains global end-to-end test scripts for the Local Ledger project.
+This directory contains global end-to-end test scripts for the Vortex project.
 
 ## Scripts
 

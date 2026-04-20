@@ -1,4 +1,4 @@
-# Local Ledger Backend
+# Vortex Backend
 
 A simple backend service based on Spring Boot for managing investment profit and loss.
 
@@ -52,7 +52,7 @@ cd backend
 mvn clean package
 
 # Run the generated JAR file
-java -jar target/backend-1.0.0.jar
+java -jar target/vortex-backend-1.0.0.jar
 ```
 
 #### Option 3: Quick Start with Skipping Tests
@@ -70,7 +70,7 @@ Or skip tests during packaging:
 ```bash
 # Package with skipping tests
 mvn clean package -DskipTests
-java -jar target/backend-1.0.0.jar
+java -jar target/vortex-backend-1.0.0.jar
 ```
 
 ### Verifying the Service
@@ -137,7 +137,7 @@ backend/
 │   ├── main/
 │   │   ├── java/
 │   │   │   └── com/
-│   │   │       └── localledger/
+│   │   │       └── vortex/
 │   │   │           ├── Application.java          # Main application entry point
 │   │   │           └── controller/
 │   │   │               └── HelloController.java  # Sample controller
@@ -146,7 +146,7 @@ backend/
 │   └── test/
 │       └── java/
 │           └── com/
-│               └── localledger/
+│               └── vortex/
 │                   └── service/
 │                       ├── TradeVerificationServiceTest.java
 │                       ├── TradeRecordServiceTest.java
