@@ -106,11 +106,9 @@ public class DividendInKindEventService {
         java.time.LocalDate oldDate = existing.getEventDate();
 
         existing.setSymbol(eventData.getSymbol());
-        existing.setUnderlyingSymbolName(eventData.getUnderlyingSymbolName());
         existing.setCurrency(eventData.getCurrency());
         existing.setEventDate(eventData.getEventDate());
         existing.setDividendSymbol(eventData.getDividendSymbol());
-        existing.setDividendSymbolName(eventData.getDividendSymbolName());
         validateDividendCurrency(eventData);
         existing.setDividendCurrency(eventData.getDividendCurrency());
         existing.setRatioFrom(eventData.getRatioFrom());
@@ -166,8 +164,8 @@ public class DividendInKindEventService {
     }
 
     /**
-     * Auto-fill currency and underlyingSymbolName from existing trade records of the symbol.
-     * Note: dividendSymbolName is NOT auto-filled here because the dividend symbol may have never been traded.
+     * Auto-fill currency from existing trade records of the held symbol.
+     * If the symbol has no trade record, abort to prevent dirty data.
      */
     private void autoFillFromExistingTradeRecord(DividendInKindEvent event) {
         String querySymbol = event.getSymbol();
@@ -181,14 +179,9 @@ public class DividendInKindEventService {
                 event.setCurrency(record.getCurrency());
                 log.debug("Auto-filled currency: {} (from trade record of {})", record.getCurrency(), querySymbol);
             }
-            // Auto-fill underlying symbol name
-            if (event.getUnderlyingSymbolName() == null || event.getUnderlyingSymbolName().isBlank()) {
-                event.setUnderlyingSymbolName(record.getName());
-                log.debug("Auto-filled underlyingSymbolName: '{}' (from trade record of {})", record.getName(), querySymbol);
-            }
         } else {
             log.error("Failed to auto-fill dividend-in-kind event: no trade record found for symbol='{}', aborting to prevent dirty data", querySymbol);
-            throw new IllegalArgumentException("No trade record found for symbol '" + querySymbol + "', cannot auto-fill currency and symbol name. Please create a trade record for this symbol first.");
+            throw new IllegalArgumentException("No trade record found for symbol '" + querySymbol + "', cannot auto-fill currency. Please create a trade record for this symbol first.");
         }
     }
 }

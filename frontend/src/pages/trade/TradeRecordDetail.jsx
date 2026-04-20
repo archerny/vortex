@@ -217,7 +217,6 @@ const TradeRecordDetail = ({ recordId, onBack }) => {
       brokerId: record.brokerId,
       assetType: record.assetType,
       symbol: record.symbol,
-      name: record.name || '',
       underlyingSymbol: record.underlyingSymbol || '',
       tradeType: record.tradeType,
       quantity: record.quantity,
@@ -243,7 +242,6 @@ const TradeRecordDetail = ({ recordId, onBack }) => {
         brokerId: values.brokerId,
         assetType: values.assetType,
         symbol: values.symbol,
-        name: values.name || null,
         underlyingSymbol: values.underlyingSymbol,
         tradeType: values.tradeType,
         quantity: values.quantity,
@@ -383,7 +381,6 @@ const TradeRecordDetail = ({ recordId, onBack }) => {
           </Tag>
         </Descriptions.Item>
         <Descriptions.Item label="证券代码">{record.symbol}</Descriptions.Item>
-        <Descriptions.Item label="底层证券名称">{record.name || '-'}</Descriptions.Item>
         <Descriptions.Item label="底层证券代码">{record.underlyingSymbol}</Descriptions.Item>
         <Descriptions.Item label="交易类型">
           <Tag color={tradeTypeColorMap[record.tradeType] || 'default'}>
@@ -552,12 +549,7 @@ const TradeRecordDetail = ({ recordId, onBack }) => {
             </Col>
           </Row>
           <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item label="底层证券名称" name="name">
-                <Input placeholder="如 苹果公司、特斯拉" />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
+            <Col span={24}>
               <Form.Item label="底层证券代码" name="underlyingSymbol" rules={[{ required: true, message: '请输入底层证券代码' }]}>
                 <Input placeholder="如 TSLA、AAPL" />
               </Form.Item>

@@ -138,7 +138,6 @@ class IbkrImportWorkerTest {
             assertEquals(AssetType.STOCK, record.getAssetType());
             assertEquals("AAPL", record.getSymbol());
             assertEquals("AAPL", record.getUnderlyingSymbol());
-            assertEquals("APPLE INC", record.getName());
             assertEquals("ORD001", record.getExternalId());
             assertEquals("ibkr", record.getExternalBroker());
             assertEquals(1L, record.getSyncBatchId());

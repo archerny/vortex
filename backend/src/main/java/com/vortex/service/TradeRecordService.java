@@ -194,7 +194,6 @@ public class TradeRecordService {
         existing.setBrokerId(recordData.getBrokerId());
         existing.setAssetType(recordData.getAssetType());
         existing.setSymbol(recordData.getSymbol());
-        existing.setName(recordData.getName());
         existing.setUnderlyingSymbol(recordData.getUnderlyingSymbol());
         existing.setTradeType(recordData.getTradeType());
         existing.setQuantity(recordData.getQuantity());

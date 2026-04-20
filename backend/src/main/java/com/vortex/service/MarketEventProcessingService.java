@@ -267,7 +267,6 @@ public class MarketEventProcessingService {
             record.setBrokerId(position.getBrokerId());
             record.setAssetType(position.getAssetType());
             record.setSymbol(event.getSymbol());
-            record.setName(position.getName());
             record.setUnderlyingSymbol(position.getUnderlyingSymbol() != null ? position.getUnderlyingSymbol() : event.getSymbol());
             record.setTradeType(TradeType.BUY);
             record.setQuantity(delta);
@@ -330,7 +329,6 @@ public class MarketEventProcessingService {
             sellRecord.setBrokerId(position.getBrokerId());
             sellRecord.setAssetType(position.getAssetType());
             sellRecord.setSymbol(event.getOldSymbol());
-            sellRecord.setName(position.getName());
             sellRecord.setUnderlyingSymbol(event.getOldSymbol());
             sellRecord.setTradeType(TradeType.SELL);
             sellRecord.setQuantity(position.getQuantity());
@@ -350,7 +348,6 @@ public class MarketEventProcessingService {
             buyRecord.setBrokerId(position.getBrokerId());
             buyRecord.setAssetType(position.getAssetType());
             buyRecord.setSymbol(event.getNewSymbol());
-            buyRecord.setName(event.getNewUnderlyingSymbolName()); // 使用变更后的底层证券名称
             buyRecord.setUnderlyingSymbol(event.getNewSymbol());
             buyRecord.setTradeType(TradeType.BUY);
             buyRecord.setQuantity(position.getQuantity());
@@ -421,7 +418,6 @@ public class MarketEventProcessingService {
             record.setBrokerId(position.getBrokerId());
             record.setAssetType(AssetType.STOCK); // 分红获得的是股票
             record.setSymbol(event.getDividendSymbol());
-            record.setName(event.getDividendSymbolName());
             record.setUnderlyingSymbol(event.getDividendSymbol());
             record.setTradeType(TradeType.BUY);
             record.setQuantity(dividendQty);

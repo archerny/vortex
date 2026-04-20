@@ -75,11 +75,10 @@ public class StockSplitEventService {
      * 新增拆股事件，并自动生成系统交易记录
      * 自动填充以下字段：
      * - currency：从 symbol 的已有交易记录中获取
-     * - underlyingSymbolName：从 symbol 的已有交易记录中获取
      */
     @Transactional
     public StockSplitEvent create(StockSplitEvent event) {
-        // 从 symbol 的已有交易记录中自动填充 currency 和 underlyingSymbolName
+        // 从 symbol 的已有交易记录中自动填充 currency
         autoFillFromExistingTradeRecord(event);
 
         StockSplitEvent saved = stockSplitEventRepository.save(event);
@@ -107,7 +106,7 @@ public class StockSplitEventService {
         existing.setRatioTo(eventData.getRatioTo());
         existing.setDescription(eventData.getDescription());
 
-        // 重新自动填充 currency 和 underlyingSymbolName（symbol 可能已变更）
+        // 重新自动填充 currency（symbol 可能已变更）
         autoFillFromExistingTradeRecord(existing);
 
         StockSplitEvent saved = stockSplitEventRepository.save(existing);
@@ -145,9 +144,9 @@ public class StockSplitEventService {
     }
 
     /**
-     * 从 symbol 的已有交易记录中自动填充 currency 和 underlyingSymbolName
-     * 如果 symbol 有交易记录，则用其 currency 和 name 填充
-     * 如果没有交易记录，则保持前端传入的值（如果有的话）
+     * 从 symbol 的已有交易记录中自动填充 currency
+     * 如果 symbol 有交易记录，则用其 currency 填充
+     * 如果没有交易记录，则抛异常阻止脏数据写入
      */
     private void autoFillFromExistingTradeRecord(StockSplitEvent event) {
         String querySymbol = event.getSymbol();
@@ -161,14 +160,9 @@ public class StockSplitEventService {
                 event.setCurrency(record.getCurrency());
                 log.debug("Auto-filled currency: {} (from trade record of {})", record.getCurrency(), querySymbol);
             }
-            // 自动填充底层证券名称
-            if (event.getUnderlyingSymbolName() == null || event.getUnderlyingSymbolName().isBlank()) {
-                event.setUnderlyingSymbolName(record.getName());
-                log.debug("Auto-filled underlyingSymbolName: '{}' (from trade record of {})", record.getName(), querySymbol);
-            }
         } else {
             log.error("Failed to auto-fill stock split event: no trade record found for symbol='{}', aborting to prevent dirty data", querySymbol);
-            throw new IllegalArgumentException("No trade record found for symbol '" + querySymbol + "', cannot auto-fill currency and symbol name. Please create a trade record for this symbol first.");
+            throw new IllegalArgumentException("No trade record found for symbol '" + querySymbol + "', cannot auto-fill currency. Please create a trade record for this symbol first.");
         }
     }
 }

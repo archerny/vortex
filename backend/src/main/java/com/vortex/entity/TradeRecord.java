@@ -355,7 +355,6 @@ public class TradeRecord extends BaseEntity {
                 ", brokerId=" + brokerId +
                 ", assetType=" + assetType +
                 ", symbol='" + symbol + '\'' +
-                ", name='" + name + '\'' +
                 ", underlyingSymbol='" + underlyingSymbol + '\'' +
                 ", tradeType=" + tradeType +
                 ", quantity=" + quantity +

@@ -38,12 +38,11 @@ const getTradeColumns = (amountVisible, brokerMap, strategyMap, onViewDetail) =>
   },
   {
     title: '底层证券',
-    dataIndex: 'name',
-    key: 'name',
-    render: (name, record) => {
-      const code = record.underlyingSymbol || record.symbol;
-      const displayName = name ? `${code}(${name})` : code;
-      return <span title={displayName} style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>{displayName}</span>;
+    dataIndex: 'underlyingSymbol',
+    key: 'underlyingSymbol',
+    render: (underlyingSymbol, record) => {
+      const code = underlyingSymbol || record.symbol;
+      return <span title={code} style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>{code}</span>;
     },
     width: 140,
     ellipsis: true,

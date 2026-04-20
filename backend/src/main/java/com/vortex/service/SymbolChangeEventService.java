@@ -90,14 +90,13 @@ public class SymbolChangeEventService {
      * 自动填充以下字段：
      * - symbol = oldSymbol（事件发生前的证券代码）
      * - currency：从 oldSymbol 的已有交易记录中获取
-     * - underlyingSymbolName：从 oldSymbol 的已有交易记录中获取（旧的底层证券名称）
      */
     @Transactional
     public SymbolChangeEvent create(SymbolChangeEvent event) {
         // 自动填充：symbol = oldSymbol（事件是对旧代码发生的）
         event.setSymbol(event.getOldSymbol());
 
-        // 从 oldSymbol 的已有交易记录中自动填充 currency 和 underlyingSymbolName
+        // 从 oldSymbol 的已有交易记录中自动填充 currency
         autoFillFromExistingTradeRecord(event);
 
         SymbolChangeEvent saved = symbolChangeEventRepository.save(event);
@@ -124,10 +123,9 @@ public class SymbolChangeEventService {
         existing.setEventDate(eventData.getEventDate());
         existing.setOldSymbol(eventData.getOldSymbol());
         existing.setNewSymbol(eventData.getNewSymbol());
-        existing.setNewUnderlyingSymbolName(eventData.getNewUnderlyingSymbolName());
         existing.setDescription(eventData.getDescription());
 
-        // 重新自动填充 currency 和 underlyingSymbolName（旧代码可能已变更）
+        // 重新自动填充 currency（旧代码可能已变更）
         autoFillFromExistingTradeRecord(existing);
 
         SymbolChangeEvent saved = symbolChangeEventRepository.save(existing);
@@ -168,9 +166,9 @@ public class SymbolChangeEventService {
     }
 
     /**
-     * 从 oldSymbol 的已有交易记录中自动填充 currency 和 underlyingSymbolName
-     * 如果 oldSymbol 有交易记录，则用其 currency 和 name 填充
-     * 如果没有交易记录，则保持前端传入的值（如果有的话）
+     * 从 oldSymbol 的已有交易记录中自动填充 currency
+     * 如果 oldSymbol 有交易记录，则用其 currency 填充
+     * 如果没有交易记录，则抛异常阻止脏数据写入
      */
     private void autoFillFromExistingTradeRecord(SymbolChangeEvent event) {
         var tradeRecordOpt = tradeRecordRepository.findFirstBySymbolAndIsDeletedFalseOrderByTradeDateDesc(event.getOldSymbol());
@@ -182,14 +180,9 @@ public class SymbolChangeEventService {
                 event.setCurrency(record.getCurrency());
                 log.debug("Auto-filled currency: {} (from trade record of {})", record.getCurrency(), event.getOldSymbol());
             }
-            // 自动填充旧的底层证券名称
-            if (event.getUnderlyingSymbolName() == null || event.getUnderlyingSymbolName().isBlank()) {
-                event.setUnderlyingSymbolName(record.getName());
-                log.debug("Auto-filled old underlyingSymbolName: {} (from trade record of {})", record.getName(), event.getOldSymbol());
-            }
         } else {
             log.error("Failed to auto-fill symbol change event: no trade record found for oldSymbol='{}', aborting to prevent dirty data", event.getOldSymbol());
-            throw new IllegalArgumentException("No trade record found for symbol '" + event.getOldSymbol() + "', cannot auto-fill currency and symbol name. Please create a trade record for this symbol first.");
+            throw new IllegalArgumentException("No trade record found for symbol '" + event.getOldSymbol() + "', cannot auto-fill currency. Please create a trade record for this symbol first.");
         }
     }
 }

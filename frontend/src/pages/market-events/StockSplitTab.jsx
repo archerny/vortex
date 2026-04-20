@@ -62,13 +62,6 @@ const StockSplitTab = () => {
       render: (text) => <Text code>{text}</Text>,
     },
     {
-      title: '底层证券名称',
-      dataIndex: 'underlyingSymbolName',
-      key: 'underlyingSymbolName',
-      width: 140,
-      render: (text) => text || <Text type="secondary">-</Text>,
-    },
-    {
       title: '拆股比例',
       key: 'ratio',
       width: 120,

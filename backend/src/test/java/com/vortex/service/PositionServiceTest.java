@@ -46,7 +46,6 @@ class PositionServiceTest {
         TradeRecord record = new TradeRecord();
         record.setId(id);
         record.setSymbol(symbol);
-        record.setName("测试证券");
         record.setUnderlyingSymbol(symbol);
         record.setAssetType(AssetType.STOCK);
         record.setCurrency(Currency.USD);

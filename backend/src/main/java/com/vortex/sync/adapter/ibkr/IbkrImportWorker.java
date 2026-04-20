@@ -178,7 +178,6 @@ public class IbkrImportWorker {
         record.setAssetType(mapAssetType(staged.getAssetCategory(), staged.getPutCall()));
         record.setSymbol(buildSymbol(staged));
         record.setUnderlyingSymbol(extractUnderlyingSymbol(staged));
-        record.setName(staged.getDescription());
         record.setStrategyId(null);
 
         // A.2 BookTrade trigger determination

@@ -51,7 +51,6 @@ public class StockSplitEvent extends BaseMarketEvent {
         return "StockSplitEvent{" +
                 "id=" + getId() +
                 ", symbol='" + getSymbol() + '\'' +
-                ", underlyingSymbolName='" + getUnderlyingSymbolName() + '\'' +
                 ", currency=" + getCurrency() +
                 ", eventDate=" + getEventDate() +
                 ", ratioFrom=" + ratioFrom +

@@ -62,13 +62,6 @@ const DividendInKindTab = () => {
       render: (text) => <Text code>{text}</Text>,
     },
     {
-      title: '底层证券名称',
-      dataIndex: 'underlyingSymbolName',
-      key: 'underlyingSymbolName',
-      width: 140,
-      render: (text) => text || <Text type="secondary">-</Text>,
-    },
-    {
       title: '币种',
       dataIndex: 'currency',
       key: 'currency',
@@ -83,13 +76,6 @@ const DividendInKindTab = () => {
       key: 'dividendSymbol',
       width: 120,
       render: (text) => <Text code style={{ color: '#722ed1' }}>{text}</Text>,
-    },
-    {
-      title: '分红证券名称',
-      dataIndex: 'dividendSymbolName',
-      key: 'dividendSymbolName',
-      width: 140,
-      render: (text) => text || <Text type="secondary">-</Text>,
     },
     {
       title: '分红币种',
@@ -215,17 +201,12 @@ const DividendInKindTab = () => {
             </Col>
           </Row>
           <Row gutter={16}>
-            <Col span={8}>
+            <Col span={12}>
               <Form.Item label="分红证券代码" name="dividendSymbol" rules={[{ required: true, message: '请输入分红证券代码' }]}>
                 <Input placeholder="获得的分红证券代码" />
               </Form.Item>
             </Col>
-            <Col span={8}>
-              <Form.Item label="分红证券名称" name="dividendSymbolName" rules={[{ required: true, message: '请输入分红证券名称' }]}>
-                <Input placeholder="分红证券底层名称" />
-              </Form.Item>
-            </Col>
-            <Col span={8}>
+            <Col span={12}>
               <Form.Item label="分红证券币种" name="dividendCurrency" rules={[{ required: true, message: '请选择分红证券币种' }]}>
                 <Select placeholder="请选择币种" options={currencyOptions} />
               </Form.Item>

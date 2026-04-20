@@ -90,13 +90,6 @@ const PositionSnapshotTab = () => {
       render: (symbol) => <Text code>{symbol}</Text>,
     },
     {
-      title: '底层证券名称',
-      dataIndex: 'name',
-      key: 'name',
-      width: 150,
-      render: (name) => name || <Text type="secondary">-</Text>,
-    },
-    {
       title: '底层证券',
       dataIndex: 'underlyingSymbol',
       key: 'underlyingSymbol',

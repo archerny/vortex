@@ -62,25 +62,11 @@ const SymbolChangeTab = () => {
       render: (text) => <Text code style={{ color: '#ff4d4f' }}>{text}</Text>,
     },
     {
-      title: '旧证券名称',
-      dataIndex: 'underlyingSymbolName',
-      key: 'underlyingSymbolName',
-      width: 140,
-      render: (text) => text || <Text type="secondary">-</Text>,
-    },
-    {
       title: '新代码',
       dataIndex: 'newSymbol',
       key: 'newSymbol',
       width: 120,
       render: (text) => <Text code style={{ color: '#52c41a' }}>{text}</Text>,
-    },
-    {
-      title: '新证券名称',
-      dataIndex: 'newUnderlyingSymbolName',
-      key: 'newUnderlyingSymbolName',
-      width: 140,
-      render: (text) => text || <Text type="secondary">-</Text>,
     },
     {
       title: '币种',
@@ -195,13 +181,6 @@ const SymbolChangeTab = () => {
             <Col span={12}>
               <Form.Item label="新代码" name="newSymbol" rules={[{ required: true, message: '请输入新代码' }]}>
                 <Input placeholder="变更后的证券代码，如 META" />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item label="新底层证券名称" name="newUnderlyingSymbolName" rules={[{ required: true, message: '请输入新底层证券名称' }]}>
-                <Input placeholder="变更后的证券名称，如 Meta Platforms" />
               </Form.Item>
             </Col>
           </Row>

@@ -46,14 +46,6 @@ public class PositionSnapshot {
         this.symbol = symbol;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getUnderlyingSymbol() {
         return underlyingSymbol;
     }

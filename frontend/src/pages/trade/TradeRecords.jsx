@@ -160,7 +160,6 @@ const TradeRecords = () => {
         brokerId: values.brokerId,
         assetType: values.assetType,
         symbol: values.symbol,
-        name: values.name,
         underlyingSymbol: values.underlyingSymbol,
         tradeType: values.tradeType,
         quantity: values.quantity,
@@ -347,23 +346,15 @@ const TradeRecords = () => {
             </Col>
             <Col span={12}>
               <Form.Item
-                label="底层证券名称"
-                name="name"
-                rules={[{ required: true, message: '请输入底层证券名称' }]}
+                label="底层证券代码"
+                name="underlyingSymbol"
+                rules={[{ required: true, message: '请输入底层证券代码' }]}
+                extra="用于关联分析期权与正股收益，例如：TSLA、AAPL"
               >
-                <Input placeholder="例如：苹果公司、特斯拉" />
+                <Input placeholder="例如：TSLA、AAPL" />
               </Form.Item>
             </Col>
           </Row>
-
-          <Form.Item
-            label="底层证券代码"
-            name="underlyingSymbol"
-            rules={[{ required: true, message: '请输入底层证券代码' }]}
-            extra="用于关联分析期权与正股收益，例如：TSLA、AAPL"
-          >
-            <Input placeholder="例如：TSLA、AAPL" />
-          </Form.Item>
 
           <Row gutter={16}>
             <Col span={8}>

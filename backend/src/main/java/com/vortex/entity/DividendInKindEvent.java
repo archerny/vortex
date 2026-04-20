@@ -23,12 +23,6 @@ public class DividendInKindEvent extends BaseMarketEvent {
     private String dividendSymbol;
 
     /**
-     * Dividend symbol name (underlying name)
-     */
-    @Column(name = "dividend_symbol_name", length = 200)
-    private String dividendSymbolName;
-
-    /**
      * Currency of the dividend symbol (may differ from the held symbol currency)
      */
     @Enumerated(EnumType.STRING)
@@ -69,14 +63,6 @@ public class DividendInKindEvent extends BaseMarketEvent {
         this.dividendSymbol = dividendSymbol != null ? dividendSymbol.trim() : null;
     }
 
-    public String getDividendSymbolName() {
-        return dividendSymbolName;
-    }
-
-    public void setDividendSymbolName(String dividendSymbolName) {
-        this.dividendSymbolName = dividendSymbolName;
-    }
-
     public Currency getDividendCurrency() {
         return dividendCurrency;
     }
@@ -114,11 +100,9 @@ public class DividendInKindEvent extends BaseMarketEvent {
         return "DividendInKindEvent{" +
                 "id=" + getId() +
                 ", symbol='" + getSymbol() + '\'' +
-                ", underlyingSymbolName='" + getUnderlyingSymbolName() + '\'' +
                 ", currency=" + getCurrency() +
                 ", eventDate=" + getEventDate() +
                 ", dividendSymbol='" + dividendSymbol + '\'' +
-                ", dividendSymbolName='" + dividendSymbolName + '\'' +
                 ", dividendCurrency=" + dividendCurrency +
                 ", ratioFrom=" + ratioFrom +
                 ", ratioTo=" + ratioTo +

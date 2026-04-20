@@ -62,7 +62,6 @@ public class PositionService {
             PositionSnapshot position = positionMap.computeIfAbsent(key, k -> {
                 PositionSnapshot snapshot = new PositionSnapshot();
                 snapshot.setSymbol(record.getSymbol());
-                snapshot.setName(record.getName());
                 snapshot.setUnderlyingSymbol(record.getUnderlyingSymbol());
                 snapshot.setAssetType(record.getAssetType());
                 snapshot.setCurrency(record.getCurrency());
@@ -75,11 +74,6 @@ public class PositionService {
             // 根据交易类型计算持仓数量变动
             int delta = calculateQuantityDelta(record);
             position.setQuantity(position.getQuantity() + delta);
-
-            // 更新名称（取最新的名称）
-            if (record.getName() != null && !record.getName().isEmpty()) {
-                position.setName(record.getName());
-            }
         }
 
         // 4. 过滤掉持仓为0的记录，返回结果
