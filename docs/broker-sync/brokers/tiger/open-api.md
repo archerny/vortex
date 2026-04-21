@@ -1,8 +1,8 @@
 # 老虎证券同步方案（设计与实现记录）
 
-> **状态**: Phase 1 已实现（API 调通 → 日志输出）  
-> **日期**: 2026-03-14（方案讨论） → 2026-03-31（实现完成）  
-> **关联**: [../../architecture.md](../../architecture.md) | [../../README.md](../../README.md)
+> **状态**: Phase 1 已实现（API 调通 → 日志输出）；Phase 3 两阶段导入设计稿已定（见 [phase3-plan.md](./phase3-plan.md)）
+> **日期**: 2026-03-14（方案讨论） → 2026-03-31（Phase 1 实现完成） → 2026-04-21（Phase 3 设计稿定稿）
+> **关联**: [../../architecture.md](../../architecture.md) | [../../README.md](../../README.md) | [staging-schema.md](./staging-schema.md) | [phase3-plan.md](./phase3-plan.md)
 
 ---
 
@@ -338,16 +338,33 @@ broker.tiger.account=your_account_here
 
 ## 8. 后续待办
 
-- [ ] 统一模型转换：实现 `TigerOrderRecord` → `BrokerTradeRecord` 映射
-- [ ] 入库逻辑：数据核对无误后接入入库
-- [ ] 去重机制：基于 `orderId` 进行幂等性控制
-- [ ] 单元测试：当前尚无 Tiger 同步相关测试用例
-- [ ] 错误重试：API 调用失败时的重试策略
-- [ ] `application-local.properties` 中补充 Tiger 凭证配置
+- [x] `application-local.properties` 中补充 Tiger 凭证配置（Phase 1 已完成）
+- [ ] **Phase 3（设计稿已定，待编码）**：
+  - 暂存表 + 两阶段导入 `trade_records`
+  - 基于 Tiger `id`（全局唯一订单 ID）的去重
+  - `TigerTradeRecordMapper` 单元测试
+  - 详细阶段与任务拆分见 [phase3-plan.md](./phase3-plan.md)
+- [ ] **Phase 3.x（延后，等真实样本）**：
+  - `attrDesc` 枚举值收集 + 期权事件映射补齐
+  - STK 侧 `trigger_ref_id` 回填（Put 被行权获得股票等场景）
+- [ ] 错误重试：API 调用失败时的重试策略（后续再议）
 
 ---
 
-## 9. 参考资料
+## 9. Phase 3 设计要点（摘要）
+
+> 完整数据契约见 [staging-schema.md](./staging-schema.md)；编码计划见 [phase3-plan.md](./phase3-plan.md)。
+
+- **目标**：对齐 IBKR，实现 `API → tiger_staged_orders → trade_records` 两阶段导入
+- **去重键**：Tiger `TradeOrder.getId()`（全局唯一 `long`），写入 `tiger_staged_orders.tiger_id` 与 `trade_records.external_id`
+- **暂存粒度**：Order（Tiger 无 TradeConfirm 粒度数据，不设附表）
+- **本期支持**：STK + OPT 正常交易
+- **本期不支持**（暂存 `FAILED`，数据不丢失）：碎股、期权事件、WAR/IOPT/FUT/FUND/CASH/CC
+- **Flyway 起点**：V26（当前最新为 V25）
+
+---
+
+## 10. 参考资料
 
 - Tiger Open API 文档：`external-resource/` 目录下相关文件
 - Tiger 开发者平台：https://developer.itigerup.com/profile

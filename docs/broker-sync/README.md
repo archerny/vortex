@@ -16,6 +16,8 @@
 | **券商层（各券商专属）** | | |
 | [brokers/tiger/README.md](./brokers/tiger/README.md) | 老虎证券同步状态页 | ✅ |
 | [brokers/tiger/open-api.md](./brokers/tiger/open-api.md) | 老虎证券同步方案（设计与实现记录） | ✅ Phase 1 已实现 |
+| [brokers/tiger/staging-schema.md](./brokers/tiger/staging-schema.md) | Tiger 暂存表结构与字段映射规范 | 📋 Phase 3 设计稿 |
+| [brokers/tiger/phase3-plan.md](./brokers/tiger/phase3-plan.md) | Tiger Phase 3 编码与工作计划 | 📋 待实施 |
 | [brokers/ibkr/README.md](./brokers/ibkr/README.md) | IBKR 同步状态页 | ✅ |
 | [brokers/ibkr/flex-web-service.md](./brokers/ibkr/flex-web-service.md) | IBKR Flex Web Service 同步方案 | ✅ Phase 2 已实现 |
 | [brokers/ibkr/staging-schema.md](./brokers/ibkr/staging-schema.md) | IBKR 暂存表结构与字段映射规范 | ✅ 已实现 |
@@ -60,7 +62,7 @@
 |------|------|---------|------|
 | **Phase 1** | 老虎证券 + 手动触发 + 日志输出 | 跑通基本流程、核对原始数据 | ✅ 已完成 |
 | **Phase 2** | IBKR 适配 + 多券商适配 + 去重机制 + 同步日志 + 入库 | 生产可用（IBKR 方案详见 [brokers/ibkr/flex-web-service.md](./brokers/ibkr/flex-web-service.md)） | ✅ IBKR 同步全链路已实现（API→暂存→导入→Resume），待真实环境验证 |
-| **Phase 3** | 自动同步 + 冲突处理 + 前端交互 | 完整体验 | 📋 待规划 |
+| **Phase 3** | Tiger 两阶段导入 + 自动同步 + 冲突处理 + 前端交互 | Tiger 对齐 IBKR 全链路；完整体验 | 🔧 Tiger 两阶段导入设计稿已定（见 [brokers/tiger/phase3-plan.md](./brokers/tiger/phase3-plan.md)），其余仍在规划 |
 
 ## 涉及的券商
 
