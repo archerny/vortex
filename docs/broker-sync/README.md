@@ -8,31 +8,43 @@
 
 | 文档 | 说明 | 状态 |
 |------|------|------|
-| [overall-design.md](./overall-design.md) | 总体方案设计（核心问题讨论与决策记录） | ✅ 核心方案已决策并实现 |
+| [architecture.md](./architecture.md) | 架构概览（包结构 + 数据流 + 异步执行模型） | ✅ 当前架构 |
 | **框架层（所有券商通用）** | | |
-| [framework/data-persistence.md](./framework/data-persistence.md) | 数据持久化设计（Order 暂存表 + 批次表 + 明细附表 + trade_records 扩展） | ✅ 数据库变更已完成（Flyway V19-V24 + Entity + Repository） |
+| [framework/data-persistence.md](./framework/data-persistence.md) | 数据持久化设计（批次表 + trade_records 扩展 + 两阶段导入原则） | ✅ 已实现（Flyway V19-V24 + Entity + Repository） |
 | [framework/import-consistency.md](./framework/import-consistency.md) | 数据一致性与中断恢复设计（事务策略 + 状态机 + 失败分类 + Resume 机制） | ✅ 已实现 |
-| [framework/broker-registration.md](./framework/broker-registration.md) | Broker Code 关联与同步器注册发现（brokerName→brokerCode 重命名 + brokers 表关联 + 前端发现机制） | ✅ 已实现 |
+| [framework/broker-registration.md](./framework/broker-registration.md) | Broker Code 关联与同步器注册发现 | ✅ 已实现 |
 | **券商层（各券商专属）** | | |
+| [brokers/tiger/README.md](./brokers/tiger/README.md) | 老虎证券同步状态页 | ✅ |
 | [brokers/tiger/open-api.md](./brokers/tiger/open-api.md) | 老虎证券同步方案（设计与实现记录） | ✅ Phase 1 已实现 |
-| [brokers/ibkr/flex-web-service.md](./brokers/ibkr/flex-web-service.md) | IBKR Flex Web Service 同步方案（讨论记录） | ✅ Phase 2 已实现（API + 解析 + 异步执行 + 前端管理） |
-| [brokers/ibkr/booktrade-mapping.md](./brokers/ibkr/booktrade-mapping.md) | BookTrade 触发判定与期权事件导入映射（code 解析 + triggerRefId 回填 + 语义匹配） | ✅ 已实现 |
+| [brokers/ibkr/README.md](./brokers/ibkr/README.md) | IBKR 同步状态页 | ✅ |
+| [brokers/ibkr/flex-web-service.md](./brokers/ibkr/flex-web-service.md) | IBKR Flex Web Service 同步方案 | ✅ Phase 2 已实现 |
+| [brokers/ibkr/staging-schema.md](./brokers/ibkr/staging-schema.md) | IBKR 暂存表结构与字段映射规范 | ✅ 已实现 |
+| [brokers/ibkr/booktrade-mapping.md](./brokers/ibkr/booktrade-mapping.md) | BookTrade 触发判定与期权事件导入映射 | ✅ 已实现 |
+
+---
+
+## 架构速览
+
+详细架构参见 [architecture.md](./architecture.md)。核心要点：
+
+- **适配器模式**：`BrokerSyncAdapter` 接口屏蔽各券商差异，新增券商只需实现接口并加 `@Component`
+- **两阶段导入**：暂存表（按券商独立）→ 正式表，避免污染数据
+- **异步执行**：`@Async` + 独立线程池，Controller 提交后立即返回
+- **每券商专属原始模型**：`IbkrOrderRecord` / `TigerOrderRecord`，日志打印和暂存表字段 1:1 对应
 
 ---
 
 ## 开放问题快速索引
 
-> **最后整理**：2026-04-18
+> **最后整理**：2026-04-21
 
-所有待讨论问题已汇总到 [framework/data-persistence.md § 九、开放问题与待后续讨论](./framework/data-persistence.md#九开放问题与待后续讨论)，按三级优先级分类：
+所有待讨论问题汇总在 [framework/data-persistence.md § 九、开放问题与待后续讨论](./framework/data-persistence.md#九开放问题与待后续讨论)，按优先级分类：
 
 | 级别 | 数量 | 含义 |
 |------|------|------|
-| 🔥 编码前必须解决 | 4 个（O-1, O-3 ~ O-5） | 不解决会卡住导入逻辑实现 |
-| 📦 可后续再说 | 7 个（D-1 ~ D-7） | 不阻塞当前编码 |
-| ✅ 已解决 | 5 个（R-1 ~ R-5） | 归档留痕 |
-
-> 其他文档中的零散待讨论项（如 `overall-design.md` 的 40+ 个早期问题、`brokers/tiger/open-api.md` 和 `brokers/ibkr/flex-web-service.md` 中的增强项）已在 D-3 ~ D-7 中归纳引用，不重复列举。
+| 🔥 编码前必须解决 | 0 个 | （暂无，阻塞性问题均已解决） |
+| 📦 可后续再说 | 6 个（D-1 ~ D-6） | 不阻塞当前编码 |
+| ✅ 已解决 | 9 个（R-1 ~ R-9） | 归档留痕 |
 
 ---
 

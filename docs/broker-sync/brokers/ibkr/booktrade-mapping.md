@@ -4,7 +4,7 @@
 > **最后更新**：2026-04-18  
 > **状态**：✅ 已实现（IbkrImportService: BookTrade 判定 + code 解析 + triggerRefId 回填 + STK 侧语义匹配 + 歧义消解）  
 > **关联**：[data-persistence.md](../../framework/data-persistence.md) | [trade-trigger-design.md](../../../trade-trigger-design.md) | [trade-type-refactor-discussion.md](../../../trade-type-refactor-discussion.md) | [flex-web-service.md](./flex-web-service.md)  
-> **解决问题**：[data-persistence.md § O-2](../../framework/data-persistence.md#九开放问题与待后续讨论)（BookTrade 的 `tradeTrigger` 判定）
+> **解决问题**：[data-persistence.md § R-5](../../framework/data-persistence.md#九开放问题与待后续讨论)（BookTrade 的 `tradeTrigger` 判定）
 
 ---
 

@@ -2,7 +2,7 @@
 
 > **状态**: ✅ Phase 1 已实现（API 调通 → 日志输出），待真实环境验证  
 > **日期**: 2026-04-14  
-> **关联**: [overall-design.md](../../overall-design.md)  
+> **关联**: [../../architecture.md](../../architecture.md) | [staging-schema.md](./staging-schema.md) | [booktrade-mapping.md](./booktrade-mapping.md)  
 > **总体规划对应**: 本文档的 Phase 1 对应总体规划（README.md）中的 **Phase 2**（多券商适配阶段）
 
 ---
@@ -44,7 +44,7 @@ Step 2: GET /GetStatement?t={token}&q={referenceCode}&v=3
 
 **Base URL**: `https://ndcdyn.interactivebrokers.com/AccountManagement/FlexWebService`
 
-> **异步执行**：上述两步 HTTP 请求耗时可能数十秒（含轮询等待），因此同步任务在后台异步线程中执行。前端提交同步请求后 Controller 立即返回 batch 信息（status=PENDING），实际的 Flex Query 调用由 `BrokerSyncAsyncExecutor` 在独立线程池中完成。详见 [overall-design.md 问题 7 决策 6](./overall-design.md)。
+> **异步执行**：上述两步 HTTP 请求耗时可能数十秒（含轮询等待），因此同步任务在后台异步线程中执行。前端提交同步请求后 Controller 立即返回 batch 信息（status=PENDING），实际的 Flex Query 调用由 `BrokerSyncAsyncExecutor` 在独立线程池中完成。详见 [architecture.md § 四 异步执行模型](../../architecture.md#四异步执行模型)。
 
 ### 阶段三：解析报告数据
 

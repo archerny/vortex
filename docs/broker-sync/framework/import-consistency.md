@@ -3,7 +3,7 @@
 > **创建日期**：2026-04-16  
 > **最后更新**：2026-04-18  
 > **状态**：✅ 已实现（逐条独立事务 + 幂等去重 + 两级状态模型 + SyncBatchRecoveryRunner + Resume 端点 + 前端恢复按钮）  
-> **关联**：[data-persistence.md](./data-persistence.md) | [overall-design.md](../overall-design.md) | [broker-registration.md](./broker-registration.md)  
+> **关联**：[architecture.md](../architecture.md) | [data-persistence.md](./data-persistence.md) | [broker-registration.md](./broker-registration.md)  
 > **前置**：Phase 2 数据库变更已完成（V19-V24 + Entity + Repository）
 
 ---
