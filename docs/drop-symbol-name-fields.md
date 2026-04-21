@@ -1,7 +1,7 @@
 # 删除交易记录与市场事件中的「证券名称」字段
 
 > 创建日期：2026-04-21
-> 状态：✅ 已实施
+> 状态：✅ 已实施（含 2026-04-21 补丁修复）
 
 ---
 
@@ -126,9 +126,32 @@ ALTER TABLE events_dividend_in_kind    DROP COLUMN IF EXISTS dividend_symbol_nam
 
 ## 七、验证
 
-- 后端：`mvn test` — ✅ BUILD SUCCESS（所有测试通过）。
+- 后端：`mvn test` — ✅ BUILD SUCCESS（所有测试通过，150/150）。
 - 前端：`npm run build` — ✅ 构建成功、无 lint 错误。
 - 搜索验证：全项目 `SymbolName` / `setName\(/getName\(` 均为 0 残留（mock Dashboard 数据与 antd Form `name="xxx"` 属性不在范围内）。
+
+---
+
+## 七点五、2026-04-21 补丁修复
+
+初次提交（commit `453525f`）的 review 存在方法论缺陷，漏删了两处关键内容：
+
+| 文件 | 遗漏 |
+|------|------|
+| `backend/.../entity/TradeRecord.java` | `private String name;` 字段声明 + `@Column(name = "name", length = 200)` 注解 + `getName()` / `setName()` |
+| `backend/.../dto/PositionSnapshot.java` | `private String name;` 字段声明 |
+
+**风险等级**：`TradeRecord.name` 的遗漏是**严重问题** —— 该字段仍带 `@Column` 注解映射到 `trade_records.name` 列，但该列已被 V25 迁移 `DROP` 掉。Hibernate 在使用 JPQL 查询、`em.persist(entity)`、以及 schema validation（`spring.jpa.hibernate.ddl-auto=validate`）时将直接报错。单元测试之所以能通过，是因为测试环境用 H2/测试配置跑迁移后 JPA schema 匹配，且没有直接触发涉及 `name` 列的 SQL。
+
+**修复内容**：
+- 删除 `TradeRecord` 中剩余的 `name` 字段声明、`@Column` 注解、getter/setter。
+- 删除 `PositionSnapshot` 中剩余的 `name` 字段声明。
+- 重新运行 `mvn test` → ✅ BUILD SUCCESS（150 tests passed）。
+
+**Review 方法论修正**：
+- 原做法用正则 `\.setName\(|\.getName\(\)` 只匹配**调用点**，无法检出仅有声明、无使用的孤儿字段。
+- 正确做法：同时扫描字段声明（`private\s+String\s+name\s*;`）与 `@Column(name = "name")` 注解。
+- 本文档中"0 残留"的原结论在补丁后才成立。
 
 ---
 

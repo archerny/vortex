@@ -12,9 +12,6 @@ public class PositionSnapshot {
     /** 证券代码 */
     private String symbol;
 
-    /** 证券名称 */
-    private String name;
-
     /** 底层证券代码 */
     private String underlyingSymbol;
 

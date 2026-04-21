@@ -54,12 +54,6 @@ public class TradeRecord extends BaseEntity {
     private String symbol;
 
     /**
-     * 底层证券名称，如 苹果公司、贵州茅台、特斯拉
-     */
-    @Column(name = "name", length = 200)
-    private String name;
-
-    /**
      * 底层证券代码，用于关联分析期权与正股收益，如 TSLA、AAPL
      */
     @Column(name = "underlying_symbol", length = 50, nullable = false)
@@ -209,14 +203,6 @@ public class TradeRecord extends BaseEntity {
 
     public void setSymbol(String symbol) {
         this.symbol = symbol;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getUnderlyingSymbol() {
