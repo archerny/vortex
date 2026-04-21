@@ -85,12 +85,9 @@ java -jar target/vortex-backend-1.0.0.jar --spring.profiles.active=local
 ```bash
 # 访问健康检查接口
 curl http://localhost:8080/api/health
-
-# 访问数据库测试接口
-curl http://localhost:8080/api/db-test
 ```
 
-如果返回正常，说明配置成功！
+若应用启动日志中 Flyway 迁移与 JPA 初始化均正常完成，且健康检查返回 200，说明配置成功！
 
 ---
 

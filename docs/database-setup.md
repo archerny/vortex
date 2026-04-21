@@ -88,34 +88,15 @@ spring.jpa.properties.hibernate.format_sql=true
 spring.jpa.properties.hibernate.jdbc.time_zone=UTC+8
 ```
 
-## 5. 测试数据库连接
+## 5. 验证数据库连接
 
-启动应用后，访问以下接口测试数据库连接：
+启动应用后，若 Flyway 迁移与 JPA 初始化正常完成，即表示数据库连接成功。可通过健康检查接口进一步确认应用已就绪：
 
 ```bash
-curl http://localhost:8080/api/db-test
+curl http://localhost:8080/api/health
 ```
 
-成功响应示例：
-```json
-{
-  "status": "SUCCESS",
-  "message": "数据库连接成功",
-  "database": "ledgerdb",
-  "url": "jdbc:postgresql://localhost:5432/ledgerdb",
-  "driver": "PostgreSQL JDBC Driver",
-  "driverVersion": "42.x.x"
-}
-```
-
-失败响应示例：
-```json
-{
-  "status": "FAILED",
-  "message": "数据库连接失败: Connection refused",
-  "error": "org.postgresql.util.PSQLException"
-}
-```
+若数据库连接失败，应用会在启动阶段直接抛出异常并在日志中打印详细错误（如 `Connection refused`、`password authentication failed` 等），据此排查配置即可。
 
 ## 6. 项目结构
 
@@ -126,10 +107,8 @@ backend/
 │   │   └── DatabaseConfig.java          # 数据库配置类
 │   ├── entity/
 │   │   └── BaseEntity.java              # 基础实体类
-│   ├── repository/
-│   │   └── BaseRepository.java          # 基础 Repository 接口
-│   └── controller/
-│       └── DatabaseTestController.java  # 数据库测试控制器
+│   └── repository/
+│       └── BaseRepository.java          # 基础 Repository 接口
 └── src/main/resources/
     └── application.properties           # 数据库配置文件
 ```
