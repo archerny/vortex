@@ -3,14 +3,14 @@
 > **创建日期**：2026-04-16  
 > **最后更新**：2026-04-18  
 > **状态**：✅ 已实现（逐条独立事务 + 幂等去重 + 两级状态模型 + SyncBatchRecoveryRunner + Resume 端点 + 前端恢复按钮）  
-> **关联**：[data-persistence-design.md](./data-persistence-design.md) | [overall-design.md](./overall-design.md) | [broker-code-design.md](./broker-code-design.md)  
+> **关联**：[data-persistence.md](./data-persistence.md) | [overall-design.md](../overall-design.md) | [broker-registration.md](./broker-registration.md)  
 > **前置**：Phase 2 数据库变更已完成（V19-V24 + Entity + Repository）
 
 ---
 
 ## 一、背景与目标
 
-[data-persistence-design.md](./data-persistence-design.md) 定义了「暂存 → 导入」两阶段的数据持久化方案。本文档聚焦于 **导入过程中的数据一致性保证**，解决以下核心问题：
+[data-persistence.md](./data-persistence.md) 定义了「暂存 → 导入」两阶段的数据持久化方案。本文档聚焦于 **导入过程中的数据一致性保证**，解决以下核心问题：
 
 1. **事务策略**：staging 和 import 阶段如何保证数据不会处于不一致的中间状态？
 2. **失败分类**：不同类型的失败如何处理？哪些可重试，哪些不可？

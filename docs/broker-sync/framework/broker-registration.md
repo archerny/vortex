@@ -3,7 +3,7 @@
 > **创建日期**：2026-04-17  
 > **最后更新**：2026-04-18  
 > **状态**：✅ 已实现（全链路 brokerName→brokerCode 重命名 + BrokerSyncInfo DTO + brokers 表关联 + 前端动态发现）  
-> **关联**：[data-persistence-design.md](./data-persistence-design.md) | [import-consistency-design.md](./import-consistency-design.md) | [overall-design.md](./overall-design.md)  
+> **关联**：[data-persistence.md](./data-persistence.md) | [import-consistency.md](./import-consistency.md) | [overall-design.md](../overall-design.md)  
 > **前置**：Phase 2 数据库变更已完成（V19-V24 + Entity + Repository）
 
 ---
@@ -217,6 +217,6 @@ GET /api/broker-sync/brokers 时：
 
 | 文档 | 更新内容 |
 |------|---------|
-| [data-persistence-design.md](./data-persistence-design.md) | `broker_sync_batches` 表结构中 `broker_name` → `broker_code`；索引名更新；「待后续讨论」中的 `brokerId 查找策略` 标记为已解决 |
-| [import-consistency-design.md](./import-consistency-design.md) | 所有代码示例和文字描述中的 `brokerName` → `brokerCode` |
-| [README.md](./README.md) | 文档索引新增本文档引用 |
+| [data-persistence.md](./data-persistence.md) | `broker_sync_batches` 表结构中 `broker_name` → `broker_code`；索引名更新；「待后续讨论」中的 `brokerId 查找策略` 标记为已解决 |
+| [import-consistency.md](./import-consistency.md) | 所有代码示例和文字描述中的 `brokerName` → `brokerCode` |
+| [README.md](../README.md) | 文档索引新增本文档引用 |

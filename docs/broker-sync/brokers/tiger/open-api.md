@@ -2,7 +2,7 @@
 
 > **状态**: Phase 1 已实现（API 调通 → 日志输出）  
 > **日期**: 2026-03-14（方案讨论） → 2026-03-31（实现完成）  
-> **关联**: [overall-design.md](./overall-design.md)
+> **关联**: [overall-design.md](../../overall-design.md)
 
 ---
 

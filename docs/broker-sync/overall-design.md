@@ -184,14 +184,14 @@
 | `fee` | BigDecimal | 手续费/佣金 | 券商可能拆分为多项（佣金、印花税、过户费等），如何汇总？ |
 | `currency` | Currency | 交易币种 | 系统目前支持 CNY/HKD/USD |
 | `strategyId` | Long | ？ | 券商 API 不会返回策略信息，如何处理？ |
-| `tradeTrigger` | TradeTrigger | 同步导入时根据交易实际业务含义设置 | 不新增枚举值，详见 [data-persistence-design.md](./data-persistence-design.md) |
+| `tradeTrigger` | TradeTrigger | 同步导入时根据交易实际业务含义设置 | 不新增枚举值，详见 [data-persistence.md](./framework/data-persistence.md) |
 | `triggerRefId` | Long | ？ | 是否关联同步批次记录？ |
 | `triggerRefType` | TriggerRefType | ？ | 是否需要新增枚举值？ |
 
 **需要讨论**：
 - [ ] 证券代码标准化：不同券商的 symbol 格式不同（港股 `00700.HK` vs `700`，美股 `AAPL` vs `AAPL.US`），如何统一？
 - [ ] `strategyId` 同步记录无法自动关联策略，是否留空？还是提供批量关联功能？
-- [x] `tradeTrigger` 是否需要新增一个 `BROKER_SYNC` 枚举值来标识同步导入的记录？→ **否**，`trade_trigger` 描述"交易为什么发生"（手动下单/期权行权/市场事件），不描述"记录来源"。同步导入的记录根据交易实际含义设置 `trade_trigger`；通过 `external_id IS NULL` 区分手动录入和同步导入。详见 [data-persistence-design.md](./data-persistence-design.md)
+- [x] `tradeTrigger` 是否需要新增一个 `BROKER_SYNC` 枚举值来标识同步导入的记录？→ **否**，`trade_trigger` 描述"交易为什么发生"（手动下单/期权行权/市场事件），不描述"记录来源"。同步导入的记录根据交易实际含义设置 `trade_trigger`；通过 `external_id IS NULL` 区分手动录入和同步导入。详见 [data-persistence.md](./framework/data-persistence.md)
 - [ ] 手续费如果券商拆分为多项，是合并成一个 `fee` 字段，还是扩展表结构？
 
 #### 5.2 证券代码规范化
@@ -445,7 +445,7 @@ Controller:
 
 #### 7.2 数据模型扩展
 
-**已决策** — 详见 [data-persistence-design.md](./data-persistence-design.md)
+**已决策** — 详见 [data-persistence.md](./framework/data-persistence.md)
 
 | 表/字段 | 用途 | 决策 |
 |---------|------|------|
@@ -544,7 +544,7 @@ Controller:
 | 问题 4：同步策略 | **REST API 手动触发**（`POST /api/broker-sync/trigger`），Controller 放在现有 `controller/` 包统一管理；核心流程：获取→反序列化为券商专属模型→**日志输出**；暂不做统一模型转换，暂不入库 | 2026-03-14 |
 | 问题 5：数据映射 | **`tradeTrigger` 不新增 `BROKER_SYNC`**，同步记录根据交易实际含义设置；通过 `external_id` 区分数据来源。其他映射细节待定 | 2026-04-13 |
 | 问题 6：凭证管理 | **放在配置文件中管理**，复用 `application-local.properties` 机制，与数据库密码保持一致的管理方式，不做过多复杂设计 | 2026-03-14 |
-| 问题 7：系统架构 | **适配器模式 + sync 独立包**；每个券商有专属原始模型，日志在专属模型层打印；统一中间模型后续再实现。**异步执行架构**：同步任务通过 `@Async` + 独立线程池异步执行，Controller 提交后立即返回，`BrokerSyncAsyncExecutor` 负责后台执行和状态更新。**数据模型扩展已完成**：新建 `broker_sync_batches`（通用批次表）+ `ibkr_staged_orders`（IBKR 核心暂存表，Order 粒度）+ `ibkr_staged_trade_confirms`（明细附表），`trade_records` 新增 `external_id`/`external_broker`/`sync_batch_id`，详见 [data-persistence-design.md](./data-persistence-design.md) | 2026-04-15 |
+| 问题 7：系统架构 | **适配器模式 + sync 独立包**；每个券商有专属原始模型，日志在专属模型层打印；统一中间模型后续再实现。**异步执行架构**：同步任务通过 `@Async` + 独立线程池异步执行，Controller 提交后立即返回，`BrokerSyncAsyncExecutor` 负责后台执行和状态更新。**数据模型扩展已完成**：新建 `broker_sync_batches`（通用批次表）+ `ibkr_staged_orders`（IBKR 核心暂存表，Order 粒度）+ `ibkr_staged_trade_confirms`（明细附表），`trade_records` 新增 `external_id`/`external_broker`/`sync_batch_id`，详见 [data-persistence.md](./framework/data-persistence.md) | 2026-04-15 |
 | 问题 8：冲突处理 | **Phase 1 不存在冲突**：仅日志输出不入库，不会与已有数据冲突；冲突处理逻辑留到入库阶段再设计 | 2026-03-14 |
 | 问题 9：前端交互 | ~~Phase 1 不做前端~~ → 已新增「同步管理」页面（批次列表+筛选，2026-04-13）和「新建同步」功能（选券商+日期范围触发同步，2026-04-14），通过 REST API 触发同步 | 2026-04-14 |
 | 问题 10：MVP 范围 | 待定 | - |

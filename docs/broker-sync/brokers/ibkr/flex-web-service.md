@@ -2,7 +2,7 @@
 
 > **状态**: ✅ Phase 1 已实现（API 调通 → 日志输出），待真实环境验证  
 > **日期**: 2026-04-14  
-> **关联**: [overall-design.md](./overall-design.md)  
+> **关联**: [overall-design.md](../../overall-design.md)  
 > **总体规划对应**: 本文档的 Phase 1 对应总体规划（README.md）中的 **Phase 2**（多券商适配阶段）
 
 ---

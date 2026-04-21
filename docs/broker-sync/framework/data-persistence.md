@@ -3,7 +3,7 @@
 > **创建日期**：2026-04-13  
 > **最后更新**：2026-04-18  
 > **状态**：✅ 已实现（DB 迁移 V19-V24 + Entity + Repository + IbkrStagingService + IbkrImportService + IbkrSyncAdapter 全链路）  
-> **关联**：[overall-design.md](./overall-design.md) | [ibkr-flex-web-service-design.md](./ibkr-flex-web-service-design.md) | [broker-code-design.md](./broker-code-design.md)  
+> **关联**：[overall-design.md](../overall-design.md) | [flex-web-service.md](../brokers/ibkr/flex-web-service.md) | [broker-registration.md](./broker-registration.md)  
 > **前置**：Phase 1（API 获取 + 日志输出）已完成
 
 ---
@@ -60,7 +60,7 @@ Phase 1 已跑通「券商 API → 解析 → 日志输出」的基本流程，�
 | 列名 | 类型 | 约束 | 说明 |
 |------|------|------|------|
 | `id` | BIGSERIAL | PK | 主键 |
-| `broker_code` | VARCHAR(50) | NOT NULL | 券商技术标识（如 `ibkr`、`tiger`），详见 [broker-code-design.md](./broker-code-design.md) |
+| `broker_code` | VARCHAR(50) | NOT NULL | 券商技术标识（如 `ibkr`、`tiger`），详见 [broker-registration.md](./broker-registration.md) |
 | `sync_date_from` | DATE | NOT NULL | 同步数据的起始日期 |
 | `sync_date_to` | DATE | NOT NULL | 同步数据的结束日期 |
 | `total_count` | INTEGER | NOT NULL DEFAULT 0 | 同步记录总数 |
@@ -396,8 +396,8 @@ schwab_staged_orders            → 字段 1:1 对应 SchwabTradeRecord
 | `V20__create_ibkr_staged_orders.sql` | 创建 `ibkr_staged_orders` 表 | ✅ 已完成 |
 | `V21__create_ibkr_staged_trade_confirms.sql` | 创建 `ibkr_staged_trade_confirms` 表 | ✅ 已完成 |
 | `V22__add_external_fields_to_trade_records.sql` | 为 `trade_records` 新增 `external_id`、`external_broker`、`sync_batch_id` 字段 | ✅ 已完成 |
-| `V23__add_broker_code_and_rename_batch_broker_name.sql` | `brokers` 新增 `broker_code` 列（UNIQUE 部分索引）+ `broker_sync_batches.broker_name` → `broker_code` 改名 | ✅ 已完成，详见 [broker-code-design.md](./broker-code-design.md) |
-| `V24__add_phase_and_expand_batch_status.sql` | `broker_sync_batches` 新增 `phase` 列 + `status` 枚举扩展（PROCESSING/PARTIAL/INTERRUPTED） | ✅ 已完成，详见 [import-consistency-design.md](./import-consistency-design.md) |
+| `V23__add_broker_code_and_rename_batch_broker_name.sql` | `brokers` 新增 `broker_code` 列（UNIQUE 部分索引）+ `broker_sync_batches.broker_name` → `broker_code` 改名 | ✅ 已完成，详见 [broker-registration.md](./broker-registration.md) |
+| `V24__add_phase_and_expand_batch_status.sql` | `broker_sync_batches` 新增 `phase` 列 + `status` 枚举扩展（PROCESSING/PARTIAL/INTERRUPTED） | ✅ 已完成，详见 [import-consistency.md](./import-consistency.md) |
 
 ### 8.3 JPA Entity 与 Repository
 
@@ -431,25 +431,25 @@ _（当前无待解决项，所有阻塞性问题已解决）_
 |---|------|------|------|
 | D-1 | 暂存表数据的清理策略 | 保留多久、是否归档、自动清理还是手动 | 系统跑起来之后根据实际数据量再定 |
 | D-2 | 是否需要"同步预览"功能 | 在正式导入前展示待导入数据供用户确认 | Phase 3 规划项 |
-| D-3 | XML 解析方案选型 | DOM 解析 vs SAX 解析 vs JAXB | Phase 1 已跑通（当前 DOM），性能优化后续考虑，详见 [ibkr-flex-web-service-design.md](./ibkr-flex-web-service-design.md) |
-| D-4 | Token 存储方式 | 当前 properties 文件，后续是否迁移到数据库 | 详见 [ibkr-flex-web-service-design.md](./ibkr-flex-web-service-design.md) |
-| D-5 | Activity Flex Query 支持 | 除 Trade Confirmation 外的其他 IBKR 报告类型 | 详见 [ibkr-flex-web-service-design.md](./ibkr-flex-web-service-design.md) |
-| D-6 | Tiger 同步后续 | 入库、去重、单元测试等 | 当前优先级低，详见 [tiger-sync-design.md](./tiger-sync-design.md) |
+| D-3 | XML 解析方案选型 | DOM 解析 vs SAX 解析 vs JAXB | Phase 1 已跑通（当前 DOM），性能优化后续考虑，详见 [flex-web-service.md](../brokers/ibkr/flex-web-service.md) |
+| D-4 | Token 存储方式 | 当前 properties 文件，后续是否迁移到数据库 | 详见 [flex-web-service.md](../brokers/ibkr/flex-web-service.md) |
+| D-5 | Activity Flex Query 支持 | 除 Trade Confirmation 外的其他 IBKR 报告类型 | 详见 [flex-web-service.md](../brokers/ibkr/flex-web-service.md) |
+| D-6 | Tiger 同步后续 | 入库、去重、单元测试等 | 当前优先级低，详见 [open-api.md](../brokers/tiger/open-api.md) |
 | D-7 | `overall-design.md` 大量开放问题 | 早期头脑风暴产物，40+ 个未关闭 `- [ ]` 项。部分已被后续设计文档覆盖或回答，但状态仍是"方案讨论中" | 等核心功能稳定后批量清理 |
 
 ### ✅ 已解决（归档）
 
 | # | 问题 | 解决方式 |
 |---|------|---------|
-| R-1 | 批次导入事务策略 | **逐条独立事务 + 幂等**，详见 [import-consistency-design.md](./import-consistency-design.md) |
-| R-2 | `brokerId` 查找策略 | `brokers` 表新增 `broker_code` 列，通过 `findByBrokerCode()` 直接查找，详见 [broker-code-design.md](./broker-code-design.md) |
+| R-1 | 批次导入事务策略 | **逐条独立事务 + 幂等**，详见 [import-consistency.md](./import-consistency.md) |
+| R-2 | `brokerId` 查找策略 | `brokers` 表新增 `broker_code` 列，通过 `findByBrokerCode()` 直接查找，详见 [broker-registration.md](./broker-registration.md) |
 | R-3 | ETF 识别 | `assetCategory = STK` 时统一默认为 `STOCK`，历史 ETF 数据已由用户手动修正为 STOCK（ETF 枚举值保留） |
 | R-4 | `trade_trigger` 是否新增 `BROKER_SYNC` | **否**，`trade_trigger` 描述"交易为什么发生"，不描述"记录来源"。通过 `external_id IS NULL` 区分手动/同步 |
-| R-5 | BookTrade 的 `tradeTrigger` 判定（原 O-2） | 通过 `orderTime` + `orderType` 为空识别 BookTrade，再查关联 TradeConfirm 的 `code` 字段判定具体期权事件类型。详见 [booktrade-trigger-mapping-design.md](./booktrade-trigger-mapping-design.md) |
+| R-5 | BookTrade 的 `tradeTrigger` 判定（原 O-2） | 通过 `orderTime` + `orderType` 为空识别 BookTrade，再查关联 TradeConfirm 的 `code` 字段判定具体期权事件类型。详见 [booktrade-mapping.md](../brokers/ibkr/booktrade-mapping.md) |
 | R-6 | 期权 symbol 格式转换（原 O-3） | **无需额外设计**。IBKR 暂存表已存 `strike`、`expiry`、`putCall` 为独立字段，导入时直接拼接为系统格式 `{underlying}-{expiry}-{putCall}{strike}`（如 `AAPL-20260130-C265`），无需解析 OCC 填充格式 |
 | R-7 | 暂存表 → `trade_records` 字段映射（原 O-1） | **已完成完整映射规范**，详见下方「附录 A：O-1 字段映射规范」 |
 | R-8 | 导入时的冲突处理策略（原 O-4） | **不做手动记录冲突匹配**。系统假设不存在手动录入的历史记录，去重仅依赖 `(external_broker, external_id)` 唯一索引。已有相同 `external_id` → SKIPPED。`CONFLICT` 状态仅保留为理论预留，当前不会触发 |
-| R-9 | 前端状态交互设计（原 O-5） | **已在 [import-consistency-design.md](./import-consistency-design.md) 完整定义**。`INTERRUPTED` → Resume 按钮（复用原 batch 完整重跑）；`FAILED` → 重新同步按钮（创建新 batch）；`PARTIAL` → 仅展示失败详情，不提供重试（数据问题重试无意义） |
+| R-9 | 前端状态交互设计（原 O-5） | **已在 [import-consistency.md](./import-consistency.md) 完整定义**。`INTERRUPTED` → Resume 按钮（复用原 batch 完整重跑）；`FAILED` → 重新同步按钮（创建新 batch）；`PARTIAL` → 仅展示失败详情，不提供重试（数据问题重试无意义） |
 
 ---
 
@@ -483,7 +483,7 @@ _（当前无待解决项，所有阻塞性问题已解决）_
 | 14 | `symbol` | `String` | **STK**：`symbol.trim()`（如 `AAPL`）<br>**OPT**：`{underlying}-{expiry}-{putCall}{normalizedStrike}`<br>示例：`AAPL-20260130-C265`，`TSM-20260320-P320` |
 | 15 | `underlying_symbol` | `String` | **STK**：与 `symbol` 相同（`symbol.trim()`）<br>**OPT**：从 `description` 字段提取第一个空格前的 token（如 `"AAPL 30JAN26 265 C"` → `"AAPL"`） |
 | 16 | `name` | `String` | 直接取 `description` 完整值（如 `"APPLE INC"`、`"TSM 20MAR26 320 P"`） |
-| 17 | `trade_trigger` | `TradeTrigger` (enum) | 按 [booktrade-trigger-mapping-design.md](./booktrade-trigger-mapping-design.md) 判定：<br>`orderTime` 非空 → `MANUAL`<br>`orderTime` 为空（BookTrade）→ 查关联 TradeConfirm `code` → `OPTION` |
+| 17 | `trade_trigger` | `TradeTrigger` (enum) | 按 [booktrade-mapping.md](../brokers/ibkr/booktrade-mapping.md) 判定：<br>`orderTime` 非空 → `MANUAL`<br>`orderTime` 为空（BookTrade）→ 查关联 TradeConfirm `code` → `OPTION` |
 | 18 | `trigger_ref_type` | `TriggerRefType` (enum) | 随 `trade_trigger` 一起判定（MANUAL → `NONE`，BookTrade 按 code 映射到具体类型） |
 | 19 | `trigger_ref_id` | `Long` | 初始为 `0`；STK 侧 BookTrade 在批次导入完成后回填对应期权 trade_records.id |
 | 20 | `strategy_id` | `Long` (nullable) | 固定为 `null`（同步导入无法自动关联策略） |
