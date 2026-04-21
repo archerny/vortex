@@ -8,6 +8,7 @@ Thumbs.db
 .vscode/
 *.swp
 *.swo
+.codebuddy/
 
 # ========== Java / JVM ==========
 *.class
