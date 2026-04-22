@@ -1,7 +1,8 @@
 # Tiger Phase 3 — 编码与工作计划
 
 > **创建日期**：2026-04-21
-> **状态**：📋 待实施
+> **最近更新**：2026-04-22
+> **状态**：🔧 进行中 — 阶段 1 已完成
 > **目标**：将老虎证券同步从 Phase 1（API → 日志）升级为与 IBKR 对齐的两阶段导入（API → `tiger_staged_orders` → `trade_records`）
 > **关联**：[staging-schema.md](./staging-schema.md) | [open-api.md](./open-api.md) | [../../framework/data-persistence.md](../../framework/data-persistence.md) | [../../framework/import-consistency.md](../../framework/import-consistency.md) | [../ibkr/flex-web-service.md](../ibkr/flex-web-service.md)
 
@@ -68,24 +69,27 @@
 
 ## 三、阶段划分（线性依赖）
 
-### 阶段 1：DB 迁移 + Entity + Repository
+### 阶段 1：DB 迁移 + Entity + Repository ✅ 已完成（2026-04-22）
 
 **目标**：数据库骨架就绪，可在后续阶段中读写。
 
-- [ ] 编写 `V26__create_tiger_staged_orders.sql`
+- [x] 编写 `V26__create_tiger_staged_orders.sql`
   - 字段顺序、长度、约束严格按 [staging-schema.md § 3](./staging-schema.md#三tiger_staged_orders--tiger-核心暂存表order-粒度)
   - 创建 `UNIQUE(tiger_id)`、`INDEX(batch_id)`、`INDEX(status)`、FK→`broker_sync_batches.id`
-- [ ] 编写 `V27__seed_tiger_broker_code.sql`
+- [x] 编写 `V27__seed_tiger_broker_code.sql`
   - 幂等：仅当 `brokers` 表中存在 Tiger 记录且 `broker_code` 为 NULL 或不等于 `tiger` 时更新
   - 若未来初始化脚本已包含 Tiger 行，此脚本可为 no-op
-- [ ] 新建 `TigerStagedOrder` Entity（字段与列名 1:1，纯 `String` 存储业务字段，保留 `@PrePersist` / `@PreUpdate` 审计时间戳）
-- [ ] 新建 `TigerStagedOrderRepository`，包含：
+- [x] 新建 `TigerStagedOrder` Entity（字段与列名 1:1，纯 `String` 存储业务字段，保留 `@PrePersist` / `@PreUpdate` 审计时间戳 via `BaseEntity`）
+- [x] 新建 `TigerStagedOrderRepository`，包含：
   - `Optional<TigerStagedOrder> findByTigerId(String tigerId)`
+  - `boolean existsByTigerId(String tigerId)`
+  - `List<TigerStagedOrder> findByBatchId(Long batchId)`
   - `List<TigerStagedOrder> findByBatchIdAndStatus(Long batchId, String status)`
   - `long countByBatchIdAndStatus(Long batchId, String status)`
-- [ ] 启动本地环境验证 Flyway 正常执行，表结构正确
+- [x] 编译通过（`mvn -q -DskipTests compile` 本地验证通过，2026-04-22）
+- [ ] 启动本地环境验证 Flyway 正常执行，表结构正确（延后到阶段 5 端到端验证时一并完成）
 
-**产出**：能编译通过，应用能启动，表已创建。
+**产出**：编译通过 ✅；Entity 与 Repository 就绪；Flyway 迁移就位等待首次启动执行。
 
 ---
 
@@ -327,5 +331,5 @@
 | 代号 | 待确认 | 默认策略（无回应时） |
 |------|--------|--------------------|
 | T-4 | SDK 是否自动分页？ | 阶段 5 用真实账号跑一次 ≥ 300 条订单的窗口验证 |
-| T-7 | `TradeOrder.getAttrDesc()` getter 是否存在？ | 不存在则尝试 `getAttrList()` / `getOrderDesc()`；都没有则 `attrDesc=null`，加 TODO 注释 |
+| T-7 | ~~`TradeOrder.getAttrDesc()` getter 是否存在？~~ | ✅ 2026-04-22 已通过 `javap` 在 SDK 2.4.7 本地 jar 中确认 `attrDesc` 字段及其 getter/setter 均存在，无需降级方案 |
 | T-8 | `brokers` 表是否已存在 Tiger 行？ | V27 设计为幂等 UPDATE，两种情况都兼容 |
