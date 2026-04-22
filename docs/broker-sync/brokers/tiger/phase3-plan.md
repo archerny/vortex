@@ -2,7 +2,7 @@
 
 > **创建日期**：2026-04-21
 > **最近更新**：2026-04-22
-> **状态**：🔧 进行中 — 阶段 1、2、3 已完成
+> **状态**：🔧 进行中 — 阶段 1、2、3、4 已完成
 > **目标**：将老虎证券同步从 Phase 1（API → 日志）升级为与 IBKR 对齐的两阶段导入（API → `tiger_staged_orders` → `trade_records`）
 > **关联**：[staging-schema.md](./staging-schema.md) | [open-api.md](./open-api.md) | [../../framework/data-persistence.md](../../framework/data-persistence.md) | [../../framework/import-consistency.md](../../framework/import-consistency.md) | [../ibkr/flex-web-service.md](../ibkr/flex-web-service.md)
 
@@ -151,30 +151,40 @@
 
 ---
 
-### 阶段 4：`TigerImportWorker` + `TigerImportService`
+### 阶段 4：`TigerImportWorker` + `TigerImportService` ✅ 已完成 2026-04-22
 
 **目标**：从暂存表读取 → 调用 `Mapper` → 写入 `trade_records`，并回写暂存状态。
 
-- [ ] 新建 `TigerImportWorker`
+- [x] 新建 `TigerImportWorker`（`@Component`）
   - `@Transactional(propagation = REQUIRES_NEW)`
-  - `importOne(Long batchId, Long stagedId, Long brokerId)`:
-    1. `stagedOrderRepository.findById(stagedId)` → 进入 `PENDING` 处理
-    2. `tradeRecordRepository.findByExternalBrokerAndExternalId("tiger", tigerId)` → `Optional`
-    3. 调 `mapper.preFilter(...)`：
-       - `SKIPPED` / `FAILED`：直接回写暂存状态，返回
+  - `importOne(Long batchId, Long brokerId, TigerStagedOrder staged)`（传入已 load 的实体，避免重复 findById）:
+    1. `tradeRecordRepository.existsByExternalBrokerAndExternalId("tiger", tigerId)` → boolean
+    2. 调 `mapper.preFilter(staged, alreadyImported)`：
+       - `SKIPPED` / `FAILED`：写入 status + errorMessage，保存暂存行，返回
        - `PASS`：继续
-    4. `TradeRecord tr = mapper.toTradeRecord(staged, brokerId, batchId)`
-    5. `tradeRecordRepository.save(tr)`
-    6. 回写 `staged.status=IMPORTED, imported_trade_id=tr.id`
-    7. 异常：`staged.status=FAILED, error_message=e.getMessage()`
-- [ ] 新建 `TigerImportService`
+    3. `TradeRecord tr = mapper.toTradeRecord(staged, brokerId, batchId)`
+    4. `tradeRecordRepository.save(tr)`
+    5. 回写 `staged.status=IMPORTED, importedTradeId=tr.id, errorMessage=null`
+    6. 任意异常 → `staged.status=FAILED, errorMessage="Import error: " + e.getMessage()`（不向外传播）
+- [x] 新建 `TigerImportService`（`@Service`）
   - 入参：`Long batchId`
-  - 1. `brokerId = brokersRepository.findByBrokerCode("tiger").getId()`（批次内只查一次）
-  - 2. `List<Long> pendingIds = stagedOrderRepository.findByBatchIdAndStatus(batchId, "PENDING").stream().map(...)`
-  - 3. 逐个调用 `importWorker.importOne(batchId, stagedId, brokerId)`
-  - 4. 返回 `ImportResult { attempted, imported, skipped, failed }`（从 DB 重新统计以防漏单）
+  - 1. `brokerId = brokerRepository.findByBrokerCode("tiger").getId()`（批次内只查一次；缺则抛 `IllegalStateException`）
+  - 2. `List<TigerStagedOrder> pending = stagedOrderRepository.findByBatchIdAndStatus(batchId, "PENDING")`
+  - 3. 逐个调用 `importWorker.importOne(batchId, brokerId, staged)`
+  - 4. 循环结束后用 `countByBatchIdAndStatus` 重新从 DB 统计 IMPORTED/SKIPPED/FAILED，返回 `ImportResult { attempted, imported, skipped, failed }`
+- [x] 单元测试：`TigerImportWorkerTest`（8 个用例，Mock Mockito 风格）
+  - PASS：成功路径 → save TradeRecord + status=IMPORTED + importedTradeId 回填
+  - SKIPPED：已导入、filledQuantity=0
+  - FAILED（过滤器）：secType=FUT、attrDesc=Exercise
+  - Exception：`save()` 抛 `RuntimeException`、`avgFillPrice` 非法导致 mapping 抛出 — 均被 catch 且标记 FAILED
+  - Invariant：staged order 每次调用都恰好被 `stagedOrderRepository.save()` 一次
+- [x] 单元测试：`TigerImportServiceTest`（4 个用例）
+  - broker 不存在 → `IllegalStateException`，worker 不被调用
+  - 无 PENDING → 不调用 worker，返回零计数
+  - 多条 PENDING → worker 被逐个调用
+  - 计数从 DB 重新查询（模拟混合 IMPORTED/SKIPPED）
 
-**产出**：端到端：`batch_id` → 暂存表若干条 `PENDING` → 运行 `TigerImportService` → 所有记录进入 `IMPORTED` / `SKIPPED` / `FAILED`，`trade_records` 中出现对应数据。
+**产出**：端到端：`batch_id` → 暂存表若干条 `PENDING` → 运行 `TigerImportService` → 所有记录进入 `IMPORTED` / `SKIPPED` / `FAILED`，`trade_records` 中出现对应数据。42 个 Tiger 子模块测试全绿，全量 `mvn test` 192 个测试零失败。
 
 ---
 
