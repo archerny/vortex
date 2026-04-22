@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Table, Tag, Select, Space, Typography, Tooltip, Card, Button, message, Modal, DatePicker, Form } from 'antd';
-import { ReloadOutlined, PlusOutlined, RedoOutlined } from '@ant-design/icons';
+import { ReloadOutlined, PlusOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
-import { fetchSyncBatches, triggerSync, fetchSupportedBrokers, resumeSync } from '../../../services/brokerSyncApi';
+import { fetchSyncBatches, triggerSync, fetchSupportedBrokers } from '../../../services/brokerSyncApi';
 import { fetchAllBrokers } from '../../../services/brokerApi';
 
 dayjs.extend(duration);
@@ -110,8 +110,37 @@ const SyncBatchesTab = () => {
         message.error(result.message || '提交同步任务失败');
       }
     } catch (error) {
-      if (error.response?.data?.message) {
-        message.error(error.response.data.message);
+      const data = error.response?.data;
+      // 409 Conflict: an active batch is blocking this request.
+      // Show a richer modal with the conflicting batch id / status and
+      // CLEANUP_FAILED guidance when applicable.
+      if (error.response?.status === 409 && data?.conflictingBatchId != null) {
+        const conflictStatus = data.conflictingStatus;
+        const conflictBatchId = data.conflictingBatchId;
+        Modal.warning({
+          title: '无法启动新的同步',
+          content: (
+            <div>
+              <p style={{ marginBottom: 8 }}>{data.message}</p>
+              <p style={{ marginBottom: 8 }}>
+                冲突批次：
+                <Tag color={statusTagColor[conflictStatus] || 'default'} style={{ marginLeft: 8 }}>
+                  #{conflictBatchId} {statusLabel[conflictStatus] || conflictStatus}
+                </Tag>
+              </p>
+              {conflictStatus === 'CLEANUP_FAILED' && (
+                <p style={{ color: '#fa8c16', marginBottom: 0 }}>
+                  该批次自动清理失败，需人工确认残留数据后将其状态改为 FAILED，才能重新触发同步。
+                </p>
+              )}
+            </div>
+          ),
+          okText: '知道了',
+        });
+        return;
+      }
+      if (data?.message) {
+        message.error(data.message);
       } else if (error.errorFields) {
         // Form validation error, do nothing
       } else {
@@ -123,36 +152,16 @@ const SyncBatchesTab = () => {
     }
   };
 
-  // Resume an interrupted / failed / partial batch
-  const handleResume = async (batchId) => {
-    try {
-      const result = await resumeSync(batchId);
-      if (result.status === 'SUCCESS') {
-        message.success('同步任务已恢复，请稍后刷新查看结果');
-        loadBatches();
-      } else {
-        message.error(result.message || '恢复同步任务失败');
-      }
-    } catch (error) {
-      if (error.response?.data?.message) {
-        message.error(error.response.data.message);
-      } else {
-        console.error('Resume sync failed:', error);
-        message.error('恢复同步请求失败');
-      }
-    }
-  };
-
-  // 可恢复的状态集合
-  const resumableStatuses = new Set(['INTERRUPTED', 'PARTIAL', 'FAILED']);
-
   // 状态标签颜色映射
+  // v2 应用产生的终态：COMPLETED / FAILED / CLEANUP_FAILED；
+  // PARTIAL / INTERRUPTED 保留仅用于显示历史批次（v1 遗留数据）。
   const statusTagColor = {
     PENDING: 'blue',
     PROCESSING: 'orange',
     COMPLETED: 'green',
-    PARTIAL: 'gold',
     FAILED: 'red',
+    CLEANUP_FAILED: 'magenta',
+    PARTIAL: 'gold',
     INTERRUPTED: 'volcano',
   };
 
@@ -161,8 +170,9 @@ const SyncBatchesTab = () => {
     PENDING: '待处理',
     PROCESSING: '处理中',
     COMPLETED: '已完成',
-    PARTIAL: '部分完成',
     FAILED: '失败',
+    CLEANUP_FAILED: '清理失败',
+    PARTIAL: '部分完成',
     INTERRUPTED: '已中断',
   };
 
@@ -256,13 +266,21 @@ const SyncBatchesTab = () => {
       dataIndex: 'status',
       key: 'status',
       width: 100,
-      render: (status, record) => (
-        <Tooltip title={record.phase ? `阶段: ${record.phase}` : undefined}>
-          <Tag color={statusTagColor[status] || 'default'}>
-            {statusLabel[status] || status}
-          </Tag>
-        </Tooltip>
-      ),
+      render: (status, record) => {
+        const tooltipParts = [];
+        if (record.phase) tooltipParts.push(`阶段: ${record.phase}`);
+        if (status === 'CLEANUP_FAILED') {
+          tooltipParts.push('自动清理失败，需人工确认残留数据后将状态改为 FAILED 才能重试');
+        }
+        const tooltipTitle = tooltipParts.length > 0 ? tooltipParts.join('；') : undefined;
+        return (
+          <Tooltip title={tooltipTitle}>
+            <Tag color={statusTagColor[status] || 'default'}>
+              {statusLabel[status] || status}
+            </Tag>
+          </Tooltip>
+        );
+      },
     },
     {
       title: '开始时间',
@@ -299,25 +317,6 @@ const SyncBatchesTab = () => {
         ) : (
           '-'
         ),
-    },
-    {
-      title: '操作',
-      key: 'action',
-      width: 90,
-      fixed: 'right',
-      render: (_, record) =>
-        resumableStatuses.has(record.status) ? (
-          <Tooltip title="恢复同步（幂等，可安全重试）">
-            <Button
-              type="link"
-              size="small"
-              icon={<RedoOutlined />}
-              onClick={() => handleResume(record.id)}
-            >
-              恢复
-            </Button>
-          </Tooltip>
-        ) : null,
     },
   ];
 
@@ -360,9 +359,8 @@ const SyncBatchesTab = () => {
                 { label: '待处理', value: 'PENDING' },
                 { label: '处理中', value: 'PROCESSING' },
                 { label: '已完成', value: 'COMPLETED' },
-                { label: '部分完成', value: 'PARTIAL' },
                 { label: '失败', value: 'FAILED' },
-                { label: '已中断', value: 'INTERRUPTED' },
+                { label: '清理失败', value: 'CLEANUP_FAILED' },
               ]}
             />
           </Space>
@@ -379,7 +377,7 @@ const SyncBatchesTab = () => {
           showSizeChanger: true,
           showTotal: (total) => `共 ${total} 条`,
         }}
-        scroll={{ x: 1500 }}
+        scroll={{ x: 1410 }}
         size="middle"
       />
 

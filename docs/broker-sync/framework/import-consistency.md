@@ -1,8 +1,8 @@
 # 券商同步 — 数据一致性与失败清理设计文档
 
 > **创建日期**：2026-04-16（v1）
-> **最后更新**：2026-04-23（v2.3 — Phase 3 Commit B + C 完成：Commit B 删除 v1 桥接方法 `markAsPartial` / `markAsInterrupted`、controller 的 `resumeSync` 端点与 `RESUMABLE_STATUSES`、相关测试与 `@Deprecated` / `@SuppressWarnings("deprecation")`；Commit C 清理关联文档中的 v1 口径，使 `brokers/tiger/phase3-plan.md` 与 v2 现状一致。Phase 3 后端至此全部落地；剩余工作是 Phase 4 前端改造）
-> **状态**：🔧 实施中（Phase 1a / 1b / 2 / 3 完成；待：Phase 4 前端）
+> **最后更新**：2026-04-23（v2.4 — Phase 4 前端完成：删除恢复按钮与 `resumeSync` 客户端；状态过滤器去除 `PARTIAL` / `INTERRUPTED` 并加入 `CLEANUP_FAILED`；新增 `CLEANUP_FAILED` 的状态 Tooltip 说明；`POST /trigger` 409 响应改为 Modal 展示冲突批次 ID / 状态并给出 `CLEANUP_FAILED` 场景的人工处理指引。Phase 1a / 1b / 2 / 3 / 4 全部落地）
+> **状态**：✅ v2 状态模型已完整落地
 > **关联**：[architecture.md](../architecture.md) | [data-persistence.md](./data-persistence.md) | [broker-registration.md](./broker-registration.md)
 > **取代**：本文档是 v1（2026-04-16）的完全重写。v1 设计的 `INTERRUPTED` / `PARTIAL` / Resume / 幂等续跑机制被整体废弃，历史版本可在 git log 中追溯。
 
@@ -396,28 +396,33 @@ COMMENT ON INDEX uk_only_one_active IS
 
 ## 八、前端代码变更
 
+> **实施状态**：✅ Phase 4 已完成（2026-04-23）。下列描述反映当前实际实现。
+
 ### 8.1 删除
 
-- "恢复" 按钮（`RedoOutlined`）及其 onClick 处理
-- "按 INTERRUPTED 过滤" / "按 PARTIAL 过滤" 的状态过滤器选项
-- `resumableStatuses` 相关判断逻辑
-- 调 `/api/broker-sync/batches/{id}/resume` 的 API 函数（如 `resumeBatch`）
+- "恢复" 按钮（`RedoOutlined`）及其 `handleResume` 处理函数
+- `resumableStatuses` 常量与按钮条件渲染
+- `services/brokerSyncApi.js` 的 `resumeSync` export（后端端点已删）
+- 状态过滤器下拉中的 `INTERRUPTED` / `PARTIAL` 选项
+- 表格中的 `操作` 列（曾唯一用途是承载恢复按钮）
 
 ### 8.2 修改
 
-- 状态徽章（Badge/Tag）的 color mapping：
-  - `PENDING` → default
-  - `PROCESSING` → processing（蓝色，spinning）
-  - `COMPLETED` → success（绿色）
-  - `FAILED` → error（红色）
-  - `CLEANUP_FAILED` → **error 红色 + 特殊图标**，tooltip 说明"本次同步清理失败，请人工处理该 batch 后再触发新同步"
-- 状态过滤器选项同步更新为上述 5 种
-- 列表不再显示 `failedCount` 列（如果之前有）
-- `triggerSync` 的错误处理：识别 HTTP 409 → 展示友好提示"已有同步任务在运行或需要人工处理，请稍后再试"
+- 状态徽章（Tag）color mapping：
+  - `PENDING` → blue
+  - `PROCESSING` → orange
+  - `COMPLETED` → green
+  - `FAILED` → red
+  - `CLEANUP_FAILED` → **magenta（洋红）**，视觉上与 FAILED 明显区分
+  - `PARTIAL` / `INTERRUPTED` → gold / volcano —— 仅保留以便正确渲染 v1 历史批次数据，过滤器不再暴露这两项
+- `CLEANUP_FAILED` 的状态列 Tooltip 追加："自动清理失败，需人工确认残留数据后将状态改为 FAILED 才能重试"
+- 状态过滤器选项更新为：`PENDING` / `PROCESSING` / `COMPLETED` / `FAILED` / `CLEANUP_FAILED`（5 种）
+- `handleSyncSubmit` 的错误处理：HTTP 409 + `conflictingBatchId != null` → 用 `Modal.warning` 弹窗展示冲突批次 ID、状态 Tag、以及 `CLEANUP_FAILED` 场景的人工处理提示（改 status 为 FAILED 才能重试）；其它错误走原有 `message.error` 分支
 
 ### 8.3 保留
 
-- 进度展示（`phase` 字段在 PROCESSING 时显示 "获取中 / 暂存中 / 导入中"）
+- 进度展示（`phase` 字段在 PROCESSING 时显示在状态 Tooltip 中）
+- v1 历史批次的状态 label/color 映射（`PARTIAL` / `INTERRUPTED`）仅用于渲染存量数据，新 sync 不会再产生这两种状态
 
 ---
 
@@ -482,7 +487,7 @@ COMMENT ON INDEX uk_only_one_active IS
 
 ---
 
-## 十二、待实施 Todos（执行前会用 todo 工具重新梳理）
+## 十二、实施 Todos（全部完成 ✅）
 
 1. ✅ 写 `V28` Flyway 脚本（Phase 1a）
 2. ✅ 改 entity / repository（删 failedCount，加 delete 方法）（Phase 1b / 2）
@@ -492,7 +497,7 @@ COMMENT ON INDEX uk_only_one_active IS
 6. ✅ 改 `BrokerSyncController`：加 `@ExceptionHandler(SyncConflictException)` → 409；删 `/batches/{id}/resume` 端点与 `RESUMABLE_STATUSES`
 7. ✅ 改 `SyncBatchRecoveryRunner`（启动扫 PROCESSING 批次 → `SyncBatchFailureHandler.handleFailure`）
 8. ✅ 删除 `SyncResult.failedCount`（Phase 1b）
-9. ⏳ 改前端：删恢复按钮、删 INTERRUPTED/PARTIAL 过滤、加 CLEANUP_FAILED 展示、处理 409（Phase 4）
+9. ✅ 改前端：删恢复按钮与 `resumeSync` 客户端；状态过滤器去除 `PARTIAL` / `INTERRUPTED`，新增 `CLEANUP_FAILED`；状态列 Tooltip 追加 `CLEANUP_FAILED` 的人工处理提示；`POST /trigger` 409 响应改为 Modal 展示冲突批次 ID / 状态并给出处理指引（Phase 4 完成）
 10. ✅ 测试：新增 `SyncBatchCleanupServiceTest`、`SyncBatchFailureHandlerTest`、`BrokerSyncControllerTest`（含 409 用例）；改 `BrokerSyncBatchServiceTest` 加 conflict 用例并清理 PARTIAL/INTERRUPTED 用例；改 `SyncBatchRecoveryRunnerTest` 改为 cleanup-flow；改 `BrokerSyncAsyncExecutorTest` 改为 failureHandler-mock；类级 `@SuppressWarnings("deprecation")` 已移除
 11. ✅ 更新关联文档：`data-persistence.md` 同步到 v2.3；`brokers/tiger/phase3-plan.md` 将 v1 的 Resume/INTERRUPTED/PARTIAL 口径改写为 v2 现状口径（Phase 3 Commit C 完成）；`architecture.md` / `broker-registration.md` 扫描无残留命中
 

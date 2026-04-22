@@ -1,8 +1,8 @@
 # 券商同步 — 数据持久化设计（框架层）
 
 > **创建日期**：2026-04-13
-> **最后更新**：2026-04-23（随 import-consistency.md v2.3 更新：Phase 3 Commit B 完成 — v1 桥接方法 `markAsPartial` / `markAsInterrupted`、controller `resumeSync` 端点与 `RESUMABLE_STATUSES` 已删除；后端 v2 状态模型全部落地）
-> **状态**：✅ 表结构与 Entity 已实现（DB 迁移 V19 + V22-V24 + V28）；✅ 应用层行为已完整切换到 v2（fail-fast cleanup + 409 conflict + 无 resume）；剩余工作是前端 Phase 4 改造，详见 [import-consistency.md](./import-consistency.md)
+> **最后更新**：2026-04-23（随 import-consistency.md v2.4 更新：Phase 4 前端完成 — 恢复按钮与 `resumeSync` 客户端已删除，状态过滤器精简为 v2 状态集，`CLEANUP_FAILED` 展示与 409 Modal 已上线；v2 状态模型端到端全部落地）
+> **状态**：✅ 表结构与 Entity 已实现（DB 迁移 V19 + V22-V24 + V28）；✅ 应用层与前端行为已完整切换到 v2（fail-fast cleanup + 409 conflict + 无 resume）
 > **关联**：[architecture.md](../architecture.md) | [import-consistency.md](./import-consistency.md) | [broker-registration.md](./broker-registration.md) | [brokers/ibkr/staging-schema.md](../brokers/ibkr/staging-schema.md)
 
 本文档定义**框架层通用**的数据持久化方案：`broker_sync_batches`（通用批次表）、`trade_records` 扩展字段、以及所有券商共同遵守的「暂存 → 导入」两阶段原则。各券商专属的暂存表结构与字段映射在各自的 `brokers/<code>/staging-schema.md` 中定义（如 [brokers/ibkr/staging-schema.md](../brokers/ibkr/staging-schema.md)）。

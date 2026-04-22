@@ -8,7 +8,9 @@ const BASE_URL = '/api/broker-sync';
  *
  * @param {Object} params - 筛选参数
  * @param {string} [params.brokerCode] - 券商标识筛选
- * @param {string} [params.status] - 状态筛选 (PENDING, PROCESSING, COMPLETED, PARTIAL, FAILED, INTERRUPTED)
+ * @param {string} [params.status] - 状态筛选。v2 应用产生的状态为
+ *   PENDING / PROCESSING / COMPLETED / FAILED / CLEANUP_FAILED；
+ *   历史批次可能仍为 PARTIAL / INTERRUPTED（后端仍可按其筛选，但 UI 不再作为独立入口）。
  */
 export const fetchSyncBatches = async (params = {}) => {
   const response = await axios.get(`${BASE_URL}/batches`, { params });
@@ -48,17 +50,5 @@ export const triggerSync = async (data) => {
  */
 export const fetchSupportedBrokers = async () => {
   const response = await axios.get(`${BASE_URL}/brokers`);
-  return response.data;
-};
-
-/**
- * 恢复中断/失败/部分完成的同步批次
- * POST /api/broker-sync/batches/{id}/resume
- *
- * @param {number} id - 批次 ID
- * @returns {Promise<{status: string, message: string, data: object}>}
- */
-export const resumeSync = async (id) => {
-  const response = await axios.post(`${BASE_URL}/batches/${id}/resume`);
   return response.data;
 };
