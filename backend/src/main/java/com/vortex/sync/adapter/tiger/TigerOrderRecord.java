@@ -119,6 +119,20 @@ public class TigerOrderRecord {
     /** 限价单价格 */
     private BigDecimal limitPrice;
 
+    // ============ 订单属性 ============
+
+    /**
+     * 订单属性描述（Tiger API 的 {@code TradeOrder.attrDesc} 字段）。
+     *
+     * 对于普通交易通常为 null 或空字符串；非空时代表订单为期权事件类订单，
+     * 例如行权（Exercise）、被指派（Assignment）、到期作废（Expired）等。
+     *
+     * 在 Phase 3 本期实现中，{@code attrDesc} 非空的订单一律暂存为 FAILED，
+     * 保留原值以便后续收集样本并补齐 attrDesc → TriggerRefType 的映射表。
+     * 参见 {@code docs/broker-sync/brokers/tiger/staging-schema.md § 5.1}。
+     */
+    private String attrDesc;
+
     // ============ Constructors ============
 
     public TigerOrderRecord() {
@@ -405,6 +419,14 @@ public class TigerOrderRecord {
         this.limitPrice = limitPrice;
     }
 
+    public String getAttrDesc() {
+        return attrDesc;
+    }
+
+    public void setAttrDesc(String attrDesc) {
+        this.attrDesc = attrDesc;
+    }
+
     // ============ toString ============
 
     @Override
@@ -437,6 +459,10 @@ public class TigerOrderRecord {
 
         if (etf) {
             sb.append(", etf=true");
+        }
+
+        if (attrDesc != null && !attrDesc.isEmpty()) {
+            sb.append(", attrDesc='").append(attrDesc).append('\'');
         }
 
         sb.append('}');

@@ -275,6 +275,9 @@ public class TigerSyncAdapter implements BrokerSyncAdapter {
             record.setLimitPrice(BigDecimal.valueOf(order.getLimitPrice()));
         }
 
+        // 订单属性描述（期权事件标识；普通交易通常为 null/空）
+        record.setAttrDesc(order.getAttrDesc());
+
         return record;
     }
 

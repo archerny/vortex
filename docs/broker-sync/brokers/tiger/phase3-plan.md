@@ -2,7 +2,7 @@
 
 > **创建日期**：2026-04-21
 > **最近更新**：2026-04-22
-> **状态**：🔧 进行中 — 阶段 1 已完成
+> **状态**：🔧 进行中 — 阶段 1、2 已完成
 > **目标**：将老虎证券同步从 Phase 1（API → 日志）升级为与 IBKR 对齐的两阶段导入（API → `tiger_staged_orders` → `trade_records`）
 > **关联**：[staging-schema.md](./staging-schema.md) | [open-api.md](./open-api.md) | [../../framework/data-persistence.md](../../framework/data-persistence.md) | [../../framework/import-consistency.md](../../framework/import-consistency.md) | [../ibkr/flex-web-service.md](../ibkr/flex-web-service.md)
 
@@ -93,24 +93,27 @@
 
 ---
 
-### 阶段 2：`TigerOrderRecord.attrDesc` 扩展 + Staging Worker
+### 阶段 2：`TigerOrderRecord.attrDesc` 扩展 + Staging Worker ✅ 已完成（2026-04-22）
 
 **目标**：暂存写入链路跑通，API → 暂存表。
 
-- [ ] `TigerOrderRecord.java` 新增 `private String attrDesc;` + getter/setter + `toString()` 输出
-- [ ] `TigerSyncAdapter.convertToRecord()` 中补 `record.setAttrDesc(order.getAttrDesc())`（确认 SDK 确实有此 getter；若无则抓 `order` 反射或走 `getAttrList()` 类似方法，依实际 SDK 行为）
-- [ ] 新建 `TigerStagingWorker`
+- [x] `TigerOrderRecord.java` 新增 `private String attrDesc;` + getter/setter + `toString()` 输出（仅在非空时输出，避免日志噪音）
+- [x] `TigerSyncAdapter.convertToRecord()` 中补 `record.setAttrDesc(order.getAttrDesc())`（T-7 已在 Stage 1 期间通过 `javap` 确认 SDK 2.4.7 有 `getAttrDesc()`）
+- [x] 新建 `TigerStagingWorker`
   - `@Transactional(propagation = REQUIRES_NEW)`
-  - `stageOne(Long batchId, TigerOrderRecord record)`：
-    1. 先 `findByTigerId`，若存在则返回（幂等）
-    2. 否则 `new TigerStagedOrder(...)`，`status=PENDING`，`save`
-- [ ] 新建 `TigerStagingService`
+  - `stageOrder(Long batchId, TigerOrderRecord record)`：
+    1. 先 `existsByTigerId`，若存在则返回 `false`（幂等）
+    2. 否则 `mapToStagedOrder(...)`，`status=PENDING`，`save`，返回 `true`
+  - 时间字段统一用 `yyyy-MM-dd'T'HH:mm:ss`（Asia/Shanghai）格式化；BigDecimal 用 `toPlainString()` 避免科学计数法
+- [x] 新建 `TigerStagingService`
   - 入参：`Long batchId, List<TigerOrderRecord> records`
-  - 对每条调用 `stagingWorker.stageOne(...)`，**单条失败不影响其他**（try/catch 汇总到结果对象）
-  - 返回：`StagingResult { attempted, inserted, skipped, failed }`
+  - 对每条调用 `stagingWorker.stageOrder(...)`，**单条失败不影响其他**（try/catch 汇总）
+  - 返回 `StagingResult { attempted, inserted, skipped, failed }`（`attempted == inserted + skipped + failed` 不变量）
   - **不负责** API 调用，纯处理内存数据 → DB
+- [x] 编译通过（`mvn -q -DskipTests compile` 本地验证通过，2026-04-22）
+- [ ] 单元测试（`TigerStagingWorkerTest`）：本阶段未写；计划中本身将其标为"可选"，实际可放在 Stage 3 的单测批次里或延后
 
-**产出**：单测 mock 一组 `TigerOrderRecord`，能正确写入 `tiger_staged_orders` 且幂等。
+**产出**：Stage 2 代码就绪；等阶段 3 的 Mapper 单测完成后，再在集成/冒烟测试中验证"mock 一组 `TigerOrderRecord` → 正确写入 `tiger_staged_orders` 且幂等"。
 
 ---
 
