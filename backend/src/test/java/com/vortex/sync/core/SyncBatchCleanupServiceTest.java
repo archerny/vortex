@@ -1,150 +1,290 @@
 package com.vortex.sync.core;
 
-import com.vortex.repository.IbkrStagedOrderRepository;
-import com.vortex.repository.IbkrStagedTradeConfirmRepository;
-import com.vortex.repository.TigerStagedOrderRepository;
 import com.vortex.repository.TradeRecordRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@link SyncBatchCleanupService}.
  *
- * Verifies:
- * - Correct broker-specific dispatch (ibkr vs. tiger)
- * - trade_records is always cleaned regardless of broker
- * - Unknown brokers throw IllegalStateException (and do NOT touch any table)
- * - Null/blank arguments are rejected up-front
- * - Repository exceptions propagate (so the @Transactional wrapper rolls back)
+ * <p>Verifies the v2.4.2 strategy-based cleanup architecture:</p>
+ * <ul>
+ *   <li>Per-broker dispatch routes to the correct {@link BrokerCleanupStrategy}</li>
+ *   <li>Shared {@code trade_records} cleanup runs regardless of broker</li>
+ *   <li>Unknown broker code at runtime throws (defensive fallback)</li>
+ *   <li>Null/blank arguments are rejected up-front</li>
+ *   <li>Exception from any step propagates (so {@code @Transactional} rolls back)</li>
+ *   <li>{@code @PostConstruct} coverage check fails when an adapter has no matching
+ *       strategy (makes "forgot to register cleanup for a new broker" a boot-time error
+ *       instead of a latent CLEANUP_FAILED disaster)</li>
+ *   <li>Duplicate strategy beans for the same broker code are rejected at construction</li>
+ * </ul>
  */
-@ExtendWith(MockitoExtension.class)
 class SyncBatchCleanupServiceTest {
 
-    @Mock
-    private IbkrStagedOrderRepository ibkrStagedOrderRepository;
+    // ------------------------------------------------------------------------
+    // Helper fakes
+    // ------------------------------------------------------------------------
 
-    @Mock
-    private IbkrStagedTradeConfirmRepository ibkrStagedTradeConfirmRepository;
+    /** Captures invocations so we can assert dispatch without Mockito per-bean. */
+    private static final class RecordingStrategy implements BrokerCleanupStrategy {
+        final String code;
+        final List<Long> deletedBatches = new ArrayList<>();
+        RuntimeException toThrow;
 
-    @Mock
-    private TigerStagedOrderRepository tigerStagedOrderRepository;
+        RecordingStrategy(String code) {
+            this.code = code;
+        }
 
-    @Mock
-    private TradeRecordRepository tradeRecordRepository;
+        @Override
+        public String brokerCode() {
+            return code;
+        }
 
-    @InjectMocks
-    private SyncBatchCleanupService cleanupService;
+        @Override
+        public void deleteStagedRows(Long batchId) {
+            deletedBatches.add(batchId);
+            if (toThrow != null) {
+                throw toThrow;
+            }
+        }
+    }
+
+    private static final class FakeAdapter implements BrokerSyncAdapter {
+        final String code;
+
+        FakeAdapter(String code) {
+            this.code = code;
+        }
+
+        @Override
+        public String getBrokerCode() {
+            return code;
+        }
+
+        @Override
+        public com.vortex.sync.core.SyncResult sync(com.vortex.sync.core.SyncRequest request) {
+            throw new UnsupportedOperationException("not used in these tests");
+        }
+    }
+
+    // ------------------------------------------------------------------------
+    // Construction / @PostConstruct coverage check
+    // ------------------------------------------------------------------------
+
+    @Nested
+    @DisplayName("construction & verifyAdapterCoverage()")
+    class ConstructionTest {
+
+        @Test
+        @DisplayName("coverage OK: all adapters have matching strategies")
+        void coverageOk() {
+            SyncBatchCleanupService svc = new SyncBatchCleanupService(
+                    List.of(new RecordingStrategy("ibkr"), new RecordingStrategy("tiger")),
+                    List.of(new FakeAdapter("ibkr"), new FakeAdapter("tiger")),
+                    mock(TradeRecordRepository.class));
+
+            // No exception from @PostConstruct helper
+            assertDoesNotThrow(svc::verifyAdapterCoverage);
+        }
+
+        @Test
+        @DisplayName("missing strategy: @PostConstruct fails, listing uncovered broker(s)")
+        void missingStrategyFailsStartup() {
+            SyncBatchCleanupService svc = new SyncBatchCleanupService(
+                    List.of(new RecordingStrategy("ibkr")),                         // no tiger!
+                    List.of(new FakeAdapter("ibkr"), new FakeAdapter("tiger")),
+                    mock(TradeRecordRepository.class));
+
+            IllegalStateException ex = assertThrows(IllegalStateException.class,
+                    svc::verifyAdapterCoverage);
+            assertTrue(ex.getMessage().contains("tiger"),
+                    "error message should mention the uncovered broker: " + ex.getMessage());
+        }
+
+        @Test
+        @DisplayName("extra strategy without an adapter: allowed (strategies may predate adapter registration)")
+        void extraStrategyAllowed() {
+            SyncBatchCleanupService svc = new SyncBatchCleanupService(
+                    List.of(new RecordingStrategy("ibkr"), new RecordingStrategy("tiger")),
+                    List.of(new FakeAdapter("ibkr")),                               // only ibkr adapter
+                    mock(TradeRecordRepository.class));
+
+            assertDoesNotThrow(svc::verifyAdapterCoverage);
+        }
+
+        @Test
+        @DisplayName("duplicate strategy beans for same broker: construction fails")
+        void duplicateStrategyFails() {
+            IllegalStateException ex = assertThrows(IllegalStateException.class, () ->
+                    new SyncBatchCleanupService(
+                            List.of(new RecordingStrategy("ibkr"), new RecordingStrategy("ibkr")),
+                            List.of(new FakeAdapter("ibkr")),
+                            mock(TradeRecordRepository.class)));
+            assertTrue(ex.getMessage().contains("ibkr"));
+        }
+    }
+
+    // ------------------------------------------------------------------------
+    // cleanupBatchData() — dispatch
+    // ------------------------------------------------------------------------
 
     @Nested
     @DisplayName("cleanupBatchData() — broker dispatch")
-    class BrokerDispatchTest {
+    class DispatchTest {
 
         @Test
-        @DisplayName("ibkr: should delete from both staging tables and trade_records")
-        void ibkrShouldDeleteStagingAndTradeRecords() {
-            when(ibkrStagedOrderRepository.deleteByBatchId(42L)).thenReturn(7L);
-            when(ibkrStagedTradeConfirmRepository.deleteByBatchId(42L)).thenReturn(9L);
-            when(tradeRecordRepository.deleteBySyncBatchId(42L)).thenReturn(3);
+        @DisplayName("ibkr: routes to IBKR strategy and deletes trade_records")
+        void ibkrDispatch() {
+            RecordingStrategy ibkr = new RecordingStrategy("ibkr");
+            RecordingStrategy tiger = new RecordingStrategy("tiger");
+            TradeRecordRepository tradeRepo = mock(TradeRecordRepository.class);
+            when(tradeRepo.deleteBySyncBatchId(42L)).thenReturn(3);
 
-            cleanupService.cleanupBatchData(42L, "ibkr");
+            SyncBatchCleanupService svc = new SyncBatchCleanupService(
+                    List.of(ibkr, tiger),
+                    List.of(new FakeAdapter("ibkr"), new FakeAdapter("tiger")),
+                    tradeRepo);
 
-            verify(ibkrStagedOrderRepository).deleteByBatchId(42L);
-            verify(ibkrStagedTradeConfirmRepository).deleteByBatchId(42L);
-            verify(tradeRecordRepository).deleteBySyncBatchId(42L);
-            verifyNoInteractions(tigerStagedOrderRepository);
+            svc.cleanupBatchData(42L, "ibkr");
+
+            assertEquals(List.of(42L), ibkr.deletedBatches);
+            assertEquals(Collections.emptyList(), tiger.deletedBatches);
+            verify(tradeRepo).deleteBySyncBatchId(42L);
         }
 
         @Test
-        @DisplayName("tiger: should delete from tiger_staged_orders and trade_records")
-        void tigerShouldDeleteStagingAndTradeRecords() {
-            when(tigerStagedOrderRepository.deleteByBatchId(11L)).thenReturn(4L);
-            when(tradeRecordRepository.deleteBySyncBatchId(11L)).thenReturn(2);
+        @DisplayName("tiger: routes to Tiger strategy and deletes trade_records")
+        void tigerDispatch() {
+            RecordingStrategy ibkr = new RecordingStrategy("ibkr");
+            RecordingStrategy tiger = new RecordingStrategy("tiger");
+            TradeRecordRepository tradeRepo = mock(TradeRecordRepository.class);
 
-            cleanupService.cleanupBatchData(11L, "tiger");
+            SyncBatchCleanupService svc = new SyncBatchCleanupService(
+                    List.of(ibkr, tiger),
+                    List.of(new FakeAdapter("ibkr"), new FakeAdapter("tiger")),
+                    tradeRepo);
 
-            verify(tigerStagedOrderRepository).deleteByBatchId(11L);
-            verify(tradeRecordRepository).deleteBySyncBatchId(11L);
-            verifyNoInteractions(ibkrStagedOrderRepository, ibkrStagedTradeConfirmRepository);
+            svc.cleanupBatchData(11L, "tiger");
+
+            assertEquals(List.of(11L), tiger.deletedBatches);
+            assertEquals(Collections.emptyList(), ibkr.deletedBatches);
+            verify(tradeRepo).deleteBySyncBatchId(11L);
         }
 
         @Test
-        @DisplayName("unknown broker: should throw and not touch any repository")
-        void unknownBrokerShouldThrowAndNotTouchRepos() {
-            assertThrows(IllegalStateException.class,
-                    () -> cleanupService.cleanupBatchData(1L, "mystery-broker"));
+        @DisplayName("unknown broker at runtime: throws and trade_records not touched")
+        void unknownBrokerThrows() {
+            RecordingStrategy ibkr = new RecordingStrategy("ibkr");
+            TradeRecordRepository tradeRepo = mock(TradeRecordRepository.class);
 
-            verifyNoInteractions(ibkrStagedOrderRepository,
-                    ibkrStagedTradeConfirmRepository,
-                    tigerStagedOrderRepository,
-                    tradeRecordRepository);
+            SyncBatchCleanupService svc = new SyncBatchCleanupService(
+                    List.of(ibkr),
+                    List.of(new FakeAdapter("ibkr")),
+                    tradeRepo);
+
+            IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+                    () -> svc.cleanupBatchData(1L, "mystery-broker"));
+            assertTrue(ex.getMessage().contains("mystery-broker"));
+
+            assertEquals(Collections.emptyList(), ibkr.deletedBatches);
+            verify(tradeRepo, never()).deleteBySyncBatchId(anyLong());
         }
     }
+
+    // ------------------------------------------------------------------------
+    // cleanupBatchData() — argument validation
+    // ------------------------------------------------------------------------
 
     @Nested
     @DisplayName("cleanupBatchData() — argument validation")
     class ArgumentValidationTest {
 
+        private SyncBatchCleanupService svc(TradeRecordRepository tradeRepo) {
+            return new SyncBatchCleanupService(
+                    List.of(new RecordingStrategy("ibkr")),
+                    List.of(new FakeAdapter("ibkr")),
+                    tradeRepo);
+        }
+
         @Test
         @DisplayName("null batchId is rejected")
         void nullBatchIdRejected() {
+            TradeRecordRepository tradeRepo = mock(TradeRecordRepository.class);
             assertThrows(IllegalArgumentException.class,
-                    () -> cleanupService.cleanupBatchData(null, "ibkr"));
-            verifyNoInteractions(ibkrStagedOrderRepository, tradeRecordRepository);
+                    () -> svc(tradeRepo).cleanupBatchData(null, "ibkr"));
+            verifyNoInteractions(tradeRepo);
         }
 
         @Test
         @DisplayName("null brokerCode is rejected")
         void nullBrokerCodeRejected() {
             assertThrows(IllegalArgumentException.class,
-                    () -> cleanupService.cleanupBatchData(1L, null));
+                    () -> svc(mock(TradeRecordRepository.class))
+                            .cleanupBatchData(1L, null));
         }
 
         @Test
         @DisplayName("blank brokerCode is rejected")
         void blankBrokerCodeRejected() {
             assertThrows(IllegalArgumentException.class,
-                    () -> cleanupService.cleanupBatchData(1L, "   "));
+                    () -> svc(mock(TradeRecordRepository.class))
+                            .cleanupBatchData(1L, "   "));
         }
     }
+
+    // ------------------------------------------------------------------------
+    // cleanupBatchData() — exception propagation
+    // ------------------------------------------------------------------------
 
     @Nested
     @DisplayName("cleanupBatchData() — exception propagation")
     class ExceptionPropagationTest {
 
         @Test
-        @DisplayName("staging DELETE failure propagates (so @Transactional rolls back)")
-        void stagingDeleteFailurePropagates() {
-            when(ibkrStagedOrderRepository.deleteByBatchId(1L))
-                    .thenThrow(new RuntimeException("DB locked"));
+        @DisplayName("staging DELETE failure propagates; trade_records not touched")
+        void stagingFailurePropagates() {
+            RecordingStrategy ibkr = new RecordingStrategy("ibkr");
+            ibkr.toThrow = new RuntimeException("DB locked");
+            TradeRecordRepository tradeRepo = mock(TradeRecordRepository.class);
+
+            SyncBatchCleanupService svc = new SyncBatchCleanupService(
+                    List.of(ibkr),
+                    List.of(new FakeAdapter("ibkr")),
+                    tradeRepo);
 
             RuntimeException thrown = assertThrows(RuntimeException.class,
-                    () -> cleanupService.cleanupBatchData(1L, "ibkr"));
+                    () -> svc.cleanupBatchData(1L, "ibkr"));
             assertTrue(thrown.getMessage().contains("DB locked"));
-
-            // trade_records should NOT have been touched because the exception
-            // aborted the method before it got there
-            verify(tradeRecordRepository, never()).deleteBySyncBatchId(anyLong());
+            verify(tradeRepo, never()).deleteBySyncBatchId(anyLong());
         }
 
         @Test
         @DisplayName("trade_records DELETE failure propagates")
-        void tradeRecordDeleteFailurePropagates() {
-            when(ibkrStagedOrderRepository.deleteByBatchId(1L)).thenReturn(0L);
-            when(ibkrStagedTradeConfirmRepository.deleteByBatchId(1L)).thenReturn(0L);
-            when(tradeRecordRepository.deleteBySyncBatchId(1L))
+        void tradeRecordFailurePropagates() {
+            RecordingStrategy ibkr = new RecordingStrategy("ibkr");
+            TradeRecordRepository tradeRepo = mock(TradeRecordRepository.class);
+            when(tradeRepo.deleteBySyncBatchId(1L))
                     .thenThrow(new RuntimeException("FK constraint"));
 
+            SyncBatchCleanupService svc = new SyncBatchCleanupService(
+                    List.of(ibkr),
+                    List.of(new FakeAdapter("ibkr")),
+                    tradeRepo);
+
             RuntimeException thrown = assertThrows(RuntimeException.class,
-                    () -> cleanupService.cleanupBatchData(1L, "ibkr"));
+                    () -> svc.cleanupBatchData(1L, "ibkr"));
             assertTrue(thrown.getMessage().contains("FK constraint"));
+            assertEquals(List.of(1L), ibkr.deletedBatches, "staging delete should have run first");
         }
     }
 }

@@ -11,7 +11,7 @@
 | [architecture.md](./architecture.md) | 架构概览（包结构 + 数据流 + 异步执行模型） | ✅ 当前架构 |
 | **框架层（所有券商通用）** | | |
 | [framework/data-persistence.md](./framework/data-persistence.md) | 数据持久化设计（批次表 + trade_records 扩展 + 两阶段导入原则） | ✅ 已实现（Flyway V19-V24 + V28 + Entity + Repository） |
-| [framework/import-consistency.md](./framework/import-consistency.md) | 数据一致性与失败清理设计（v2：失败即清理，三终态 `COMPLETED` / `FAILED` / `CLEANUP_FAILED`） | ✅ v2 状态模型已完整落地（Phase 1a / 1b / 2 / 3 / 4） |
+| [framework/import-consistency.md](./framework/import-consistency.md) | 数据一致性与失败清理设计（v2：失败即清理，三终态 `COMPLETED` / `FAILED` / `CLEANUP_FAILED`；v2.4.2 清理改为 `BrokerCleanupStrategy` 策略模式） | ✅ v2 状态模型 + v2.4.2 架构加固已完整落地（Phase 1a / 1b / 2 / 3 / 4） |
 | [framework/broker-registration.md](./framework/broker-registration.md) | Broker Code 关联与同步器注册发现 | ✅ 已实现 |
 | **券商层（各券商专属）** | | |
 | [brokers/tiger/README.md](./brokers/tiger/README.md) | 老虎证券同步状态页 | ✅ |

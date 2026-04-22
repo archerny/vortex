@@ -1,8 +1,8 @@
 # 券商同步 — 数据一致性与失败清理设计文档
 
 > **创建日期**：2026-04-16（v1）
-> **最后更新**：2026-04-23（v2.4.1 — 端到端 audit 修复：`TigerSyncAdapter.fetchFilledOrders` 不再吞 API 异常（消除 Tiger 静默丢数据风险）；`SyncBatchRecoveryRunner` 启动扫描扩展为 PENDING ∪ PROCESSING（消除 PENDING 残留永久阻塞新 sync 的风险）；IBKR / Tiger adapter 的 fail-fast 路径由 "throw→catch→failure" 简化为直接 `return SyncResult.failure(...)`。Phase 4 前端完成：删除恢复按钮与 `resumeSync` 客户端；状态过滤器去除 `PARTIAL` / `INTERRUPTED` 并加入 `CLEANUP_FAILED`；`POST /trigger` 409 响应改为 Modal 展示冲突批次 ID / 状态并给出 `CLEANUP_FAILED` 场景的人工处理指引。Phase 1a / 1b / 2 / 3 / 4 全部落地）
-> **状态**：✅ v2 状态模型已完整落地
+> **最后更新**：2026-04-23（v2.4.2 — 架构加固：（1）`TigerStagingService` 对齐 IBKR fail-fast 语义：删除内部 try/catch，staging 阶段单条异常直接冒泡 → adapter 外层 catch 转 `SyncResult.failure` → 整批清理；消除了 `StagingResult.failed` 只存在于内存而不被下游计数检查的 silent data-loss 路径。（2）清理链路重构为 `BrokerCleanupStrategy` 策略模式：每个 broker adapter 提供独立的 `@Component` 策略 bean，`SyncBatchCleanupService` 在 `@PostConstruct` 阶段校验"所有 `BrokerSyncAdapter` 都有匹配的 cleanup strategy"；把"新 broker 忘记注册 cleanup → runtime CLEANUP_FAILED → `uk_only_one_active` 永久锁死"这个灾难路径变成启动期可见的 fail-fast）
+> **状态**：✅ v2 状态模型已完整落地 + 架构加固
 > **关联**：[architecture.md](../architecture.md) | [data-persistence.md](./data-persistence.md) | [broker-registration.md](./broker-registration.md)
 > **取代**：本文档是 v1（2026-04-16）的完全重写。v1 设计的 `INTERRUPTED` / `PARTIAL` / Resume / 幂等续跑机制被整体废弃，历史版本可在 git log 中追溯。
 
@@ -205,31 +205,42 @@ Controller 捕获 `SyncConflictException` → 返回 **HTTP 409 Conflict**。
 
 ### 5.3 清理事务设计
 
-**单个 `@Transactional` 包所有 DELETE**：
+**策略模式 + 单个 `@Transactional` 包所有 DELETE**：
 
 ```java
+// Per-broker strategy — each BrokerSyncAdapter ships one of these.
+public interface BrokerCleanupStrategy {
+    String brokerCode();
+    void deleteStagedRows(Long batchId);
+}
+
+@Component
+public class TigerCleanupStrategy implements BrokerCleanupStrategy {
+    public String brokerCode() { return "tiger"; }
+    public void deleteStagedRows(Long batchId) {
+        tigerStagedOrderRepo.deleteByBatchId(batchId);
+    }
+}
+
+// Composer — unchanged for existing brokers, zero edits for new brokers.
 @Service
 public class SyncBatchCleanupService {
+    private final Map<String, BrokerCleanupStrategy> byBroker;   // from Spring
+
+    @PostConstruct
+    void verifyAdapterCoverage() {
+        // Fail-fast at startup if any adapter has no matching strategy.
+    }
 
     @Transactional
     public void cleanupBatchData(Long batchId, String brokerCode) {
-        // Broker-specific staged tables
-        switch (brokerCode) {
-            case "ibkr":
-                ibkrStagedOrderRepo.deleteByBatchId(batchId);
-                ibkrStagedTradeConfirmRepo.deleteByBatchId(batchId);
-                break;
-            case "tiger":
-                tigerStagedOrderRepo.deleteByBatchId(batchId);
-                break;
-            default:
-                throw new IllegalStateException("Unknown broker: " + brokerCode);
-        }
-        // Common table (all brokers)
-        tradeRecordRepo.deleteBySyncBatchId(batchId);
+        byBroker.get(brokerCode).deleteStagedRows(batchId);     // broker-specific
+        tradeRecordRepo.deleteBySyncBatchId(batchId);            // common
     }
 }
 ```
+
+`trade_record_tags` 表通过 `ON DELETE CASCADE` 外键随 `trade_records` 一起清理，无需手工操作。
 
 事务内任意一个 DELETE 失败 → Spring 自动回滚整个事务 → 保证"要么全删，要么全不删"。
 
@@ -357,7 +368,9 @@ COMMENT ON INDEX uk_only_one_active IS
 
 | 组件 | 说明 |
 |------|------|
-| `SyncBatchCleanupService` | 单个 `@Transactional` 方法，按 brokerCode dispatch 清理 staged + trade_records |
+| `SyncBatchCleanupService` | 单个 `@Transactional` 方法，按 brokerCode 查 `BrokerCleanupStrategy` 清理 staged + trade_records；`@PostConstruct` 校验所有 adapter 都有匹配策略 |
+| `BrokerCleanupStrategy`（接口，v2.4.2 引入）| 每个 broker adapter 提供一个策略 `@Component` 负责清理自己的 staged 表；替代原 switch/case |
+| `IbkrCleanupStrategy` / `TigerCleanupStrategy`（v2.4.2 引入）| 两个 broker 的具体策略实现 |
 | `SyncBatchFailureHandler` | 清理重试 3 次 + 状态标记统一入口 |
 | `SyncConflictException` | RuntimeException，表示活跃 batch 约束冲突，Controller 捕获返回 409 |
 | `V28__simplify_sync_batch_state_model.sql` | 见第六章 |
