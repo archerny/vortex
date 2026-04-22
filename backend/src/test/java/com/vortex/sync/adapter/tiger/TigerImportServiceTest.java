@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -29,10 +28,14 @@ import static org.mockito.Mockito.when;
 /**
  * Unit tests for {@link TigerImportService}.
  *
- * <p>Focuses on orchestration responsibilities — resolving the broker id,
- * iterating over PENDING staged orders, and re-querying counts after the
- * loop completes. Per-record logic is mocked via {@link TigerImportWorker}
- * and covered in {@link TigerImportWorkerTest}.
+ * <p>Focuses on orchestration responsibilities — resolving the broker id and
+ * iterating over PENDING staged orders. Per-record logic is mocked via
+ * {@link TigerImportWorker} and covered in {@link TigerImportWorkerTest}.
+ *
+ * <p>Aggregate counting is intentionally <strong>not</strong> performed by
+ * {@code TigerImportService} (aligned with {@code IbkrImportService}); the
+ * adapter re-queries the staging table itself, so this test suite does not
+ * assert on count values.
  */
 @ExtendWith(MockitoExtension.class)
 class TigerImportServiceTest {
@@ -83,21 +86,14 @@ class TigerImportServiceTest {
         }
 
         @Test
-        @DisplayName("should return zero-counts and not touch worker when no PENDING rows")
+        @DisplayName("should complete silently and not touch worker when no PENDING rows")
         void shouldHandleNoPendingOrders() {
             when(brokerRepository.findByBrokerCode("tiger")).thenReturn(Optional.of(buildBroker()));
             when(stagedOrderRepository.findByBatchIdAndStatus(1L, "PENDING"))
                     .thenReturn(Collections.emptyList());
-            when(stagedOrderRepository.countByBatchIdAndStatus(1L, "IMPORTED")).thenReturn(0L);
-            when(stagedOrderRepository.countByBatchIdAndStatus(1L, "SKIPPED")).thenReturn(0L);
-            when(stagedOrderRepository.countByBatchIdAndStatus(1L, "FAILED")).thenReturn(0L);
 
-            TigerImportService.ImportResult result = assertDoesNotThrow(() -> importService.importAll(1L));
+            assertDoesNotThrow(() -> importService.importAll(1L));
 
-            assertEquals(0, result.attempted);
-            assertEquals(0, result.imported);
-            assertEquals(0, result.skipped);
-            assertEquals(0, result.failed);
             verify(importWorker, never()).importOne(anyLong(), anyLong(), any());
         }
 
@@ -109,31 +105,11 @@ class TigerImportServiceTest {
             TigerStagedOrder o2 = buildStagedOrder("T-2");
             when(stagedOrderRepository.findByBatchIdAndStatus(1L, "PENDING"))
                     .thenReturn(List.of(o1, o2));
-            when(stagedOrderRepository.countByBatchIdAndStatus(anyLong(), any())).thenReturn(0L);
 
             importService.importAll(1L);
 
             verify(importWorker).importOne(1L, 7L, o1);
             verify(importWorker).importOne(1L, 7L, o2);
-        }
-
-        @Test
-        @DisplayName("should re-query final counts from the staging table after the loop")
-        void shouldReQueryCountsAfterLoop() {
-            when(brokerRepository.findByBrokerCode("tiger")).thenReturn(Optional.of(buildBroker()));
-            when(stagedOrderRepository.findByBatchIdAndStatus(1L, "PENDING"))
-                    .thenReturn(List.of(buildStagedOrder("T-1"), buildStagedOrder("T-2"),
-                            buildStagedOrder("T-3")));
-            when(stagedOrderRepository.countByBatchIdAndStatus(1L, "IMPORTED")).thenReturn(2L);
-            when(stagedOrderRepository.countByBatchIdAndStatus(1L, "SKIPPED")).thenReturn(1L);
-            when(stagedOrderRepository.countByBatchIdAndStatus(1L, "FAILED")).thenReturn(0L);
-
-            TigerImportService.ImportResult result = importService.importAll(1L);
-
-            assertEquals(3, result.attempted);
-            assertEquals(2, result.imported);
-            assertEquals(1, result.skipped);
-            assertEquals(0, result.failed);
         }
     }
 }
