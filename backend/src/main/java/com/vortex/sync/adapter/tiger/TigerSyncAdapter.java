@@ -185,7 +185,10 @@ public class TigerSyncAdapter implements BrokerSyncAdapter {
 
         LocalDate windowStart = startDate;
 
-        while (windowStart.isBefore(endDate)) {
+        // Loop condition and window advancement mirror IbkrSyncAdapter.fetchInWindows:
+        //   !isAfter(endDate) — correctly handles single-day ranges (startDate == endDate)
+        //   windowEnd.plusDays(1) — no overlap between adjacent windows
+        while (!windowStart.isAfter(endDate)) {
             LocalDate windowEnd = windowStart.plusDays(MAX_QUERY_DAYS);
             if (windowEnd.isAfter(endDate)) {
                 windowEnd = endDate;
@@ -197,7 +200,7 @@ public class TigerSyncAdapter implements BrokerSyncAdapter {
             logger.info("[TigerSync] Window {} ~ {} returned {} records",
                     windowStart, windowEnd, windowRecords.size());
 
-            windowStart = windowEnd;
+            windowStart = windowEnd.plusDays(1);
         }
 
         return allRecords;
