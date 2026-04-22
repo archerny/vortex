@@ -1,7 +1,8 @@
 # 券商同步 — 架构概览
 
 > **创建日期**：2026-04-21
-> **状态**：✅ 已实现
+> **最后更新**：2026-04-22（状态机与失败处理策略随 import-consistency.md v2 更新：`COMPLETED` / `FAILED` / `CLEANUP_FAILED` 三终态，失败即清理）
+> **状态**：✅ 架构骨架已实现（状态机语义待 import-consistency.md v2 实施完成后全面对齐）
 > **关联**：[README.md](./README.md) | [framework/data-persistence.md](./framework/data-persistence.md) | [framework/import-consistency.md](./framework/import-consistency.md) | [framework/broker-registration.md](./framework/broker-registration.md)
 
 本文档给出券商同步模块的高层架构视图：包结构、数据流、异步执行模型。具体的表结构、字段映射、导入一致性、券商专属实现细节，分别参见 framework/ 和 brokers/ 目录下的专题文档。
@@ -90,7 +91,7 @@ BrokerSyncAdapter（按 brokerCode 路由）
     │ 字段映射 + 类型转换 + 去重校验
     │ 每条记录独立事务，状态 IMPORTED / SKIPPED / CONFLICT / FAILED
     ▼
-trade_records（正式表）                          ← batch: COMPLETED / PARTIAL / FAILED
+trade_records（正式表）                          ← batch: COMPLETED / FAILED / CLEANUP_FAILED
     │ 设置 external_id / external_broker / sync_batch_id
     │ 按交易业务含义设置 trade_trigger（MANUAL / OPTION / MARKET_EVENT）
     ▼
@@ -150,5 +151,5 @@ IBKR Flex Query 需要 `SendRequest` → 轮询 `GetStatement`，耗时可能数
 | 阶段 | 范围 | 关键能力 | 状态 |
 |------|------|---------|------|
 | **Phase 1** | 老虎证券 + 手动触发 + 日志输出 | 跑通基本流程、核对原始数据 | ✅ 已完成 |
-| **Phase 2** | IBKR 适配 + 暂存入库 + Resume 机制 + 前端管理 | 生产可用 | ✅ 已完成（待真实环境验证） |
+| **Phase 2** | IBKR 适配 + 暂存入库 + 失败清理 + 前端管理 | 生产可用 | ✅ 已完成（待真实环境验证；失败清理机制待 import-consistency.md v2 实施完成） |
 | **Phase 3** | 自动同步 + 冲突处理 + 同步预览 | 完整体验 | 📋 待规划 |

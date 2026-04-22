@@ -1,6 +1,6 @@
 # IBKR（盈透证券）同步
 
-> **状态**：✅ Phase 2 已实现（API → 暂存 → 导入 → Resume 全链路），待真实环境验证
+> **状态**：✅ Phase 2 已实现（API → 暂存 → 导入 全链路），待真实环境验证；🔧 失败清理机制待 [import-consistency.md](../../framework/import-consistency.md) v2 实施完成后全面对齐
 > **适配器**：`IbkrSyncAdapter`
 > **API 类型**：Flex Web Service（REST + XML）
 > **Broker Code**：`ibkr`
@@ -17,7 +17,6 @@
 | 暂存表 → `trade_records` 字段映射 | ✅ | `IbkrImportService` |
 | BookTrade 触发判定（期权到期/行权/被指派） | ✅ | `IbkrImportService` + [booktrade-mapping.md](./booktrade-mapping.md) |
 | `triggerRefId` 反向回填（STK 侧关联期权 trade_records.id） | ✅ | `IbkrImportService` |
-| 中断恢复（进程崩溃后 Resume 批次） | ✅ | 详见 [import-consistency.md](../../framework/import-consistency.md) |
 | 异步执行（后台线程池 + 前端提交后立即返回） | ✅ | 详见 [architecture.md § 四](../../architecture.md#四异步执行模型) |
 
 ---

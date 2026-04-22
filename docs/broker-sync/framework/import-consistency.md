@@ -1,23 +1,38 @@
-# 券商同步 — 数据一致性与中断恢复设计文档
+# 券商同步 — 数据一致性与失败清理设计文档
 
-> **创建日期**：2026-04-16  
-> **最后更新**：2026-04-18  
-> **状态**：✅ 已实现（逐条独立事务 + 幂等去重 + 两级状态模型 + SyncBatchRecoveryRunner + Resume 端点 + 前端恢复按钮）  
-> **关联**：[architecture.md](../architecture.md) | [data-persistence.md](./data-persistence.md) | [broker-registration.md](./broker-registration.md)  
-> **前置**：Phase 2 数据库变更已完成（V19-V24 + Entity + Repository）
+> **创建日期**：2026-04-16（v1）
+> **最后更新**：2026-04-22（v2 — 全面重构：移除 INTERRUPTED / PARTIAL / Resume，改为"失败即清理"模型）
+> **状态**：📋 设计中（等待实施）
+> **关联**：[architecture.md](../architecture.md) | [data-persistence.md](./data-persistence.md) | [broker-registration.md](./broker-registration.md)
+> **取代**：本文档是 v1（2026-04-16）的完全重写。v1 设计的 `INTERRUPTED` / `PARTIAL` / Resume / 幂等续跑机制被整体废弃，历史版本可在 git log 中追溯。
 
 ---
 
 ## 一、背景与目标
 
-[data-persistence.md](./data-persistence.md) 定义了「暂存 → 导入」两阶段的数据持久化方案。本文档聚焦于 **导入过程中的数据一致性保证**，解决以下核心问题：
+### 1.1 v1 设计的问题
 
-1. **事务策略**：staging 和 import 阶段如何保证数据不会处于不一致的中间状态？
-2. **失败分类**：不同类型的失败如何处理？哪些可重试，哪些不可？
-3. **中断恢复**：应用在 staging 或 import 过程中崩溃重启后，如何安全恢复？
-4. **状态机设计**：batch 和 staged order 的状态如何精确反映执行进度？
+v1（"两级状态 + 幂等 + Resume"）虽然理论上优雅，但在实际使用中暴露出**复杂度过高、收益有限**的问题：
 
-**核心原则**：这是一个金融记账应用，对数据完整性不能妥协。不允许静默丢数据，不允许残留不可恢复的中间状态。
+1. **状态机过于复杂**：6 种 status × 4 种 phase 的组合难以穷举测试，前端展示逻辑、过滤器、按钮可用性判断充满边界条件
+2. **`PARTIAL` 语义模糊**：用户看到 "部分成功" 的第一反应是"所以呢？我该怎么办？"—— 实际上单条映射失败几乎都是代码 bug 或脏数据，"重试"并无价值
+3. **Resume 的价值有限**：
+   - 对 IBKR：Flex Query 重新拉取代价低，用户直接点"同步"按钮和点"恢复"按钮效果一致
+   - 对 Tiger：两阶段分页拉取的"第一阶段 staged 数据"复用价值更低，实操中几乎总是重新拉
+4. **残留数据成孤儿**：失败/中断批次的 staged 记录长期留在表里占用空间，且对后续新 batch 不产生任何价值
+5. **INTERRUPTED → Resume 流程对用户不友好**：用户必须记住"INTERRUPTED 要点恢复，不能点触发"，增加心智负担
+
+### 1.2 v2 的核心思路
+
+**"失败即清理" —— 任何没有完整成功的 sync，都回滚到"从未发生过"的状态**。
+
+核心原则：
+
+1. **结果二元化**：sync 要么 `COMPLETED`（全部成功），要么 `FAILED`（失败 + 已清理）。没有中间态
+2. **失败即清理**：失败的 batch 自动删除其写入的所有数据（staged 表 + `trade_records`），释放资源
+3. **不保留复用价值**：没有 resume，没有"幂等续跑"。重试 = 用户重新触发一次 sync
+4. **金融数据不妥协**：清理必须原子（事务保证）。清理本身失败时，系统进入**保护性阻塞状态**，拒绝后续 sync 直到人工介入
+5. **同时只跑一个 sync**：DB 级唯一约束保证不会有并发 sync 任务，避免复杂的并发一致性问题
 
 ---
 
@@ -25,362 +40,474 @@
 
 | # | 决策项 | 结论 | 理由 |
 |---|--------|------|------|
-| 1 | 事务策略 | **逐条独立事务 + 幂等**，不用一个大事务包裹整个流程 | 数据量可能上百条，大事务 holding 连接时间太长；一条出错不应阻塞其他；逐条幂等天然支持断点续传 |
-| 2 | Batch 状态模型 | **`status` + `phase` 两级状态** | `status` 是主状态（前端展示），`phase` 是子阶段（进度展示 + 诊断）；拆分后语义更清晰 |
-| 3 | Batch 最终状态 | **三态：`COMPLETED` / `PARTIAL` / `FAILED`** | 区分全部成功、部分成功、整体失败三种结果，用户一看就知道后续操作 |
-| 4 | 中断恢复策略 | **方案 A：完整重跑（fetch → parse → staging → import）** | 不用简化版（只 import 已有 staged records），因为 staging 中断时你无法确认数据是否完整，静默丢数据不可接受 |
-| 5 | 计数统计方式 | **从 DB 统计，不依赖内存累加器** | 中断恢复后也能拿到准确数字 |
+| 1 | 最终状态 | **三态：`COMPLETED` / `FAILED` / `CLEANUP_FAILED`**（活跃态另有 `PENDING` / `PROCESSING`） | 取代 v1 的六态，语义简化 |
+| 2 | 失败处理 | **失败 → 自动清理 → 标记 FAILED**（不保留残留） | 用户任何时候看到 FAILED 都表示"这次没留下任何痕迹" |
+| 3 | 清理原子性 | 用**单个事务包裹所有 DELETE**，任何一张表删不掉就整体回滚 | 不能留半清理状态 |
+| 4 | 清理失败重试 | **重试 3 次**（含原始尝试 = 最多 3 次事务执行），仍失败则进入 `CLEANUP_FAILED` | 容忍偶发 DB 抖动，又不无限阻塞 |
+| 5 | CLEANUP_FAILED 恢复 | **人工介入**：DBA 手动清理残留后，手动更新 status 为 FAILED | 小项目不做自动恢复机制 |
+| 6 | 并发控制 | **DB 级唯一约束**：同时只能有 1 个活跃 batch（PENDING / PROCESSING / CLEANUP_FAILED）| 应用层 check-then-insert 有 TOCTOU race；DB 约束绝对安全 |
+| 7 | 启动检测 | 扫 PENDING / PROCESSING → 走**完整清理流程** → 标记 FAILED / CLEANUP_FAILED | 和运行时失败处理统一 |
+| 8 | Resume | **完全删除** | 价值不足以抵消复杂度 |
+| 9 | PARTIAL | **完全删除** | 一刀切失败，让人工查原因 |
+| 10 | INTERRUPTED | **完全删除** | 被"启动检测 → 清理"取代 |
+| 11 | `phase` 字段 | **保留** | 仍用于 PROCESSING 时的进度展示（FETCHING/STAGING/IMPORTING），以及 CLEANUP_FAILED 时的诊断 |
+| 12 | `failedCount` 字段 | **删除** | 新模型下没有部分失败概念 |
+| 13 | 历史数据迁移 | **不迁移**（目前无生产数据） | 清库重建 Flyway 即可 |
 
 ---
 
-## 三、Batch 状态机
+## 三、状态机
 
-### 3.1 两级状态模型
+### 3.1 状态定义
 
-| 字段 | 可选值 | 说明 |
-|------|--------|------|
-| `status` | `PENDING` / `PROCESSING` / `COMPLETED` / `PARTIAL` / `FAILED` / `INTERRUPTED` | 主状态，前端主要展示 |
-| `phase` | `null` / `FETCHING` / `STAGING` / `IMPORTING` | 子阶段，仅 `status=PROCESSING` 时有意义；`status=INTERRUPTED` 时保留中断时的值用于诊断 |
+| status | 含义 | phase 是否有意义 | 用户可见操作 |
+|--------|------|-----------------|-------------|
+| `PENDING` | 已创建，等待 async 线程拾取 | 否（null） | 仅展示，等待自动流转 |
+| `PROCESSING` | 执行中 | **是**（FETCHING / STAGING / IMPORTING） | 仅展示进度，禁止其他操作 |
+| `COMPLETED` | 全部成功 | 否（null） | 查看详情 |
+| `FAILED` | 失败且清理成功（数据已回滚） | 否（null） | 查看错误原因 `error_message`，可重新触发一次 sync |
+| `CLEANUP_FAILED` | 失败且清理本身也失败（**数据可能有残留**） | 保留清理发起时的 phase 用于诊断 | 阻塞所有新 sync，需人工介入 |
 
-> **命名变更**：之前的 `IMPORTING` 主状态改为 `PROCESSING`，因为它实际覆盖了 fetch / stage / import 三个子阶段，`IMPORTING` 容易产生歧义。
+`CLEANUP_FAILED` 是本次设计新增的保护性状态。它的存在目的就是让系统"**宁可阻塞也不允许错误累积**"。
 
-### 3.2 状态流转图
+### 3.2 活跃态定义（并发控制用）
+
+| 是否"活跃" | 状态 |
+|----------|------|
+| ✅ 活跃（阻塞新 sync） | `PENDING`, `PROCESSING`, `CLEANUP_FAILED` |
+| ❌ 非活跃（不阻塞） | `COMPLETED`, `FAILED` |
+
+`CLEANUP_FAILED` 列为活跃态，目的是通过"阻塞新 sync"倒逼人工介入。
+
+### 3.3 状态流转图
 
 ```
-PENDING (phase=null)
-   │
-   ▼
-PROCESSING (phase=FETCHING)   ── 从券商 API 拉取数据
-   │
-   ▼
-PROCESSING (phase=STAGING)    ── 逐条写入 staged 表
-   │
-   ▼
-PROCESSING (phase=IMPORTING)  ── 逐条从 staged 表导入 trade_records
-   │
-   ├── 全部成功 ──→ COMPLETED  (phase=null)   failedCount == 0
-   │
-   ├── 部分成功 ──→ PARTIAL    (phase=null)   importedCount > 0 && failedCount > 0
-   │
-   ├── 全部失败 ──→ FAILED     (phase=null)   请求/解析阶段失败 或 全部记录 failed
-   │
-   └── 应用崩溃 ──→ INTERRUPTED (phase=保留)   应用重启时检测到卡在 PROCESSING
-                    │
-                    └── 用户触发 resume ──→ PROCESSING (phase=FETCHING) → ...正常流转
+             ┌─────────────────────────────────────────────────┐
+             │                                                 │
+             │                                                 ▼
+        ┌─────────┐     ┌────────────┐     ┌─────────────────────────┐
+        │ PENDING ├────▶│ PROCESSING │────▶│ 成功                     │
+        └─────────┘     │            │     │ → COMPLETED (phase=null)│
+             ▲          │ FETCHING   │     └─────────────────────────┘
+             │          │ STAGING    │
+             │          │ IMPORTING  │     ┌─────────────────────────┐
+     (create │          │            ├────▶│ 失败 → 清理                │
+      batch) │          │            │     │ ├─ 清理 OK               │
+             │          └────────────┘     │ │   → FAILED            │
+             │                             │ └─ 清理 3 次仍失败         │
+        ┌────┴────┐                        │     → CLEANUP_FAILED    │
+        │ 用户触发  │                        │       (phase=保留)       │
+        │ 或启动   │                        └─────────────────────────┘
+        │ 检测    │                                     │
+        └─────────┘                                     │
+                                         ┌──────────────┘
+                                         ▼
+                                   ❗ DBA 人工介入
+                                   手动清理残留 + 手动 UPDATE status=FAILED
 ```
 
-### 3.3 最终状态判定规则
+### 3.4 应用启动时的状态处理
 
-| 最终 status | 判定条件 | 用户含义 |
-|------------|---------|---------|
-| `COMPLETED` | `failedCount == 0` | 全部成功导入，无需操作 |
-| `PARTIAL` | `importedCount > 0 && failedCount > 0` | 部分成功，需关注失败记录 |
-| `FAILED` | 请求/解析阶段整体失败；或所有记录都 failed | 整体失败，查看 error_message |
+`SyncBatchRecoveryRunner` 在应用启动时执行：
 
-### 3.4 数据库变更
+```
+for batch in findByStatusIn([PENDING, PROCESSING]):
+  // 说明 JVM 上次异常退出前这些 batch 未完成
+  cleanupAndMarkFailed(batch.id,
+      "Interrupted: application restarted during " + batch.phase)
+```
 
-`broker_sync_batches` 表新增 `phase` 字段：
+**注意**：启动时遇到 `CLEANUP_FAILED` 的 batch **不做任何处理**，保持其现状 —— 它本来就需要人工介入。
+
+---
+
+## 四、并发控制：DB 级唯一约束
+
+### 4.1 问题
+
+我们希望"同时只能有一个活跃 sync batch"。纯应用层的 `SELECT COUNT → INSERT` 方案有 TOCTOU race（两个请求同时通过校验，各自 INSERT 一条）。必须用 DB 层保证。
+
+### 4.2 方案：虚拟列 + 唯一索引
 
 ```sql
-ALTER TABLE broker_sync_batches ADD COLUMN phase VARCHAR(32);
+ALTER TABLE broker_sync_batches
+  ADD COLUMN active_flag TINYINT
+  GENERATED ALWAYS AS (
+    CASE WHEN status IN ('PENDING', 'PROCESSING', 'CLEANUP_FAILED') THEN 1
+         ELSE NULL
+    END
+  ) VIRTUAL;
+
+ALTER TABLE broker_sync_batches
+  ADD UNIQUE KEY uk_only_one_active (active_flag);
 ```
 
-batch 状态注释更新（原有 4 种 → 6 种）：
+原理：
+- `active_flag` 是 `VIRTUAL` 列（不占存储，读时计算），值取决于 `status`
+- MySQL 的唯一索引**不对 NULL 去重**：无数条 NULL 可以共存
+- 活跃状态的记录 `active_flag = 1`，非活跃记录为 NULL
+- 因此：**最多存在 1 条记录 active_flag = 1**，天然保证"至多一个活跃 batch"
 
-| 旧状态 | 新状态 | 说明 |
-|--------|--------|------|
-| `PENDING` | `PENDING` | 不变 |
-| `IMPORTING` | `PROCESSING` | 改名，含义扩展为覆盖 fetch/stage/import 全流程 |
-| `COMPLETED` | `COMPLETED` | 不变 |
-| _(无)_ | `PARTIAL` | 新增，部分成功 |
-| `FAILED` | `FAILED` | 不变 |
-| _(无)_ | `INTERRUPTED` | 新增，应用中断后恢复标记 |
-
----
-
-## 四、事务与幂等性设计
-
-### 4.1 Staging 阶段
-
-每条 staged order 独立事务写入：
-
-```
-stageOrders(batchId, orders):
-  for each order:
-    @Transactional(REQUIRES_NEW):
-      if stagedOrderRepo.existsByOrderId(order.getOrderId()):
-        skip  // 幂等：已存在则跳过
-      else:
-        save(mapToEntity(batchId, order))
-```
-
-**幂等保证**：`order_id` UNIQUE 约束。重复写入时：
-- 优先通过 `existsByOrderId()` 检查跳过（避免依赖异常控制流）
-- UNIQUE 约束作为兜底防线
-
-**中断后恢复**：对同一 batch 重新调用 staging，已有的跳过，未写入的补上。
-
-### 4.2 Import 阶段
-
-每条 staged order 独立事务导入：
-
-```
-importStagedOrders(batchId):
-  pendingOrders = stagedOrderRepo.findByBatchIdAndStatus(batchId, "PENDING")
-  for each staged in pendingOrders:
-    @Transactional(REQUIRES_NEW):
-      try:
-        // 去重检查
-        if tradeRecordRepo.existsByExternalBrokerAndExternalId("ibkr", staged.orderId):
-          staged.status = "SKIPPED"
-          staged.errorMessage = "Duplicate: already exists in trade_records"
-        else:
-          // 映射 + 保存
-          tradeRecord = mapToTradeRecord(staged)
-          saved = tradeRecordRepo.save(tradeRecord)
-          staged.status = "IMPORTED"
-          staged.importedTradeId = saved.id
-      catch Exception:
-        staged.status = "FAILED"
-        staged.errorMessage = e.message
-      stagedOrderRepo.save(staged)
-```
-
-**幂等保证**（双重）：
-1. 只查询 `status = PENDING` 的记录 → 已处理的不会再出现
-2. `(external_broker, external_id)` 唯一索引 → 即使状态判断出问题，也不会重复插入
-
-**中断后恢复**：重新查询 `WHERE batch_id = ? AND status = 'PENDING'`，已处理的不会再出现。
-
-### 4.3 为什么不用一个大事务？
-
-| 考虑因素 | 大事务 | 逐条独立事务 |
-|---------|--------|------------|
-| 连接占用 | 长时间 hold 连接 | 每条快进快出 |
-| 一条失败的影响 | 全部回滚 | 仅该条标记 FAILED，其他继续 |
-| 断点续传 | 不支持，必须从头来 | 天然支持（PENDING 过滤） |
-| 中断恢复代价 | 前功尽弃 | 只需处理剩余 PENDING |
-| 进度可见性 | 全部完成前看不到进度 | 实时可见每条处理结果 |
-
-### 4.4 计数统计
-
-Import 阶段完成后，从 staged 表统计实际结果（不依赖内存累加器）：
+### 4.3 应用层配合
 
 ```java
-int importedCount = stagedOrderRepo.countByBatchIdAndStatus(batchId, "IMPORTED");
-int skippedCount  = stagedOrderRepo.countByBatchIdAndStatus(batchId, "SKIPPED");
-int failedCount   = stagedOrderRepo.countByBatchIdAndStatus(batchId, "FAILED");
-int totalCount    = importedCount + skippedCount + failedCount;
+// BrokerSyncBatchService.createBatch()
+@Transactional
+public BrokerSyncBatch createBatch(String brokerCode, LocalDate from, LocalDate to) {
+    BrokerSyncBatch batch = buildNewBatch(brokerCode, from, to);  // status=PENDING
+    try {
+        return batchRepository.save(batch);
+    } catch (DataIntegrityViolationException e) {
+        if (isActiveBatchConstraintViolation(e)) {
+            throw new SyncConflictException(
+                "Another sync task is running or blocked. Please wait for it to "
+                + "complete, or resolve the CLEANUP_FAILED batch manually.");
+        }
+        throw e;
+    }
+}
 ```
 
-**好处**：即使中断恢复后重新统计，也能拿到准确数字。
+Controller 捕获 `SyncConflictException` → 返回 **HTTP 409 Conflict**。
+
+### 4.4 保护性阻塞的含义
+
+当存在 `CLEANUP_FAILED` batch 时：
+- 新的 `triggerSync` 请求会被 DB 唯一约束拒绝 → 409
+- 前端展示错误信息："上一次同步清理失败，请人工处理 batch #X 后再试"
+- 只有 DBA 人工把 `CLEANUP_FAILED` batch 的 status 改为 `FAILED`（或删除该 batch 记录），系统才能接受新 sync
+
+这是**故意为之**的保护机制：CLEANUP_FAILED 意味着 staged 表或 trade_records 可能有孤儿数据，继续跑新 sync 可能放大问题。
 
 ---
 
-## 五、失败分类与处理策略
+## 五、清理机制
 
-### 5.1 失败类型全览
+### 5.1 清理范围
 
-| # | 阶段 | 失败原因 | 已写入的数据 | batch 最终状态 | 重试价值 |
-|---|------|---------|-------------|--------------|---------|
-| A | Fetch | HTTP 超时 / 认证失败 / 网络错误 | 无 | `FAILED` | 网络问题有价值；认证问题无价值 |
-| B | Parse | XML 格式异常 / 解析器 bug | 无 | `FAILED` | 一般无价值（数据/代码有问题）|
-| C | Staging 中断 | 应用崩溃 / OOM / DB 连接断 | 部分 staged records | → `INTERRUPTED` (phase=STAGING) | **有价值（resume 完整重跑）** |
-| D | Import 中断 | 同上 | 部分 staged→IMPORTED，部分 PENDING | → `INTERRUPTED` (phase=IMPORTING) | **有价值（resume 完整重跑）** |
-| E | 单条映射失败 | 字段值不合法 / 类型转换出错 | 该条→FAILED，其他正常 | `PARTIAL` | 无价值（数据本身有问题）|
-| F | 全部映射失败 | 所有记录都转换出错 | 全部→FAILED | `FAILED` | 一般无价值（代码有问题）|
-| G | 全部成功 | — | 全部→IMPORTED/SKIPPED | `COMPLETED` | 不需要 |
+清理必须覆盖**本次 sync 写入的所有表**。以 `batch_id` / `sync_batch_id` 为锚点定位：
 
-### 5.2 各类型详细分析
+| 表名 | 锚点字段 | 所有 broker 通用？ |
+|------|---------|------------------|
+| `ibkr_staged_orders` | `batch_id` | 仅 IBKR 写入 |
+| `ibkr_staged_trade_confirms` | `batch_id` | 仅 IBKR 写入 |
+| `tiger_staged_orders` | `batch_id` | 仅 Tiger 写入 |
+| `trade_records` | `sync_batch_id` | ✅ 所有 broker 共享 |
 
-#### 类型 A/B：请求/解析阶段失败
+**未来新 broker 加入时的约束**：任何引入的新 staged 表必须带 `batch_id` 字段并在 `SyncBatchCleanupService` 中注册，否则清理会漏数据。
 
-- 还没有写入任何 staged 数据
-- batch 直接标记为 `FAILED`，`errorMessage` 记录原因
-- 跟之前 Phase 1 的失败处理完全一致，不涉及 staging/import 逻辑
-- 用户可以重新触发一次 sync（创建新 batch）
+### 5.2 不清理的表
 
-#### 类型 C：Staging 中断
+以下表**不在清理范围**（它们不是 sync 直接写入的）：
 
-- **核心问题**：staged 表里只有写进去的部分，缺失的部分无从得知。原始数据在内存中，应用崩溃后丢失
-- **不能只 import 已有 staged records**：这会导致静默丢数据，对金融应用不可接受
-- **处理方式**：resume 时完整重跑（fetch → parse → staging → import），staging 阶段的幂等性保证已有记录不会重复
+- `dividend_records` —— sync 流程不写
+- 持仓快照 / 成本重算缓存 —— 由 `trade_records` 派生，删 `trade_records` 时这些会被下次重算自动校正
+- `market_event_*` —— 独立业务表，不在 sync 范围
 
-#### 类型 D：Import 中断
+### 5.3 清理事务设计
 
-- staged 表部分记录已 IMPORTED，部分还是 PENDING
-- **同样走完整重跑**：因为无法确认 staging 是否完整（万一 staging 看起来完了但最后几条没写进去？）
-- 安全起见统一走 fetch → staging → import，代价只是多一次 API 调用和一些 UNIQUE 冲突跳过
-
-#### 类型 E：单条映射失败
-
-- 该条被标记为 FAILED + errorMessage，其他条正常继续
-- batch 最终标记为 `PARTIAL`（如果有成功的）或 `FAILED`（如果全部失败）
-- 重试一般无意义——数据本身有问题，重试 100 次结果一样
-- 需要人工查看 error_message 处理
-
----
-
-## 六、中断检测与恢复机制
-
-### 6.1 应用启动扫描
-
-应用启动时，扫描所有卡在 `PROCESSING` 状态的 batch，标记为 `INTERRUPTED`：
+**单个 `@Transactional` 包所有 DELETE**：
 
 ```java
-@Component
-public class SyncBatchRecoveryRunner implements ApplicationRunner {
+@Service
+public class SyncBatchCleanupService {
 
-    @Override
-    public void run(ApplicationArguments args) {
-        List<BrokerSyncBatch> stuckBatches =
-            batchRepo.findByStatus("PROCESSING");
+    @Transactional
+    public void cleanupBatchData(Long batchId, String brokerCode) {
+        // Broker-specific staged tables
+        switch (brokerCode) {
+            case "ibkr":
+                ibkrStagedOrderRepo.deleteByBatchId(batchId);
+                ibkrStagedTradeConfirmRepo.deleteByBatchId(batchId);
+                break;
+            case "tiger":
+                tigerStagedOrderRepo.deleteByBatchId(batchId);
+                break;
+            default:
+                throw new IllegalStateException("Unknown broker: " + brokerCode);
+        }
+        // Common table (all brokers)
+        tradeRecordRepo.deleteBySyncBatchId(batchId);
+    }
+}
+```
 
-        for (BrokerSyncBatch batch : stuckBatches) {
-            batch.setStatus("INTERRUPTED");
-            batch.setErrorMessage("Interrupted: application restarted during sync");
-            // phase 保留原值，用于诊断中断发生在哪个阶段
-            batchRepo.save(batch);
-            log.warn("Batch {} marked as INTERRUPTED (was PROCESSING, phase={})",
-                     batch.getId(), batch.getPhase());
+事务内任意一个 DELETE 失败 → Spring 自动回滚整个事务 → 保证"要么全删，要么全不删"。
+
+**注意**：清理事务**不包含** batch 本身的 status 更新。status 更新在独立的下一步做（见 5.4）。
+
+### 5.4 带重试的清理入口
+
+```java
+@Service
+public class SyncBatchFailureHandler {
+
+    private static final int MAX_CLEANUP_ATTEMPTS = 3;
+
+    /**
+     * 失败处理统一入口：清理数据 + 标记 FAILED（或 CLEANUP_FAILED）
+     * 清理成功 → status = FAILED + errorMessage = 原因
+     * 清理失败 3 次 → status = CLEANUP_FAILED + errorMessage = 清理失败原因 + 原始失败原因 (保留 phase)
+     */
+    public void handleFailure(Long batchId, String brokerCode, String originalError) {
+        for (int attempt = 1; attempt <= MAX_CLEANUP_ATTEMPTS; attempt++) {
+            try {
+                cleanupService.cleanupBatchData(batchId, brokerCode);
+                batchService.markAsFailed(batchId, originalError);  // clears phase
+                log.info("Batch {} cleaned up and marked FAILED (attempt {})", batchId, attempt);
+                return;
+            } catch (Exception e) {
+                log.error("Cleanup attempt {}/{} failed for batch {}: {}",
+                        attempt, MAX_CLEANUP_ATTEMPTS, batchId, e.getMessage(), e);
+                if (attempt == MAX_CLEANUP_ATTEMPTS) {
+                    // 最后一次仍失败 → CLEANUP_FAILED
+                    batchService.markAsCleanupFailed(batchId,
+                            String.format("Cleanup failed after %d attempts: %s. Original error: %s",
+                                    MAX_CLEANUP_ATTEMPTS, e.getMessage(), originalError));
+                    return;
+                }
+                // otherwise retry after small backoff (optional)
+            }
         }
     }
 }
 ```
 
-> **为什么不自动恢复？** 应用重启时自动触发 API 调用不太合适——可能是计划内的重启，也可能是配置变更后的重启。让用户主动决定是否 resume 更安全。
+`markAsCleanupFailed` **保留** `phase` 值用于诊断（和 v1 的 INTERRUPTED 处理一样）；`markAsFailed` 清空 `phase`。
 
-### 6.2 Resume API
+### 5.5 清理触发时机
+
+所有以下场景都调用 `SyncBatchFailureHandler.handleFailure`：
+
+1. **Fetch / Parse 阶段异常**：`BrokerSyncAsyncExecutor` catch 后调用
+2. **Staging / Import 阶段异常**：同上
+3. **单条映射失败导致整批失败**：v2 新模型下，单条失败不再变成 PARTIAL，而是**整批判定为失败**触发清理（见 5.6）
+4. **应用重启后的启动检测**：`SyncBatchRecoveryRunner` 扫到 PENDING/PROCESSING 时调用
+
+### 5.6 "单条失败整批失败" 的具体判定
+
+v1 中 import 阶段每条独立事务，失败时只标记该条 FAILED，其他继续。v2 保留这个事务模型（性能必需），但最终判定时：
 
 ```
-POST /api/broker-sync/batches/{id}/resume
+import 阶段结束后：
+  importedCount = countByStatus(IMPORTED)
+  skippedCount  = countByStatus(SKIPPED)
+  failedCount   = countByStatus(FAILED)
+  totalCount    = imported + skipped + failed
+
+  if failedCount == 0:
+      → markAsCompleted
+  else:
+      → handleFailure("N records failed to import, see staged records for details")
+      // 触发完整清理，包括那些已成功 IMPORTED 的 trade_records
 ```
 
-#### 前置校验
+**代价**：已成功 import 的记录会被清理（重拉时重新 import）。但这是"全有或全无"原则的必然结果，用户会从 UI 上得到清晰的信号（FAILED 就是整体失败）。
 
-- batch `status` 必须是 `INTERRUPTED`，其他状态一律拒绝
-- batch 的 `brokerCode` 对应的适配器必须存在且已配置
-
-#### 执行流程
-
-```
-resumeSync(batchId):
-  1. 验证 batch.status == INTERRUPTED
-  2. 从 batch 记录恢复请求参数：
-     - brokerCode  → batch.brokerCode
-     - startTime   → batch.syncDateFrom
-     - endTime     → batch.syncDateTo
-  3. markAsProcessing(batchId, phase=FETCHING)
-  4. 完整执行：fetch → parse → staging(幂等补全) → import(从 PENDING 续传)
-  5. 统计 counts，更新 batch 最终状态
-```
-
-#### 为什么是完整重跑？
-
-| 阶段 | 已有数据的处理 | 幂等保证 |
-|------|-------------|---------|
-| Fetch + Parse | 重新从 API 拿完整数据 | IBKR Flex Query 查历史成交记录，结果稳定（至少是超集） |
-| Staging | 已有的跳过，缺失的补上 | `order_id` UNIQUE 约束 |
-| Import | 已 IMPORTED 的不会被选中 | `status = PENDING` 过滤 + `(external_broker, external_id)` 唯一索引 |
-
-完整重跑的代价：多一次 API 调用 + 一些 UNIQUE 冲突跳过。不会产生错误数据。
-
-#### Resume 和重新 Sync 的区别
-
-| | Resume | 重新 Sync |
-|--|--------|----------|
-| Batch | 复用原 batch（INTERRUPTED → PROCESSING） | 创建新 batch |
-| 请求参数 | 从 batch 记录恢复，**用户无需重新填** | 用户重新填参数 |
-| Staged 数据 | 复用 + 补全（同一 batch_id） | 全新写入（新 batch_id） |
-| 旧残留数据 | 被整合进同一 batch | 旧 batch 的 staged 数据成孤儿 |
-| 历史追溯 | 干净：一个 batch = 一次完整 sync | 两个 batch 记录，旧的是残缺的 |
-
-### 6.3 隐含假设
-
-**IBKR API 的幂等性**：对同样的日期范围重新 fetch，IBKR 返回的数据应该是一致的（至少是超集）。
-
-这个假设对 IBKR Flex Query 成立——它查的是历史成交记录，不会因为多查一次就变了。最多是两次查询之间有新的成交产生（超集），不会丢失已有记录。
+**诊断仍然可用**：staged 表在清理**之前**已经包含每条的 status 和 errorMessage；但清理会把 staged 记录一并删掉 —— 为了让用户能查原因，**error_message 字段要包含具体失败记录的汇总信息**（例如前 3 条的错误摘要）。清理完成后用户仍能从 batch 的 `error_message` 看到失败概况。
 
 ---
 
-## 七、完整执行流程
+## 六、数据库变更（Flyway V28）
 
-### 7.1 正常流程
+### 6.1 变更清单
 
+单个 Flyway 脚本 `V28__simplify_sync_batch_state_model.sql`：
+
+```sql
+-- 1. 删除 failedCount 列（v2 新模型不再有部分失败概念）
+ALTER TABLE broker_sync_batches
+  DROP COLUMN failed_count;
+
+-- 2. 更新 status 注释（语义变化）
+ALTER TABLE broker_sync_batches
+  MODIFY COLUMN status VARCHAR(32) NOT NULL
+  COMMENT '批次主状态: PENDING, PROCESSING, COMPLETED, FAILED, CLEANUP_FAILED';
+
+-- 3. 更新 phase 注释（语义微调）
+ALTER TABLE broker_sync_batches
+  MODIFY COLUMN phase VARCHAR(32)
+  COMMENT '子阶段: FETCHING, STAGING, IMPORTING. PROCESSING 时表示当前进度; CLEANUP_FAILED 时保留发起清理时的阶段用于诊断; 其他状态为 NULL.';
+
+-- 4. 新增 active_flag 虚拟列（并发控制）
+ALTER TABLE broker_sync_batches
+  ADD COLUMN active_flag TINYINT
+  GENERATED ALWAYS AS (
+    CASE WHEN status IN ('PENDING', 'PROCESSING', 'CLEANUP_FAILED') THEN 1
+         ELSE NULL
+    END
+  ) VIRTUAL
+  COMMENT 'Virtual: 1 when batch is active (blocks new sync), NULL otherwise. Used by uk_only_one_active.';
+
+-- 5. 新增唯一索引（保证至多一个活跃 batch）
+ALTER TABLE broker_sync_batches
+  ADD UNIQUE KEY uk_only_one_active (active_flag);
 ```
-triggerSync(request):
-  → createBatch(PENDING, phase=null)
-  → asyncExecutor.execute(batchId, request):
-      → markAsProcessing(batchId, phase=FETCHING)
-      → adapter.fetch(request)           // 从券商 API 拉数据
-      → adapter.parse(response)          // 解析为内存模型
 
-      → updatePhase(batchId, STAGING)
-      → stagingService.stage(batchId, orders)   // 逐条写入 staged 表
+### 6.2 数据迁移说明
 
-      → updatePhase(batchId, IMPORTING)
-      → importService.import(batchId)           // 逐条 PENDING→IMPORTED/SKIPPED/FAILED
+**不迁移**。目前无生产数据，Flyway 执行前库里不会有 INTERRUPTED / PARTIAL 记录。如果未来发现有历史数据，可以在脚本首部加：
 
-      → 从 DB 统计 counts
-      → markAsCompleted / markAsPartial / markAsFailed(batchId, counts)
+```sql
+-- (not needed now, placeholder for future)
+-- DELETE FROM broker_sync_batches WHERE status IN ('INTERRUPTED', 'PARTIAL');
 ```
 
-### 7.2 恢复流程
-
-```
-resumeSync(batchId):
-  → 验证 status == INTERRUPTED
-  → 从 batch 恢复 SyncRequest(brokerCode, syncDateFrom, syncDateTo)
-  → asyncExecutor.executeResume(batchId, request):
-      → markAsProcessing(batchId, phase=FETCHING)
-      → 同正常流程（fetch → parse → staging → import → 统计 → 更新状态）
-```
+开发环境已有测试数据的话，推荐清库重来（`ibkr_staged_*`, `tiger_staged_*`, `trade_records`, `broker_sync_batches` 全清），避免遗留 `failed_count` 非零、`PARTIAL` / `INTERRUPTED` 老状态干扰。
 
 ---
 
-## 八、失败场景全覆盖表
+## 七、后端代码变更
 
-| # | 场景 | batch 最终状态 | staged 状态 | Resume 支持 | 用户操作 |
-|---|------|--------------|------------|-------------|---------|
-| 1 | HTTP 请求失败 | `FAILED` | 无数据 | ❌ 不支持（重新 sync） | 检查网络/配置，重新触发 sync |
-| 2 | XML 解析失败 | `FAILED` | 无数据 | ❌ 不支持 | 排查数据/代码问题 |
-| 3 | Staging 中断 | → `INTERRUPTED` (phase=STAGING) | 部分 PENDING | ✅ 完整重跑 | 点击 Resume |
-| 4 | Import 中断 | → `INTERRUPTED` (phase=IMPORTING) | 部分 IMPORTED/PENDING | ✅ 完整重跑 | 点击 Resume |
-| 5 | 单条映射失败 | `PARTIAL` | 该条 FAILED，其他 IMPORTED | ❌（数据问题，重试无意义） | 查看 error_message，手动处理 |
-| 6 | 全部映射失败 | `FAILED` | 全部 FAILED | ❌（代码/数据问题） | 代码修复后重新 sync |
-| 7 | 全部成功 | `COMPLETED` | 全部 IMPORTED/SKIPPED | 不需要 | 无需操作 |
-
----
-
-## 九、需要变更的地方汇总
-
-### 9.1 数据库变更
-
-| 变更 | 说明 | Flyway 脚本 |
-|------|------|------------|
-| `broker_sync_batches` 新增 `phase` 列 | `VARCHAR(32)`，可空 | V24 |
-| `broker_sync_batches.status` 枚举扩展 | 新增 `PROCESSING`、`PARTIAL`、`INTERRUPTED`；`IMPORTING` 改为 `PROCESSING` | 注释更新，无 DDL 变更（VARCHAR 字段） |
-
-> **注意**：如果已有数据中存在 `status = 'IMPORTING'` 的记录，需要在 Flyway 脚本中做数据迁移：`UPDATE broker_sync_batches SET status = 'PROCESSING' WHERE status = 'IMPORTING'`
-
-### 9.2 后端代码变更
-
-| 组件 | 变更类型 | 说明 |
-|------|---------|------|
-| `BrokerSyncBatch` entity | 修改 | 新增 `phase` 字段；状态注释更新 |
-| `BrokerSyncBatchRepository` | 修改 | 新增 `findByStatus(String status)` 查询 |
-| `BrokerSyncBatchService` | 修改 | 新增 `markAsProcessing(id, phase)`、`markAsPartial(id, result)`、`markAsInterrupted(id, message)` 方法；`markAsImporting` 改为 `markAsProcessing` |
-| `SyncBatchRecoveryRunner` | **新建** | `ApplicationRunner`，启动时扫描 PROCESSING → INTERRUPTED |
-| `IbkrStagingService` | **新建** | 逐条幂等写入 staged 表 |
-| `IbkrImportService` | **新建** | 逐条从 staged 表导入 trade_records |
-| `BrokerSyncController` | 修改 | 新增 `POST /batches/{id}/resume` 端点 |
-| `BrokerSyncAsyncExecutor` | 修改 | 适配新的 status/phase 流转；支持 resume 模式 |
-
-### 9.3 前端变更（后续任务）
+### 7.1 新增
 
 | 组件 | 说明 |
 |------|------|
-| Batch 列表状态展示 | 支持 `PROCESSING`（含 phase 展示）、`PARTIAL`、`INTERRUPTED` 状态 |
-| Resume 按钮 | `INTERRUPTED` 状态的 batch 显示「恢复」按钮 |
+| `SyncBatchCleanupService` | 单个 `@Transactional` 方法，按 brokerCode dispatch 清理 staged + trade_records |
+| `SyncBatchFailureHandler` | 清理重试 3 次 + 状态标记统一入口 |
+| `SyncConflictException` | RuntimeException，表示活跃 batch 约束冲突，Controller 捕获返回 409 |
+| `V28__simplify_sync_batch_state_model.sql` | 见第六章 |
 
+### 7.2 修改
 
+| 组件 | 变更 |
+|------|------|
+| `BrokerSyncBatch` entity | 删除 `failedCount` 字段；更新 `status` / `phase` javadoc |
+| `BrokerSyncBatchService.createBatch` | catch `DataIntegrityViolationException` → 转换为 `SyncConflictException` |
+| `BrokerSyncBatchService` | **新增** `markAsCleanupFailed(batchId, message)`（保留 phase）|
+| `BrokerSyncBatchService` | **删除** `markAsPartial`、`markAsInterrupted` 方法 |
+| `BrokerSyncBatchService.markAsCompleted` | 去掉 `setFailedCount` 调用 |
+| `BrokerSyncBatchService.markAsFailed` | 保持签名，但现在只代表"清理成功后的最终 FAILED" |
+| `SyncResult` | 删除 `failedCount` 字段及 setter/getter；`success()` 重载去掉 `failedCount` 参数；toString 同步更新 |
+| `BrokerSyncAsyncExecutor.execute` | 删除 `markAsPartial` 分支；失败分支（包括 result.failedCount>0 和 catch）统一调 `SyncBatchFailureHandler.handleFailure` |
+| `BrokerSyncController` | 删除 `resumeSync` 端点和 `RESUMABLE_STATUSES` 常量 |
+| `BrokerSyncController.triggerSync` | catch `SyncConflictException` → 返回 409 |
+| `SyncBatchRecoveryRunner` | 行为改为：扫 PENDING/PROCESSING → 调 `SyncBatchFailureHandler.handleFailure`；CLEANUP_FAILED 的 batch 跳过（不做任何处理） |
+| `BrokerSyncBatchRepository` | 删除与 INTERRUPTED/PARTIAL 相关的查询（如有）|
+| `IbkrStagedOrderRepository` / `IbkrStagedTradeConfirmRepository` / `TigerStagedOrderRepository` | **新增** `deleteByBatchId(Long)` 方法（如尚未存在）|
+| `TradeRecordRepository` | **新增** `deleteBySyncBatchId(Long)` 方法 |
+| 所有 Import/Staging Service 里的 import 阶段统计代码 | 保持逐条事务模型，但最终 `result.getFailedCount() > 0` 触发 failure handler，不再走 PARTIAL |
+
+### 7.3 删除
+
+| 组件 | 处理 |
+|------|------|
+| `BrokerSyncController.resumeSync` 方法 | 删除 |
+| `BrokerSyncController.RESUMABLE_STATUSES` | 删除 |
+| `BrokerSyncBatchService.markAsPartial` / `markAsInterrupted` | 删除 |
+| `SyncResult` 的 `failedCount` 字段 | 删除（影响 6 处代码：field/getter/setter/两个 success 重载/toString）|
+| 任何对 `INTERRUPTED` / `PARTIAL` 状态字符串的引用 | 全库 grep 清除 |
+
+---
+
+## 八、前端代码变更
+
+### 8.1 删除
+
+- "恢复" 按钮（`RedoOutlined`）及其 onClick 处理
+- "按 INTERRUPTED 过滤" / "按 PARTIAL 过滤" 的状态过滤器选项
+- `resumableStatuses` 相关判断逻辑
+- 调 `/api/broker-sync/batches/{id}/resume` 的 API 函数（如 `resumeBatch`）
+
+### 8.2 修改
+
+- 状态徽章（Badge/Tag）的 color mapping：
+  - `PENDING` → default
+  - `PROCESSING` → processing（蓝色，spinning）
+  - `COMPLETED` → success（绿色）
+  - `FAILED` → error（红色）
+  - `CLEANUP_FAILED` → **error 红色 + 特殊图标**，tooltip 说明"本次同步清理失败，请人工处理该 batch 后再触发新同步"
+- 状态过滤器选项同步更新为上述 5 种
+- 列表不再显示 `failedCount` 列（如果之前有）
+- `triggerSync` 的错误处理：识别 HTTP 409 → 展示友好提示"已有同步任务在运行或需要人工处理，请稍后再试"
+
+### 8.3 保留
+
+- 进度展示（`phase` 字段在 PROCESSING 时显示 "获取中 / 暂存中 / 导入中"）
+
+---
+
+## 九、失败场景全覆盖表（v2）
+
+| # | 场景 | 期间写入数据 | 清理是否成功 | batch 最终状态 | 用户操作 |
+|---|------|-------------|------------|--------------|---------|
+| 1 | Fetch 阶段异常（HTTP 超时/认证失败） | 无 | 无需清理（立即走 FAILED） | `FAILED` | 查 error，修复后重新触发 sync |
+| 2 | Parse 阶段异常 | 无 | 无需清理 | `FAILED` | 查 error 排查数据/代码 |
+| 3 | Staging 中途应用重启 | 部分 staged 记录 | 启动检测 → 清理成功 | `FAILED` | 重新触发 sync |
+| 4 | Staging 中途应用重启 | 部分 staged 记录 | 启动检测 → 清理失败 | `CLEANUP_FAILED` | DBA 人工清理 |
+| 5 | Import 中途应用重启 | 部分 staged + 部分 trade_records | 启动检测 → 清理成功 | `FAILED` | 重新触发 sync |
+| 6 | Import 中途应用重启 | 部分 staged + 部分 trade_records | 启动检测 → 清理失败 | `CLEANUP_FAILED` | DBA 人工清理 |
+| 7 | 单条映射失败（其他条正常） | 部分 staged + 部分 trade_records | 运行时清理成功 | `FAILED` | 查 error_message 中的失败摘要，修复数据/代码后重试 |
+| 8 | 全部映射失败 | staged 全 FAILED | 运行时清理成功 | `FAILED` | 查原因，代码/数据修复后重试 |
+| 9 | 运行时任何清理失败 | 数据可能部分残留 | 重试 3 次仍失败 | `CLEANUP_FAILED` | DBA 人工清理 |
+| 10 | 全部成功 | 全部 IMPORTED/SKIPPED | 无需清理 | `COMPLETED` | 无需操作 |
+| 11 | 用户在有活跃 batch 时触发新 sync | — | — | — | 收到 409，前端提示"请等待当前任务完成" |
+
+---
+
+## 十、CLEANUP_FAILED 的人工处理 SOP
+
+当看到 CLEANUP_FAILED 状态时，DBA 需要：
+
+1. **看 batch 的 `error_message`**：了解清理失败原因（通常是 DB 连接问题 / 锁等待 / 外键约束等）
+2. **看 batch 的 `phase`**：判断清理发起时 batch 处于哪个阶段，据此推断可能有残留数据的表
+3. **手动执行清理 SQL**（按 brokerCode 选择）：
+   ```sql
+   -- 假设 batchId = 123, brokerCode = 'ibkr'
+   DELETE FROM trade_records WHERE sync_batch_id = 123;
+   DELETE FROM ibkr_staged_trade_confirms WHERE batch_id = 123;
+   DELETE FROM ibkr_staged_orders WHERE batch_id = 123;
+   ```
+4. **更新 batch 状态**：
+   ```sql
+   UPDATE broker_sync_batches
+   SET status = 'FAILED', phase = NULL,
+       error_message = CONCAT(error_message, ' | Manually cleaned by DBA at ', NOW())
+   WHERE id = 123;
+   ```
+5. **验证 active_flag 已变 NULL**：`uk_only_one_active` 解锁，新 sync 可以触发
+
+此 SOP 应该写进运维手册（本项目目前没有，可放到 `docs/operations/` 新建）。
+
+---
+
+## 十一、和 v1 的对照（给 reviewer 的快速指南）
+
+| 方面 | v1 (2026-04-16) | v2 (2026-04-22) |
+|------|----------------|----------------|
+| 状态数量 | 6 种 | 5 种（少了 INTERRUPTED/PARTIAL，多了 CLEANUP_FAILED） |
+| 失败批次数据 | 保留，等 resume 续跑 | 立即清理，无残留（CLEANUP_FAILED 除外） |
+| Resume 机制 | 完整支持（幂等续跑） | 完全删除 |
+| 部分成功 | `PARTIAL` 状态 | 整体判失败，触发清理 |
+| 并发控制 | 未处理（隐含假设） | DB 虚拟列 + 唯一索引 |
+| `failedCount` | 保留展示 | 完全删除 |
+| 运维心智 | 复杂（3 种失败状态需要理解） | 简单（FAILED = 没留下任何东西） |
+| JVM 崩溃恢复 | 标记 INTERRUPTED + 用户点 Resume | 启动自动清理 + 标记 FAILED |
+
+**核心权衡**：用"多一次 API 调用（重拉）"换取"零运维心智 + 零残留数据 + 零并发隐患"。对小项目性价比极高。
+
+---
+
+## 十二、待实施 Todos（执行前会用 todo 工具重新梳理）
+
+1. 写 `V28` Flyway 脚本
+2. 改 entity / repository（删 failedCount，加 delete 方法）
+3. 新增 `SyncBatchCleanupService` + `SyncBatchFailureHandler`
+4. 改 `BrokerSyncBatchService`（删 markAsPartial/markAsInterrupted，加 markAsCleanupFailed，处理 conflict）
+5. 改 `BrokerSyncAsyncExecutor`（接入 failure handler，删 PARTIAL 分支）
+6. 改 `BrokerSyncController`（删 resume，处理 409）
+7. 改 `SyncBatchRecoveryRunner`（改为清理逻辑）
+8. 删除 `SyncResult.failedCount`
+9. 改前端：删恢复按钮、删 INTERRUPTED/PARTIAL 过滤、加 CLEANUP_FAILED 展示、处理 409
+10. 测试：新增 `SyncBatchCleanupServiceTest`、`SyncBatchFailureHandlerTest`；修改 `BrokerSyncBatchServiceTest`（去掉 PARTIAL/INTERRUPTED 用例）、`BrokerSyncControllerTest`（去掉 resume 用例，加 409 用例）、`SyncBatchRecoveryRunnerTest`（改为清理流程）
+11. 更新关联文档：`data-persistence.md`、`architecture.md`、`broker-registration.md` 中任何提到 INTERRUPTED/PARTIAL/Resume 的地方 —— 按"零文档债"规则
+
+---
+
+## 十三、开放问题 / Review 待确认
+
+✅ 所有 A-H 问题已在讨论中确认。
+✅ 并发方案（虚拟列 + 唯一索引）已确认采用。
+✅ 文档重写策略（直接 v2 覆盖，v1 从 git 追溯）已确认。
+
+剩余小决策由 AI 在实施时自行决定（第五章 5.6 的 error_message 汇总格式、前端 409 错误文案具体措辞等），有歧义会在 PR review 时再讨论。

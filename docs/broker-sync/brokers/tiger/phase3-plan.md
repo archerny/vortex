@@ -1,10 +1,12 @@
 # Tiger Phase 3 — 编码与工作计划
 
 > **创建日期**：2026-04-21
-> **最近更新**：2026-04-22
-> **状态**：🔧 进行中 — 阶段 1、2、3、4、5 已完成
+> **最近更新**：2026-04-22（随 import-consistency.md v2 更新相关措辞；原文中涉及"Resume"/"PARTIAL"的段落已标注为 v1 历史口径）
+> **状态**：🔧 进行中 — 阶段 1、2、3、4、5 已完成；已完成对照 IBKR 的代码 review 与对齐修复（窗口循环边界、ImportResult 契约对齐）
 > **目标**：将老虎证券同步从 Phase 1（API → 日志）升级为与 IBKR 对齐的两阶段导入（API → `tiger_staged_orders` → `trade_records`）
 > **关联**：[staging-schema.md](./staging-schema.md) | [open-api.md](./open-api.md) | [../../framework/data-persistence.md](../../framework/data-persistence.md) | [../../framework/import-consistency.md](../../framework/import-consistency.md) | [../ibkr/flex-web-service.md](../ibkr/flex-web-service.md)
+>
+> **⚠️ 与 import-consistency.md v2 的一致性说明**：本文档里阶段 5（Resume 相关描述）和阶段 5.1（对照 IBKR 的 review）中提到的 `PARTIAL` / `INTERRUPTED` / "Resume" 均为 **v1 的口径**。v2（2026-04-22 发布，等待实施）已改为"失败即清理、三终态"模型，Tiger 侧无需额外 Resume 逻辑，批次收敛到 `COMPLETED` / `FAILED` / `CLEANUP_FAILED`。具体执行改造随 v2 V28 迁移同步落地。
 
 ---
 
@@ -32,8 +34,8 @@
 - `BrokerSyncAdapter` 接口
 - `BrokerSyncController` / `BrokerSyncService`（控制器与编排）
 - `broker_sync_batches` 通用批次表
-- `BrokerSyncBatchService`（批次管理：状态机、phase、Resume 条件）
-- `SyncBatchRecoveryRunner`（应用启动恢复）
+- `BrokerSyncBatchService`（批次管理：状态机 / phase；v2 起改为"失败即清理"，不再有 Resume 条件）
+- `SyncBatchRecoveryRunner`（应用启动恢复；v2 起行为改为"扫到残留活跃批次 → 清理数据 → 标记 FAILED"）
 - `trade_records` 扩展字段（`external_id` / `external_broker` / `sync_batch_id`）
 - 前端动态券商列表（`/api/broker-sync/brokers`）
 
@@ -63,7 +65,7 @@
 ### 2.4 不新建的内容
 
 - ❌ `tiger_staged_trade_confirms`（Tiger 无 TradeConfirm 粒度数据）
-- ❌ Tiger 专属 Resume 逻辑（复用框架通用 Resume 即可）
+- ❌ Tiger 专属失败处理逻辑（复用框架通用 `SyncBatchFailureHandler`，v2 起为"失败即清理 + 标记 FAILED"）
 
 ---
 
@@ -167,22 +169,21 @@
     5. 回写 `staged.status=IMPORTED, importedTradeId=tr.id, errorMessage=null`
     6. 任意异常 → `staged.status=FAILED, errorMessage="Import error: " + e.getMessage()`（不向外传播）
 - [x] 新建 `TigerImportService`（`@Service`）
-  - 入参：`Long batchId`
+  - 入参：`Long batchId`（返回 `void`，与 `IbkrImportService.importAll` 契约一致）
   - 1. `brokerId = brokerRepository.findByBrokerCode("tiger").getId()`（批次内只查一次；缺则抛 `IllegalStateException`）
   - 2. `List<TigerStagedOrder> pending = stagedOrderRepository.findByBatchIdAndStatus(batchId, "PENDING")`
   - 3. 逐个调用 `importWorker.importOne(batchId, brokerId, staged)`
-  - 4. 循环结束后用 `countByBatchIdAndStatus` 重新从 DB 统计 IMPORTED/SKIPPED/FAILED，返回 `ImportResult { attempted, imported, skipped, failed }`
+  - 4. 汇总计数（IMPORTED/SKIPPED/FAILED）由 `TigerSyncAdapter` 通过 `countByBatchIdAndStatus` 统一从 DB 重查，`TigerImportService` 不再自己 count，避免重复 SQL
 - [x] 单元测试：`TigerImportWorkerTest`（8 个用例，Mock Mockito 风格）
   - PASS：成功路径 → save TradeRecord + status=IMPORTED + importedTradeId 回填
   - SKIPPED：已导入、filledQuantity=0
   - FAILED（过滤器）：secType=FUT、attrDesc=Exercise
   - Exception：`save()` 抛 `RuntimeException`、`avgFillPrice` 非法导致 mapping 抛出 — 均被 catch 且标记 FAILED
   - Invariant：staged order 每次调用都恰好被 `stagedOrderRepository.save()` 一次
-- [x] 单元测试：`TigerImportServiceTest`（4 个用例）
+- [x] 单元测试：`TigerImportServiceTest`（3 个用例）
   - broker 不存在 → `IllegalStateException`，worker 不被调用
-  - 无 PENDING → 不调用 worker，返回零计数
+  - 无 PENDING → 不调用 worker，方法正常返回（void）
   - 多条 PENDING → worker 被逐个调用
-  - 计数从 DB 重新查询（模拟混合 IMPORTED/SKIPPED）
 
 **产出**：端到端：`batch_id` → 暂存表若干条 `PENDING` → 运行 `TigerImportService` → 所有记录进入 `IMPORTED` / `SKIPPED` / `FAILED`，`trade_records` 中出现对应数据。42 个 Tiger 子模块测试全绿，全量 `mvn test` 192 个测试零失败。
 
@@ -207,21 +208,23 @@
    - TigerImportService.importAll(batchId)
 5. 统计：从 DB 按 batchId 重新 countByBatchIdAndStatus(IMPORTED/SKIPPED/FAILED)
 6. 返回 SyncResult.success(brokerCode, total, imported, skipped, failed, durationMs)
-7. 批次状态收敛（COMPLETED / PARTIAL / FAILED / 异常兜底）由 BrokerSyncAsyncExecutor
-   统一处理，adapter 只管更新 phase 与返回 SyncResult
+   （注：`SyncResult.failedCount` 字段将随 import-consistency.md v2 删除；当前代码仍沿用 v1 结构）
+7. 批次状态收敛（v1：COMPLETED / PARTIAL / FAILED；v2：COMPLETED / FAILED / CLEANUP_FAILED）
+   由 BrokerSyncAsyncExecutor 统一处理，adapter 只管更新 phase 与返回 SyncResult
 ```
 
 - [x] 注入 `BrokerSyncBatchService`、`TigerStagingService`、`TigerImportService`、`TigerStagedOrderRepository`
 - [x] `convertToRecord()` `attrDesc` 字段（阶段 2 已做，此处确认保持）
 - [x] 分页行为：确认 `get_filled_orders` 服务端一次性返回，无需 pageToken 循环
 - [x] 原有"日志逐条打印"降级为 DEBUG 级别（`logRecordsForDebug`，带 `isDebugEnabled()` 保护），便于排障
-- [x] Resume：`SyncBatchRecoveryRunner` 是框架级（与 broker 无关），启动时会把残留 PROCESSING 批次标记为 INTERRUPTED，用户通过 `POST /api/broker-sync/batches/{id}/resume` 重跑；Tiger 链路依赖幂等的 `TigerStagingService`，天然支持重跑
+- [x] ~~Resume~~ **(v1 历史口径；v2 已废弃)**：`SyncBatchRecoveryRunner` 是框架级（与 broker 无关），启动时会把残留 PROCESSING 批次标记为 INTERRUPTED，用户通过 `POST /api/broker-sync/batches/{id}/resume` 重跑；Tiger 链路依赖幂等的 `TigerStagingService`，天然支持重跑。
+  - **v2 变更**：启动检测直接"清理残留数据 + 标记 FAILED"，无需 Resume；Tiger 侧 `TigerStagingService` 的幂等性依然有价值（避免重拉后的重复插入），无需改动。
 
 **实现要点**：
 
 - `TigerSyncAdapter` 构造器从 1 参扩到 5 参；Spring DI 自动注入
-- 批次生命周期（PROCESSING / COMPLETED / PARTIAL / FAILED）完全由 `BrokerSyncAsyncExecutor` 拥有；adapter 只更新 `phase` 字段（FETCHING → STAGING → IMPORTING）并返回 `SyncResult`。**不在 adapter 里调 `batchService.markFailed` / `markSuccess`**，与 IBKR 一致
-- 异常路径：`try { ... } catch (Exception e)` → 返回 `SyncResult.failure`；由 `BrokerSyncAsyncExecutor` 根据 `result.isSuccess() == false` 调 `markAsFailed`
+- 批次生命周期（v1：PROCESSING / COMPLETED / PARTIAL / FAILED；v2：PROCESSING / COMPLETED / FAILED / CLEANUP_FAILED）完全由 `BrokerSyncAsyncExecutor` 拥有；adapter 只更新 `phase` 字段（FETCHING → STAGING → IMPORTING）并返回 `SyncResult`。**不在 adapter 里调 `batchService.markFailed` / `markSuccess`**，与 IBKR 一致
+- 异常路径：`try { ... } catch (Exception e)` → 返回 `SyncResult.failure`；由 `BrokerSyncAsyncExecutor` 根据 `result.isSuccess() == false` 调失败处理入口（v1：`markAsFailed`；v2：`SyncBatchFailureHandler.handleFailure` 清理 + 标记 FAILED）
 
 **验证**：
 
@@ -230,6 +233,24 @@
 - 真实 Tiger API 冒烟测试（凭证相关）列入 Phase 3 发布前最后一步，本 issue 不做
 
 **产出**：端到端可跑；Postman/curl 触发 `POST /api/broker-sync/trigger -d '{"brokerCode":"tiger","startTime":"...","endTime":"..."}'` 后，`broker_sync_batches` / `tiger_staged_orders` / `trade_records` 三张表联动正确。
+
+---
+
+### 阶段 5.1：对照 IBKR 的 review 修复 ✅ 已完成 2026-04-22
+
+**触发**：阶段 5 完工后对 Tiger 与 IBKR 全链路代码做一次 review，发现两处落差：
+
+- **差异 1（真正的 bug）**：`TigerSyncAdapter.fetchOrdersInWindows` 循环条件 `windowStart.isBefore(endDate)` 导致 `startDate == endDate`（同步当天）时不执行；且推进 `windowStart = windowEnd` 会让相邻窗口端点重叠一天。
+  - 修复：对齐 `IbkrSyncAdapter.fetchInWindows` 的 `!windowStart.isAfter(endDate)` + `windowStart = windowEnd.plusDays(1)`。
+- **差异 3（冗余）**：`TigerImportService.importAll` 返回 `ImportResult` 并在内部 `countByBatchIdAndStatus` 三次，同一 batch 的三次 COUNT 又在 `TigerSyncAdapter` 里被重复执行一次（共 6 条 SQL）。
+  - 修复：`importAll` 改为 `void`，删除内部计数与 `ImportResult`；由 adapter 统一重查，契约与 `IbkrImportService.importAll` 完全一致。
+
+**未处理**（已评估、本期不做）：
+
+- 差异 2（`TigerImportWorker` 手动 `new TigerTradeRecordMapper()`）：mapper 是无状态纯类，改成 Spring bean 只是风格一致性，不影响行为，留作未来清理。
+- `StagingResult.failed` 未上报到 `SyncResult`：Tiger 对 staging 阶段异常的容错优于 IBKR，但计数未反映到最终结果；属于增强项，不在 Phase 3 范围内。
+
+**验证**：全量 `mvn test`：**192 / 0 / 0**，零回归。
 
 ---
 

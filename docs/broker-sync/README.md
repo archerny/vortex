@@ -11,7 +11,7 @@
 | [architecture.md](./architecture.md) | 架构概览（包结构 + 数据流 + 异步执行模型） | ✅ 当前架构 |
 | **框架层（所有券商通用）** | | |
 | [framework/data-persistence.md](./framework/data-persistence.md) | 数据持久化设计（批次表 + trade_records 扩展 + 两阶段导入原则） | ✅ 已实现（Flyway V19-V24 + Entity + Repository） |
-| [framework/import-consistency.md](./framework/import-consistency.md) | 数据一致性与中断恢复设计（事务策略 + 状态机 + 失败分类 + Resume 机制） | ✅ 已实现 |
+| [framework/import-consistency.md](./framework/import-consistency.md) | 数据一致性与失败清理设计（v2：失败即清理，三终态 `COMPLETED` / `FAILED` / `CLEANUP_FAILED`） | 📋 v2 设计中（等待实施，v1 Resume/PARTIAL/INTERRUPTED 方案已废弃） |
 | [framework/broker-registration.md](./framework/broker-registration.md) | Broker Code 关联与同步器注册发现 | ✅ 已实现 |
 | **券商层（各券商专属）** | | |
 | [brokers/tiger/README.md](./brokers/tiger/README.md) | 老虎证券同步状态页 | ✅ |
@@ -61,7 +61,7 @@
 | 阶段 | 范围 | 关键能力 | 状态 |
 |------|------|---------|------|
 | **Phase 1** | 老虎证券 + 手动触发 + 日志输出 | 跑通基本流程、核对原始数据 | ✅ 已完成 |
-| **Phase 2** | IBKR 适配 + 多券商适配 + 去重机制 + 同步日志 + 入库 | 生产可用（IBKR 方案详见 [brokers/ibkr/flex-web-service.md](./brokers/ibkr/flex-web-service.md)） | ✅ IBKR 同步全链路已实现（API→暂存→导入→Resume），待真实环境验证 |
+| **Phase 2** | IBKR 适配 + 多券商适配 + 去重机制 + 同步日志 + 入库 | 生产可用（IBKR 方案详见 [brokers/ibkr/flex-web-service.md](./brokers/ibkr/flex-web-service.md)） | ✅ IBKR 同步全链路已实现（API→暂存→导入），待真实环境验证 |
 | **Phase 3** | Tiger 两阶段导入 + 自动同步 + 冲突处理 + 前端交互 | Tiger 对齐 IBKR 全链路；完整体验 | 🔧 Tiger 两阶段导入设计稿已定（见 [brokers/tiger/phase3-plan.md](./brokers/tiger/phase3-plan.md)），其余仍在规划 |
 
 ## 涉及的券商
