@@ -2,7 +2,7 @@
 
 > **创建日期**：2026-04-21
 > **最近更新**：2026-04-22
-> **状态**：🔧 进行中 — 阶段 1、2、3、4 已完成
+> **状态**：🔧 进行中 — 阶段 1、2、3、4、5 已完成
 > **目标**：将老虎证券同步从 Phase 1（API → 日志）升级为与 IBKR 对齐的两阶段导入（API → `tiger_staged_orders` → `trade_records`）
 > **关联**：[staging-schema.md](./staging-schema.md) | [open-api.md](./open-api.md) | [../../framework/data-persistence.md](../../framework/data-persistence.md) | [../../framework/import-consistency.md](../../framework/import-consistency.md) | [../ibkr/flex-web-service.md](../ibkr/flex-web-service.md)
 
@@ -188,7 +188,7 @@
 
 ---
 
-### 阶段 5：`TigerSyncAdapter` 流程改造（两阶段接入）
+### 阶段 5：`TigerSyncAdapter` 流程改造（两阶段接入） ✅ 已完成 2026-04-22
 
 **目标**：`POST /api/broker-sync/trigger` 从入口到落库全链路跑通。
 
@@ -196,30 +196,40 @@
 
 ```
 1. 前置检查（配置 / TigerApiProperties.isConfigured）
-2. 创建批次：batchService.createAndStart(brokerCode="tiger", startDate, endDate)
-3. 进入 phase=FETCHING：
-   - 调用 Tiger API（现有 fetchOrdersInWindows） → List<TigerOrderRecord>
-   - ⚠️ 确认分页：get_filled_orders 是否自动翻页
-     · 方案 A：SDK 自动翻页 → 无需改
-     · 方案 B：需要手动循环 pageToken → 在 fetchFilledOrders 里加 while(pageToken != null)
-4. 进入 phase=STAGING：
+2. phase=FETCHING（由 BrokerSyncAsyncExecutor 预设）：
+   - 调用 Tiger API（复用 fetchOrdersInWindows，90 天窗口拆分） → List<TigerOrderRecord>
+   - ✅ 分页确认：get_filled_orders 由服务端一次性返回整个窗口的完整列表
+     （external-resource/tiger-api/docs/orderinfo.md 无 limit/page_token 参数），
+     无需客户端分页
+3. phase=STAGING：
    - TigerStagingService.stageAll(batchId, records)
-5. 进入 phase=IMPORTING：
+4. phase=IMPORTING：
    - TigerImportService.importAll(batchId)
-6. 进入 phase=COMPLETED：
-   - 从 DB 重新统计 totalRecords（只算 IMPORTED）
-   - batchService.markSuccess(batchId, imported, skipped, failed)
-7. 异常：batchService.markFailed(batchId, errorMessage)；phase 停在失败处
-8. 返回 SyncResult（注意：异步执行，Controller 直接返回 batchId）
+5. 统计：从 DB 按 batchId 重新 countByBatchIdAndStatus(IMPORTED/SKIPPED/FAILED)
+6. 返回 SyncResult.success(brokerCode, total, imported, skipped, failed, durationMs)
+7. 批次状态收敛（COMPLETED / PARTIAL / FAILED / 异常兜底）由 BrokerSyncAsyncExecutor
+   统一处理，adapter 只管更新 phase 与返回 SyncResult
 ```
 
-- [ ] 注入 `BrokerSyncBatchService`、`TigerStagingService`、`TigerImportService`、`TigerStagedOrderRepository`
-- [ ] `convertToRecord()` 补 `attrDesc`（阶段 2 已做，此处只是确认）
-- [ ] 确认分页行为（必要时加 `pageToken` 循环）
-- [ ] 移除或保留原先的"日志逐条打印"：默认保留在 DEBUG 级别，便于排障
-- [ ] 验证 Resume：启动时 `SyncBatchRecoveryRunner` 能接续未完成批次
+- [x] 注入 `BrokerSyncBatchService`、`TigerStagingService`、`TigerImportService`、`TigerStagedOrderRepository`
+- [x] `convertToRecord()` `attrDesc` 字段（阶段 2 已做，此处确认保持）
+- [x] 分页行为：确认 `get_filled_orders` 服务端一次性返回，无需 pageToken 循环
+- [x] 原有"日志逐条打印"降级为 DEBUG 级别（`logRecordsForDebug`，带 `isDebugEnabled()` 保护），便于排障
+- [x] Resume：`SyncBatchRecoveryRunner` 是框架级（与 broker 无关），启动时会把残留 PROCESSING 批次标记为 INTERRUPTED，用户通过 `POST /api/broker-sync/batches/{id}/resume` 重跑；Tiger 链路依赖幂等的 `TigerStagingService`，天然支持重跑
 
-**产出**：端到端可跑；Postman/curl 触发后，`broker_sync_batches` / `tiger_staged_orders` / `trade_records` 三张表联动正确。
+**实现要点**：
+
+- `TigerSyncAdapter` 构造器从 1 参扩到 5 参；Spring DI 自动注入
+- 批次生命周期（PROCESSING / COMPLETED / PARTIAL / FAILED）完全由 `BrokerSyncAsyncExecutor` 拥有；adapter 只更新 `phase` 字段（FETCHING → STAGING → IMPORTING）并返回 `SyncResult`。**不在 adapter 里调 `batchService.markFailed` / `markSuccess`**，与 IBKR 一致
+- 异常路径：`try { ... } catch (Exception e)` → 返回 `SyncResult.failure`；由 `BrokerSyncAsyncExecutor` 根据 `result.isSuccess() == false` 调 `markAsFailed`
+
+**验证**：
+
+- `mvn -q -DskipTests compile`：通过
+- 全量 `mvn test`：**192 / 0 / 0，BUILD SUCCESS**，零回归
+- 真实 Tiger API 冒烟测试（凭证相关）列入 Phase 3 发布前最后一步，本 issue 不做
+
+**产出**：端到端可跑；Postman/curl 触发 `POST /api/broker-sync/trigger -d '{"brokerCode":"tiger","startTime":"...","endTime":"..."}'` 后，`broker_sync_batches` / `tiger_staged_orders` / `trade_records` 三张表联动正确。
 
 ---
 

@@ -1,5 +1,7 @@
 package com.vortex.sync.adapter.tiger;
 
+import com.vortex.repository.TigerStagedOrderRepository;
+import com.vortex.service.BrokerSyncBatchService;
 import com.vortex.sync.core.BrokerSyncAdapter;
 import com.vortex.sync.core.SyncRequest;
 import com.vortex.sync.core.SyncResult;
@@ -22,34 +24,56 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 老虎证券同步适配器
+ * Tiger Brokers Sync Adapter
  *
- * 实现 BrokerSyncAdapter 接口，通过 Tiger Open API 获取已成交订单数据。
+ * Implements BrokerSyncAdapter to sync filled orders from Tiger Open API.
  *
- * Phase 1 行为：
- * 1. 初始化 TigerHttpClient（使用 application-local.properties 中的凭证）
- * 2. 调用 get_filled_orders API 获取已成交订单
- * 3. 处理 90 天分页限制（自动拆分时间窗口）
- * 4. 将 API 返回的 TradeOrder 转换为 TigerOrderRecord
- * 5. 逐条日志输出（供核对原始数据）
+ * Phase 3 behavior (aligned with IbkrSyncAdapter):
+ * <ol>
+ *   <li>Validate Tiger API configuration</li>
+ *   <li>Parse date range from SyncRequest (default: endDate = today, startDate = endDate - 90d)</li>
+ *   <li>Split date range into &le; 90-day windows (Tiger API limit) and fetch filled orders
+ *       via {@code get_filled_orders} (server returns full list per window — no client-side
+ *       pagination is needed; see external-resource/tiger-api/docs/orderinfo.md)</li>
+ *   <li>phase=STAGING: {@link TigerStagingService#stageAll(Long, List)} — idempotent</li>
+ *   <li>phase=IMPORTING: {@link TigerImportService#importAll(Long)} — staged → trade_records</li>
+ *   <li>Re-count IMPORTED/SKIPPED/FAILED from DB and return {@link SyncResult}</li>
+ * </ol>
  *
- * 注意：start_time 和 end_time 之间的间隔不能超过 90 天
+ * <p>Batch lifecycle (PROCESSING → COMPLETED/PARTIAL/FAILED) is owned by
+ * {@code BrokerSyncAsyncExecutor}; this adapter only updates the {@code phase} field.
+ *
+ * @see TigerStagingService
+ * @see TigerImportService
+ * @see TigerTradeRecordMapper
  */
 @Component
 public class TigerSyncAdapter implements BrokerSyncAdapter {
 
     private static final Logger logger = LoggerFactory.getLogger(TigerSyncAdapter.class);
 
-    /** Tiger API 单次查询最大时间跨度（天） */
+    /** Tiger API maximum date range per request (days). */
     private static final int MAX_QUERY_DAYS = 90;
 
-    /** 日期格式化器 */
+    /** Date formatter for SyncRequest + Tiger API (yyyy-MM-dd). */
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     private final TigerApiProperties tigerApiProperties;
+    private final TigerStagingService stagingService;
+    private final TigerImportService importService;
+    private final BrokerSyncBatchService batchService;
+    private final TigerStagedOrderRepository stagedOrderRepository;
 
-    public TigerSyncAdapter(TigerApiProperties tigerApiProperties) {
+    public TigerSyncAdapter(TigerApiProperties tigerApiProperties,
+                            TigerStagingService stagingService,
+                            TigerImportService importService,
+                            BrokerSyncBatchService batchService,
+                            TigerStagedOrderRepository stagedOrderRepository) {
         this.tigerApiProperties = tigerApiProperties;
+        this.stagingService = stagingService;
+        this.importService = importService;
+        this.batchService = batchService;
+        this.stagedOrderRepository = stagedOrderRepository;
     }
 
     @Override
@@ -60,32 +84,53 @@ public class TigerSyncAdapter implements BrokerSyncAdapter {
     @Override
     public SyncResult sync(SyncRequest request) {
         long startMs = System.currentTimeMillis();
+        Long batchId = request.getBatchId();
 
-        // 1. 检查配置
+        // 1. Check configuration
         if (!tigerApiProperties.isConfigured()) {
             logger.error("[TigerSync] Tiger API credentials not configured. " +
                     "Please set broker.tiger.* properties in application-local.properties");
-            return SyncResult.failure(getBrokerCode(), "API credentials not configured", System.currentTimeMillis() - startMs);
+            return SyncResult.failure(getBrokerCode(),
+                    "Tiger API credentials not configured",
+                    System.currentTimeMillis() - startMs);
         }
 
         try {
-            // 2. 初始化客户端
+            // 2. Initialize client
             TigerHttpClient client = createClient();
             logger.info("[TigerSync] Tiger API client initialized, account: {}", tigerApiProperties.getAccount());
 
-            // 3. 确定时间范围
+            // 3. Resolve date range (phase=FETCHING already set by BrokerSyncAsyncExecutor)
             LocalDate endDate = resolveEndDate(request);
             LocalDate startDate = resolveStartDate(request, endDate);
             logger.info("[TigerSync] Sync date range: {} ~ {}", startDate, endDate);
 
-            // 4. 分段查询（90 天限制）
+            // 4. Fetch all filled orders in 90-day windows
             List<TigerOrderRecord> allRecords = fetchOrdersInWindows(client, startDate, endDate);
+            logger.info("[TigerSync] Total fetched: {} filled orders", allRecords.size());
+            logRecordsForDebug(allRecords);
 
-            // 5. 日志输出
-            logRecords(allRecords);
+            // 5. Stage into tiger_staged_orders
+            if (batchId != null) {
+                batchService.updatePhase(batchId, "STAGING");
+            }
+            stagingService.stageAll(batchId, allRecords);
+
+            // 6. Import from staged to trade_records
+            if (batchId != null) {
+                batchService.updatePhase(batchId, "IMPORTING");
+            }
+            importService.importAll(batchId);
+
+            // 7. Re-count results from DB (accurate even after resume)
+            long importedCount = stagedOrderRepository.countByBatchIdAndStatus(batchId, "IMPORTED");
+            long skippedCount = stagedOrderRepository.countByBatchIdAndStatus(batchId, "SKIPPED");
+            long failedCount = stagedOrderRepository.countByBatchIdAndStatus(batchId, "FAILED");
+            int totalCount = (int) (importedCount + skippedCount + failedCount);
 
             long durationMs = System.currentTimeMillis() - startMs;
-            return SyncResult.success(getBrokerCode(), allRecords.size(), durationMs);
+            return SyncResult.success(getBrokerCode(), totalCount,
+                    (int) importedCount, (int) skippedCount, (int) failedCount, durationMs);
 
         } catch (Exception e) {
             long durationMs = System.currentTimeMillis() - startMs;
@@ -94,11 +139,11 @@ public class TigerSyncAdapter implements BrokerSyncAdapter {
         }
     }
 
-    // ============ 客户端初始化 ============
+    // ============ Client Initialization ============
 
     /**
-     * 创建 TigerHttpClient 实例
-     * 使用硬编码配置方式（不依赖 tiger_openapi_config.properties 文件）
+     * Create a TigerHttpClient instance using credentials from TigerApiProperties
+     * (no dependency on tiger_openapi_config.properties file).
      */
     private TigerHttpClient createClient() {
         ClientConfig clientConfig = ClientConfig.DEFAULT_CONFIG;
@@ -109,13 +154,13 @@ public class TigerSyncAdapter implements BrokerSyncAdapter {
         return TigerHttpClient.getInstance().clientConfig(clientConfig);
     }
 
-    // ============ 时间范围解析 ============
+    // ============ Date Resolution ============
 
     private LocalDate resolveStartDate(SyncRequest request, LocalDate endDate) {
         if (request.getStartTime() != null && !request.getStartTime().isBlank()) {
             return LocalDate.parse(request.getStartTime(), DATE_FORMATTER);
         }
-        // 默认：从 endDate 往前推 90 天
+        // Default: 90 days back from endDate (Tiger API hard limit)
         return endDate.minusDays(MAX_QUERY_DAYS);
     }
 
@@ -123,17 +168,17 @@ public class TigerSyncAdapter implements BrokerSyncAdapter {
         if (request.getEndTime() != null && !request.getEndTime().isBlank()) {
             return LocalDate.parse(request.getEndTime(), DATE_FORMATTER);
         }
-        // 默认：今天
+        // Default: today
         return LocalDate.now();
     }
 
-    // ============ 分段查询 ============
+    // ============ Windowed Fetching ============
 
     /**
-     * 将时间范围按 90 天窗口拆分，逐段查询已成交订单
+     * Split the date range into &le; 90-day windows and fetch filled orders for each window.
      *
-     * Tiger API 限制 start_time 和 end_time 之间的间隔不能超过 90 天，
-     * 因此如果请求的时间范围超过 90 天，需要自动拆分为多个子窗口依次查询。
+     * <p>Tiger API's {@code get_filled_orders} requires start_time and end_time within 90 days.
+     * The server returns the full list per window (no client-side pagination).
      */
     private List<TigerOrderRecord> fetchOrdersInWindows(TigerHttpClient client, LocalDate startDate, LocalDate endDate) {
         List<TigerOrderRecord> allRecords = new ArrayList<>();
@@ -149,7 +194,8 @@ public class TigerSyncAdapter implements BrokerSyncAdapter {
             logger.info("[TigerSync] Fetching window: {} ~ {}", windowStart, windowEnd);
             List<TigerOrderRecord> windowRecords = fetchFilledOrders(client, windowStart, windowEnd);
             allRecords.addAll(windowRecords);
-            logger.info("[TigerSync] Window {} ~ {} returned {} records", windowStart, windowEnd, windowRecords.size());
+            logger.info("[TigerSync] Window {} ~ {} returned {} records",
+                    windowStart, windowEnd, windowRecords.size());
 
             windowStart = windowEnd;
         }
@@ -158,7 +204,7 @@ public class TigerSyncAdapter implements BrokerSyncAdapter {
     }
 
     /**
-     * 调用 Tiger API 获取指定时间范围内的已成交订单
+     * Call Tiger API for a single window.
      */
     private List<TigerOrderRecord> fetchFilledOrders(TigerHttpClient client, LocalDate startDate, LocalDate endDate) {
         List<TigerOrderRecord> records = new ArrayList<>();
@@ -192,21 +238,22 @@ public class TigerSyncAdapter implements BrokerSyncAdapter {
             }
 
         } catch (Exception e) {
-            logger.error("[TigerSync] Exception while querying {} ~ {}: {}", startDate, endDate, e.getMessage(), e);
+            logger.error("[TigerSync] Exception while querying {} ~ {}: {}",
+                    startDate, endDate, e.getMessage(), e);
         }
 
         return records;
     }
 
-    // ============ 数据转换 ============
+    // ============ Data Conversion ============
 
     /**
-     * 将 Tiger SDK 的 TradeOrder 对象转换为 TigerOrderRecord
+     * Convert Tiger SDK's TradeOrder to TigerOrderRecord (DTO used by staging/mapper).
      */
     private TigerOrderRecord convertToRecord(TradeOrder order) {
         TigerOrderRecord record = new TigerOrderRecord();
 
-        // 订单基本信息
+        // Basic order info
         record.setAccount(order.getAccount());
         record.setOrderId(order.getId() != null ? order.getId() : 0L);
         record.setOrderTime(order.getOpenTime() != null ? order.getOpenTime() : 0L);
@@ -214,14 +261,14 @@ public class TigerSyncAdapter implements BrokerSyncAdapter {
         record.setAction(order.getAction());
         record.setStatus(order.getStatus() != null ? order.getStatus().name() : null);
 
-        // 数量与价格（totalQuantity 和 filledQuantity 是 Long 类型）
+        // Quantity + price (totalQuantity / filledQuantity are Long)
         record.setQuantity(order.getTotalQuantity() != null ? order.getTotalQuantity().intValue() : 0);
         record.setQuantityScale(order.getTotalQuantityScale() != null ? order.getTotalQuantityScale() : 0);
         record.setFilledQuantity(order.getFilledQuantity() != null ? order.getFilledQuantity().intValue() : 0);
         record.setAvgFillPrice(order.getAvgFillPrice() != null
                 ? BigDecimal.valueOf(order.getAvgFillPrice()) : BigDecimal.ZERO);
 
-        // 费用
+        // Fees
         record.setCommission(order.getCommission() != null
                 ? BigDecimal.valueOf(order.getCommission()) : BigDecimal.ZERO);
         record.setGst(order.getGst() != null
@@ -229,7 +276,7 @@ public class TigerSyncAdapter implements BrokerSyncAdapter {
         record.setRealizedPnl(order.getRealizedPnl() != null
                 ? BigDecimal.valueOf(order.getRealizedPnl()) : BigDecimal.ZERO);
 
-        // 合约信息
+        // Contract info
         if (order.getSymbol() != null) {
             record.setSymbol(order.getSymbol());
         }
@@ -252,7 +299,7 @@ public class TigerSyncAdapter implements BrokerSyncAdapter {
             record.setMultiplier(BigDecimal.valueOf(order.getMultiplier()));
         }
 
-        // 期权专有字段
+        // Option-specific fields
         if (order.getExpiry() != null) {
             record.setExpiry(order.getExpiry());
         }
@@ -267,7 +314,7 @@ public class TigerSyncAdapter implements BrokerSyncAdapter {
             record.setPutCall(order.getRight());
         }
 
-        // 订单类型
+        // Order type
         if (order.getOrderType() != null) {
             record.setOrderType(order.getOrderType());
         }
@@ -275,25 +322,27 @@ public class TigerSyncAdapter implements BrokerSyncAdapter {
             record.setLimitPrice(BigDecimal.valueOf(order.getLimitPrice()));
         }
 
-        // 订单属性描述（期权事件标识；普通交易通常为 null/空）
+        // attrDesc — option event marker ("Exercise" / "Assigned" / "Expired"); null for ordinary trades
         record.setAttrDesc(order.getAttrDesc());
 
         return record;
     }
 
-    // ============ 日志输出 ============
+    // ============ Debug Logging ============
 
     /**
-     * 逐条打印订单记录，用于与券商平台核对原始数据
+     * Dump each record at DEBUG level for troubleshooting. Kept from Phase 1
+     * but demoted from INFO to DEBUG — in production we rely on the DB tables
+     * (tiger_staged_orders + trade_records) as the source of truth.
      */
-    private void logRecords(List<TigerOrderRecord> records) {
-        logger.info("[TigerSync] ====== Sync result: {} filled orders total ======", records.size());
-
-        for (int i = 0; i < records.size(); i++) {
-            TigerOrderRecord record = records.get(i);
-            logger.info("[TigerSync] [{}] {}", i + 1, record);
+    private void logRecordsForDebug(List<TigerOrderRecord> records) {
+        if (!logger.isDebugEnabled()) {
+            return;
         }
-
-        logger.info("[TigerSync] ====== Log output complete ======");
+        logger.debug("[TigerSync] ====== Raw fetch result: {} filled orders total ======", records.size());
+        for (int i = 0; i < records.size(); i++) {
+            logger.debug("[TigerSync] [{}] {}", i + 1, records.get(i));
+        }
+        logger.debug("[TigerSync] ====== Log output complete ======");
     }
 }
