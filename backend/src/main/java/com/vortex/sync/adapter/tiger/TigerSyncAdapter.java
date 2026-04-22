@@ -15,6 +15,7 @@ import com.tigerbrokers.stock.openapi.client.struct.enums.MethodName;
 import com.tigerbrokers.stock.openapi.client.util.builder.AccountParamBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -54,6 +55,13 @@ public class TigerSyncAdapter implements BrokerSyncAdapter {
 
     /** Tiger API maximum date range per request (days). */
     private static final int MAX_QUERY_DAYS = 90;
+
+    /** Terminal staged-row statuses that contribute to a healthy sync result. */
+    private static final List<String> TERMINAL_STAGED_STATUSES =
+            List.of("IMPORTED", "SKIPPED", "FAILED");
+
+    /** Cap on how many residual staged-row ids we dump in the WARN log. */
+    private static final int RESIDUAL_ID_LOG_CAP = 20;
 
     /** Date formatter for SyncRequest + Tiger API (yyyy-MM-dd). */
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -126,20 +134,34 @@ public class TigerSyncAdapter implements BrokerSyncAdapter {
             long importedCount = stagedOrderRepository.countByBatchIdAndStatus(batchId, "IMPORTED");
             long skippedCount = stagedOrderRepository.countByBatchIdAndStatus(batchId, "SKIPPED");
             long failedCount = stagedOrderRepository.countByBatchIdAndStatus(batchId, "FAILED");
+            // Residual = staged rows that ended in a non-terminal state (typically PENDING).
+            // See IbkrSyncAdapter for the rationale — P0-2 of the data-loss chain fix.
+            long residualCount = stagedOrderRepository.countByBatchIdAndStatusNotIn(
+                    batchId, TERMINAL_STAGED_STATUSES);
             int totalCount = (int) (importedCount + skippedCount + failedCount);
             long durationMs = System.currentTimeMillis() - startMs;
 
-            if (failedCount > 0) {
-                // v2 fail-fast: any per-record failure escalates to whole-batch cleanup.
-                // Returning a failure result routes through BrokerSyncAsyncExecutor →
-                // SyncBatchFailureHandler, which wipes the staged rows + any partially
-                // imported trade_records and finalizes the batch as FAILED (or
-                // CLEANUP_FAILED if cleanup itself fails). We return failure directly
-                // (rather than throwing) so that the executor only sees one error path,
-                // not throw→catch→failure.
+            if (residualCount > 0) {
+                List<Long> residualIds = stagedOrderRepository.findIdsByBatchIdAndStatusNotIn(
+                        batchId, TERMINAL_STAGED_STATUSES, PageRequest.of(0, RESIDUAL_ID_LOG_CAP));
+                logger.warn("[TigerSync] Residual non-terminal staged rows in batch {} " +
+                                "(showing first {} of {} ids): {}",
+                        batchId, residualIds.size(), residualCount, residualIds);
+            }
+
+            if (failedCount > 0 || residualCount > 0) {
+                // v2 fail-fast: any per-record failure (or residue that should have been
+                // terminal) escalates to whole-batch cleanup. Returning a failure result
+                // routes through BrokerSyncAsyncExecutor → SyncBatchFailureHandler, which
+                // wipes the staged rows + any partially imported trade_records and
+                // finalizes the batch as FAILED (or CLEANUP_FAILED if cleanup itself
+                // fails). We return failure directly (rather than throwing) so that the
+                // executor only sees one error path, not throw→catch→failure.
                 String reason = String.format(
-                        "%d record(s) failed import in batch %d (imported=%d, skipped=%d, duration=%dms)",
-                        failedCount, batchId, importedCount, skippedCount, durationMs);
+                        "%d record(s) failed import in batch %d " +
+                                "(imported=%d, skipped=%d, failed=%d, residual_non_terminal=%d, duration=%dms)",
+                        failedCount + residualCount, batchId,
+                        importedCount, skippedCount, failedCount, residualCount, durationMs);
                 logger.error("[TigerSync] {} — triggering fail-fast cleanup", reason);
                 return SyncResult.failure(getBrokerCode(), reason, durationMs);
             }

@@ -13,9 +13,14 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -192,51 +197,100 @@ class TigerImportWorkerTest {
     class ExceptionPath {
 
         @Test
-        @DisplayName("should mark FAILED and capture message when save() throws")
-        void shouldCatchSaveException() {
+        @DisplayName("should throw ImportOneFailedException when save() throws")
+        void shouldThrowWhenSaveThrows() {
             TigerStagedOrder staged = validStockOrder();
             when(tradeRecordRepository.existsByExternalBrokerAndExternalId("tiger", "T-123456"))
                     .thenReturn(false);
             when(tradeRecordRepository.save(any(TradeRecord.class)))
                     .thenThrow(new RuntimeException("DB down"));
 
-            // Should not throw out of importOne
-            worker.importOne(1L, 42L, staged);
+            // Per P0-1 fix: worker no longer saves FAILED itself — that would
+            // run inside the rolled-back REQUIRES_NEW tx and be lost. It now
+            // wraps + rethrows so TigerImportService can invoke markFailed()
+            // in a fresh tx via the Spring AOP proxy.
+            ImportOneFailedException ex = assertThrows(ImportOneFailedException.class,
+                    () -> worker.importOne(1L, 42L, staged));
+            assertSame(staged, ex.getStaged());
+            assertEquals("DB down", ex.getCause().getMessage());
 
-            assertEquals("FAILED", staged.getStatus());
-            assertNotNull(staged.getErrorMessage());
-            // Error message should include the exception detail
-            assertEquals("Import error: DB down", staged.getErrorMessage());
-            verify(stagedOrderRepository).save(staged);
+            // Status is NOT mutated to FAILED by the worker.
+            assertEquals("PENDING", staged.getStatus());
+            // Worker no longer persists staged row in the error path.
+            verify(stagedOrderRepository, never()).save(any(TigerStagedOrder.class));
         }
 
         @Test
-        @DisplayName("should mark FAILED when mapping throws (e.g. malformed numeric field)")
-        void shouldCatchMappingException() {
+        @DisplayName("should throw ImportOneFailedException when mapping throws (e.g. malformed numeric field)")
+        void shouldThrowWhenMappingThrows() {
             TigerStagedOrder staged = validStockOrder();
             staged.setAvgFillPrice("not-a-number");
             when(tradeRecordRepository.existsByExternalBrokerAndExternalId("tiger", "T-123456"))
                     .thenReturn(false);
 
-            worker.importOne(1L, 42L, staged);
+            ImportOneFailedException ex = assertThrows(ImportOneFailedException.class,
+                    () -> worker.importOne(1L, 42L, staged));
+            assertSame(staged, ex.getStaged());
+            assertNotNull(ex.getCause());
 
-            assertEquals("FAILED", staged.getStatus());
-            assertNotNull(staged.getErrorMessage());
+            assertEquals("PENDING", staged.getStatus());
             verify(tradeRecordRepository, never()).save(any(TradeRecord.class));
-            verify(stagedOrderRepository).save(staged);
+            verify(stagedOrderRepository, never()).save(any(TigerStagedOrder.class));
         }
     }
 
     // ========================================================
-    // Invariant — staged order always gets persisted exactly once
+    // markFailed — P0-1 fix
     // ========================================================
     @Nested
-    @DisplayName("importOne() — persistence invariant")
-    class PersistenceInvariant {
+    @DisplayName("markFailed()")
+    class MarkFailedTest {
 
         @Test
-        @DisplayName("staged order should be saved exactly once for every branch")
-        void stagedOrderSavedOncePerCall() {
+        @DisplayName("should re-read row, set FAILED + errorMessage, and save")
+        void shouldPersistFailedStatus() {
+            TigerStagedOrder stale = validStockOrder();
+            stale.setStatus("PENDING");
+
+            TigerStagedOrder fresh = validStockOrder();
+            fresh.setStatus("PENDING");
+
+            when(stagedOrderRepository.findById(100L)).thenReturn(Optional.of(fresh));
+
+            worker.markFailed(stale, "Import error: boom");
+
+            verify(stagedOrderRepository).findById(100L);
+            // Mutation + save target the fresh instance, not the stale arg.
+            assertEquals("FAILED", fresh.getStatus());
+            assertEquals("Import error: boom", fresh.getErrorMessage());
+            verify(stagedOrderRepository).save(fresh);
+            verify(stagedOrderRepository, never()).save(stale);
+        }
+
+        @Test
+        @DisplayName("should throw IllegalStateException when row disappeared")
+        void shouldThrowWhenRowMissing() {
+            TigerStagedOrder stale = validStockOrder();
+            when(stagedOrderRepository.findById(100L)).thenReturn(Optional.empty());
+
+            IllegalStateException ex = assertThrows(IllegalStateException.class,
+                    () -> worker.markFailed(stale, "Import error: x"));
+            assertTrue(ex.getMessage().contains("Staged row disappeared"));
+            assertTrue(ex.getMessage().contains("id=100"));
+        }
+    }
+
+    // ========================================================
+    // Invariant — SKIPPED/FAILED pre-filter branches still persist staged row
+    // (importOne's error path no longer does — see ExceptionPath).
+    // ========================================================
+    @Nested
+    @DisplayName("importOne() — pre-filter terminal branches persist staged row")
+    class PreFilterTerminalPersistsStaged {
+
+        @Test
+        @DisplayName("SKIPPED branch should save staged row once")
+        void skippedBranchSavesStaged() {
             TigerStagedOrder staged = validStockOrder();
             when(tradeRecordRepository.existsByExternalBrokerAndExternalId(eq("tiger"), anyString()))
                     .thenReturn(true); // routes to SKIPPED

@@ -65,6 +65,17 @@ public class IbkrImportService {
      * After all records are processed, back-fill trigger_ref_id for
      * STK-side BookTrade records.
      *
+     * <p><b>Failure handling (P0-1 fix)</b>: when
+     * {@link IbkrImportWorker#importSingleOrder} cannot import a row it
+     * throws {@link ImportOneFailedException}; we catch it here and invoke
+     * {@link IbkrImportWorker#markFailed} through the Spring AOP proxy,
+     * which opens a fresh REQUIRES_NEW transaction to persist the FAILED
+     * status. Previously that write was attempted inside the rolled-back
+     * {@code importSingleOrder} tx and silently lost, leaving rows stuck
+     * in PENDING. If {@code markFailed} itself also fails, the row stays
+     * PENDING and is caught later by the adapter's residual-non-terminal
+     * check (P0-2).
+     *
      * @param batchId the batch ID
      */
     public void importAll(Long batchId) {
@@ -75,13 +86,48 @@ public class IbkrImportService {
         logger.info("[IbkrImport] Starting import: batchId={}, pendingOrders={}", batchId, pendingOrders.size());
 
         for (IbkrStagedOrder staged : pendingOrders) {
-            importWorker.importSingleOrder(batchId, brokerId, staged);
+            try {
+                importWorker.importSingleOrder(batchId, brokerId, staged);
+            } catch (ImportOneFailedException e) {
+                markFailedSafely(e.getStaged(), "Import error: " + rootMessage(e.getCause()));
+            } catch (Exception e) {
+                // Defensive: importSingleOrder should always wrap in
+                // ImportOneFailedException, but belt-and-suspenders in case a
+                // future change lets a raw exception escape.
+                logger.error("[IbkrImport] Unexpected non-wrapped exception importing orderId={}: {}",
+                        staged.getOrderId(), e.getMessage(), e);
+                markFailedSafely(staged, "Unexpected error: " + e.getMessage());
+            }
         }
 
         // Back-fill trigger_ref_id for STK-side BookTrade records
         backfillStockSideTriggerRefId(batchId);
 
         logger.info("[IbkrImport] Import complete: batchId={}", batchId);
+    }
+
+    /**
+     * Invoke {@link IbkrImportWorker#markFailed} and swallow any exception
+     * from the markFailed call itself. A markFailed failure leaves the row
+     * in PENDING; the adapter-level residual-non-terminal check will still
+     * catch it and escalate the batch to fail-fast cleanup.
+     */
+    private void markFailedSafely(IbkrStagedOrder staged, String errorMessage) {
+        try {
+            importWorker.markFailed(staged, errorMessage);
+        } catch (Exception markErr) {
+            logger.error("[IbkrImport] Failed to mark staged id={} as FAILED — row will stay PENDING " +
+                            "and be caught by the adapter-level residual check: {}",
+                    staged.getId(), markErr.getMessage(), markErr);
+        }
+    }
+
+    private static String rootMessage(Throwable cause) {
+        if (cause == null) {
+            return "unknown";
+        }
+        String msg = cause.getMessage();
+        return msg != null ? msg : cause.getClass().getSimpleName();
     }
 
     // ============ STK-side trigger_ref_id Back-fill ============

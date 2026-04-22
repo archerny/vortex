@@ -220,17 +220,83 @@ class IbkrImportWorkerTest {
     class ErrorHandlingTest {
 
         @Test
-        @DisplayName("should mark as FAILED when mapping throws")
-        void shouldMarkAsFailedWhenMappingThrows() {
+        @DisplayName("should throw ImportOneFailedException when mapping throws")
+        void shouldThrowWhenMappingThrows() {
             IbkrStagedOrder staged = buildStkOrder("ORD_ERR");
             staged.setTradeDate(null); // will cause parse error
             when(tradeRecordRepository.existsByExternalBrokerAndExternalId("ibkr", "ORD_ERR")).thenReturn(false);
 
-            importWorker.importSingleOrder(1L, 1L, staged);
+            // Per P0-1 fix: worker no longer saves FAILED itself — that would
+            // run inside the rolled-back REQUIRES_NEW tx and be lost. It now
+            // wraps + rethrows so IbkrImportService can invoke markFailed() in
+            // a fresh tx via the Spring AOP proxy.
+            ImportOneFailedException ex = assertThrows(ImportOneFailedException.class,
+                    () -> importWorker.importSingleOrder(1L, 1L, staged));
+            assertSame(staged, ex.getStaged());
+            assertNotNull(ex.getCause());
 
-            assertEquals("FAILED", staged.getStatus());
-            assertNotNull(staged.getErrorMessage());
+            // Status is NOT mutated to FAILED by the worker — that's markFailed's job.
+            assertEquals("PENDING", staged.getStatus());
             verify(tradeRecordRepository, never()).save(any(TradeRecord.class));
+            // Worker no longer persists staged row in the error path.
+            verify(stagedOrderRepository, never()).save(any(IbkrStagedOrder.class));
+        }
+
+        @Test
+        @DisplayName("should throw ImportOneFailedException when save() throws")
+        void shouldThrowWhenSaveThrows() {
+            IbkrStagedOrder staged = buildStkOrder("ORD_SAVE_ERR");
+            when(tradeRecordRepository.existsByExternalBrokerAndExternalId("ibkr", "ORD_SAVE_ERR")).thenReturn(false);
+            when(tradeRecordRepository.save(any(TradeRecord.class)))
+                    .thenThrow(new RuntimeException("DB down"));
+
+            ImportOneFailedException ex = assertThrows(ImportOneFailedException.class,
+                    () -> importWorker.importSingleOrder(1L, 1L, staged));
+            assertSame(staged, ex.getStaged());
+            assertEquals("DB down", ex.getCause().getMessage());
+        }
+    }
+
+    // ========================================================
+    // markFailed — P0-1 fix
+    // ========================================================
+    @Nested
+    @DisplayName("markFailed()")
+    class MarkFailedTest {
+
+        @Test
+        @DisplayName("should re-read row, set FAILED + errorMessage, and save")
+        void shouldPersistFailedStatus() {
+            IbkrStagedOrder stale = buildStkOrder("ORD_MF");
+            stale.setStatus("PENDING");
+
+            IbkrStagedOrder fresh = buildStkOrder("ORD_MF");
+            fresh.setStatus("PENDING");
+
+            when(stagedOrderRepository.findById(100L)).thenReturn(java.util.Optional.of(fresh));
+
+            importWorker.markFailed(stale, "Import error: boom");
+
+            // Re-read happens via findById before mutation
+            verify(stagedOrderRepository).findById(100L);
+            // The fresh instance is the one mutated + saved (not the stale arg)
+            assertEquals("FAILED", fresh.getStatus());
+            assertEquals("Import error: boom", fresh.getErrorMessage());
+            verify(stagedOrderRepository).save(fresh);
+            // Importantly, the stale arg passed in was not saved
+            verify(stagedOrderRepository, never()).save(stale);
+        }
+
+        @Test
+        @DisplayName("should throw IllegalStateException when row disappeared")
+        void shouldThrowWhenRowMissing() {
+            IbkrStagedOrder stale = buildStkOrder("ORD_GONE");
+            when(stagedOrderRepository.findById(100L)).thenReturn(java.util.Optional.empty());
+
+            IllegalStateException ex = assertThrows(IllegalStateException.class,
+                    () -> importWorker.markFailed(stale, "Import error: x"));
+            assertTrue(ex.getMessage().contains("Staged row disappeared"));
+            assertTrue(ex.getMessage().contains("id=100"));
         }
     }
 
@@ -308,23 +374,79 @@ class IbkrImportWorkerTest {
         }
 
         @Test
-        @DisplayName("should default to MANUAL when no TradeConfirm found for BookTrade")
-        void shouldDefaultToManualWhenNoConfirm() {
+        @DisplayName("should throw ImportOneFailedException when BookTrade has no TradeConfirm")
+        void shouldThrowWhenNoConfirm() {
+            // P0-3 fix: BookTrade with no confirm used to silently default to
+            // trigger_ref_type=NONE, producing garbage trade_records rows. It
+            // now throws and routes through the FAILED → cleanup path.
             IbkrStagedOrder staged = buildBookTradeOrder("ORD_NO_CONF");
             when(tradeRecordRepository.existsByExternalBrokerAndExternalId("ibkr", "ORD_NO_CONF")).thenReturn(false);
-
             when(stagedTradeConfirmRepository.findByOrderId("ORD_NO_CONF")).thenReturn(Collections.emptyList());
 
+            ImportOneFailedException ex = assertThrows(ImportOneFailedException.class,
+                    () -> importWorker.importSingleOrder(1L, 1L, staged));
+            assertSame(staged, ex.getStaged());
+            assertInstanceOf(IllegalStateException.class, ex.getCause());
+            assertTrue(ex.getCause().getMessage().contains("no associated TradeConfirm"),
+                    "expected 'no associated TradeConfirm' in: " + ex.getCause().getMessage());
+
+            verify(tradeRecordRepository, never()).save(any(TradeRecord.class));
+            verify(stagedOrderRepository, never()).save(any(IbkrStagedOrder.class));
+        }
+
+        @Test
+        @DisplayName("should throw ImportOneFailedException when BookTrade code is blank")
+        void shouldThrowWhenBlankCode() {
+            IbkrStagedOrder staged = buildBookTradeOrder("ORD_BLANK");
+            when(tradeRecordRepository.existsByExternalBrokerAndExternalId("ibkr", "ORD_BLANK")).thenReturn(false);
+
+            IbkrStagedTradeConfirm confirm = new IbkrStagedTradeConfirm();
+            confirm.setCode("   ");
+            when(stagedTradeConfirmRepository.findByOrderId("ORD_BLANK")).thenReturn(List.of(confirm));
+
+            ImportOneFailedException ex = assertThrows(ImportOneFailedException.class,
+                    () -> importWorker.importSingleOrder(1L, 1L, staged));
+            assertInstanceOf(IllegalStateException.class, ex.getCause());
+            assertTrue(ex.getCause().getMessage().contains("blank code"),
+                    "expected 'blank code' in: " + ex.getCause().getMessage());
+        }
+
+        @Test
+        @DisplayName("should throw ImportOneFailedException when BookTrade code is unknown")
+        void shouldThrowWhenUnknownCode() {
+            IbkrStagedOrder staged = buildBookTradeOrder("ORD_UNK");
+            when(tradeRecordRepository.existsByExternalBrokerAndExternalId("ibkr", "ORD_UNK")).thenReturn(false);
+
+            IbkrStagedTradeConfirm confirm = new IbkrStagedTradeConfirm();
+            confirm.setCode("XYZ;Q");
+            when(stagedTradeConfirmRepository.findByOrderId("ORD_UNK")).thenReturn(List.of(confirm));
+
+            ImportOneFailedException ex = assertThrows(ImportOneFailedException.class,
+                    () -> importWorker.importSingleOrder(1L, 1L, staged));
+            assertInstanceOf(IllegalStateException.class, ex.getCause());
+            assertTrue(ex.getCause().getMessage().contains("did not match any known option event"),
+                    "expected 'did not match' in: " + ex.getCause().getMessage());
+        }
+
+        @Test
+        @DisplayName("should detect GEA as OPTION_ASSIGNED")
+        void shouldDetectGeaAssignedCode() {
+            IbkrStagedOrder staged = buildBookTradeOrder("ORD_GEA");
+            when(tradeRecordRepository.existsByExternalBrokerAndExternalId("ibkr", "ORD_GEA")).thenReturn(false);
+
+            IbkrStagedTradeConfirm confirm = new IbkrStagedTradeConfirm();
+            confirm.setCode("GEA");
+            when(stagedTradeConfirmRepository.findByOrderId("ORD_GEA")).thenReturn(List.of(confirm));
+
             TradeRecord savedRecord = new TradeRecord();
-            savedRecord.setId(603L);
+            savedRecord.setId(605L);
             when(tradeRecordRepository.save(any(TradeRecord.class))).thenReturn(savedRecord);
 
             importWorker.importSingleOrder(1L, 1L, staged);
 
             ArgumentCaptor<TradeRecord> captor = ArgumentCaptor.forClass(TradeRecord.class);
             verify(tradeRecordRepository).save(captor.capture());
-            assertEquals(TradeTrigger.OPTION, captor.getValue().getTradeTrigger());
-            assertEquals(TriggerRefType.NONE, captor.getValue().getTriggerRefType());
+            assertEquals(TriggerRefType.OPTION_ASSIGNED, captor.getValue().getTriggerRefType());
         }
 
         @Test

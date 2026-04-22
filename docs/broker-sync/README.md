@@ -9,9 +9,10 @@
 | 文档 | 说明 | 状态 |
 |------|------|------|
 | [architecture.md](./architecture.md) | 架构概览（包结构 + 数据流 + 异步执行模型） | ✅ 当前架构 |
+| [fix-p0-data-loss-chain.md](./fix-p0-data-loss-chain.md) | P0 数据丢失链修复（worker rolled-back 事务内 save FAILED / residual 非终态 staged / BookTrade silent-downgrade） | ✅ 已实现（2026-04-23） |
 | **框架层（所有券商通用）** | | |
 | [framework/data-persistence.md](./framework/data-persistence.md) | 数据持久化设计（批次表 + trade_records 扩展 + 两阶段导入原则） | ✅ 已实现（Flyway V19-V24 + V28 + Entity + Repository） |
-| [framework/import-consistency.md](./framework/import-consistency.md) | 数据一致性与失败清理设计（v2：失败即清理，三终态 `COMPLETED` / `FAILED` / `CLEANUP_FAILED`；v2.4.2 清理改为 `BrokerCleanupStrategy` 策略模式） | ✅ v2 状态模型 + v2.4.2 架构加固已完整落地（Phase 1a / 1b / 2 / 3 / 4） |
+| [framework/import-consistency.md](./framework/import-consistency.md) | 数据一致性与失败清理设计（v2：失败即清理，三终态 `COMPLETED` / `FAILED` / `CLEANUP_FAILED`；v2.4.3 已合入 P0 数据丢失链修复） | ✅ v2 状态模型 + v2.4.2 架构加固 + v2.4.3 P0 修复已完整落地 |
 | [framework/broker-registration.md](./framework/broker-registration.md) | Broker Code 关联与同步器注册发现 | ✅ 已实现 |
 | **券商层（各券商专属）** | | |
 | [brokers/tiger/README.md](./brokers/tiger/README.md) | 老虎证券同步状态页 | ✅ |
@@ -21,7 +22,7 @@
 | [brokers/ibkr/README.md](./brokers/ibkr/README.md) | IBKR 同步状态页 | ✅ |
 | [brokers/ibkr/flex-web-service.md](./brokers/ibkr/flex-web-service.md) | IBKR Flex Web Service 同步方案 | ✅ Phase 2 已实现 |
 | [brokers/ibkr/staging-schema.md](./brokers/ibkr/staging-schema.md) | IBKR 暂存表结构与字段映射规范 | ✅ 已实现 |
-| [brokers/ibkr/booktrade-mapping.md](./brokers/ibkr/booktrade-mapping.md) | BookTrade 触发判定与期权事件导入映射 | ✅ 已实现 |
+| [brokers/ibkr/booktrade-mapping.md](./brokers/ibkr/booktrade-mapping.md) | BookTrade 触发判定与期权事件导入映射（含缺失/异常 TradeConfirm fail-fast 处理；GEA token 支持） | ✅ 已实现（2026-04-23 更新） |
 
 ---
 
@@ -38,7 +39,7 @@
 
 ## 开放问题快速索引
 
-> **最后整理**：2026-04-21
+> **最后整理**：2026-04-23
 
 所有待讨论问题汇总在 [framework/data-persistence.md § 九、开放问题与待后续讨论](./framework/data-persistence.md#九开放问题与待后续讨论)，按优先级分类：
 

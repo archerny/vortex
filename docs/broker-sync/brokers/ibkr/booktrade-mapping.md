@@ -1,9 +1,9 @@
 # BookTrade 触发判定与期权事件导入映射设计
 
 > **创建日期**：2026-04-18  
-> **最后更新**：2026-04-18  
-> **状态**：✅ 已实现（IbkrImportService: BookTrade 判定 + code 解析 + triggerRefId 回填 + STK 侧语义匹配 + 歧义消解）  
-> **关联**：[data-persistence.md](../../framework/data-persistence.md) | [trade-trigger-design.md](../../../trade-trigger-design.md) | [trade-type-refactor-discussion.md](../../../trade-type-refactor-discussion.md) | [flex-web-service.md](./flex-web-service.md)  
+> **最后更新**：2026-04-23（缺失/空/未知 TradeConfirm 分支由 "默认 MANUAL" 改为 **fail-fast throw**，配合 [fix-p0-data-loss-chain.md](../../fix-p0-data-loss-chain.md) 的 P0 修复；`GEA` 正式并入 `A` 的 ASSIGNED 匹配分支）  
+> **状态**：✅ 已实现（IbkrImportWorker: BookTrade 判定 + code 解析 + triggerRefId 回填 + STK 侧语义匹配 + 歧义消解 + 异常 code fail-fast）  
+> **关联**：[data-persistence.md](../../framework/data-persistence.md) | [trade-trigger-design.md](../../../trade-trigger-design.md) | [trade-type-refactor-discussion.md](../../../trade-type-refactor-discussion.md) | [flex-web-service.md](./flex-web-service.md) | [fix-p0-data-loss-chain.md](../../fix-p0-data-loss-chain.md)  
 > **解决问题**：[data-persistence.md § R-5](../../framework/data-persistence.md#九开放问题与待后续讨论)（BookTrade 的 `tradeTrigger` 判定）
 
 ---
@@ -72,8 +72,11 @@ LIMIT 1
 | 3 | `Ex` | 行权（持有人主动行权） | `OPTION` | `OPTION_EXERCISE` |
 | 4 | `Ep` | 期权到期 | `OPTION` | `OPTION_EXPIRE` |
 | 5 | `A` | 被指派 | `OPTION` | `OPTION_ASSIGNED` |
+| 5 | `GEA` | 被指派（别名，同 `A`） | `OPTION` | `OPTION_ASSIGNED` |
 
 > **重要**：使用分割后的独立标记进行**精确匹配**（不是子串包含），避免 `AEx` 被误匹配为 `A` + `Ex`。
+>
+> `GEA` 是 IBKR 在部分场景下对被指派的代号（Good Exercise Assignment 等），语义等同 `A`，在同优先级下匹配 `OPTION_ASSIGNED`。
 
 #### 解析示例
 
@@ -100,14 +103,42 @@ LIMIT 1
 2. 查询同 order_id 的 TradeConfirm 记录，获取 code 字段
 
 3. 按分号分割 code，逐标记匹配：
-   ┌─ 含 "Ep"           → OPTION_EXPIRE
-   ├─ 含 "A"            → OPTION_ASSIGNED
-   ├─ 含 "Ex"/"MEx"/"AEx" → OPTION_EXERCISE
-   └─ 均未匹配          → ⚠️ 异常情况，记录 WARNING 日志，
-                           默认设为 MANUAL（保守策略）
+   ┌─ 含 "Ep"              → OPTION_EXPIRE
+   ├─ 含 "A" / "GEA"       → OPTION_ASSIGNED
+   ├─ 含 "Ex" / "MEx" / "AEx" → OPTION_EXERCISE
+   └─ 均未匹配 / code 为空 / TradeConfirm 缺失
+                           → 抛出 IllegalStateException
+                           → 该 staged 行被标记为 FAILED（经 service 层
+                             markFailed 新事务持久化）
+                           → 触发整批 fail-fast cleanup（参见
+                             [fix-p0-data-loss-chain.md](../../fix-p0-data-loss-chain.md)
+                             §3.3）
 
 4. 设置 trade_trigger = OPTION, trigger_ref_type = 匹配结果
 ```
+
+### 2.4 缺失或异常的 TradeConfirm 处理（fail-fast）
+
+> **变更历史**：2026-04-23 之前，以下三种情况采用 "默认 MANUAL（保守策略）" 的 silent downgrade。由于该策略会把期权事件静默误分类为手动交易，导致下游财务语义错误，2026-04-23 起改为 **fail-fast throw**，与 P0 修复保持一致。详见 [fix-p0-data-loss-chain.md § P0-3](../../fix-p0-data-loss-chain.md)。
+
+被识别为 BookTrade 后，查询 TradeConfirm 时若出现以下任意一种情况，`resolveBookTradeRefType` 会抛出 `IllegalStateException` 而非返回任何默认值：
+
+| 情况 | 触发条件 | 抛出消息关键字 |
+|------|---------|--------------|
+| 1. TradeConfirm 记录缺失 | 同 `order_id` 下查询不到任何 TradeConfirm | `no TradeConfirm found` |
+| 2. TradeConfirm code 字段为空 | TradeConfirm 存在但 `code` 为 `null` 或空白 | `blank code` |
+| 3. code 含未知 token | 分号分割后所有 token 都不匹配已知规则 | `unknown code tokens` |
+
+**后续链路**：
+
+1. 异常在 `IbkrImportWorker.importOne` 中被 catch；由于此时事务已标记 rollback-only，worker 不再直接 `save(FAILED)`，而是抛出 package-private 的 `ImportOneFailedException(staged, cause)` 向上抛到 service 层。
+2. `IbkrImportService.importAll` 在 per-order 循环中捕获该异常，通过 AOP 代理调用 `markFailed(...)`（带 `REQUIRES_NEW` 的独立事务）将该行标记为 `FAILED` 并记录错误消息。
+3. 整批处理完后，`IbkrSyncAdapter` 统计 `failedCount + residualCount`，任一 > 0 即触发 fail-fast cleanup，删除该 batch 所有已落地的 order/trade，保证原子语义。
+
+**运维建议**：
+
+- 若看到 `unknown code tokens` 异常，请把样本 code 反馈给维护者（更新本文优先级表）。
+- 若 `no TradeConfirm found`，通常意味着 Flex 查询 `TradeConfirm` 段未勾选或时间窗口裁剪漏掉了相关记录，检查 FlexQuery 配置。
 
 ---
 
@@ -301,7 +332,7 @@ IBKR 产生 **2 条 Order**，模式与被指派**完全对称**：
 | `Ex` | Exercise | 行权（持有人主动行权） | → `OPTION_EXERCISE` |
 | `MEx` | Manual Exercise (dividend) | 手动行权（股息相关） | → `OPTION_EXERCISE` |
 | `AEx` | Automatic Exercise (dividend) | 自动行权（股息相关） | → `OPTION_EXERCISE` |
-| `GEA` | Expiration/Assignment from offsetting | 由抵消仓位产生 | → `OPTION_ASSIGNED`（保守归类） |
+| `GEA` | Good Exercise Assignment | 被指派（`A` 的别名，2026-04-23 正式支持） | → `OPTION_ASSIGNED` |
 
 > **设计决策**：`MEx`、`AEx`、`Ex` 统一映射为 `OPTION_EXERCISE`，不做细分。主动行权和自动行权在结果上完全一样，是否自动触发只是券商的执行细节。
 
@@ -383,5 +414,5 @@ WHERE trade_trigger = 'OPTION'
 
 | # | 问题 | 当前决策 | 备注 |
 |---|------|---------|------|
-| 1 | `GEA` code 的映射 | 暂归为 `OPTION_ASSIGNED` | 实际数据中未出现，待遇到时确认 |
+| 1 | ~~`GEA` code 的映射~~ | ✅ 已支持（2026-04-23）：与 `A` 同归 `OPTION_ASSIGNED`，实现于 `IbkrImportWorker.resolveBookTradeRefType` | — |
 | 2 | 回填失败的 STK 记录如何在前端展示 | 保持 `trigger_ref_id = 0`，校验规则标记异常 | 前端异常提示待设计 |

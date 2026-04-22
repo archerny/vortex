@@ -145,5 +145,83 @@ class IbkrImportServiceTest {
             verify(importWorker).backfillSingleStkRecord(stkRecord1);
             verify(importWorker).backfillSingleStkRecord(stkRecord2);
         }
+
+        @Test
+        @DisplayName("should call markFailed via proxy when worker throws ImportOneFailedException")
+        void shouldInvokeMarkFailedOnImportFailure() {
+            when(brokerRepository.findByBrokerCode("ibkr")).thenReturn(Optional.of(buildBroker()));
+            IbkrStagedOrder bad = buildStagedOrder("ORD_FAIL");
+            when(stagedOrderRepository.findByBatchIdAndStatus(1L, "PENDING")).thenReturn(List.of(bad));
+
+            // Worker throws the wrapped exception (per P0-1 fix)
+            RuntimeException root = new RuntimeException("parse error");
+            doThrow(new ImportOneFailedException(bad, root))
+                    .when(importWorker).importSingleOrder(1L, 1L, bad);
+
+            // Backfill path: no STK records to process
+            when(tradeRecordRepository.findStkSideBookTradesNeedingBackfill(
+                    eq(1L), eq(TradeTrigger.OPTION),
+                    eq(List.of(TriggerRefType.OPTION_ASSIGNED, TriggerRefType.OPTION_EXERCISE)),
+                    eq(AssetType.STOCK)))
+                    .thenReturn(Collections.emptyList());
+
+            // Must NOT bubble out — the loop must keep going and batch must finalize.
+            assertDoesNotThrow(() -> importService.importAll(1L));
+
+            // Service invokes markFailed on the exception's staged ref with a wrapped message.
+            verify(importWorker).markFailed(same(bad), contains("parse error"));
+        }
+
+        @Test
+        @DisplayName("should swallow markFailed exception so adapter-level residual check can pick it up")
+        void shouldSwallowMarkFailedException() {
+            when(brokerRepository.findByBrokerCode("ibkr")).thenReturn(Optional.of(buildBroker()));
+            IbkrStagedOrder bad = buildStagedOrder("ORD_MF_FAIL");
+            when(stagedOrderRepository.findByBatchIdAndStatus(1L, "PENDING")).thenReturn(List.of(bad));
+
+            doThrow(new ImportOneFailedException(bad, new RuntimeException("mapping boom")))
+                    .when(importWorker).importSingleOrder(1L, 1L, bad);
+            doThrow(new IllegalStateException("markFailed also failed"))
+                    .when(importWorker).markFailed(same(bad), anyString());
+
+            when(tradeRecordRepository.findStkSideBookTradesNeedingBackfill(
+                    eq(1L), eq(TradeTrigger.OPTION),
+                    eq(List.of(TriggerRefType.OPTION_ASSIGNED, TriggerRefType.OPTION_EXERCISE)),
+                    eq(AssetType.STOCK)))
+                    .thenReturn(Collections.emptyList());
+
+            // Per markFailedSafely: swallow + error-log. Adapter residual check catches the leftover.
+            assertDoesNotThrow(() -> importService.importAll(1L));
+
+            verify(importWorker).markFailed(same(bad), anyString());
+        }
+
+        @Test
+        @DisplayName("should keep iterating remaining orders after one import failure")
+        void shouldKeepIteratingAfterFailure() {
+            when(brokerRepository.findByBrokerCode("ibkr")).thenReturn(Optional.of(buildBroker()));
+            IbkrStagedOrder good1 = buildStagedOrder("ORD_GOOD1");
+            IbkrStagedOrder bad = buildStagedOrder("ORD_FAIL");
+            IbkrStagedOrder good2 = buildStagedOrder("ORD_GOOD2");
+            when(stagedOrderRepository.findByBatchIdAndStatus(1L, "PENDING"))
+                    .thenReturn(List.of(good1, bad, good2));
+
+            doThrow(new ImportOneFailedException(bad, new RuntimeException("row2 boom")))
+                    .when(importWorker).importSingleOrder(1L, 1L, bad);
+
+            when(tradeRecordRepository.findStkSideBookTradesNeedingBackfill(
+                    eq(1L), eq(TradeTrigger.OPTION),
+                    eq(List.of(TriggerRefType.OPTION_ASSIGNED, TriggerRefType.OPTION_EXERCISE)),
+                    eq(AssetType.STOCK)))
+                    .thenReturn(Collections.emptyList());
+
+            importService.importAll(1L);
+
+            // All three were attempted.
+            verify(importWorker).importSingleOrder(1L, 1L, good1);
+            verify(importWorker).importSingleOrder(1L, 1L, bad);
+            verify(importWorker).importSingleOrder(1L, 1L, good2);
+            verify(importWorker).markFailed(same(bad), anyString());
+        }
     }
 }

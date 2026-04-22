@@ -7,6 +7,7 @@ import com.vortex.sync.core.SyncRequest;
 import com.vortex.sync.core.SyncResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -40,6 +41,13 @@ public class IbkrSyncAdapter implements BrokerSyncAdapter {
 
     /** IBKR Flex API maximum date range per request (days) */
     private static final int MAX_QUERY_DAYS = 365;
+
+    /** Terminal staged-row statuses that contribute to a healthy sync result. */
+    private static final List<String> TERMINAL_STAGED_STATUSES =
+            List.of("IMPORTED", "SKIPPED", "FAILED");
+
+    /** Cap on how many residual staged-row ids we dump in the WARN log. */
+    private static final int RESIDUAL_ID_LOG_CAP = 20;
 
     /** Date formatter for SyncRequest (yyyy-MM-dd) */
     private static final DateTimeFormatter REQUEST_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -124,20 +132,38 @@ public class IbkrSyncAdapter implements BrokerSyncAdapter {
             long importedCount = stagedOrderRepository.countByBatchIdAndStatus(batchId, "IMPORTED");
             long skippedCount = stagedOrderRepository.countByBatchIdAndStatus(batchId, "SKIPPED");
             long failedCount = stagedOrderRepository.countByBatchIdAndStatus(batchId, "FAILED");
+            // Residual = staged rows that ended in a non-terminal state (typically PENDING).
+            // Before the P0-2 fix the adapter silently ignored them, which, combined with
+            // P0-1 (failed rows staying PENDING because the FAILED write was lost inside
+            // a rolled-back tx), let the batch finalize as COMPLETED while rows were
+            // actually broken or never imported. Detect and escalate to fail-fast cleanup.
+            long residualCount = stagedOrderRepository.countByBatchIdAndStatusNotIn(
+                    batchId, TERMINAL_STAGED_STATUSES);
             int totalCount = (int) (importedCount + skippedCount + failedCount);
             long durationMs = System.currentTimeMillis() - startMs;
 
-            if (failedCount > 0) {
-                // v2 fail-fast: any per-record failure escalates to whole-batch cleanup.
-                // Returning a failure result routes through BrokerSyncAsyncExecutor →
-                // SyncBatchFailureHandler, which wipes the staged rows + any partially
-                // imported trade_records and finalizes the batch as FAILED (or
-                // CLEANUP_FAILED if cleanup itself fails). We return failure directly
-                // (rather than throwing) so that the executor only sees one error path,
-                // not throw→catch→failure.
+            if (residualCount > 0) {
+                // Log a bounded sample of residual ids so operators have breadcrumbs.
+                List<Long> residualIds = stagedOrderRepository.findIdsByBatchIdAndStatusNotIn(
+                        batchId, TERMINAL_STAGED_STATUSES, PageRequest.of(0, RESIDUAL_ID_LOG_CAP));
+                logger.warn("[IbkrSync] Residual non-terminal staged rows in batch {} " +
+                                "(showing first {} of {} ids): {}",
+                        batchId, residualIds.size(), residualCount, residualIds);
+            }
+
+            if (failedCount > 0 || residualCount > 0) {
+                // v2 fail-fast: any per-record failure (or residue that should have been
+                // terminal) escalates to whole-batch cleanup. Returning a failure result
+                // routes through BrokerSyncAsyncExecutor → SyncBatchFailureHandler, which
+                // wipes the staged rows + any partially imported trade_records and
+                // finalizes the batch as FAILED (or CLEANUP_FAILED if cleanup itself
+                // fails). We return failure directly (rather than throwing) so that the
+                // executor only sees one error path, not throw→catch→failure.
                 String reason = String.format(
-                        "%d record(s) failed import in batch %d (imported=%d, skipped=%d, duration=%dms)",
-                        failedCount, batchId, importedCount, skippedCount, durationMs);
+                        "%d record(s) failed import in batch %d " +
+                                "(imported=%d, skipped=%d, failed=%d, residual_non_terminal=%d, duration=%dms)",
+                        failedCount + residualCount, batchId,
+                        importedCount, skippedCount, failedCount, residualCount, durationMs);
                 logger.error("[IbkrSync] {} — triggering fail-fast cleanup", reason);
                 return SyncResult.failure(getBrokerCode(), reason, durationMs);
             }

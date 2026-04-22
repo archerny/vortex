@@ -1,9 +1,9 @@
 # 券商同步 — 数据一致性与失败清理设计文档
 
 > **创建日期**：2026-04-16（v1）
-> **最后更新**：2026-04-23（v2.4.2 — 架构加固：（1）`TigerStagingService` 对齐 IBKR fail-fast 语义：删除内部 try/catch，staging 阶段单条异常直接冒泡 → adapter 外层 catch 转 `SyncResult.failure` → 整批清理；消除了 `StagingResult.failed` 只存在于内存而不被下游计数检查的 silent data-loss 路径。（2）清理链路重构为 `BrokerCleanupStrategy` 策略模式：每个 broker adapter 提供独立的 `@Component` 策略 bean，`SyncBatchCleanupService` 在 `@PostConstruct` 阶段校验"所有 `BrokerSyncAdapter` 都有匹配的 cleanup strategy"；把"新 broker 忘记注册 cleanup → runtime CLEANUP_FAILED → `uk_only_one_active` 永久锁死"这个灾难路径变成启动期可见的 fail-fast）
-> **状态**：✅ v2 状态模型已完整落地 + 架构加固
-> **关联**：[architecture.md](../architecture.md) | [data-persistence.md](./data-persistence.md) | [broker-registration.md](./broker-registration.md)
+> **最后更新**：2026-04-23（v2.4.3 — P0 数据丢失链修复：（1）import worker 的错误路径不再在 rolled-back REQUIRES_NEW 事务内 `save(FAILED)`，而是抛出 package-private `ImportOneFailedException(staged, cause)`；service 层 per-order 循环捕获后通过 AOP 代理调 `markFailed(...)` 以独立 `REQUIRES_NEW` 事务重读并持久化 staged=FAILED。（2）adapter 新增 residual（非终态）staged 计数：`failedCount + residualCount > 0` 即触发整批 fail-fast cleanup，并 WARN 日志 dump 前 20 个残留 id 样本。（3）`IbkrImportWorker.resolveBookTradeRefType` 由 silent-downgrade 为 MANUAL 改为 fail-fast throw（TradeConfirm 缺失 / code 为空 / 含未知 token 三种情况），异常经 P0-1 路径落为 staged=FAILED 并触发批级 cleanup。详见 [fix-p0-data-loss-chain.md](../fix-p0-data-loss-chain.md)。）
+> **状态**：✅ v2 状态模型已完整落地 + 架构加固 + P0 数据丢失链已修复
+> **关联**：[architecture.md](../architecture.md) | [data-persistence.md](./data-persistence.md) | [broker-registration.md](./broker-registration.md) | [../fix-p0-data-loss-chain.md](../fix-p0-data-loss-chain.md)
 > **取代**：本文档是 v1（2026-04-16）的完全重写。v1 设计的 `INTERRUPTED` / `PARTIAL` / Resume / 幂等续跑机制被整体废弃，历史版本可在 git log 中追溯。
 
 ---
@@ -530,3 +530,54 @@ COMMENT ON INDEX uk_only_one_active IS
 ✅ 文档重写策略（直接 v2 覆盖，v1 从 git 追溯）已确认。
 
 剩余小决策由 AI 在实施时自行决定（第五章 5.6 的 error_message 汇总格式、前端 409 错误文案具体措辞等），有歧义会在 PR review 时再讨论。
+
+---
+
+## 十四、P0 Data-Loss Chain — Fixed in 2026-04 (v2.4.3)
+
+> **完整设计 / 决策记录**：[../fix-p0-data-loss-chain.md](../fix-p0-data-loss-chain.md)（Status: ✅ Implemented）
+
+v2.4.2 架构加固之后，在进一步审计 import 链路时发现了一组**紧耦合的三个 P0 级数据丢失缺陷**——单独看每个都严重，组合在一起意味着失败的 staged 行可以**既不落到 `trade_records`、又不以 FAILED 呈现**，batch 最终仍报 `COMPLETED`。2026-04-23 完整修复。
+
+### 14.1 三个 P0 缺陷回顾
+
+| 编号 | 问题 | 结果 |
+|------|------|------|
+| **P0-1** | `importSingleOrder` / `importOne` 在 `REQUIRES_NEW` 事务内 catch 异常后，直接在**同一个已被标记 rollback-only 的事务**里 `save(staged=FAILED)` | 要么在 commit 时抛 `UnexpectedRollbackException`（错误上下文被掩盖），要么 Hibernate 层成功但随事务回滚而丢弃——无论哪种，staged 保持原 `PENDING` 状态 |
+| **P0-2** | Adapter 的 failure 判定只看 `failedCount`；若 P0-1 让 FAILED 写入丢失，`failedCount=0` → batch 判 `COMPLETED` → 不触发 cleanup → 残留的 `PENDING` staged 行永久留在表中 | batch 看起来"成功"，但有行既没进正式表也没记为 FAILED |
+| **P0-3** | `IbkrImportWorker.resolveBookTradeRefType` 在 TradeConfirm 缺失 / code 空 / 含未知 token 时采用 silent downgrade 为 `MANUAL`，把期权事件误分类为手动交易 | 财务语义污染，且配合 P0-1/P0-2 下游没有任何异常信号 |
+
+### 14.2 修复思路
+
+1. **P0-1 → package-private `ImportOneFailedException`**：
+   - Worker 的 catch 块不再自己 `save(FAILED)`，而是 `throw new ImportOneFailedException(staged, cause)`。
+   - Service 层 per-order 循环捕获该异常，通过 **AOP 代理**调本 service bean 的 `markFailed(staged.getId(), rootMessage(cause))`。
+   - `markFailed` 本身 `@Transactional(REQUIRES_NEW)`，内部通过 `findById` 重新读取后再 `save` —— 与 worker 的事务完全隔离，不会被 rollback 牵连。
+   - `markFailed` 自身抛异常时，service 以 `markFailedSafely` 吞异常 + WARN，避免"记 FAILED 失败 → 整批循环崩溃"的链式失败。
+
+2. **P0-2 → residual（非终态）staged 计数**：
+   - Repository 新增 `countByBatchIdAndStatusNotIn(batchId, TERMINAL_STATUSES)` 和 `findIdsByBatchIdAndStatusNotIn(... Pageable)`（`TERMINAL_STATUSES = {IMPORTED, SKIPPED, FAILED}`）。
+   - Adapter 在 import 阶段完成后，`residualCount = count(status NOT IN terminal)`。
+   - failure 条件改为 `failedCount > 0 || residualCount > 0`；reason 中附带 `residual_non_terminal=N`。
+   - `residualCount > 0` 时 WARN 日志 dump 前 20 个残留 staged id（`RESIDUAL_ID_LOG_CAP`），便于运维人肉排查——这是兜底诊断工具，正常修复后不应被触发。
+
+3. **P0-3 → fail-fast throw**：
+   - `resolveBookTradeRefType` 的三个 silent-downgrade 分支一律改为 `throw new IllegalStateException(...)`。
+   - 异常路径 = P0-1 路径：经 `importOne` 冒泡 → `ImportOneFailedException` → service `markFailed` 持久化 staged=FAILED → `failedCount > 0` → batch fail-fast cleanup。
+   - 语义上把"未知 code 要不要悄悄归到 MANUAL"的决定权交还运维：看到 `unknown code tokens` 就是需要更新 [booktrade-mapping.md](../brokers/ibkr/booktrade-mapping.md) §2.2 优先级表。
+   - 顺便正式并入 `GEA` token（与 `A` 同归 `OPTION_ASSIGNED`）。
+
+### 14.3 测试覆盖
+
+| 类 | 新增/改动用例 |
+|----|-------------|
+| `IbkrImportWorkerTest` | `ErrorHandlingTest`（mapping/save 异常均断言抛 `ImportOneFailedException` 且不再 save FAILED）、`MarkFailedTest`（REQUIRES_NEW 行为 + findById 路径）、`BookTradeDetectionTest` 4 个新分支（missing / blank / unknown / GEA） |
+| `TigerImportWorkerTest` | 对称：`ExceptionPath` 重写 + `MarkFailedTest` + `PreFilterTerminalPersistsStaged`（名字改动反映 importOne 错误路径不再 save） |
+| `IbkrImportServiceTest` / `TigerImportServiceTest` | `shouldInvokeMarkFailedOnImportFailure`、`shouldSwallowMarkFailedException`、`shouldKeepIteratingAfterFailure` |
+| `IbkrSyncAdapterTest` | `ResidualNonTerminalTest`：residual-only / failed+residual / 无 residual 三分支 |
+
+全量 `mvn test` 2026-04-23：**242 tests, 0 failures, 0 errors, BUILD SUCCESS**。
+
+### 14.4 对 v2 状态模型的兼容性
+
+本次修复**不改变**三终态（`COMPLETED` / `FAILED` / `CLEANUP_FAILED`）、不改变"失败即清理"原则、不改变 `uk_only_one_active` 并发约束，仅堵住了"失败信号丢失 → 批次被误判 COMPLETED"的缺口。v2 状态图、清理策略、前端交互全部保持不变。

@@ -1,10 +1,14 @@
 package com.vortex.repository;
 
 import com.vortex.entity.TigerStagedOrder;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,6 +48,27 @@ public interface TigerStagedOrderRepository extends JpaRepository<TigerStagedOrd
     long countByBatchIdAndStatus(Long batchId, String status);
 
     /**
+     * Count staged orders in a batch whose status is <b>not</b> in the given
+     * set. Used by {@link com.vortex.sync.adapter.tiger.TigerSyncAdapter} to
+     * detect non-terminal residue (typically PENDING) left behind after the
+     * import loop — see P0-2 fix in {@code fix-p0-data-loss-chain.md}.
+     */
+    long countByBatchIdAndStatusNotIn(Long batchId, Collection<String> statuses);
+
+    /**
+     * Fetch up to {@link Pageable#getPageSize()} staged-row ids in a batch
+     * whose status is <b>not</b> in the given set. Used to enrich the
+     * adapter-level residual WARN log with a bounded sample of offending
+     * ids, so operators have breadcrumbs for debugging.
+     */
+    @Query("SELECT s.id FROM TigerStagedOrder s " +
+            "WHERE s.batchId = :batchId AND s.status NOT IN :statuses " +
+            "ORDER BY s.id ASC")
+    List<Long> findIdsByBatchIdAndStatusNotIn(@Param("batchId") Long batchId,
+                                              @Param("statuses") Collection<String> statuses,
+                                              Pageable pageable);
+
+    /**
      * Delete all staged orders for the given batch. Used by
      * {@code SyncBatchCleanupService} when rolling back a failed sync.
      *
@@ -52,3 +77,4 @@ public interface TigerStagedOrderRepository extends JpaRepository<TigerStagedOrd
     @Modifying
     long deleteByBatchId(Long batchId);
 }
+

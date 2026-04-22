@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -320,6 +321,101 @@ class IbkrSyncAdapterTest {
             assertTrue(result.isSuccess());
             // Phase updates should not be called when batchId is null
             verify(batchService, never()).updatePhase(anyLong(), anyString());
+        }
+    }
+
+    // ========================================================
+    // P0-2 — residual non-terminal staged rows (stuck PENDING/PROCESSING)
+    // must escalate the batch to fail-fast cleanup.
+    // ========================================================
+    @Nested
+    @DisplayName("sync() - residual non-terminal staged rows")
+    class ResidualNonTerminalTest {
+
+        @Test
+        @DisplayName("should return failure when residual non-terminal rows exist")
+        void shouldReturnFailureWhenResidualPending() {
+            when(properties.isConfigured()).thenReturn(true);
+
+            SyncRequest request = new SyncRequest("ibkr", "2026-01-01", "2026-03-31");
+            request.setBatchId(9L);
+
+            when(flexClient.fetchReport(anyString(), anyString())).thenReturn("<xml/>");
+            FlexQueryParseResult parseResult = buildParseResult(10, 0);
+            when(flexQueryParser.parse("<xml/>")).thenReturn(parseResult);
+
+            // All terminal counts clean (no FAILED) — the trigger is residual alone.
+            when(stagedOrderRepository.countByBatchIdAndStatus(9L, "IMPORTED")).thenReturn(7L);
+            when(stagedOrderRepository.countByBatchIdAndStatus(9L, "SKIPPED")).thenReturn(0L);
+            when(stagedOrderRepository.countByBatchIdAndStatus(9L, "FAILED")).thenReturn(0L);
+            // 3 rows stuck in PENDING after the import loop returned
+            when(stagedOrderRepository.countByBatchIdAndStatusNotIn(
+                    eq(9L), anyCollection())).thenReturn(3L);
+            when(stagedOrderRepository.findIdsByBatchIdAndStatusNotIn(
+                    eq(9L), anyCollection(), any(Pageable.class)))
+                    .thenReturn(List.of(101L, 102L, 103L));
+
+            SyncResult result = adapter.sync(request);
+
+            assertFalse(result.isSuccess());
+            assertTrue(result.getMessage().contains("residual_non_terminal=3"),
+                    "expected residual_non_terminal=3 in: " + result.getMessage());
+            assertTrue(result.getMessage().contains("batch 9"));
+        }
+
+        @Test
+        @DisplayName("should return failure combining failed + residual counts")
+        void shouldReturnFailureForBothFailedAndResidual() {
+            when(properties.isConfigured()).thenReturn(true);
+
+            SyncRequest request = new SyncRequest("ibkr", "2026-01-01", "2026-03-31");
+            request.setBatchId(10L);
+
+            when(flexClient.fetchReport(anyString(), anyString())).thenReturn("<xml/>");
+            FlexQueryParseResult parseResult = buildParseResult(10, 0);
+            when(flexQueryParser.parse("<xml/>")).thenReturn(parseResult);
+
+            when(stagedOrderRepository.countByBatchIdAndStatus(10L, "IMPORTED")).thenReturn(5L);
+            when(stagedOrderRepository.countByBatchIdAndStatus(10L, "SKIPPED")).thenReturn(0L);
+            when(stagedOrderRepository.countByBatchIdAndStatus(10L, "FAILED")).thenReturn(2L);
+            when(stagedOrderRepository.countByBatchIdAndStatusNotIn(
+                    eq(10L), anyCollection())).thenReturn(3L);
+            when(stagedOrderRepository.findIdsByBatchIdAndStatusNotIn(
+                    eq(10L), anyCollection(), any(Pageable.class)))
+                    .thenReturn(List.of(201L, 202L, 203L));
+
+            SyncResult result = adapter.sync(request);
+
+            assertFalse(result.isSuccess());
+            // Reason string lists both counts
+            assertTrue(result.getMessage().contains("failed=2"));
+            assertTrue(result.getMessage().contains("residual_non_terminal=3"));
+        }
+
+        @Test
+        @DisplayName("should succeed when residualCount is 0 (happy path unaffected)")
+        void shouldSucceedWithoutResidual() {
+            when(properties.isConfigured()).thenReturn(true);
+
+            SyncRequest request = new SyncRequest("ibkr", "2026-01-01", "2026-03-31");
+            request.setBatchId(11L);
+
+            when(flexClient.fetchReport(anyString(), anyString())).thenReturn("<xml/>");
+            FlexQueryParseResult parseResult = buildParseResult(5, 0);
+            when(flexQueryParser.parse("<xml/>")).thenReturn(parseResult);
+
+            when(stagedOrderRepository.countByBatchIdAndStatus(11L, "IMPORTED")).thenReturn(5L);
+            when(stagedOrderRepository.countByBatchIdAndStatus(11L, "SKIPPED")).thenReturn(0L);
+            when(stagedOrderRepository.countByBatchIdAndStatus(11L, "FAILED")).thenReturn(0L);
+            when(stagedOrderRepository.countByBatchIdAndStatusNotIn(
+                    eq(11L), anyCollection())).thenReturn(0L);
+
+            SyncResult result = adapter.sync(request);
+
+            assertTrue(result.isSuccess());
+            // findIds should NOT be consulted when residualCount==0 (no WARN dump)
+            verify(stagedOrderRepository, never()).findIdsByBatchIdAndStatusNotIn(
+                    anyLong(), anyCollection(), any(Pageable.class));
         }
     }
 

@@ -55,6 +55,15 @@ public class TigerImportService {
      * {@code trade_records}. Each row is processed in its own transaction
      * via {@link TigerImportWorker#importOne}.
      *
+     * <p><b>Failure handling (P0-1 fix)</b>: when
+     * {@link TigerImportWorker#importOne} cannot import a row it throws
+     * {@link ImportOneFailedException}; we catch it here and invoke
+     * {@link TigerImportWorker#markFailed} through the Spring AOP proxy,
+     * which opens a fresh REQUIRES_NEW transaction to persist the FAILED
+     * status. If {@code markFailed} itself also fails, the row stays
+     * PENDING and is caught later by the adapter's residual-non-terminal
+     * check (P0-2).
+     *
      * @param batchId the broker-sync batch id
      */
     public void importAll(Long batchId) {
@@ -67,10 +76,45 @@ public class TigerImportService {
                 batchId, pendingOrders.size());
 
         for (TigerStagedOrder staged : pendingOrders) {
-            importWorker.importOne(batchId, brokerId, staged);
+            try {
+                importWorker.importOne(batchId, brokerId, staged);
+            } catch (ImportOneFailedException e) {
+                markFailedSafely(e.getStaged(), "Import error: " + rootMessage(e.getCause()));
+            } catch (Exception e) {
+                // Defensive: importOne should always wrap in
+                // ImportOneFailedException, but belt-and-suspenders in case a
+                // future change lets a raw exception escape.
+                logger.error("[TigerImport] Unexpected non-wrapped exception importing tigerId={}: {}",
+                        staged.getTigerId(), e.getMessage(), e);
+                markFailedSafely(staged, "Unexpected error: " + e.getMessage());
+            }
         }
 
         logger.info("[TigerImport] Import complete: batchId={}", batchId);
+    }
+
+    /**
+     * Invoke {@link TigerImportWorker#markFailed} and swallow any exception
+     * from the markFailed call itself. A markFailed failure leaves the row
+     * in PENDING; the adapter-level residual-non-terminal check will still
+     * catch it and escalate the batch to fail-fast cleanup.
+     */
+    private void markFailedSafely(TigerStagedOrder staged, String errorMessage) {
+        try {
+            importWorker.markFailed(staged, errorMessage);
+        } catch (Exception markErr) {
+            logger.error("[TigerImport] Failed to mark staged id={} as FAILED — row will stay PENDING " +
+                            "and be caught by the adapter-level residual check: {}",
+                    staged.getId(), markErr.getMessage(), markErr);
+        }
+    }
+
+    private static String rootMessage(Throwable cause) {
+        if (cause == null) {
+            return "unknown";
+        }
+        String msg = cause.getMessage();
+        return msg != null ? msg : cause.getClass().getSimpleName();
     }
 
     // ============ Helpers ============

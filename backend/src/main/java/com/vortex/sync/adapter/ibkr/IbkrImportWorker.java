@@ -66,9 +66,18 @@ public class IbkrImportWorker {
      * Runs in its own transaction (REQUIRES_NEW) so that one failure
      * does not roll back the entire batch.
      *
+     * <p><b>Failure contract (P0-1 fix)</b>: on any exception, this method
+     * rethrows as {@link ImportOneFailedException} instead of trying to
+     * persist {@code status=FAILED} in the same rolled-back transaction.
+     * The caller ({@link IbkrImportService}) is responsible for invoking
+     * {@link #markFailed} through the Spring AOP proxy, which opens a fresh
+     * REQUIRES_NEW transaction that can actually commit the FAILED status.
+     *
      * @param batchId  the batch ID
      * @param brokerId the resolved broker ID
      * @param staged   the staged order to import
+     * @throws ImportOneFailedException if the row cannot be imported; carries
+     *         the still-attached {@code staged} ref and the original cause
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void importSingleOrder(Long batchId, Long brokerId, IbkrStagedOrder staged) {
@@ -94,11 +103,42 @@ public class IbkrImportWorker {
             logger.debug("[IbkrImport] Imported: orderId={} → tradeRecordId={}", staged.getOrderId(), saved.getId());
 
         } catch (Exception e) {
-            staged.setStatus("FAILED");
-            staged.setErrorMessage("Import error: " + e.getMessage());
-            stagedOrderRepository.save(staged);
-            logger.warn("[IbkrImport] Failed to import orderId={}: {}", staged.getOrderId(), e.getMessage(), e);
+            // Do NOT save staged here — this tx is already rollback-only.
+            // Propagate to the service, which invokes markFailed() via the AOP
+            // proxy so the FAILED write runs in a fresh REQUIRES_NEW tx.
+            logger.warn("[IbkrImport] Failed to import orderId={}: {}",
+                    staged.getOrderId(), e.getMessage(), e);
+            throw new ImportOneFailedException(staged, e);
         }
+    }
+
+    /**
+     * Persist {@code status=FAILED} + {@code error_message} for a single
+     * staged row in a fresh REQUIRES_NEW transaction — separated from
+     * {@link #importSingleOrder} because that method's tx is already
+     * rollback-only once the importing exception fires.
+     *
+     * <p>Re-reads the row by id before mutating to avoid detached-entity
+     * pitfalls (e.g. if the caller passes the same object across multiple
+     * transactional boundaries).
+     *
+     * <p>Must be called through the Spring AOP proxy (i.e. from another
+     * bean — {@link IbkrImportService}). Self-invocation would bypass the
+     * proxy and silently drop the REQUIRES_NEW semantic, re-introducing the
+     * very bug this method exists to fix.
+     *
+     * @param staged       the staged row that failed (needs a non-null id)
+     * @param errorMessage the error message to persist
+     * @throws IllegalStateException if the row no longer exists in the DB
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void markFailed(IbkrStagedOrder staged, String errorMessage) {
+        IbkrStagedOrder fresh = stagedOrderRepository.findById(staged.getId())
+                .orElseThrow(() -> new IllegalStateException(
+                        "Staged row disappeared while marking FAILED: id=" + staged.getId()));
+        fresh.setStatus("FAILED");
+        fresh.setErrorMessage(errorMessage);
+        stagedOrderRepository.save(fresh);
     }
 
     /**
@@ -212,22 +252,35 @@ public class IbkrImportWorker {
     /**
      * Resolve the TriggerRefType for a BookTrade by looking up the associated
      * TradeConfirm's code field.
+     *
+     * <p><b>Fail-fast contract (P0-3 fix)</b>: missing / blank / unknown codes
+     * throw {@link IllegalStateException} rather than silently defaulting to
+     * {@link TriggerRefType#NONE}. The previous "default to MANUAL" behavior
+     * produced invalid {@code trade_trigger=OPTION} + {@code trigger_ref_type=NONE}
+     * rows in {@code trade_records} that poisoned downstream reconciliation.
+     * Rejecting the row instead routes it through the normal FAILED → batch
+     * cleanup path, so the user sees the data quality issue and can fix it
+     * upstream (e.g. re-run the Flex Query once IBKR publishes the missing
+     * TradeConfirm).
+     *
+     * @throws IllegalStateException when the confirm list is empty, the code
+     *         is blank, or no token matches a known option event
      */
     private TriggerRefType resolveBookTradeRefType(IbkrStagedOrder staged) {
         List<IbkrStagedTradeConfirm> confirms =
                 stagedTradeConfirmRepository.findByOrderId(staged.getOrderId());
 
         if (confirms.isEmpty()) {
-            logger.warn("[IbkrImport] BookTrade orderId={} has no associated TradeConfirm, " +
-                    "defaulting to MANUAL", staged.getOrderId());
-            return TriggerRefType.NONE;
+            throw new IllegalStateException(String.format(
+                    "BookTrade orderId=%s has no associated TradeConfirm — cannot determine option-event type",
+                    staged.getOrderId()));
         }
 
         String code = confirms.get(0).getCode();
         if (isBlank(code)) {
-            logger.warn("[IbkrImport] BookTrade orderId={} has empty code in TradeConfirm, " +
-                    "defaulting to MANUAL", staged.getOrderId());
-            return TriggerRefType.NONE;
+            throw new IllegalStateException(String.format(
+                    "BookTrade orderId=%s TradeConfirm has blank code — cannot determine option-event type",
+                    staged.getOrderId()));
         }
 
         // Parse code tokens (semicolon-separated)
@@ -253,9 +306,10 @@ public class IbkrImportWorker {
             }
         }
 
-        logger.warn("[IbkrImport] BookTrade orderId={} code='{}' did not match any known option event, " +
-                "defaulting to MANUAL", staged.getOrderId(), code);
-        return TriggerRefType.NONE;
+        throw new IllegalStateException(String.format(
+                "BookTrade orderId=%s code='%s' did not match any known option event " +
+                        "(EXERCISE=%s, EXPIRE=Ep, ASSIGNED=A|GEA)",
+                staged.getOrderId(), code, EXERCISE_CODES));
     }
 
     // ============ Disambiguation helpers ============
