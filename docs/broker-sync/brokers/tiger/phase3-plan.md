@@ -1,12 +1,12 @@
 # Tiger Phase 3 — 编码与工作计划
 
 > **创建日期**：2026-04-21
-> **最近更新**：2026-04-22（随 import-consistency.md v2 更新相关措辞；原文中涉及"Resume"/"PARTIAL"的段落已标注为 v1 历史口径）
+> **最近更新**：2026-04-23（随 import-consistency.md v2.3 更新：v2 状态模型已在后端完整落地，本文档中 v1 历史口径已改写为 v2 现状口径）
 > **状态**：🔧 进行中 — 阶段 1、2、3、4、5 已完成；已完成对照 IBKR 的代码 review 与对齐修复（窗口循环边界、ImportResult 契约对齐）
 > **目标**：将老虎证券同步从 Phase 1（API → 日志）升级为与 IBKR 对齐的两阶段导入（API → `tiger_staged_orders` → `trade_records`）
 > **关联**：[staging-schema.md](./staging-schema.md) | [open-api.md](./open-api.md) | [../../framework/data-persistence.md](../../framework/data-persistence.md) | [../../framework/import-consistency.md](../../framework/import-consistency.md) | [../ibkr/flex-web-service.md](../ibkr/flex-web-service.md)
 >
-> **⚠️ 与 import-consistency.md v2 的一致性说明**：本文档里阶段 5（Resume 相关描述）和阶段 5.1（对照 IBKR 的 review）中提到的 `PARTIAL` / `INTERRUPTED` / "Resume" 均为 **v1 的口径**。v2（2026-04-22 发布，等待实施）已改为"失败即清理、三终态"模型，Tiger 侧无需额外 Resume 逻辑，批次收敛到 `COMPLETED` / `FAILED` / `CLEANUP_FAILED`。具体执行改造随 v2 V28 迁移同步落地。
+> **✅ 与 import-consistency.md v2 的一致性说明**：v2 状态模型已在后端完整落地（Phase 1a/1b/2/3 Commit A+B 均已合并），批次仅收敛到 `COMPLETED` / `FAILED` / `CLEANUP_FAILED`，应用不再产生 `PARTIAL` / `INTERRUPTED`，也不再提供 resume 端点。Tiger 侧的 `TigerStagingService` 幂等性无需改动——它在 v2 下仍然避免重试时的重复插入，只是语义由"用户手动 resume 时复用"变为"启动恢复清理后的下一次同步自然复用"。
 
 ---
 
@@ -34,7 +34,7 @@
 - `BrokerSyncAdapter` 接口
 - `BrokerSyncController` / `BrokerSyncService`（控制器与编排）
 - `broker_sync_batches` 通用批次表
-- `BrokerSyncBatchService`（批次管理：状态机 / phase；v2 起改为"失败即清理"，不再有 Resume 条件）
+- `BrokerSyncBatchService`（批次管理：状态机 / phase；v2 为"失败即清理"模型，不再有 Resume 分支）
 - `SyncBatchRecoveryRunner`（应用启动恢复；v2 起行为改为"扫到残留活跃批次 → 清理数据 → 标记 FAILED"）
 - `trade_records` 扩展字段（`external_id` / `external_broker` / `sync_batch_id`）
 - 前端动态券商列表（`/api/broker-sync/brokers`）
@@ -217,14 +217,16 @@
 - [x] `convertToRecord()` `attrDesc` 字段（阶段 2 已做，此处确认保持）
 - [x] 分页行为：确认 `get_filled_orders` 服务端一次性返回，无需 pageToken 循环
 - [x] 原有"日志逐条打印"降级为 DEBUG 级别（`logRecordsForDebug`，带 `isDebugEnabled()` 保护），便于排障
-- [x] ~~Resume~~ **(v1 历史口径；v2 已废弃)**：`SyncBatchRecoveryRunner` 是框架级（与 broker 无关），启动时会把残留 PROCESSING 批次标记为 INTERRUPTED，用户通过 `POST /api/broker-sync/batches/{id}/resume` 重跑；Tiger 链路依赖幂等的 `TigerStagingService`，天然支持重跑。
-  - **v2 变更**：启动检测直接"清理残留数据 + 标记 FAILED"，无需 Resume；Tiger 侧 `TigerStagingService` 的幂等性依然有价值（避免重拉后的重复插入），无需改动。
+- [x] ~~Resume~~ **(v1 历史口径；v2 已移除)**：v1 中 `SyncBatchRecoveryRunner` 启动时会把残留 PROCESSING 批次标记为 `INTERRUPTED`，用户通过 `POST /api/broker-sync/batches/{id}/resume` 手动重跑。
+  - **v2 现状**：启动检测直接经由 `SyncBatchFailureHandler` "清理残留数据 + 标记 FAILED"（或兜底 `CLEANUP_FAILED`），不再有 `INTERRUPTED` 状态，resume 端点也已删除。Tiger 侧 `TigerStagingService` 的幂等性依然有价值（下一次同步自然避免重复插入），无需改动。
 
 **实现要点**：
 
 - `TigerSyncAdapter` 构造器从 1 参扩到 5 参；Spring DI 自动注入
-- 批次生命周期（v1：PROCESSING / COMPLETED / PARTIAL / FAILED；v2：PROCESSING / COMPLETED / FAILED / CLEANUP_FAILED）完全由 `BrokerSyncAsyncExecutor` 拥有；adapter 只更新 `phase` 字段（FETCHING → STAGING → IMPORTING）并返回 `SyncResult`。**不在 adapter 里调 `batchService.markFailed` / `markSuccess`**，与 IBKR 一致
-- 异常路径：`try { ... } catch (Exception e)` → 返回 `SyncResult.failure`；由 `BrokerSyncAsyncExecutor` 根据 `result.isSuccess() == false` 调失败处理入口（v1：`markAsFailed`；v2：`SyncBatchFailureHandler.handleFailure` 清理 + 标记 FAILED）
+- 批次生命周期完全由 `BrokerSyncAsyncExecutor` 拥有；adapter 只更新 `phase` 字段（FETCHING → STAGING → IMPORTING）并返回 `SyncResult`。**不在 adapter 里调 `batchService.markFailed` / `markSuccess`**，与 IBKR 一致
+  - v1 终态集：`PROCESSING` / `COMPLETED` / `PARTIAL` / `FAILED`
+  - v2 终态集：`PROCESSING` / `COMPLETED` / `FAILED` / `CLEANUP_FAILED`（当前生效）
+- 异常路径：`try { ... } catch (Exception e)` → 返回 `SyncResult.failure`；`BrokerSyncAsyncExecutor` 根据 `result.isSuccess() == false` 走统一失败入口 `SyncBatchFailureHandler.handleFailure`（清理 staged + trade_records，再标 FAILED；清理耗尽则标 CLEANUP_FAILED）
 
 **验证**：
 
