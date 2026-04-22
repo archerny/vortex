@@ -5,6 +5,7 @@ import com.vortex.repository.BrokerSyncBatchRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -12,22 +13,30 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link SyncBatchRecoveryRunner}.
+ * Unit tests for {@link SyncBatchRecoveryRunner} under the v2 state model.
  *
- * Covers:
- * - No stuck batches: should do nothing
- * - Single stuck batch: should mark as INTERRUPTED, preserve phase
- * - Multiple stuck batches: should mark all as INTERRUPTED
+ * <p>v2 does not have an INTERRUPTED state. Any batch stuck in PROCESSING on
+ * startup is routed through {@link SyncBatchFailureHandler#handleFailure},
+ * which performs cleanup and finalizes the batch as FAILED (or
+ * CLEANUP_FAILED if cleanup exhausts its retries).</p>
  */
 @ExtendWith(MockitoExtension.class)
 class SyncBatchRecoveryRunnerTest {
 
     @Mock
     private BrokerSyncBatchRepository batchRepository;
+
+    @Mock
+    private SyncBatchFailureHandler failureHandler;
 
     @InjectMocks
     private SyncBatchRecoveryRunner recoveryRunner;
@@ -39,12 +48,13 @@ class SyncBatchRecoveryRunnerTest {
 
         recoveryRunner.run(null);
 
-        verify(batchRepository, never()).save(any());
+        verifyNoInteractions(failureHandler);
+        verify(batchRepository, never()).save(org.mockito.ArgumentMatchers.any());
     }
 
     @Test
-    @DisplayName("should mark stuck batch as INTERRUPTED and preserve phase")
-    void shouldMarkStuckBatchAsInterrupted() {
+    @DisplayName("should route a single stuck batch through failureHandler with its broker code")
+    void shouldCleanupSingleStuckBatch() {
         BrokerSyncBatch batch = new BrokerSyncBatch();
         batch.setId(1L);
         batch.setBrokerCode("ibkr");
@@ -55,23 +65,27 @@ class SyncBatchRecoveryRunnerTest {
 
         recoveryRunner.run(null);
 
-        assertEquals("INTERRUPTED", batch.getStatus());
-        assertEquals("STAGING", batch.getPhase()); // preserved
-        assertNotNull(batch.getErrorMessage());
-        assertTrue(batch.getErrorMessage().contains("restarted"));
-        verify(batchRepository).save(batch);
+        verify(failureHandler).handleFailure(
+                eq(1L),
+                eq("ibkr"),
+                argThat(msg -> msg != null && msg.contains("Interrupted")));
+        // Runner must not mutate the entity directly — failureHandler owns the
+        // status transition (to FAILED or CLEANUP_FAILED).
+        verify(batchRepository, never()).save(org.mockito.ArgumentMatchers.any());
     }
 
     @Test
-    @DisplayName("should mark multiple stuck batches as INTERRUPTED")
-    void shouldMarkAllStuckBatches() {
+    @DisplayName("should clean up all stuck batches in order")
+    void shouldCleanupAllStuckBatches() {
         BrokerSyncBatch batch1 = new BrokerSyncBatch();
         batch1.setId(1L);
+        batch1.setBrokerCode("ibkr");
         batch1.setStatus("PROCESSING");
         batch1.setPhase("FETCHING");
 
         BrokerSyncBatch batch2 = new BrokerSyncBatch();
         batch2.setId(2L);
+        batch2.setBrokerCode("tiger");
         batch2.setStatus("PROCESSING");
         batch2.setPhase("IMPORTING");
 
@@ -79,10 +93,8 @@ class SyncBatchRecoveryRunnerTest {
 
         recoveryRunner.run(null);
 
-        assertEquals("INTERRUPTED", batch1.getStatus());
-        assertEquals("INTERRUPTED", batch2.getStatus());
-        assertEquals("FETCHING", batch1.getPhase()); // preserved
-        assertEquals("IMPORTING", batch2.getPhase()); // preserved
-        verify(batchRepository, times(2)).save(any());
+        InOrder inOrder = org.mockito.Mockito.inOrder(failureHandler);
+        inOrder.verify(failureHandler).handleFailure(eq(1L), eq("ibkr"), anyString());
+        inOrder.verify(failureHandler).handleFailure(eq(2L), eq("tiger"), anyString());
     }
 }

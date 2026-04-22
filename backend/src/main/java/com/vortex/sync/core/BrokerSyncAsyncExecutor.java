@@ -9,24 +9,33 @@ import org.springframework.stereotype.Service;
 /**
  * Async executor for broker sync tasks.
  *
- * This is a dedicated Spring bean that runs sync operations on the
- * {@code syncTaskExecutor} thread pool.  It is intentionally separated
+ * <p>This is a dedicated Spring bean that runs sync operations on the
+ * {@code syncTaskExecutor} thread pool. It is intentionally separated
  * from {@link BrokerSyncService} and the controller so that Spring's
- * AOP proxy can intercept the {@code @Async} annotation correctly.
+ * AOP proxy can intercept the {@code @Async} annotation correctly.</p>
  *
  * <h3>Exception safety</h3>
- * The {@link #execute} method guarantees that the batch record will
- * <strong>never</strong> be left in an intermediate state (e.g. PROCESSING
- * forever).  Any unhandled exception is caught and the batch is marked
- * as FAILED with the error message.
+ * <p>The {@link #execute} method guarantees the batch record will
+ * <strong>never</strong> be left in an intermediate state (e.g. stuck in
+ * {@code PROCESSING}). Any failure — whether an adapter-level failure
+ * result, an unhandled exception, or the v2 per-record fail-fast escalation
+ * — is funneled through {@link SyncBatchFailureHandler#handleFailure},
+ * which performs cleanup + status finalization in a single place.</p>
  *
- * <h3>Status lifecycle</h3>
- * PENDING → PROCESSING (phase=FETCHING) → adapter.sync() → COMPLETED / FAILED
+ * <h3>Status lifecycle (v2)</h3>
+ * <pre>
+ *                       success
+ *                     ┌────────→  COMPLETED
+ *   PENDING → PROCESSING
+ *                     └────────→  cleanup → FAILED
+ *                       failure              │
+ *                                            └────→  CLEANUP_FAILED
+ *                                  (if cleanup itself exhausts retries)
+ * </pre>
  *
- * <p><b>v2 note:</b> PARTIAL and INTERRUPTED states are gone. A success
- * result always transitions to COMPLETED (per-record failures are handled
- * earlier via fail-fast cleanup, implemented in phase 3). A failure result
- * transitions to FAILED.</p>
+ * <p>v2 has no PARTIAL / INTERRUPTED states: a success result always becomes
+ * {@code COMPLETED}, and any per-record failure escalates to whole-batch
+ * cleanup before the batch is marked terminal.</p>
  */
 @Service
 public class BrokerSyncAsyncExecutor {
@@ -35,11 +44,14 @@ public class BrokerSyncAsyncExecutor {
 
     private final BrokerSyncService brokerSyncService;
     private final BrokerSyncBatchService batchService;
+    private final SyncBatchFailureHandler failureHandler;
 
     public BrokerSyncAsyncExecutor(BrokerSyncService brokerSyncService,
-                                   BrokerSyncBatchService batchService) {
+                                   BrokerSyncBatchService batchService,
+                                   SyncBatchFailureHandler failureHandler) {
         this.brokerSyncService = brokerSyncService;
         this.batchService = batchService;
+        this.failureHandler = failureHandler;
     }
 
     /**
@@ -50,7 +62,10 @@ public class BrokerSyncAsyncExecutor {
      *   <li>Mark batch as PROCESSING with phase=FETCHING</li>
      *   <li>Inject batchId into the request so adapters can reference the batch</li>
      *   <li>Delegate to {@link BrokerSyncService#sync(SyncRequest)}</li>
-     *   <li>Mark batch as COMPLETED or FAILED based on the result</li>
+     *   <li>On success → {@code markAsCompleted}.
+     *       On failure result or exception → {@link SyncBatchFailureHandler#handleFailure},
+     *       which cleans up staged / trade_records rows and flips the batch to
+     *       {@code FAILED} (or {@code CLEANUP_FAILED} if cleanup exhausts retries).</li>
      * </ol>
      *
      * @param batchId the persisted batch ID (must already exist in DB)
@@ -58,10 +73,13 @@ public class BrokerSyncAsyncExecutor {
      */
     @Async("syncTaskExecutor")
     public void execute(Long batchId, SyncRequest request) {
-        logger.info("Async sync started: batchId={}, broker={}", batchId, request.getBrokerCode());
+        String brokerCode = request.getBrokerCode();
+        logger.info("Async sync started: batchId={}, broker={}", batchId, brokerCode);
 
         try {
-            // Step 1: Mark as PROCESSING (phase=FETCHING)
+            // Step 1: Mark as PROCESSING (phase=FETCHING). If this fails the batch
+            // doesn't exist or DB is down — fall through to catch, which will try
+            // cleanup; cleanup on a non-existent batch is safe (no-op deletes).
             batchService.markAsProcessing(batchId, "FETCHING");
 
             // Step 2: Inject batchId into request so adapters can reference the batch
@@ -70,28 +88,31 @@ public class BrokerSyncAsyncExecutor {
             // Step 3: Execute the actual sync (may take seconds to minutes)
             SyncResult result = brokerSyncService.sync(request);
 
-            // Step 4: Update batch based on result.
-            //   v2: always COMPLETED on success (no more PARTIAL). Per-record failures
-            //       are handled by fail-fast cleanup inside the sync pipeline itself
-            //       (to be wired in phase 3).
+            // Step 4: Dispatch on result.
+            //   v2: success → COMPLETED (no PARTIAL).
+            //       failure → fail-fast cleanup + FAILED via failureHandler.
             if (result.isSuccess()) {
                 batchService.markAsCompleted(batchId, result);
                 logger.info("Async sync completed: batchId={}, total={}, imported={}, skipped={}",
                         batchId, result.getTotalRecords(), result.getImportedCount(), result.getSkippedCount());
             } else {
-                batchService.markAsFailed(batchId, result.getMessage());
-                logger.warn("Async sync failed: batchId={}, message={}",
+                logger.warn("Async sync returned failure: batchId={}, message={}",
                         batchId, result.getMessage());
+                failureHandler.handleFailure(batchId, brokerCode, result.getMessage());
             }
         } catch (Exception e) {
-            // Catch-all: ensure batch is never stuck in PROCESSING
+            // Catch-all: ensure batch is never stuck in PROCESSING. The failure
+            // handler is responsible for cleaning up staged rows / trade_records
+            // and transitioning to FAILED (or CLEANUP_FAILED on cleanup failure).
             logger.error("Unexpected error during async sync: batchId={}", batchId, e);
             try {
-                batchService.markAsFailed(batchId,
+                failureHandler.handleFailure(batchId, brokerCode,
                         "Unexpected error: " + e.getMessage());
             } catch (Exception ex) {
-                // Even the fail-safe update failed — log and give up
-                logger.error("Failed to mark batch {} as FAILED after exception", batchId, ex);
+                // handleFailure swallows its own second-order exceptions, so reaching
+                // this catch would indicate a programming error — log loudly.
+                logger.error("Failure handler itself threw for batch {}; "
+                        + "batch may be stuck in PROCESSING", batchId, ex);
             }
         }
     }

@@ -4,7 +4,9 @@ import com.vortex.entity.BrokerSyncBatch;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Repository for broker sync batch operations.
@@ -39,4 +41,15 @@ public interface BrokerSyncBatchRepository extends JpaRepository<BrokerSyncBatch
      * Find batches by status (for recovery scanning).
      */
     List<BrokerSyncBatch> findByStatus(String status);
+
+    /**
+     * Find the first batch whose status is in the given set, ordered by id
+     * descending. Used by the v2 sync conflict check to surface an active
+     * batch (PENDING / PROCESSING / CLEANUP_FAILED) before attempting to
+     * create a new one. The DB-level guard is the partial unique index
+     * {@code uk_only_one_active}; this method is the application-layer
+     * fast-path that lets us return a rich {@code SyncConflictException}
+     * with the conflicting batch's ID/status.
+     */
+    Optional<BrokerSyncBatch> findFirstByStatusInOrderByIdDesc(Collection<String> statuses);
 }

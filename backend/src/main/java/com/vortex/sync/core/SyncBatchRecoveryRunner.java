@@ -7,22 +7,26 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 /**
- * Startup recovery runner for broker sync batches.
+ * Startup recovery runner for broker sync batches (v2).
  *
- * On application startup, scans for any batches stuck in PROCESSING status
- * (which means the application crashed or was restarted during sync) and
- * marks them as INTERRUPTED. The phase field is preserved for diagnostics,
- * so operators can see at which stage the interruption occurred.
+ * <p>On application startup, scans for any batches stuck in {@code PROCESSING}
+ * status — i.e. the JVM crashed or was restarted mid-sync — and routes each
+ * one through {@link SyncBatchFailureHandler#handleFailure}. The handler
+ * wipes whatever staged rows / trade_records the interrupted batch had
+ * written and finalizes the batch as {@code FAILED} (or
+ * {@code CLEANUP_FAILED} if cleanup itself exhausts retries).</p>
  *
- * Users can later trigger a resume via POST /api/broker-sync/batches/{id}/resume
- * to restart the sync from the beginning (complete re-run with idempotent staging).
+ * <p>v2 intentionally has no "resume" concept: after a cleanup the user
+ * simply triggers a fresh sync. Because staging is idempotent and trade
+ * record imports skip duplicates by business key, re-running the sync is
+ * safe and converges to the same final state.</p>
  *
  * @see BrokerSyncBatchRepository#findByStatus(String)
+ * @see SyncBatchFailureHandler
  */
 @Component
 public class SyncBatchRecoveryRunner implements ApplicationRunner {
@@ -30,13 +34,15 @@ public class SyncBatchRecoveryRunner implements ApplicationRunner {
     private static final Logger logger = LoggerFactory.getLogger(SyncBatchRecoveryRunner.class);
 
     private final BrokerSyncBatchRepository batchRepository;
+    private final SyncBatchFailureHandler failureHandler;
 
-    public SyncBatchRecoveryRunner(BrokerSyncBatchRepository batchRepository) {
+    public SyncBatchRecoveryRunner(BrokerSyncBatchRepository batchRepository,
+                                   SyncBatchFailureHandler failureHandler) {
         this.batchRepository = batchRepository;
+        this.failureHandler = failureHandler;
     }
 
     @Override
-    @Transactional
     public void run(ApplicationArguments args) {
         List<BrokerSyncBatch> stuckBatches = batchRepository.findByStatus("PROCESSING");
 
@@ -45,16 +51,18 @@ public class SyncBatchRecoveryRunner implements ApplicationRunner {
             return;
         }
 
-        logger.warn("[SyncRecovery] Found {} batch(es) stuck in PROCESSING status, marking as INTERRUPTED",
-                stuckBatches.size());
+        logger.warn("[SyncRecovery] Found {} batch(es) stuck in PROCESSING status; "
+                + "routing through fail-fast cleanup", stuckBatches.size());
 
         for (BrokerSyncBatch batch : stuckBatches) {
-            batch.setStatus("INTERRUPTED");
-            batch.setErrorMessage("Interrupted: application restarted during sync");
-            // phase is preserved for diagnostics — shows which stage was interrupted
-            batchRepository.save(batch);
-            logger.warn("[SyncRecovery] Batch {} marked as INTERRUPTED (was PROCESSING, phase={})",
-                    batch.getId(), batch.getPhase());
+            logger.warn("[SyncRecovery] Cleaning up batch {} (broker={}, phase={})",
+                    batch.getId(), batch.getBrokerCode(), batch.getPhase());
+            // handleFailure swallows its own exceptions, so one bad batch cannot
+            // block the application from starting.
+            failureHandler.handleFailure(
+                    batch.getId(),
+                    batch.getBrokerCode(),
+                    "Interrupted: application restarted during sync");
         }
     }
 }

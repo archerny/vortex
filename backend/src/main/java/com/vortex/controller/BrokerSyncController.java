@@ -6,6 +6,7 @@ import com.vortex.sync.core.BrokerSyncAsyncExecutor;
 import com.vortex.sync.core.BrokerSyncInfo;
 import com.vortex.sync.core.BrokerSyncService;
 import com.vortex.sync.core.SyncRequest;
+import com.vortex.sync.exception.SyncConflictException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -234,5 +235,25 @@ public class BrokerSyncController {
         response.put("status", "ERROR");
         response.put("message", message);
         return ResponseEntity.status(status).body(response);
+    }
+
+    /**
+     * Map {@link SyncConflictException} to {@code HTTP 409 Conflict}.
+     *
+     * <p>The response body exposes {@code conflictingBatchId} and
+     * {@code conflictingStatus} so the frontend can distinguish between
+     * "another sync is still running, please wait" and "a previous batch is
+     * in {@code CLEANUP_FAILED}, please resolve it first".</p>
+     */
+    @ExceptionHandler(SyncConflictException.class)
+    public ResponseEntity<Map<String, Object>> handleSyncConflict(SyncConflictException ex) {
+        logger.warn("Sync conflict: conflictingBatchId={}, conflictingStatus={}, message={}",
+                ex.getConflictingBatchId(), ex.getConflictingStatus(), ex.getMessage());
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", "ERROR");
+        response.put("message", ex.getMessage());
+        response.put("conflictingBatchId", ex.getConflictingBatchId());
+        response.put("conflictingStatus", ex.getConflictingStatus());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
 }

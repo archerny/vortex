@@ -3,6 +3,7 @@ package com.vortex.service;
 import com.vortex.entity.BrokerSyncBatch;
 import com.vortex.repository.BrokerSyncBatchRepository;
 import com.vortex.sync.core.SyncResult;
+import com.vortex.sync.exception.SyncConflictException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -220,6 +222,62 @@ class BrokerSyncBatchServiceTest {
 
             assertEquals(LocalDate.now(), result.getSyncDateFrom());
             assertEquals(LocalDate.now(), result.getSyncDateTo());
+        }
+
+        @Test
+        @DisplayName("v2 conflict: should throw SyncConflictException when another batch is active")
+        void shouldThrowWhenActiveBatchExists() {
+            BrokerSyncBatch active = buildBatch(77L, "ibkr", "PROCESSING");
+            when(batchRepository.findFirstByStatusInOrderByIdDesc(
+                    BrokerSyncBatchService.ACTIVE_STATUSES))
+                    .thenReturn(Optional.of(active));
+
+            SyncConflictException ex = assertThrows(SyncConflictException.class,
+                    () -> batchService.createBatch("ibkr", null, null));
+
+            assertEquals(77L, ex.getConflictingBatchId());
+            assertEquals("PROCESSING", ex.getConflictingStatus());
+            assertTrue(ex.getMessage().contains("77"));
+            assertTrue(ex.getMessage().contains("PROCESSING"));
+            verify(batchRepository, never()).save(any());
+        }
+
+        @Test
+        @DisplayName("v2 conflict: CLEANUP_FAILED batch should also block new syncs")
+        void shouldThrowWhenCleanupFailedBatchExists() {
+            BrokerSyncBatch blocked = buildBatch(88L, "tiger", "CLEANUP_FAILED");
+            when(batchRepository.findFirstByStatusInOrderByIdDesc(
+                    BrokerSyncBatchService.ACTIVE_STATUSES))
+                    .thenReturn(Optional.of(blocked));
+
+            SyncConflictException ex = assertThrows(SyncConflictException.class,
+                    () -> batchService.createBatch("tiger", null, null));
+
+            assertEquals(88L, ex.getConflictingBatchId());
+            assertEquals("CLEANUP_FAILED", ex.getConflictingStatus());
+            verify(batchRepository, never()).save(any());
+        }
+
+        @Test
+        @DisplayName("v2 conflict: DB unique-index race is translated to SyncConflictException")
+        void shouldTranslateUniqueIndexViolation() {
+            // Fast-path finds nothing (race window)
+            when(batchRepository.findFirstByStatusInOrderByIdDesc(
+                    BrokerSyncBatchService.ACTIVE_STATUSES))
+                    .thenReturn(Optional.empty());
+            // …but the INSERT loses the uk_only_one_active race
+            when(batchRepository.save(any(BrokerSyncBatch.class)))
+                    .thenThrow(new DataIntegrityViolationException(
+                            "ERROR: duplicate key value violates unique constraint "
+                                    + "\"uk_only_one_active\""));
+
+            SyncConflictException ex = assertThrows(SyncConflictException.class,
+                    () -> batchService.createBatch("ibkr", null, null));
+
+            assertNull(ex.getConflictingBatchId(),
+                    "DB-level fallback has no way to surface the conflicting batch ID");
+            assertNull(ex.getConflictingStatus());
+            assertNotNull(ex.getCause(), "should wrap the DataIntegrityViolationException");
         }
     }
 
