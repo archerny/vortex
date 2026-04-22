@@ -43,6 +43,16 @@ public interface BrokerSyncBatchRepository extends JpaRepository<BrokerSyncBatch
     List<BrokerSyncBatch> findByStatus(String status);
 
     /**
+     * Find batches whose status is in the given set. Used by
+     * {@link com.vortex.sync.core.SyncBatchRecoveryRunner} at startup to scan
+     * for residual active batches (PENDING + PROCESSING) left behind by a
+     * crashed JVM. PENDING covers the narrow window between
+     * {@code createBatch} and {@code markAsProcessing}; PROCESSING covers
+     * everything after the adapter starts running.
+     */
+    List<BrokerSyncBatch> findByStatusIn(Collection<String> statuses);
+
+    /**
      * Find the first batch whose status is in the given set, ordered by id
      * descending. Used by the v2 sync conflict check to surface an active
      * batch (PENDING / PROCESSING / CLEANUP_FAILED) before attempting to
