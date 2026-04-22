@@ -125,19 +125,23 @@ public class IbkrSyncAdapter implements BrokerSyncAdapter {
             long skippedCount = stagedOrderRepository.countByBatchIdAndStatus(batchId, "SKIPPED");
             long failedCount = stagedOrderRepository.countByBatchIdAndStatus(batchId, "FAILED");
             int totalCount = (int) (importedCount + skippedCount + failedCount);
+            long durationMs = System.currentTimeMillis() - startMs;
+
             if (failedCount > 0) {
                 // v2 fail-fast: any per-record failure escalates to whole-batch cleanup.
-                // Throwing here routes through BrokerSyncAsyncExecutor → SyncBatchFailureHandler,
-                // which wipes the staged rows + any partially imported trade_records and
-                // finalizes the batch as FAILED (or CLEANUP_FAILED if cleanup itself fails).
-                long durationMs = System.currentTimeMillis() - startMs;
-                throw new RuntimeException(String.format(
-                        "[IbkrSync] %d record(s) failed import in batch %d "
-                                + "(imported=%d, skipped=%d, duration=%dms); triggering fail-fast cleanup",
-                        failedCount, batchId, importedCount, skippedCount, durationMs));
+                // Returning a failure result routes through BrokerSyncAsyncExecutor →
+                // SyncBatchFailureHandler, which wipes the staged rows + any partially
+                // imported trade_records and finalizes the batch as FAILED (or
+                // CLEANUP_FAILED if cleanup itself fails). We return failure directly
+                // (rather than throwing) so that the executor only sees one error path,
+                // not throw→catch→failure.
+                String reason = String.format(
+                        "%d record(s) failed import in batch %d (imported=%d, skipped=%d, duration=%dms)",
+                        failedCount, batchId, importedCount, skippedCount, durationMs);
+                logger.error("[IbkrSync] {} — triggering fail-fast cleanup", reason);
+                return SyncResult.failure(getBrokerCode(), reason, durationMs);
             }
 
-            long durationMs = System.currentTimeMillis() - startMs;
             return SyncResult.success(getBrokerCode(), totalCount,
                     (int) importedCount, (int) skippedCount, durationMs);
 

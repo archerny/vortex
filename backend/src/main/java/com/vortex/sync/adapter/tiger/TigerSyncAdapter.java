@@ -127,19 +127,23 @@ public class TigerSyncAdapter implements BrokerSyncAdapter {
             long skippedCount = stagedOrderRepository.countByBatchIdAndStatus(batchId, "SKIPPED");
             long failedCount = stagedOrderRepository.countByBatchIdAndStatus(batchId, "FAILED");
             int totalCount = (int) (importedCount + skippedCount + failedCount);
+            long durationMs = System.currentTimeMillis() - startMs;
+
             if (failedCount > 0) {
                 // v2 fail-fast: any per-record failure escalates to whole-batch cleanup.
-                // Throwing here routes through BrokerSyncAsyncExecutor → SyncBatchFailureHandler,
-                // which wipes the staged rows + any partially imported trade_records and
-                // finalizes the batch as FAILED (or CLEANUP_FAILED if cleanup itself fails).
-                long durationMs = System.currentTimeMillis() - startMs;
-                throw new RuntimeException(String.format(
-                        "[TigerSync] %d record(s) failed import in batch %d "
-                                + "(imported=%d, skipped=%d, duration=%dms); triggering fail-fast cleanup",
-                        failedCount, batchId, importedCount, skippedCount, durationMs));
+                // Returning a failure result routes through BrokerSyncAsyncExecutor →
+                // SyncBatchFailureHandler, which wipes the staged rows + any partially
+                // imported trade_records and finalizes the batch as FAILED (or
+                // CLEANUP_FAILED if cleanup itself fails). We return failure directly
+                // (rather than throwing) so that the executor only sees one error path,
+                // not throw→catch→failure.
+                String reason = String.format(
+                        "%d record(s) failed import in batch %d (imported=%d, skipped=%d, duration=%dms)",
+                        failedCount, batchId, importedCount, skippedCount, durationMs);
+                logger.error("[TigerSync] {} — triggering fail-fast cleanup", reason);
+                return SyncResult.failure(getBrokerCode(), reason, durationMs);
             }
 
-            long durationMs = System.currentTimeMillis() - startMs;
             return SyncResult.success(getBrokerCode(), totalCount,
                     (int) importedCount, (int) skippedCount, durationMs);
 
@@ -219,43 +223,60 @@ public class TigerSyncAdapter implements BrokerSyncAdapter {
 
     /**
      * Call Tiger API for a single window.
+     *
+     * <p>v2 fail-fast contract: any upstream error (API failure, non-success response,
+     * network exception) is re-thrown so the outer {@link #sync(SyncRequest)} catch-all
+     * can escalate the whole batch to {@code SyncBatchFailureHandler}. Previously this
+     * method swallowed exceptions and returned an empty list, which caused API errors
+     * to be silently treated as "no orders in this window" — a data-loss hazard.
+     *
+     * <p>An empty result (response ok but zero orders) is still returned as an empty
+     * list, which is the normal "no activity in this window" case.
      */
     private List<TigerOrderRecord> fetchFilledOrders(TigerHttpClient client, LocalDate startDate, LocalDate endDate) {
-        List<TigerOrderRecord> records = new ArrayList<>();
+        QueryOrderRequest request = new QueryOrderRequest(MethodName.FILLED_ORDERS);
+        String bizContent = AccountParamBuilder.instance()
+                .account(tigerApiProperties.getAccount())
+                .startDate(startDate.format(DATE_FORMATTER))
+                .endDate(endDate.format(DATE_FORMATTER))
+                .buildJson();
+        request.setBizContent(bizContent);
 
+        BatchOrderResponse response;
         try {
-            QueryOrderRequest request = new QueryOrderRequest(MethodName.FILLED_ORDERS);
-            String bizContent = AccountParamBuilder.instance()
-                    .account(tigerApiProperties.getAccount())
-                    .startDate(startDate.format(DATE_FORMATTER))
-                    .endDate(endDate.format(DATE_FORMATTER))
-                    .buildJson();
-            request.setBizContent(bizContent);
-
-            BatchOrderResponse response = client.execute(request);
-
-            if (response == null || !response.isSuccess()) {
-                String errorMsg = response != null ? response.getMessage() : "response is null";
-                logger.warn("[TigerSync] API call failed: {}", errorMsg);
-                return records;
-            }
-
-            BatchOrderItem orderItem = response.getItem();
-            if (orderItem == null || orderItem.getOrders() == null) {
-                logger.info("[TigerSync] No filled orders in this window");
-                return records;
-            }
-
-            for (TradeOrder order : orderItem.getOrders()) {
-                TigerOrderRecord record = convertToRecord(order);
-                records.add(record);
-            }
-
+            response = client.execute(request);
         } catch (Exception e) {
+            // Network / SDK failure — rethrow so outer sync() catch escalates to fail-fast cleanup.
             logger.error("[TigerSync] Exception while querying {} ~ {}: {}",
                     startDate, endDate, e.getMessage(), e);
+            throw new RuntimeException(String.format(
+                    "Tiger API call threw exception for window %s ~ %s: %s",
+                    startDate, endDate, e.getMessage()), e);
         }
 
+        if (response == null) {
+            throw new RuntimeException(String.format(
+                    "Tiger API returned null response for window %s ~ %s", startDate, endDate));
+        }
+        if (!response.isSuccess()) {
+            // Non-success response (auth failure, rate limit, server error, etc.) must not be
+            // silently treated as "no orders" — doing so would drop real trades from the sync.
+            throw new RuntimeException(String.format(
+                    "Tiger API returned error for window %s ~ %s: code=%s, message=%s",
+                    startDate, endDate, response.getCode(), response.getMessage()));
+        }
+
+        List<TigerOrderRecord> records = new ArrayList<>();
+        BatchOrderItem orderItem = response.getItem();
+        if (orderItem == null || orderItem.getOrders() == null) {
+            logger.info("[TigerSync] No filled orders in this window");
+            return records;
+        }
+
+        for (TradeOrder order : orderItem.getOrders()) {
+            TigerOrderRecord record = convertToRecord(order);
+            records.add(record);
+        }
         return records;
     }
 
