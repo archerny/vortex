@@ -27,13 +27,12 @@ import static org.mockito.Mockito.*;
  * Covers:
  * - listBatches (various filter combinations)
  * - findById
- * - createBatch
+ * - createBatch (incl. v2 409 conflict paths)
  * - save
  * - Status lifecycle: markAsProcessing, updatePhase, markAsCompleted,
- *   markAsPartial, markAsFailed, markAsInterrupted
+ *   markAsFailed, markAsCleanupFailed
  */
 @ExtendWith(MockitoExtension.class)
-@SuppressWarnings("deprecation") // markAsPartial / markAsInterrupted are v2 bridge methods; removed in phase 3
 class BrokerSyncBatchServiceTest {
 
     @Mock
@@ -336,23 +335,6 @@ class BrokerSyncBatchServiceTest {
         }
 
         @Test
-        @DisplayName("markAsPartial (deprecated v2 bridge) should set PARTIAL status and counts")
-        void markAsPartialShouldSetPartialStatus() {
-            BrokerSyncBatch batch = buildBatch(1L, "ibkr", "PROCESSING");
-            when(batchRepository.findById(1L)).thenReturn(Optional.of(batch));
-            when(batchRepository.save(any())).thenReturn(batch);
-
-            SyncResult result = SyncResult.success("ibkr", 100, 80, 20, 3000);
-            batchService.markAsPartial(1L, result);
-
-            assertEquals("PARTIAL", batch.getStatus());
-            assertNull(batch.getPhase());
-            assertEquals(100, batch.getTotalCount());
-            assertEquals(80, batch.getImportedCount());
-            assertEquals(20, batch.getSkippedCount());
-        }
-
-        @Test
         @DisplayName("markAsFailed should set error message and clear phase")
         void markAsFailedShouldSetErrorMessage() {
             BrokerSyncBatch batch = buildBatch(1L, "ibkr", "PROCESSING");
@@ -366,21 +348,6 @@ class BrokerSyncBatchServiceTest {
             assertNull(batch.getPhase());
             assertEquals("API timeout", batch.getErrorMessage());
             assertNotNull(batch.getCompletedAt());
-        }
-
-        @Test
-        @DisplayName("markAsInterrupted should preserve phase for diagnostics")
-        void markAsInterruptedShouldPreservePhase() {
-            BrokerSyncBatch batch = buildBatch(1L, "ibkr", "PROCESSING");
-            batch.setPhase("STAGING");
-            when(batchRepository.findById(1L)).thenReturn(Optional.of(batch));
-            when(batchRepository.save(any())).thenReturn(batch);
-
-            batchService.markAsInterrupted(1L, "Application restarted");
-
-            assertEquals("INTERRUPTED", batch.getStatus());
-            assertEquals("STAGING", batch.getPhase()); // preserved!
-            assertEquals("Application restarted", batch.getErrorMessage());
         }
 
         @Test

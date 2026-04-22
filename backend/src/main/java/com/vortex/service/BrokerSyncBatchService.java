@@ -206,34 +206,6 @@ public class BrokerSyncBatchService {
     }
 
     /**
-     * Transition a batch to PARTIAL status (some records imported, some failed).
-     *
-     * @param batchId the batch ID
-     * @param result  the sync result containing record counts
-     * @deprecated v2 has no PARTIAL state. This method is retained only as a
-     *             bridge so that phase-1b compiles without removing the call
-     *             site in {@link com.vortex.sync.core.BrokerSyncAsyncExecutor}.
-     *             Phase 3 will delete this method along with the
-     *             {@code markAsInterrupted} / resume code paths.
-     */
-    @Deprecated
-    @Transactional
-    public void markAsPartial(Long batchId, SyncResult result) {
-        BrokerSyncBatch batch = batchRepository.findById(batchId)
-                .orElseThrow(() -> new IllegalArgumentException("Batch not found: " + batchId));
-        batch.setStatus("PARTIAL");
-        batch.setPhase(null);
-        batch.setTotalCount(result.getTotalRecords());
-        batch.setImportedCount(result.getImportedCount());
-        batch.setSkippedCount(result.getSkippedCount());
-        batch.setCompletedAt(LocalDateTime.now());
-        batchRepository.save(batch);
-        logger.warn("Batch {} status changed to PARTIAL, total={}, imported={}, skipped={}",
-                batchId, result.getTotalRecords(), result.getImportedCount(),
-                result.getSkippedCount());
-    }
-
-    /**
      * Transition a batch to FAILED status with an error message.
      *
      * @param batchId      the batch ID
@@ -277,28 +249,6 @@ public class BrokerSyncBatchService {
         batch.setCompletedAt(LocalDateTime.now());
         batchRepository.save(batch);
         logger.error("Batch {} status changed to CLEANUP_FAILED (phase={}): {}",
-                batchId, batch.getPhase(), errorMessage);
-    }
-
-    /**
-     * Transition a batch to INTERRUPTED status (preserving phase for diagnostics).
-     *
-     * @param batchId      the batch ID
-     * @param errorMessage description of the interruption
-     * @deprecated v2 removed the INTERRUPTED state. This method is retained as
-     *             a bridge until phase 3 rewires {@code SyncBatchRecoveryRunner}
-     *             to use the fail-fast cleanup path.
-     */
-    @Deprecated
-    @Transactional
-    public void markAsInterrupted(Long batchId, String errorMessage) {
-        BrokerSyncBatch batch = batchRepository.findById(batchId)
-                .orElseThrow(() -> new IllegalArgumentException("Batch not found: " + batchId));
-        batch.setStatus("INTERRUPTED");
-        // phase preserved for diagnostics
-        batch.setErrorMessage(errorMessage);
-        batchRepository.save(batch);
-        logger.warn("Batch {} status changed to INTERRUPTED (phase={}): {}",
                 batchId, batch.getPhase(), errorMessage);
     }
 }

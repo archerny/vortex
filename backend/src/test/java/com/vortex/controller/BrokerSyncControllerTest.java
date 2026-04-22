@@ -24,7 +24,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -168,16 +167,5 @@ class BrokerSyncControllerTest {
         assertNotNull(body);
         assertNull(body.get("conflictingBatchId"));
         assertNull(body.get("conflictingStatus"));
-    }
-
-    @Test
-    @DisplayName("resumeSync: returns 404 for missing batch")
-    void resumeSyncReturns404WhenMissing() {
-        when(batchService.findById(999L)).thenReturn(java.util.Optional.empty());
-
-        ResponseEntity<Map<String, Object>> response = controller.resumeSync(999L);
-
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        verify(asyncExecutor, never()).execute(anyLong(), any());
     }
 }

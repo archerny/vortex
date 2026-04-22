@@ -40,7 +40,7 @@ import java.util.List;
  *   <li>Re-count IMPORTED/SKIPPED/FAILED from DB and return {@link SyncResult}</li>
  * </ol>
  *
- * <p>Batch lifecycle (PROCESSING → COMPLETED/PARTIAL/FAILED) is owned by
+ * <p>Batch lifecycle (PROCESSING → COMPLETED or FAILED/CLEANUP_FAILED) is owned by
  * {@code BrokerSyncAsyncExecutor}; this adapter only updates the {@code phase} field.
  *
  * @see TigerStagingService

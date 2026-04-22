@@ -1,8 +1,8 @@
 # 券商同步 — 数据一致性与失败清理设计文档
 
 > **创建日期**：2026-04-16（v1）
-> **最后更新**：2026-04-23（v2.2 — Phase 3 Commit A 完成：fail-fast cleanup 接入 executor + recovery runner；409 SyncConflictException + controller handler 上线。v1 桥接方法 `markAsPartial`/`markAsInterrupted` 以及 controller 的 `resumeSync` 端点保留到 Commit B 删除）
-> **状态**：🔧 实施中（Phase 1a / 1b / 2 / 3-CommitA 完成；待：3-CommitB 拆旧 + Phase 4 前端）
+> **最后更新**：2026-04-23（v2.3 — Phase 3 Commit B 完成：删除 v1 桥接方法 `markAsPartial` / `markAsInterrupted`、controller 的 `resumeSync` 端点与 `RESUMABLE_STATUSES`、相关测试与 `@Deprecated` / `@SuppressWarnings("deprecation")`。Phase 3 后端至此全部落地；剩余工作是 Phase 4 前端改造与零星文档清理）
+> **状态**：🔧 实施中（Phase 1a / 1b / 2 / 3 完成；待：Phase 4 前端）
 > **关联**：[architecture.md](../architecture.md) | [data-persistence.md](./data-persistence.md) | [broker-registration.md](./broker-registration.md)
 > **取代**：本文档是 v1（2026-04-16）的完全重写。v1 设计的 `INTERRUPTED` / `PARTIAL` / Resume / 幂等续跑机制被整体废弃，历史版本可在 git log 中追溯。
 
@@ -487,14 +487,14 @@ COMMENT ON INDEX uk_only_one_active IS
 1. ✅ 写 `V28` Flyway 脚本（Phase 1a）
 2. ✅ 改 entity / repository（删 failedCount，加 delete 方法）（Phase 1b / 2）
 3. ✅ 新增 `SyncBatchCleanupService` + `SyncBatchFailureHandler`（Phase 2）
-4. 🔧 改 `BrokerSyncBatchService`：加 `markAsCleanupFailed` ✅；加 `createBatch` 409 guard（`SyncConflictException` + DB 唯一索引兜底）✅；删 `markAsPartial`/`markAsInterrupted` ⏳ Commit B
-5. 🔧 改 `BrokerSyncAsyncExecutor`：接入 `SyncBatchFailureHandler` ✅；成功 → COMPLETED ✅（旧 PARTIAL 分支已在 Phase 1b 移除）
-6. 🔧 改 `BrokerSyncController`：加 `@ExceptionHandler(SyncConflictException)` → 409 ✅；删 `/batches/{id}/resume` 端点 ⏳ Commit B
+4. ✅ 改 `BrokerSyncBatchService`：加 `markAsCleanupFailed`；加 `createBatch` 409 guard（`SyncConflictException` + DB 唯一索引兜底）；删 `markAsPartial`/`markAsInterrupted`（Phase 3 Commit B 完成）
+5. ✅ 改 `BrokerSyncAsyncExecutor`：接入 `SyncBatchFailureHandler`；成功 → COMPLETED；旧 PARTIAL 分支已完全移除
+6. ✅ 改 `BrokerSyncController`：加 `@ExceptionHandler(SyncConflictException)` → 409；删 `/batches/{id}/resume` 端点与 `RESUMABLE_STATUSES`
 7. ✅ 改 `SyncBatchRecoveryRunner`（启动扫 PROCESSING 批次 → `SyncBatchFailureHandler.handleFailure`）
 8. ✅ 删除 `SyncResult.failedCount`（Phase 1b）
 9. ⏳ 改前端：删恢复按钮、删 INTERRUPTED/PARTIAL 过滤、加 CLEANUP_FAILED 展示、处理 409（Phase 4）
-10. 🔧 测试：新增 `SyncBatchCleanupServiceTest` ✅、`SyncBatchFailureHandlerTest` ✅；新增 `BrokerSyncControllerTest`（含 409 用例）✅；改 `BrokerSyncBatchServiceTest` 加 conflict 用例 ✅；改 `SyncBatchRecoveryRunnerTest` 改为 cleanup-flow ✅；改 `BrokerSyncAsyncExecutorTest` 改为 failureHandler-mock ✅；**Commit B 还要清掉 PARTIAL/INTERRUPTED 用例 + @SuppressWarnings(deprecation)**
-11. 🔧 更新关联文档（`data-persistence.md` 已同步；`architecture.md`、`broker-registration.md`、`brokers/tiger/phase3-plan.md` 中的 Resume/INTERRUPTED/PARTIAL 文案还需清理，放到 Commit B 或 Phase 5）
+10. ✅ 测试：新增 `SyncBatchCleanupServiceTest`、`SyncBatchFailureHandlerTest`、`BrokerSyncControllerTest`（含 409 用例）；改 `BrokerSyncBatchServiceTest` 加 conflict 用例并清理 PARTIAL/INTERRUPTED 用例；改 `SyncBatchRecoveryRunnerTest` 改为 cleanup-flow；改 `BrokerSyncAsyncExecutorTest` 改为 failureHandler-mock；类级 `@SuppressWarnings("deprecation")` 已移除
+11. ⏳ 更新关联文档（`data-persistence.md` 已同步 v2.3；`architecture.md`、`broker-registration.md`、`brokers/tiger/phase3-plan.md` 中可能仍有 Resume/INTERRUPTED/PARTIAL 文案 —— 待 Phase 4 或后续清理 commit 扫一遍）
 
 标记含义：✅ 完成；🔧 进行中；⏳ 待开始。
 
