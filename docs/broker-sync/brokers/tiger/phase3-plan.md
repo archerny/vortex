@@ -1,8 +1,8 @@
 # Tiger Phase 3 — 编码与工作计划
 
 > **创建日期**：2026-04-21
-> **最近更新**：2026-04-23（随 import-consistency.md v2.3 更新：v2 状态模型已在后端完整落地，本文档中 v1 历史口径已改写为 v2 现状口径）
-> **状态**：🔧 进行中 — 阶段 1、2、3、4、5 已完成；已完成对照 IBKR 的代码 review 与对齐修复（窗口循环边界、ImportResult 契约对齐）
+> **最近更新**：2026-04-23（Tiger 两阶段导入 + v2 状态模型 + 前端对齐全部完成；fail-fast 路径与 IBKR 完全对齐）
+> **状态**：✅ 已完成 — 阶段 1-5 全部落地，与 IBKR 对齐的代码 review 与修复（窗口循环边界、ImportResult 契约、fail-fast 返回 failure 路径）均已合并
 > **目标**：将老虎证券同步从 Phase 1（API → 日志）升级为与 IBKR 对齐的两阶段导入（API → `tiger_staged_orders` → `trade_records`）
 > **关联**：[staging-schema.md](./staging-schema.md) | [open-api.md](./open-api.md) | [../../framework/data-persistence.md](../../framework/data-persistence.md) | [../../framework/import-consistency.md](../../framework/import-consistency.md) | [../ibkr/flex-web-service.md](../ibkr/flex-web-service.md)
 >

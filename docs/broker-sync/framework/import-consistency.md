@@ -1,7 +1,7 @@
 # 券商同步 — 数据一致性与失败清理设计文档
 
 > **创建日期**：2026-04-16（v1）
-> **最后更新**：2026-04-23（v2.4 — Phase 4 前端完成：删除恢复按钮与 `resumeSync` 客户端；状态过滤器去除 `PARTIAL` / `INTERRUPTED` 并加入 `CLEANUP_FAILED`；新增 `CLEANUP_FAILED` 的状态 Tooltip 说明；`POST /trigger` 409 响应改为 Modal 展示冲突批次 ID / 状态并给出 `CLEANUP_FAILED` 场景的人工处理指引。Phase 1a / 1b / 2 / 3 / 4 全部落地）
+> **最后更新**：2026-04-23（v2.4.1 — 端到端 audit 修复：`TigerSyncAdapter.fetchFilledOrders` 不再吞 API 异常（消除 Tiger 静默丢数据风险）；`SyncBatchRecoveryRunner` 启动扫描扩展为 PENDING ∪ PROCESSING（消除 PENDING 残留永久阻塞新 sync 的风险）；IBKR / Tiger adapter 的 fail-fast 路径由 "throw→catch→failure" 简化为直接 `return SyncResult.failure(...)`。Phase 4 前端完成：删除恢复按钮与 `resumeSync` 客户端；状态过滤器去除 `PARTIAL` / `INTERRUPTED` 并加入 `CLEANUP_FAILED`；`POST /trigger` 409 响应改为 Modal 展示冲突批次 ID / 状态并给出 `CLEANUP_FAILED` 场景的人工处理指引。Phase 1a / 1b / 2 / 3 / 4 全部落地）
 > **状态**：✅ v2 状态模型已完整落地
 > **关联**：[architecture.md](../architecture.md) | [data-persistence.md](./data-persistence.md) | [broker-registration.md](./broker-registration.md)
 > **取代**：本文档是 v1（2026-04-16）的完全重写。v1 设计的 `INTERRUPTED` / `PARTIAL` / Resume / 幂等续跑机制被整体废弃，历史版本可在 git log 中追溯。
@@ -495,11 +495,16 @@ COMMENT ON INDEX uk_only_one_active IS
 4. ✅ 改 `BrokerSyncBatchService`：加 `markAsCleanupFailed`；加 `createBatch` 409 guard（`SyncConflictException` + DB 唯一索引兜底）；删 `markAsPartial`/`markAsInterrupted`（Phase 3 Commit B 完成）
 5. ✅ 改 `BrokerSyncAsyncExecutor`：接入 `SyncBatchFailureHandler`；成功 → COMPLETED；旧 PARTIAL 分支已完全移除
 6. ✅ 改 `BrokerSyncController`：加 `@ExceptionHandler(SyncConflictException)` → 409；删 `/batches/{id}/resume` 端点与 `RESUMABLE_STATUSES`
-7. ✅ 改 `SyncBatchRecoveryRunner`（启动扫 PROCESSING 批次 → `SyncBatchFailureHandler.handleFailure`）
+7. ✅ 改 `SyncBatchRecoveryRunner`（启动扫 PENDING / PROCESSING 批次 → `SyncBatchFailureHandler.handleFailure`）
 8. ✅ 删除 `SyncResult.failedCount`（Phase 1b）
 9. ✅ 改前端：删恢复按钮与 `resumeSync` 客户端；状态过滤器去除 `PARTIAL` / `INTERRUPTED`，新增 `CLEANUP_FAILED`；状态列 Tooltip 追加 `CLEANUP_FAILED` 的人工处理提示；`POST /trigger` 409 响应改为 Modal 展示冲突批次 ID / 状态并给出处理指引（Phase 4 完成）
 10. ✅ 测试：新增 `SyncBatchCleanupServiceTest`、`SyncBatchFailureHandlerTest`、`BrokerSyncControllerTest`（含 409 用例）；改 `BrokerSyncBatchServiceTest` 加 conflict 用例并清理 PARTIAL/INTERRUPTED 用例；改 `SyncBatchRecoveryRunnerTest` 改为 cleanup-flow；改 `BrokerSyncAsyncExecutorTest` 改为 failureHandler-mock；类级 `@SuppressWarnings("deprecation")` 已移除
 11. ✅ 更新关联文档：`data-persistence.md` 同步到 v2.3；`brokers/tiger/phase3-plan.md` 将 v1 的 Resume/INTERRUPTED/PARTIAL 口径改写为 v2 现状口径（Phase 3 Commit C 完成）；`architecture.md` / `broker-registration.md` 扫描无残留命中
+12. ✅ 端到端 audit 修复（v2.4.1）：
+    - **数据一致性修复**：`TigerSyncAdapter.fetchFilledOrders` 改为抛出 API 异常（原先吞 `Exception` 只返回空 list，会把 API 错误静默当作"没有订单"，存在丢数据风险）；`!response.isSuccess()` 同样抛 `RuntimeException`。IBKR 的 `IbkrFlexClient.fetchReport` 行为未变（本就会抛异常），两边达到对等。
+    - **启动恢复扫描范围扩展**：`SyncBatchRecoveryRunner` 由只扫 `PROCESSING` 扩展到 `PENDING ∪ PROCESSING`；新增 `BrokerSyncBatchRepository.findByStatusIn(Collection)`。原先 `createBatch` 与 `markAsProcessing` 之间的窗口若发生 JVM 崩溃会留下 PENDING 残留，被 `uk_only_one_active` 永久锁死新 sync；修复后启动时一并清理。
+    - **adapter fail-fast 路径简化**：IBKR / Tiger `sync()` 在 `failedCount > 0` 时改为直接 `return SyncResult.failure(...)`（原先 throw 后被同方法 catch 再转 failure，路径绕且日志双重）。最终效果与之前一致：`BrokerSyncAsyncExecutor` → `SyncBatchFailureHandler.handleFailure` → FAILED / CLEANUP_FAILED。
+    - 测试：`SyncBatchRecoveryRunnerTest` 改为 `findByStatusIn` 契约，新增"PENDING 残留也会被清理"用例，同时断言扫描集合与 v2 active 语义一致（不包含 CLEANUP_FAILED）。
 
 标记含义：✅ 完成；🔧 进行中；⏳ 待开始。
 
