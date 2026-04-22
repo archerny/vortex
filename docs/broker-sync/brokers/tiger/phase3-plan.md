@@ -2,7 +2,7 @@
 
 > **创建日期**：2026-04-21
 > **最近更新**：2026-04-22
-> **状态**：🔧 进行中 — 阶段 1、2 已完成
+> **状态**：🔧 进行中 — 阶段 1、2、3 已完成
 > **目标**：将老虎证券同步从 Phase 1（API → 日志）升级为与 IBKR 对齐的两阶段导入（API → `tiger_staged_orders` → `trade_records`）
 > **关联**：[staging-schema.md](./staging-schema.md) | [open-api.md](./open-api.md) | [../../framework/data-persistence.md](../../framework/data-persistence.md) | [../../framework/import-consistency.md](../../framework/import-consistency.md) | [../ibkr/flex-web-service.md](../ibkr/flex-web-service.md)
 
@@ -117,33 +117,35 @@
 
 ---
 
-### 阶段 3：`TigerTradeRecordMapper` + 单元测试（核心）
+### 阶段 3：`TigerTradeRecordMapper` + 单元测试（核心）✅ 已完成 2026-04-22
 
 **目标**：纯函数的字段映射逻辑完备且被测试覆盖。
 
-- [ ] 新建 `TigerTradeRecordMapper`
-  - 方法 1：`FilterResult preFilter(TigerStagedOrder s, Optional<TradeRecord> existing)` — 返回 `PASS` / `SKIPPED` / `FAILED(msg)`，覆盖 [§ 5.1](./staging-schema.md#51-前置过滤不映射直接-failed-或-skipped) 七条规则
+- [x] 新建 `TigerTradeRecordMapper`
+  - 方法 1：`FilterResult preFilter(TigerStagedOrder s, boolean alreadyImported)` — 返回 `PASS` / `SKIPPED` / `FAILED(msg)`，覆盖 [§ 5.1](./staging-schema.md#51-前置过滤不映射直接-failed-或-skipped) 七条规则
   - 方法 2：`TradeRecord toTradeRecord(TigerStagedOrder s, Long brokerId, Long batchId)` — 覆盖 5.2 / 5.3
   - 方法 3：`String buildOptionSymbol(String underlying, String expiry, String putCall, String strike)` — 独立可测
   - 方法 4：`Currency mapCurrency(String raw)` — `USD/HKD/CNH→CNY`，其他抛 `IllegalArgumentException`
-- [ ] 单测文件 `TigerTradeRecordMapperTest`
-  - 覆盖用例（≥ 15 个）：
-    1. STK BUY / USD / 100 股 / 手续费 → 正常映射
-    2. STK SELL / HKD / 200 股（港股 5 位代码）
-    3. STK / CNH → 系统 CNY
-    4. OPT CALL → `AAPL-20260130-C265`，`asset_type=OPTION_CALL`，`amount = qty × price × multiplier`
-    5. OPT PUT + strike 含小数（`17.50` → `17.5`）
-    6. `filledQuantity=0` → `SKIPPED`（未实际成交）
-    7. `secType=WAR` → `FAILED("Unsupported secType: WAR")`
-    8. `secType=FUT` / `FUND` 同上
-    9. `quantityScale=2` → `FAILED("Fractional share not supported...")`
-    10. `attrDesc="Exercise"` → `FAILED("Option event attrDesc=Exercise — mapping TBD")`
-    11. `attrDesc=""`（空字符串）→ 视为空，`PASS`
-    12. `action="CANCEL"` → `FAILED("Unsupported action: CANCEL")`
-    13. OPT 缺 `putCall` → `FAILED`
-    14. `fee` 计算：`commission=-1.50, gst=null` → `1.50`
-    15. 已存在 `trade_records`（同 `external_id`）→ `SKIPPED`
+- [x] 单测文件 `TigerTradeRecordMapperTest`（25 个用例，全绿 2026-04-22）
+  - 覆盖用例：
+    1. STK BUY / USD / 100 股 / 手续费 → 正常映射 ✅
+    2. STK SELL / HKD / 200 股（港股 5 位代码）✅
+    3. STK / CNH → 系统 CNY ✅
+    4. OPT CALL → `AAPL-20260130-C265`，`asset_type=OPTION_CALL`，`amount = qty × price × multiplier` ✅
+    5. OPT PUT + strike 含小数（`17.50` → `17.5`）✅
+    6. `filledQuantity=0` / `null` → `SKIPPED` ✅
+    7. `secType=WAR` → `FAILED("Unsupported secType: WAR")` ✅
+    8. `secType=FUT` / `FUND` / `IOPT` / `CASH` / `CC` 同上 ✅
+    9. `quantityScale=2` → `FAILED("Fractional share not supported...")` ✅
+    10. `attrDesc="Exercise"` → `FAILED("Option event attrDesc=Exercise — mapping TBD")` ✅
+    11. `attrDesc="   "`（空白字符串）→ 视为空，`PASS` ✅
+    12. `action="CANCEL"` → `FAILED("Unsupported action: CANCEL")` ✅
+    13. OPT 缺 `putCall` / 非法 `putCall` → `FAILED` ✅
+    14. `fee` 计算：`commission=-1.50, gst=null` → `1.50`；含负 gst 亦取绝对值求和 ✅
+    15. 已存在 `trade_records`（`alreadyImported=true`）→ `SKIPPED` ✅
+    16. 额外：`mapCurrency` 7 个用例 + `buildOptionSymbol` 5 个用例
   - `amount` 浮点计算用 `BigDecimal.compareTo`，不用 `equals`
+- [x] 文档同步：移除 `staging-schema.md` § 5.3 中对 `TradeRecord.name` 的映射（该列已被 V25 移除），并在 § 5.5 补充说明 `contract_name` 不再映射。
 
 **产出**：单测全绿，字段映射逻辑锁定（后续 `ImportWorker` 只做 DB 交互）。
 

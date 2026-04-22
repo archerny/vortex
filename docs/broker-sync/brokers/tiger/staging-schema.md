@@ -1,8 +1,8 @@
 # Tiger 暂存表结构与字段映射
 
 > **创建日期**：2026-04-21
-> **最后更新**：2026-04-21
-> **状态**：📋 设计稿（Phase 3 实现中）
+> **最后更新**：2026-04-22
+> **状态**：🔧 Phase 3 实施中（Stage 1/2/3 已完成）
 > **关联**：[framework/data-persistence.md](../../framework/data-persistence.md) | [open-api.md](./open-api.md) | [phase3-plan.md](./phase3-plan.md)
 
 本文档定义 Tiger 专属的暂存表结构（`tiger_staged_orders`），以及从暂存表映射到 `trade_records` 的字段规范。框架层通用内容（`broker_sync_batches`、`trade_records` 扩展字段、两阶段导入原则）参见 [framework/data-persistence.md](../../framework/data-persistence.md)。
@@ -184,10 +184,11 @@ trade_records.(external_broker + external_id) ←→ tiger_staged_orders.tiger_i
 | 14 | `asset_type` | `AssetType` (enum) | `STK → STOCK`<br>`OPT + putCall=CALL → OPTION_CALL`<br>`OPT + putCall=PUT → OPTION_PUT` |
 | 15 | `symbol` | `String` | **STK**：`symbol.trim()`（如 `AAPL`、`00700`、`600519`）<br>**OPT**：`{underlying}-{expiry}-{putCall[0]}{normalizedStrike}`（如 `AAPL-20260130-C265`） |
 | 16 | `underlying_symbol` | `String` | STK：与 `symbol` 一致<br>OPT：直接取暂存的 `symbol` 字段（Tiger 的 OPT `symbol` 就是正股代码） |
-| 17 | `name` | `String` | `contract_name`；若为空则回落 `identifier`，再为空则回落 `symbol` |
-| 18 | `trade_trigger` | `TradeTrigger` (enum) | 经 5.1 规则 5 过滤后，此处 `attrDesc` 必为空 → **固定 `MANUAL`**（Phase 3.x 扩展再覆盖期权事件） |
-| 19 | `trigger_ref_type` | `TriggerRefType` (enum) | 固定 `NONE`（同上） |
-| 20 | `trigger_ref_id` | `Long` | 固定 `0`（同上） |
+| 17 | `trade_trigger` | `TradeTrigger` (enum) | 经 5.1 规则 5 过滤后，此处 `attrDesc` 必为空 → **固定 `MANUAL`**（Phase 3.x 扩展再覆盖期权事件） |
+| 18 | `trigger_ref_type` | `TriggerRefType` (enum) | 固定 `NONE`（同上） |
+| 19 | `trigger_ref_id` | `Long` | 固定 `0`（同上） |
+
+> **注**：早期设计曾包含 `name` 字段映射（源自 `contract_name`），但 `TradeRecord.name` 列已在 V25 迁移脚本 `V25__drop_symbol_name_fields.sql` 中被移除，因此本期**不再映射** `contract_name` 到 `trade_records`，该字段仅保留在 `tiger_staged_orders` 中供审计/回溯。
 
 ### 5.4 期权 symbol 拼接细节
 
@@ -215,7 +216,8 @@ String optionSymbol = symbol.trim() + "-" + expiry + "-" + pc + normalizedStrike
 | `quantity` / `quantity_scale` | 已在映射中消化为 `filled_quantity` 推导真实数量 |
 | `realized_pnl` | 系统不记录券商返回的已实现盈亏，由仓位计算得出 |
 | `exchange` / `market` | 仅供审计 |
-| `identifier` | 仅用于 `name` 回落 |
+| `contract_name` | `TradeRecord.name` 列已被 V25 移除，本期不再映射；仅保留在暂存表供审计 |
+| `identifier` | 仅供审计（原设计用于 `name` 字段回落，现已废弃） |
 | `multiplier` | 仅用于 `amount` 计算 |
 | `strike` / `expiry` / `put_call` | 仅用于拼接 `symbol` 和判断 `asset_type` |
 | `order_type` / `limit_price` | 订单类型对已成交订单无业务意义 |
