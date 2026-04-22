@@ -125,10 +125,18 @@ public class IbkrSyncAdapter implements BrokerSyncAdapter {
             long skippedCount = stagedOrderRepository.countByBatchIdAndStatus(batchId, "SKIPPED");
             long failedCount = stagedOrderRepository.countByBatchIdAndStatus(batchId, "FAILED");
             int totalCount = (int) (importedCount + skippedCount + failedCount);
+            if (failedCount > 0) {
+                // v2 should never reach here: per-record failures are supposed to trigger
+                // fail-fast cleanup (implemented in phase 3). If this fires, it means the
+                // bridge state between phase 1b and phase 3 has leaked FAILED rows.
+                logger.warn("[IbkrSync] Batch {} ended with {} FAILED staged rows; "
+                                + "fail-fast cleanup not yet active (phase 3 pending)",
+                        batchId, failedCount);
+            }
 
             long durationMs = System.currentTimeMillis() - startMs;
             return SyncResult.success(getBrokerCode(), totalCount,
-                    (int) importedCount, (int) skippedCount, (int) failedCount, durationMs);
+                    (int) importedCount, (int) skippedCount, durationMs);
 
         } catch (Exception e) {
             long durationMs = System.currentTimeMillis() - startMs;

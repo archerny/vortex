@@ -16,16 +16,18 @@ import static org.mockito.Mockito.*;
 /**
  * Unit tests for {@link BrokerSyncAsyncExecutor}.
  *
- * Covers:
+ * Covers (v2 state model):
  * - Successful sync: PENDING → PROCESSING(FETCHING) → COMPLETED
- * - Partial sync: some records failed → PARTIAL
  * - Failed sync (adapter returns failure): PENDING → PROCESSING → FAILED
  * - Exception during sync: PENDING → PROCESSING → FAILED (catch-all)
  * - Exception during markAsFailed: logged but not re-thrown
  * - Correct invocation order of lifecycle methods
  * - batchId injection into SyncRequest
+ *
+ * <p>v2 removed the PARTIAL branch; markAsPartial is never invoked from the executor.</p>
  */
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings("deprecation") // markAsPartial is a v2 bridge; these tests verify it is NEVER called
 class BrokerSyncAsyncExecutorTest {
 
     @Mock
@@ -46,7 +48,7 @@ class BrokerSyncAsyncExecutorTest {
         void shouldCompleteSuccessfully() {
             Long batchId = 1L;
             SyncRequest request = new SyncRequest("ibkr");
-            SyncResult successResult = SyncResult.success("ibkr", 100, 90, 10, 0, 2000);
+            SyncResult successResult = SyncResult.success("ibkr", 100, 90, 10, 2000);
 
             when(brokerSyncService.sync(request)).thenReturn(successResult);
 
@@ -78,22 +80,23 @@ class BrokerSyncAsyncExecutorTest {
     }
 
     @Nested
-    @DisplayName("execute() - partial sync (some records failed)")
-    class PartialSyncTest {
+    @DisplayName("execute() - v2: success always maps to COMPLETED (no PARTIAL)")
+    class NoPartialBranchTest {
 
         @Test
-        @DisplayName("should transition to PARTIAL when failedCount > 0")
-        void shouldMarkAsPartialWhenSomeRecordsFailed() {
+        @DisplayName("success result always routes to markAsCompleted, never markAsPartial")
+        void successAlwaysRoutesToCompleted() {
             Long batchId = 10L;
             SyncRequest request = new SyncRequest("ibkr");
-            SyncResult partialResult = SyncResult.success("ibkr", 100, 85, 10, 5, 3000);
+            // Even with a lopsided result (e.g. 85 imported / 15 skipped), v2 routes to COMPLETED.
+            SyncResult result = SyncResult.success("ibkr", 100, 85, 15, 3000);
 
-            when(brokerSyncService.sync(request)).thenReturn(partialResult);
+            when(brokerSyncService.sync(request)).thenReturn(result);
 
             asyncExecutor.execute(batchId, request);
 
-            verify(batchService).markAsPartial(batchId, partialResult);
-            verify(batchService, never()).markAsCompleted(anyLong(), any());
+            verify(batchService).markAsCompleted(batchId, result);
+            verify(batchService, never()).markAsPartial(anyLong(), any());
             verify(batchService, never()).markAsFailed(anyLong(), anyString());
         }
     }

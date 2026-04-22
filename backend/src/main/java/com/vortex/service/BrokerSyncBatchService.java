@@ -81,7 +81,6 @@ public class BrokerSyncBatchService {
         batch.setTotalCount(0);
         batch.setImportedCount(0);
         batch.setSkippedCount(0);
-        batch.setFailedCount(0);
 
         BrokerSyncBatch saved = batchRepository.save(batch);
         logger.info("Created sync batch: id={}, broker={}, dateRange=[{} ~ {}]",
@@ -149,12 +148,11 @@ public class BrokerSyncBatchService {
         batch.setTotalCount(result.getTotalRecords());
         batch.setImportedCount(result.getImportedCount());
         batch.setSkippedCount(result.getSkippedCount());
-        batch.setFailedCount(result.getFailedCount());
         batch.setCompletedAt(LocalDateTime.now());
         batchRepository.save(batch);
-        logger.info("Batch {} status changed to COMPLETED, total={}, imported={}, skipped={}, failed={}",
+        logger.info("Batch {} status changed to COMPLETED, total={}, imported={}, skipped={}",
                 batchId, result.getTotalRecords(), result.getImportedCount(),
-                result.getSkippedCount(), result.getFailedCount());
+                result.getSkippedCount());
     }
 
     /**
@@ -162,7 +160,13 @@ public class BrokerSyncBatchService {
      *
      * @param batchId the batch ID
      * @param result  the sync result containing record counts
+     * @deprecated v2 has no PARTIAL state. This method is retained only as a
+     *             bridge so that phase-1b compiles without removing the call
+     *             site in {@link com.vortex.sync.core.BrokerSyncAsyncExecutor}.
+     *             Phase 3 will delete this method along with the
+     *             {@code markAsInterrupted} / resume code paths.
      */
+    @Deprecated
     @Transactional
     public void markAsPartial(Long batchId, SyncResult result) {
         BrokerSyncBatch batch = batchRepository.findById(batchId)
@@ -172,12 +176,11 @@ public class BrokerSyncBatchService {
         batch.setTotalCount(result.getTotalRecords());
         batch.setImportedCount(result.getImportedCount());
         batch.setSkippedCount(result.getSkippedCount());
-        batch.setFailedCount(result.getFailedCount());
         batch.setCompletedAt(LocalDateTime.now());
         batchRepository.save(batch);
-        logger.warn("Batch {} status changed to PARTIAL, total={}, imported={}, skipped={}, failed={}",
+        logger.warn("Batch {} status changed to PARTIAL, total={}, imported={}, skipped={}",
                 batchId, result.getTotalRecords(), result.getImportedCount(),
-                result.getSkippedCount(), result.getFailedCount());
+                result.getSkippedCount());
     }
 
     /**
@@ -203,7 +206,11 @@ public class BrokerSyncBatchService {
      *
      * @param batchId      the batch ID
      * @param errorMessage description of the interruption
+     * @deprecated v2 removed the INTERRUPTED state. This method is retained as
+     *             a bridge until phase 3 rewires {@code SyncBatchRecoveryRunner}
+     *             to use the fail-fast cleanup path.
      */
+    @Deprecated
     @Transactional
     public void markAsInterrupted(Long batchId, String errorMessage) {
         BrokerSyncBatch batch = batchRepository.findById(batchId)

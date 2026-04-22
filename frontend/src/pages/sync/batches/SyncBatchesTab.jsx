@@ -252,18 +252,6 @@ const SyncBatchesTab = () => {
       ),
     },
     {
-      title: '失败',
-      dataIndex: 'failedCount',
-      key: 'failedCount',
-      width: 70,
-      align: 'center',
-      render: (count) => (
-        <Text style={{ color: count > 0 ? '#ff4d4f' : undefined, fontWeight: count > 0 ? 600 : undefined }}>
-          {count}
-        </Text>
-      ),
-    },
-    {
       title: '状态',
       dataIndex: 'status',
       key: 'status',

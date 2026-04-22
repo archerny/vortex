@@ -53,20 +53,15 @@ public class BrokerSyncBatch extends BaseEntity {
     private Integer skippedCount = 0;
 
     /**
-     * 失败的数量
-     */
-    @Column(name = "failed_count", nullable = false)
-    private Integer failedCount = 0;
-
-    /**
-     * 批次主状态：PENDING, PROCESSING, COMPLETED, PARTIAL, FAILED, INTERRUPTED
+     * 批次主状态：PENDING, PROCESSING, COMPLETED, FAILED, CLEANUP_FAILED
+     * (v2 removed PARTIAL and INTERRUPTED — see docs/broker-sync/framework/import-consistency.md)
      */
     @Column(name = "status", nullable = false, length = 32)
     private String status;
 
     /**
-     * 子阶段：FETCHING, STAGING, IMPORTING。仅 PROCESSING 时有意义。
-     * INTERRUPTED 时保留中断时的值用于诊断。
+     * 子阶段：FETCHING, STAGING, IMPORTING.
+     * 仅在 status=PROCESSING 时表示当前进度；status=CLEANUP_FAILED 时保留发起清理时的阶段用于诊断；其他状态为 NULL.
      */
     @Column(name = "phase", length = 32)
     private String phase;
@@ -144,14 +139,6 @@ public class BrokerSyncBatch extends BaseEntity {
         this.skippedCount = skippedCount;
     }
 
-    public Integer getFailedCount() {
-        return failedCount;
-    }
-
-    public void setFailedCount(Integer failedCount) {
-        this.failedCount = failedCount;
-    }
-
     public String getStatus() {
         return status;
     }
@@ -202,7 +189,6 @@ public class BrokerSyncBatch extends BaseEntity {
                 ", totalCount=" + totalCount +
                 ", importedCount=" + importedCount +
                 ", skippedCount=" + skippedCount +
-                ", failedCount=" + failedCount +
                 ", status='" + status + '\'' +
                 ", phase='" + phase + '\'' +
                 ", startedAt=" + startedAt +

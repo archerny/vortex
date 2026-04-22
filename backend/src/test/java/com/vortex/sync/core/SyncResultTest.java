@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * Covers:
  * - success() 3-parameter factory method (Phase 1 style)
- * - success() 6-parameter factory method (Phase 2 style with import counts)
+ * - success() 5-parameter factory method (Phase 2 style with import counts; v2 dropped failedCount)
  * - failure() factory method
  * - Field getters/setters
  * - toString() output
@@ -31,10 +31,9 @@ class SyncResultTest {
             assertEquals("ibkr", result.getBrokerCode());
             assertEquals(150, result.getTotalRecords());
             assertEquals(2500, result.getDurationMs());
-            // importedCount/skippedCount/failedCount default to 0
+            // importedCount/skippedCount default to 0
             assertEquals(0, result.getImportedCount());
             assertEquals(0, result.getSkippedCount());
-            assertEquals(0, result.getFailedCount());
             assertNotNull(result.getMessage());
             assertTrue(result.getMessage().contains("ibkr"));
             assertTrue(result.getMessage().contains("150"));
@@ -64,30 +63,28 @@ class SyncResultTest {
     }
 
     @Nested
-    @DisplayName("success() 6-param factory method (Phase 2)")
-    class SuccessFactory6ParamTest {
+    @DisplayName("success() 5-param factory method (Phase 2 / v2)")
+    class SuccessFactory5ParamTest {
 
         @Test
         @DisplayName("should create a success result with import counts")
         void shouldCreateSuccessResultWithCounts() {
-            SyncResult result = SyncResult.success("ibkr", 100, 85, 10, 5, 3000);
+            SyncResult result = SyncResult.success("ibkr", 100, 85, 15, 3000);
 
             assertTrue(result.isSuccess());
             assertEquals("ibkr", result.getBrokerCode());
             assertEquals(100, result.getTotalRecords());
             assertEquals(85, result.getImportedCount());
-            assertEquals(10, result.getSkippedCount());
-            assertEquals(5, result.getFailedCount());
+            assertEquals(15, result.getSkippedCount());
             assertEquals(3000, result.getDurationMs());
             assertTrue(result.getMessage().contains("imported=85"));
-            assertTrue(result.getMessage().contains("skipped=10"));
-            assertTrue(result.getMessage().contains("failed=5"));
+            assertTrue(result.getMessage().contains("skipped=15"));
         }
 
         @Test
         @DisplayName("should handle all-skipped scenario")
         void shouldHandleAllSkipped() {
-            SyncResult result = SyncResult.success("ibkr", 50, 0, 50, 0, 1000);
+            SyncResult result = SyncResult.success("ibkr", 50, 0, 50, 1000);
 
             assertTrue(result.isSuccess());
             assertEquals(0, result.getImportedCount());
@@ -150,7 +147,6 @@ class SyncResultTest {
             assertEquals(0, result.getTotalRecords());
             assertEquals(0, result.getImportedCount());
             assertEquals(0, result.getSkippedCount());
-            assertEquals(0, result.getFailedCount());
             assertNull(result.getMessage());
             assertEquals(0, result.getDurationMs());
         }
@@ -164,7 +160,6 @@ class SyncResultTest {
             result.setTotalRecords(42);
             result.setImportedCount(30);
             result.setSkippedCount(10);
-            result.setFailedCount(2);
             result.setMessage("custom message");
             result.setDurationMs(9999);
 
@@ -173,7 +168,6 @@ class SyncResultTest {
             assertEquals(42, result.getTotalRecords());
             assertEquals(30, result.getImportedCount());
             assertEquals(10, result.getSkippedCount());
-            assertEquals(2, result.getFailedCount());
             assertEquals("custom message", result.getMessage());
             assertEquals(9999, result.getDurationMs());
         }
@@ -195,7 +189,6 @@ class SyncResultTest {
             assertTrue(str.contains("durationMs=500"));
             assertTrue(str.contains("importedCount="));
             assertTrue(str.contains("skippedCount="));
-            assertTrue(str.contains("failedCount="));
         }
     }
 }

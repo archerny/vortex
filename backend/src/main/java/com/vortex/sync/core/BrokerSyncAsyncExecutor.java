@@ -21,7 +21,12 @@ import org.springframework.stereotype.Service;
  * as FAILED with the error message.
  *
  * <h3>Status lifecycle</h3>
- * PENDING → PROCESSING (phase=FETCHING) → adapter.sync() → COMPLETED / PARTIAL / FAILED
+ * PENDING → PROCESSING (phase=FETCHING) → adapter.sync() → COMPLETED / FAILED
+ *
+ * <p><b>v2 note:</b> PARTIAL and INTERRUPTED states are gone. A success
+ * result always transitions to COMPLETED (per-record failures are handled
+ * earlier via fail-fast cleanup, implemented in phase 3). A failure result
+ * transitions to FAILED.</p>
  */
 @Service
 public class BrokerSyncAsyncExecutor {
@@ -45,7 +50,7 @@ public class BrokerSyncAsyncExecutor {
      *   <li>Mark batch as PROCESSING with phase=FETCHING</li>
      *   <li>Inject batchId into the request so adapters can reference the batch</li>
      *   <li>Delegate to {@link BrokerSyncService#sync(SyncRequest)}</li>
-     *   <li>Mark batch as COMPLETED, PARTIAL, or FAILED based on the result</li>
+     *   <li>Mark batch as COMPLETED or FAILED based on the result</li>
      * </ol>
      *
      * @param batchId the persisted batch ID (must already exist in DB)
@@ -65,18 +70,14 @@ public class BrokerSyncAsyncExecutor {
             // Step 3: Execute the actual sync (may take seconds to minutes)
             SyncResult result = brokerSyncService.sync(request);
 
-            // Step 4: Update batch based on result
+            // Step 4: Update batch based on result.
+            //   v2: always COMPLETED on success (no more PARTIAL). Per-record failures
+            //       are handled by fail-fast cleanup inside the sync pipeline itself
+            //       (to be wired in phase 3).
             if (result.isSuccess()) {
-                if (result.getFailedCount() > 0) {
-                    // Some records failed → PARTIAL
-                    batchService.markAsPartial(batchId, result);
-                    logger.warn("Async sync partial: batchId={}, total={}, imported={}, failed={}",
-                            batchId, result.getTotalRecords(), result.getImportedCount(), result.getFailedCount());
-                } else {
-                    batchService.markAsCompleted(batchId, result);
-                    logger.info("Async sync completed: batchId={}, total={}, imported={}, skipped={}",
-                            batchId, result.getTotalRecords(), result.getImportedCount(), result.getSkippedCount());
-                }
+                batchService.markAsCompleted(batchId, result);
+                logger.info("Async sync completed: batchId={}, total={}, imported={}, skipped={}",
+                        batchId, result.getTotalRecords(), result.getImportedCount(), result.getSkippedCount());
             } else {
                 batchService.markAsFailed(batchId, result.getMessage());
                 logger.warn("Async sync failed: batchId={}, message={}",

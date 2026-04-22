@@ -1,8 +1,8 @@
 # 券商同步 — 数据持久化设计（框架层）
 
 > **创建日期**：2026-04-13
-> **最后更新**：2026-04-22（随 import-consistency.md v2 更新：§4.2 状态枚举、`failed_count` 字段、§8.2 Flyway 清单、§9 R-9）
-> **状态**：✅ 表结构与 Entity 已实现（DB 迁移 V19 + V22-V24）；🔧 状态机 / `failed_count` / 并发控制将随 import-consistency.md v2（V28）实施更新
+> **最后更新**：2026-04-22（随 import-consistency.md v2.1 更新：§4.2 状态枚举、`failed_count` 字段、§8.2 Flyway 清单、§9 R-9；V28 schema 已落地）
+> **状态**：✅ 表结构与 Entity 已实现（DB 迁移 V19 + V22-V24 + V28）；🔧 状态机 / 并发控制的应用层行为（fail-fast cleanup、CLEANUP_FAILED 状态、409 冲突处理）仍在实施中，详见 [import-consistency.md](./import-consistency.md)
 > **关联**：[architecture.md](../architecture.md) | [import-consistency.md](./import-consistency.md) | [broker-registration.md](./broker-registration.md) | [brokers/ibkr/staging-schema.md](../brokers/ibkr/staging-schema.md)
 
 本文档定义**框架层通用**的数据持久化方案：`broker_sync_batches`（通用批次表）、`trade_records` 扩展字段、以及所有券商共同遵守的「暂存 → 导入」两阶段原则。各券商专属的暂存表结构与字段映射在各自的 `brokers/<code>/staging-schema.md` 中定义（如 [brokers/ibkr/staging-schema.md](../brokers/ibkr/staging-schema.md)）。
@@ -63,7 +63,7 @@ Phase 1 已跑通「券商 API → 解析 → 日志输出」的基本流程，�
 | `total_count` | INTEGER | NOT NULL DEFAULT 0 | 同步记录总数 |
 | `imported_count` | INTEGER | NOT NULL DEFAULT 0 | 已导入正式表的数量 |
 | `skipped_count` | INTEGER | NOT NULL DEFAULT 0 | 跳过的数量（重复记录等） |
-| ~~`failed_count`~~ | ~~INTEGER~~ | ~~NOT NULL DEFAULT 0~~ | **将在 V28 中删除**（v2：没有"部分失败"概念，失败整批清理；保留 V19-V27 时期的历史定义仅作参考） |
+| ~~`failed_count`~~ | ~~INTEGER~~ | — | **已由 V28 删除**（v2：没有"部分失败"概念，任一记录失败会触发整批清理。保留该行仅为历史参考；V19-V27 时期存在此列） |
 | `status` | VARCHAR(32) | NOT NULL | 批次状态（见下方状态枚举） |
 | `phase` | VARCHAR(32) | | `PROCESSING` 时表示当前阶段（FETCHING/STAGING/IMPORTING）；`CLEANUP_FAILED` 时保留清理发起时的阶段用于诊断；其他状态为 NULL。详见 [import-consistency.md](./import-consistency.md) |
 | `error_message` | TEXT | | 批次级错误信息 |
@@ -204,7 +204,7 @@ futu_staged_orders              → 字段 1:1 对应 FutuOrderRecord
 | `V22__add_external_fields_to_trade_records.sql` | 为 `trade_records` 新增 `external_id`、`external_broker`、`sync_batch_id` 字段 | ✅ 已完成 |
 | `V23__add_broker_code_and_rename_batch_broker_name.sql` | `brokers` 新增 `broker_code` 列（UNIQUE 部分索引）+ `broker_sync_batches.broker_name` → `broker_code` 改名 | ✅ 已完成，详见 [broker-registration.md](./broker-registration.md) |
 | `V24__add_phase_and_expand_batch_status.sql` | `broker_sync_batches` 新增 `phase` 列 + `status` 枚举扩展（引入 `PROCESSING` / `PARTIAL` / `INTERRUPTED`） | ✅ 已执行（**历史脚本，`PARTIAL` / `INTERRUPTED` 已由 V28 在 v2 模型中废弃**），详见 [import-consistency.md](./import-consistency.md) |
-| `V28__simplify_sync_batch_state_model.sql` | 删除 `failed_count` 列；更新 `status` / `phase` 注释；新增 `active_flag` 虚拟列 + `uk_only_one_active` 唯一索引（并发控制） | 📋 待实施，详见 [import-consistency.md § 六](./import-consistency.md) |
+| `V28__simplify_sync_batch_state_model.sql` | 删除 `failed_count` 列；刷新 `status` / `phase` 注释（5 态模型）；新增部分唯一索引 `uk_only_one_active`（PostgreSQL 部分索引，约束"至多一个活跃 batch"） | ✅ 已执行，详见 [import-consistency.md § 四 / § 六](./import-consistency.md) |
 
 ### 8.3 JPA Entity 与 Repository（框架层）
 

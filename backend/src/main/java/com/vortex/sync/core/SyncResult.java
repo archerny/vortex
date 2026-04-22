@@ -4,6 +4,12 @@ package com.vortex.sync.core;
  * 同步结果
  *
  * 封装一次同步操作的执行结果信息。
+ *
+ * <p><b>v2 note:</b> {@code failedCount} is intentionally absent. v2 uses a
+ * fail-fast model — any per-record failure triggers whole-batch cleanup and
+ * transitions the batch straight to FAILED, so there is no "partial failure
+ * count" to surface. Adapters either return {@code success(...)} with
+ * imported+skipped counts, or {@code failure(...)}.</p>
  */
 public class SyncResult {
 
@@ -21,9 +27,6 @@ public class SyncResult {
 
     /** 跳过的数量（重复记录等） */
     private int skippedCount;
-
-    /** 失败的数量 */
-    private int failedCount;
 
     /** 结果消息（成功时为概要信息，失败时为错误原因） */
     private String message;
@@ -50,18 +53,17 @@ public class SyncResult {
     }
 
     public static SyncResult success(String brokerCode, int totalRecords, int importedCount,
-                                     int skippedCount, int failedCount, long durationMs) {
+                                     int skippedCount, long durationMs) {
         SyncResult result = new SyncResult();
         result.success = true;
         result.brokerCode = brokerCode;
         result.totalRecords = totalRecords;
         result.importedCount = importedCount;
         result.skippedCount = skippedCount;
-        result.failedCount = failedCount;
         result.durationMs = durationMs;
         result.message = String.format(
-                "Sync completed [%s]: total=%d, imported=%d, skipped=%d, failed=%d in %d ms",
-                brokerCode, totalRecords, importedCount, skippedCount, failedCount, durationMs);
+                "Sync completed [%s]: total=%d, imported=%d, skipped=%d in %d ms",
+                brokerCode, totalRecords, importedCount, skippedCount, durationMs);
         return result;
     }
 
@@ -118,14 +120,6 @@ public class SyncResult {
         this.skippedCount = skippedCount;
     }
 
-    public int getFailedCount() {
-        return failedCount;
-    }
-
-    public void setFailedCount(int failedCount) {
-        this.failedCount = failedCount;
-    }
-
     public String getMessage() {
         return message;
     }
@@ -150,7 +144,6 @@ public class SyncResult {
                 ", totalRecords=" + totalRecords +
                 ", importedCount=" + importedCount +
                 ", skippedCount=" + skippedCount +
-                ", failedCount=" + failedCount +
                 ", durationMs=" + durationMs +
                 ", message='" + message + '\'' +
                 '}';

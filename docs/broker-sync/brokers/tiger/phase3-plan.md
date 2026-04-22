@@ -207,9 +207,9 @@
 4. phase=IMPORTING：
    - TigerImportService.importAll(batchId)
 5. 统计：从 DB 按 batchId 重新 countByBatchIdAndStatus(IMPORTED/SKIPPED/FAILED)
-6. 返回 SyncResult.success(brokerCode, total, imported, skipped, failed, durationMs)
-   （注：`SyncResult.failedCount` 字段将随 import-consistency.md v2 删除；当前代码仍沿用 v1 结构）
-7. 批次状态收敛（v1：COMPLETED / PARTIAL / FAILED；v2：COMPLETED / FAILED / CLEANUP_FAILED）
+6. 返回 SyncResult.success(brokerCode, total, imported, skipped, durationMs)
+   （注：v2 已删除 `SyncResult.failedCount` 字段——失败记录触发整批清理，而非计入聚合）
+7. 批次状态收敛（v2：COMPLETED / FAILED / CLEANUP_FAILED，无 PARTIAL）
    由 BrokerSyncAsyncExecutor 统一处理，adapter 只管更新 phase 与返回 SyncResult
 ```
 

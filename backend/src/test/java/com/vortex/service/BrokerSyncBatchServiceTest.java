@@ -31,6 +31,7 @@ import static org.mockito.Mockito.*;
  *   markAsPartial, markAsFailed, markAsInterrupted
  */
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings("deprecation") // markAsPartial / markAsInterrupted are v2 bridge methods; removed in phase 3
 class BrokerSyncBatchServiceTest {
 
     @Mock
@@ -50,8 +51,7 @@ class BrokerSyncBatchServiceTest {
         batch.setSyncDateTo(LocalDate.of(2026, 1, 31));
         batch.setTotalCount(10);
         batch.setImportedCount(8);
-        batch.setSkippedCount(1);
-        batch.setFailedCount(1);
+        batch.setSkippedCount(2);
         return batch;
     }
 
@@ -205,7 +205,6 @@ class BrokerSyncBatchServiceTest {
             assertEquals(0, result.getTotalCount());
             assertEquals(0, result.getImportedCount());
             assertEquals(0, result.getSkippedCount());
-            assertEquals(0, result.getFailedCount());
         }
 
         @Test
@@ -267,32 +266,32 @@ class BrokerSyncBatchServiceTest {
             when(batchRepository.findById(1L)).thenReturn(Optional.of(batch));
             when(batchRepository.save(any())).thenReturn(batch);
 
-            SyncResult result = SyncResult.success("ibkr", 100, 85, 10, 5, 3000);
+            SyncResult result = SyncResult.success("ibkr", 100, 85, 15, 3000);
             batchService.markAsCompleted(1L, result);
 
             assertEquals("COMPLETED", batch.getStatus());
             assertNull(batch.getPhase());
             assertEquals(100, batch.getTotalCount());
             assertEquals(85, batch.getImportedCount());
-            assertEquals(10, batch.getSkippedCount());
-            assertEquals(5, batch.getFailedCount());
+            assertEquals(15, batch.getSkippedCount());
             assertNotNull(batch.getCompletedAt());
         }
 
         @Test
-        @DisplayName("markAsPartial should set PARTIAL status and counts")
+        @DisplayName("markAsPartial (deprecated v2 bridge) should set PARTIAL status and counts")
         void markAsPartialShouldSetPartialStatus() {
             BrokerSyncBatch batch = buildBatch(1L, "ibkr", "PROCESSING");
             when(batchRepository.findById(1L)).thenReturn(Optional.of(batch));
             when(batchRepository.save(any())).thenReturn(batch);
 
-            SyncResult result = SyncResult.success("ibkr", 100, 80, 10, 10, 3000);
+            SyncResult result = SyncResult.success("ibkr", 100, 80, 20, 3000);
             batchService.markAsPartial(1L, result);
 
             assertEquals("PARTIAL", batch.getStatus());
             assertNull(batch.getPhase());
             assertEquals(100, batch.getTotalCount());
-            assertEquals(10, batch.getFailedCount());
+            assertEquals(80, batch.getImportedCount());
+            assertEquals(20, batch.getSkippedCount());
         }
 
         @Test

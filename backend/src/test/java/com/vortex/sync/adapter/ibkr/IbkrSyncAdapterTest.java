@@ -115,7 +115,6 @@ class IbkrSyncAdapterTest {
             assertEquals(50, result.getTotalRecords());
             assertEquals(45, result.getImportedCount());
             assertEquals(5, result.getSkippedCount());
-            assertEquals(0, result.getFailedCount());
             assertEquals("ibkr", result.getBrokerCode());
             assertTrue(result.getDurationMs() >= 0);
 
