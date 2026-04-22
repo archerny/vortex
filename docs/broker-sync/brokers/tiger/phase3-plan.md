@@ -109,8 +109,8 @@
   - 时间字段统一用 `yyyy-MM-dd'T'HH:mm:ss`（Asia/Shanghai）格式化；BigDecimal 用 `toPlainString()` 避免科学计数法
 - [x] 新建 `TigerStagingService`
   - 入参：`Long batchId, List<TigerOrderRecord> records`
-  - 对每条调用 `stagingWorker.stageOrder(...)`，**单条失败不影响其他**（try/catch 汇总）
-  - 返回 `StagingResult { attempted, inserted, skipped, failed }`（`attempted == inserted + skipped + failed` 不变量）
+  - 对每条调用 `stagingWorker.stageOrder(...)`；**v2.4.2 起对齐 IBKR fail-fast：单条异常直接冒泡，adapter 外层 catch 转 `SyncResult.failure` 触发整批清理**
+  - 返回 `StagingResult { attempted, inserted, skipped }`（`attempted == inserted + skipped` 不变量；正常返回即表示无失败）
   - **不负责** API 调用，纯处理内存数据 → DB
 - [x] 编译通过（`mvn -q -DskipTests compile` 本地验证通过，2026-04-22）
 - [ ] 单元测试（`TigerStagingWorkerTest`）：本阶段未写；计划中本身将其标为"可选"，实际可放在 Stage 3 的单测批次里或延后
@@ -250,7 +250,7 @@
 **未处理**（已评估、本期不做）：
 
 - 差异 2（`TigerImportWorker` 手动 `new TigerTradeRecordMapper()`）：mapper 是无状态纯类，改成 Spring bean 只是风格一致性，不影响行为，留作未来清理。
-- `StagingResult.failed` 未上报到 `SyncResult`：Tiger 对 staging 阶段异常的容错优于 IBKR，但计数未反映到最终结果；属于增强项，不在 Phase 3 范围内。
+- ~~`StagingResult.failed` 未上报到 `SyncResult`：Tiger 对 staging 阶段异常的容错优于 IBKR，但计数未反映到最终结果；属于增强项，不在 Phase 3 范围内。~~ ✅ v2.4.2 已解决：去掉了 `TigerStagingService` 内的 try/catch，staging 阶段异常直接冒泡 → adapter 外层 catch 转 `SyncResult.failure` → fail-fast cleanup。`StagingResult.failed` 字段已删除。行为与 IBKR 一致，消除了 silent data-loss 路径。
 
 **验证**：全量 `mvn test`：**192 / 0 / 0**，零回归。
 
