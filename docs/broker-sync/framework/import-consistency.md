@@ -1,7 +1,7 @@
 # 券商同步 — 数据一致性与失败清理设计文档
 
 > **创建日期**：2026-04-16（v1）
-> **最后更新**：2026-04-22（v2 — 全面重构：移除 INTERRUPTED / PARTIAL / Resume，改为"失败即清理"模型）
+> **最后更新**：2026-04-22（v2.1 — 适配 PostgreSQL：§4.2 改为部分唯一索引；§6.1 V28 脚本改写为 PG 方言）
 > **状态**：📋 设计中（等待实施）
 > **关联**：[architecture.md](../architecture.md) | [data-persistence.md](./data-persistence.md) | [broker-registration.md](./broker-registration.md)
 > **取代**：本文档是 v1（2026-04-16）的完全重写。v1 设计的 `INTERRUPTED` / `PARTIAL` / Resume / 幂等续跑机制被整体废弃，历史版本可在 git log 中追溯。
@@ -127,26 +127,25 @@ for batch in findByStatusIn([PENDING, PROCESSING]):
 
 我们希望"同时只能有一个活跃 sync batch"。纯应用层的 `SELECT COUNT → INSERT` 方案有 TOCTOU race（两个请求同时通过校验，各自 INSERT 一条）。必须用 DB 层保证。
 
-### 4.2 方案：虚拟列 + 唯一索引
+### 4.2 方案：部分唯一索引（PostgreSQL）
+
+本项目使用 **PostgreSQL**，采用 PG 的**部分唯一索引**（Partial Unique Index）即可满足"最多一条活跃 batch"的约束，**无需引入虚拟列**：
 
 ```sql
-ALTER TABLE broker_sync_batches
-  ADD COLUMN active_flag TINYINT
-  GENERATED ALWAYS AS (
-    CASE WHEN status IN ('PENDING', 'PROCESSING', 'CLEANUP_FAILED') THEN 1
-         ELSE NULL
-    END
-  ) VIRTUAL;
-
-ALTER TABLE broker_sync_batches
-  ADD UNIQUE KEY uk_only_one_active (active_flag);
+CREATE UNIQUE INDEX uk_only_one_active
+  ON broker_sync_batches ((1))
+  WHERE status IN ('PENDING', 'PROCESSING', 'CLEANUP_FAILED');
 ```
 
 原理：
-- `active_flag` 是 `VIRTUAL` 列（不占存储，读时计算），值取决于 `status`
-- MySQL 的唯一索引**不对 NULL 去重**：无数条 NULL 可以共存
-- 活跃状态的记录 `active_flag = 1`，非活跃记录为 NULL
-- 因此：**最多存在 1 条记录 active_flag = 1**，天然保证"至多一个活跃 batch"
+- 表达式 `(1)` 是**常量表达式索引**：所有进入该索引的行 key 都是 `1`
+- `WHERE ...` 子句限定**只有活跃状态的行**才被索引（非活跃行完全不进索引）
+- 因此：**最多存在 1 条活跃记录**（否则两条 key=1 的行会冲突），天然保证"至多一个活跃 batch"
+- 活跃状态结束后（status 变为 COMPLETED / FAILED），行自动从索引中消失，不阻塞后续 sync
+
+**为什么不用虚拟列方案？** MySQL 常见的写法是"`VIRTUAL` 生成列 + 普通唯一索引"（利用"唯一索引不去重 NULL"的特性）。在 PG 里这种写法会有两个代价：(a) PG 的生成列必须是 `STORED`（实际占用存储），(b) JPA 对"数据库生成的列"需要额外注解（`@Generated` + `insertable=false`）否则 INSERT 时会冲突。PG 原生的部分索引更干净，且语义完全等价。
+
+> 📌 如果未来迁移到 MySQL，此方案不通用，需改为"虚拟列 + 普通唯一索引"。届时在此处注明。
 
 ### 4.3 应用层配合
 
@@ -312,36 +311,31 @@ import 阶段结束后：
 
 ### 6.1 变更清单
 
-单个 Flyway 脚本 `V28__simplify_sync_batch_state_model.sql`：
+单个 Flyway 脚本 `V28__simplify_sync_batch_state_model.sql`（PostgreSQL 方言）：
 
 ```sql
--- 1. 删除 failedCount 列（v2 新模型不再有部分失败概念）
+-- 1. Drop failed_count column (v2 has no "partial success" concept anymore)
 ALTER TABLE broker_sync_batches
   DROP COLUMN failed_count;
 
--- 2. 更新 status 注释（语义变化）
-ALTER TABLE broker_sync_batches
-  MODIFY COLUMN status VARCHAR(32) NOT NULL
-  COMMENT '批次主状态: PENDING, PROCESSING, COMPLETED, FAILED, CLEANUP_FAILED';
+-- 2. Update status column comment (semantic change: 5 states, no PARTIAL / INTERRUPTED)
+COMMENT ON COLUMN broker_sync_batches.status IS
+  'Batch status: PENDING, PROCESSING, COMPLETED, FAILED, CLEANUP_FAILED';
 
--- 3. 更新 phase 注释（语义微调）
-ALTER TABLE broker_sync_batches
-  MODIFY COLUMN phase VARCHAR(32)
-  COMMENT '子阶段: FETCHING, STAGING, IMPORTING. PROCESSING 时表示当前进度; CLEANUP_FAILED 时保留发起清理时的阶段用于诊断; 其他状态为 NULL.';
+-- 3. Update phase column comment (minor semantic tweak for CLEANUP_FAILED)
+COMMENT ON COLUMN broker_sync_batches.phase IS
+  'Sub-stage: FETCHING, STAGING, IMPORTING. Indicates current progress when status=PROCESSING; preserved for diagnostics when status=CLEANUP_FAILED; NULL otherwise.';
 
--- 4. 新增 active_flag 虚拟列（并发控制）
-ALTER TABLE broker_sync_batches
-  ADD COLUMN active_flag TINYINT
-  GENERATED ALWAYS AS (
-    CASE WHEN status IN ('PENDING', 'PROCESSING', 'CLEANUP_FAILED') THEN 1
-         ELSE NULL
-    END
-  ) VIRTUAL
-  COMMENT 'Virtual: 1 when batch is active (blocks new sync), NULL otherwise. Used by uk_only_one_active.';
+-- 4. Enforce "at most one active batch" via partial unique index.
+--    Active = status IN (PENDING, PROCESSING, CLEANUP_FAILED). Non-active rows
+--    are excluded from the index entirely, so they never collide. Active rows
+--    all share the constant key (1), so a second active row violates uniqueness.
+CREATE UNIQUE INDEX uk_only_one_active
+  ON broker_sync_batches ((1))
+  WHERE status IN ('PENDING', 'PROCESSING', 'CLEANUP_FAILED');
 
--- 5. 新增唯一索引（保证至多一个活跃 batch）
-ALTER TABLE broker_sync_batches
-  ADD UNIQUE KEY uk_only_one_active (active_flag);
+COMMENT ON INDEX uk_only_one_active IS
+  'Partial unique index: blocks a second active sync batch at DB level. Released automatically when status becomes COMPLETED or FAILED.';
 ```
 
 ### 6.2 数据迁移说明
