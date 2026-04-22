@@ -2,6 +2,7 @@ package com.vortex.repository;
 
 import com.vortex.entity.IbkrStagedTradeConfirm;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -36,4 +37,13 @@ public interface IbkrStagedTradeConfirmRepository extends JpaRepository<IbkrStag
      * Check if a staged trade confirm exists for the given IBKR trade ID.
      */
     boolean existsByTradeId(String tradeId);
+
+    /**
+     * Delete all staged trade confirms for the given batch. Used by
+     * {@code SyncBatchCleanupService} when rolling back a failed sync.
+     *
+     * @return number of rows deleted
+     */
+    @Modifying
+    long deleteByBatchId(Long batchId);
 }

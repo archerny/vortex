@@ -131,6 +131,23 @@ public interface TradeRecordRepository extends BaseRepository<TradeRecord, Long>
     );
 
     /**
+     * Physically delete all trade records that were imported by the given sync
+     * batch. Used by {@code SyncBatchCleanupService} to roll back a failed
+     * sync (v2 fail-fast model).
+     *
+     * <p>This is a hard delete (not soft delete) because the rows are
+     * considered to have never been validly imported — leaving soft-deleted
+     * rows behind would muddy subsequent reconciliation and cost-basis
+     * recalculation.</p>
+     *
+     * @param syncBatchId the batch whose trade records should be removed
+     * @return number of rows deleted
+     */
+    @org.springframework.data.jpa.repository.Modifying
+    @Query("DELETE FROM TradeRecord t WHERE t.syncBatchId = :syncBatchId")
+    int deleteBySyncBatchId(@Param("syncBatchId") Long syncBatchId);
+
+    /**
      * 根据证券代码查询最近一条未删除的交易记录
      * 用于自动填充市场事件中的 currency 和 name 等字段
      */

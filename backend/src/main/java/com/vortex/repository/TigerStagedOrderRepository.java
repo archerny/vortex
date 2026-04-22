@@ -2,6 +2,7 @@ package com.vortex.repository;
 
 import com.vortex.entity.TigerStagedOrder;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -41,4 +42,13 @@ public interface TigerStagedOrderRepository extends JpaRepository<TigerStagedOrd
      * Count staged orders by batch ID and status.
      */
     long countByBatchIdAndStatus(Long batchId, String status);
+
+    /**
+     * Delete all staged orders for the given batch. Used by
+     * {@code SyncBatchCleanupService} when rolling back a failed sync.
+     *
+     * @return number of rows deleted
+     */
+    @Modifying
+    long deleteByBatchId(Long batchId);
 }

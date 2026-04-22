@@ -326,6 +326,32 @@ class BrokerSyncBatchServiceTest {
         }
 
         @Test
+        @DisplayName("markAsCleanupFailed should set CLEANUP_FAILED, preserve phase, and record error")
+        void markAsCleanupFailedShouldPreservePhaseAndRecordError() {
+            BrokerSyncBatch batch = buildBatch(1L, "ibkr", "PROCESSING");
+            batch.setPhase("IMPORTING");
+            when(batchRepository.findById(1L)).thenReturn(Optional.of(batch));
+            when(batchRepository.save(any())).thenReturn(batch);
+
+            String msg = "Cleanup failed after 3 attempts: DB connection lost. Original error: IBKR 500";
+            batchService.markAsCleanupFailed(1L, msg);
+
+            assertEquals("CLEANUP_FAILED", batch.getStatus());
+            assertEquals("IMPORTING", batch.getPhase()); // preserved for diagnostics
+            assertEquals(msg, batch.getErrorMessage());
+            assertNotNull(batch.getCompletedAt());
+        }
+
+        @Test
+        @DisplayName("markAsCleanupFailed should throw for non-existent batch")
+        void markAsCleanupFailedShouldThrowForMissingBatch() {
+            when(batchRepository.findById(999L)).thenReturn(Optional.empty());
+
+            assertThrows(IllegalArgumentException.class,
+                    () -> batchService.markAsCleanupFailed(999L, "any"));
+        }
+
+        @Test
         @DisplayName("markAsProcessing should throw for non-existent batch")
         void markAsProcessingShouldThrowForMissingBatch() {
             when(batchRepository.findById(999L)).thenReturn(Optional.empty());

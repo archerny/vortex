@@ -202,6 +202,35 @@ public class BrokerSyncBatchService {
     }
 
     /**
+     * Transition a batch to CLEANUP_FAILED status after repeated cleanup
+     * attempts have exhausted. This is v2's protective terminal state:
+     * something in {@code trade_records} or a staged table may still be
+     * referencing this batch, so the partial unique index
+     * {@code uk_only_one_active} keeps this batch "active" and refuses new
+     * sync requests until an operator manually resolves it.
+     *
+     * <p>Unlike {@link #markAsFailed(Long, String)}, this method <b>preserves
+     * {@code phase}</b> so the diagnostic UI can show where the failed sync
+     * was when cleanup went wrong.</p>
+     *
+     * @param batchId      the batch ID
+     * @param errorMessage description of the cleanup failure (should also
+     *                     reference the original sync error)
+     */
+    @Transactional
+    public void markAsCleanupFailed(Long batchId, String errorMessage) {
+        BrokerSyncBatch batch = batchRepository.findById(batchId)
+                .orElseThrow(() -> new IllegalArgumentException("Batch not found: " + batchId));
+        batch.setStatus("CLEANUP_FAILED");
+        // phase intentionally preserved for diagnostics
+        batch.setErrorMessage(errorMessage);
+        batch.setCompletedAt(LocalDateTime.now());
+        batchRepository.save(batch);
+        logger.error("Batch {} status changed to CLEANUP_FAILED (phase={}): {}",
+                batchId, batch.getPhase(), errorMessage);
+    }
+
+    /**
      * Transition a batch to INTERRUPTED status (preserving phase for diagnostics).
      *
      * @param batchId      the batch ID
