@@ -14,6 +14,9 @@
 | [framework/data-persistence.md](./framework/data-persistence.md) | 数据持久化设计（批次表 + trade_records 扩展 + 两阶段导入原则） | ✅ 已实现（Flyway V19-V24 + V28 + Entity + Repository） |
 | [framework/import-consistency.md](./framework/import-consistency.md) | 数据一致性与失败清理设计（v2：失败即清理，三终态 `COMPLETED` / `FAILED` / `CLEANUP_FAILED`；v2.4.3 已合入 P0 数据丢失链修复） | ✅ v2 状态模型 + v2.4.2 架构加固 + v2.4.3 P0 修复已完整落地 |
 | [framework/broker-registration.md](./framework/broker-registration.md) | Broker Code 关联与同步器注册发现 | ✅ 已实现 |
+| [framework/sync-lifecycle.md](./framework/sync-lifecycle.md) | 同步生命周期流程手册（Controller→Async→Adapter→Cleanup 端到端时序；adapter 作者实现指南） | ✅ v1.0（2026-04-24） |
+| [framework/symbol-classification.md](./framework/symbol-classification.md) | Symbol / secType → `AssetType` 分类规则与扩展流程 | 📋 设计中（未实现；Tiger/IBKR 当前走的是 `IllegalArgumentException` 路径，行为等价于 fail-fast 但缺规范化的 `UNRECOGNIZED` 分类、external_id、per-broker Exception 类） |
+| [framework/unrecognized-data-logging.md](./framework/unrecognized-data-logging.md) | 无法识别数据的日志规范与 fail-fast 处理 | 📋 设计中（未实现；Tiger/IBKR 当前日志 / error_message 均未打 `[AUTH]` / `[NETWORK]` / `[UNRECOGNIZED]` / `[INTERNAL]` 分类前缀） |
 | **券商层（各券商专属）** | | |
 | [brokers/tiger/README.md](./brokers/tiger/README.md) | 老虎证券同步状态页 | ✅ |
 | [brokers/tiger/open-api.md](./brokers/tiger/open-api.md) | 老虎证券同步方案（设计与实现记录） | ✅ Phase 1 已实现 |
@@ -24,6 +27,7 @@
 | [brokers/ibkr/staging-schema.md](./brokers/ibkr/staging-schema.md) | IBKR 暂存表结构与字段映射规范 | ✅ 已实现 |
 | [brokers/ibkr/booktrade-mapping.md](./brokers/ibkr/booktrade-mapping.md) | BookTrade 触发判定与期权事件导入映射（含缺失/异常 TradeConfirm fail-fast 处理；GEA token 支持） | ✅ 已实现（2026-04-23 更新） |
 | [brokers/futu/README.md](./brokers/futu/README.md) | 富途证券同步设计稿（OpenD 本地网关 + `GetHistoryOrderFillList` + 综合账户×市场展开） | 📋 设计稿 v0.1（待 review） |
+| [brokers/longbridge/README.md](./brokers/longbridge/README.md) | 长桥证券同步设计稿（Rust JNI SDK + `getHistoryExecutions` + 订单表补字段 + `has_more` 嵌套翻页） | 📋 设计稿 v0.1（待 review） |
 
 ---
 
@@ -74,3 +78,22 @@
 | 盈透证券 (IBKR) | Phase 2+ | Flex Web Service | `IbkrSyncAdapter` |
 | 嘉信证券 | Phase 2+ | Schwab API | `SchwabSyncAdapter` |
 | 富途证券 | Phase 2+ | OpenD + OpenAPI | `FutuSyncAdapter`（设计稿：[brokers/futu/README.md](./brokers/futu/README.md)） |
+| 长桥证券 | Phase 2+ | Longbridge OpenAPI (HTTPS + Java SDK) | `LongbridgeSyncAdapter`（设计稿：[brokers/longbridge/README.md](./brokers/longbridge/README.md)） |
+
+## 各 Adapter 支持的 AssetType 总览
+
+> **判定规则**：每个 broker adapter 自行决定把哪些上游 secType 映射到哪些系统内 `AssetType`。无法映射的上游类型一律按 `UNRECOGNIZED` 处理并触发 batch fail-fast（见 [framework/unrecognized-data-logging.md](./framework/unrecognized-data-logging.md) 和 [framework/symbol-classification.md](./framework/symbol-classification.md)）。
+>
+> **`AssetType` 是开放枚举**（当前定义：`STOCK` / `ETF` / `OPTION_CALL` / `OPTION_PUT`）。某个 adapter 不支持某个 `AssetType` 并不代表系统不支持——手动录入 / 其他 adapter 仍可能产生该类型的记录。
+
+| Adapter | `STOCK` | `OPTION_CALL` | `OPTION_PUT` | `ETF` | 备注 |
+|---------|:---:|:---:|:---:|:---:|------|
+| `TigerSyncAdapter` | ✅ | ✅ | ✅ | ➖ | 上游 secType `STK`/`OPT`；ETF 当前归入 STOCK |
+| `IbkrSyncAdapter` | ✅ | ✅ | ✅ | ➖ | 上游 assetCategory `STK`/`OPT`（`putCall=C/P` 区分）；ETF 当前归入 STOCK |
+| `LongbridgeSyncAdapter` | ✅ (v0.2) | ❌ | ❌ | ❌ | 设计稿 v0.2 仅支持股票，期权后续版本再加 |
+| `FutuSyncAdapter` | 📋 | 📋 | 📋 | 📋 | 设计稿，未落地 |
+| `SchwabSyncAdapter` | 📋 | 📋 | 📋 | 📋 | 尚未启动 |
+
+图例：✅ 已实现 / ❌ 当前版本不支持（命中即走 `UNRECOGNIZED` + fail-fast）/ ➖ 未单独分类（归入相邻类型）/ 📋 设计或待启动
+
+**扩展某个 adapter 的支持范围**的流程见 [framework/symbol-classification.md § 7](./framework/symbol-classification.md)。

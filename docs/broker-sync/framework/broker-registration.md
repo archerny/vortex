@@ -3,7 +3,7 @@
 > **创建日期**：2026-04-17  
 > **最后更新**：2026-04-18  
 > **状态**：✅ 已实现（全链路 brokerName→brokerCode 重命名 + BrokerSyncInfo DTO + brokers 表关联 + 前端动态发现）  
-> **关联**：[architecture.md](../architecture.md) | [data-persistence.md](./data-persistence.md) | [import-consistency.md](./import-consistency.md)  
+> **关联**：[architecture.md](../architecture.md) | [data-persistence.md](./data-persistence.md) | [import-consistency.md](./import-consistency.md) | [sync-lifecycle.md](./sync-lifecycle.md)  
 > **前置**：Phase 2 数据库变更已完成（V19-V24 + Entity + Repository）
 
 ---

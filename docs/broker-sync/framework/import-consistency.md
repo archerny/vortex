@@ -3,7 +3,7 @@
 > **创建日期**：2026-04-16（v1）
 > **最后更新**：2026-04-23（v2.4.4 — cleanup retry 加入固定 2s backoff：`SyncBatchFailureHandler` 在两次 cleanup 尝试之间 `Thread.sleep(2000)`，让瞬时 DB 抖动（连接池耗尽 / 短时锁冲突 / serialization failure）有机会自愈；中断时立即退出 retry 升级 `CLEANUP_FAILED`，保持优雅关停语义。§5.4 代码示例与 "Cleanup retry policy" 小节已同步更新；原 v2.4.3 P0 修复内容保持不变。）
 > **状态**：✅ v2 状态模型已完整落地 + 架构加固 + P0 数据丢失链已修复 + cleanup retry 加入 backoff
-> **关联**：[architecture.md](../architecture.md) | [data-persistence.md](./data-persistence.md) | [broker-registration.md](./broker-registration.md) | [../fix-p0-data-loss-chain.md](../fix-p0-data-loss-chain.md)
+> **关联**：[architecture.md](../architecture.md) | [data-persistence.md](./data-persistence.md) | [broker-registration.md](./broker-registration.md) | [sync-lifecycle.md](./sync-lifecycle.md) | [../fix-p0-data-loss-chain.md](../fix-p0-data-loss-chain.md)
 > **取代**：本文档是 v1（2026-04-16）的完全重写。v1 设计的 `INTERRUPTED` / `PARTIAL` / Resume / 幂等续跑机制被整体废弃，历史版本可在 git log 中追溯。
 
 ---
