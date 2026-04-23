@@ -1,7 +1,7 @@
 # 券商同步 — 数据持久化设计（框架层）
 
 > **创建日期**：2026-04-13
-> **最后更新**：2026-04-23（随 import-consistency.md v2.4.1 更新：端到端 audit 修复 — Tiger API 异常不再被吞、启动恢复扩展覆盖 PENDING+PROCESSING、adapter fail-fast 路径简化；v2 状态模型端到端全部落地）
+> **最后更新**：2026-04-23（D-6 归档至已解决；Phase 3 后清单同步）
 > **状态**：✅ 表结构与 Entity 已实现（DB 迁移 V19 + V22-V24 + V28）；✅ 应用层与前端行为已完整切换到 v2（fail-fast cleanup + 409 conflict + 无 resume）
 > **关联**：[architecture.md](../architecture.md) | [import-consistency.md](./import-consistency.md) | [broker-registration.md](./broker-registration.md) | [brokers/ibkr/staging-schema.md](../brokers/ibkr/staging-schema.md)
 
@@ -233,11 +233,10 @@ _（当前无待解决项，所有阻塞性问题已解决）_
 | # | 问题 | 说明 | 备注 |
 |---|------|------|------|
 | D-1 | 暂存表数据的清理策略 | 保留多久、是否归档、自动清理还是手动 | 系统跑起来之后根据实际数据量再定 |
-| D-2 | 是否需要"同步预览"功能 | 在正式导入前展示待导入数据供用户确认 | Phase 3 规划项 |
+| D-2 | 是否需要"同步预览"功能 | 在正式导入前展示待导入数据供用户确认 | Phase 3.x 增量能力（Phase 3 核心已完成） |
 | D-3 | XML 解析方案选型 | DOM 解析 vs SAX 解析 vs JAXB | Phase 1 已跑通（当前 DOM），性能优化后续考虑，详见 [flex-web-service.md](../brokers/ibkr/flex-web-service.md) |
 | D-4 | Token 存储方式 | 当前 properties 文件，后续是否迁移到数据库 | 详见 [flex-web-service.md](../brokers/ibkr/flex-web-service.md) |
 | D-5 | Activity Flex Query 支持 | 除 Trade Confirmation 外的其他 IBKR 报告类型 | 详见 [flex-web-service.md](../brokers/ibkr/flex-web-service.md) |
-| D-6 | Tiger 同步后续 | 入库、去重、单元测试等 | 当前优先级低，详见 [open-api.md](../brokers/tiger/open-api.md) |
 
 ### ✅ 已解决（归档）
 
@@ -252,3 +251,4 @@ _（当前无待解决项，所有阻塞性问题已解决）_
 | R-7 | 暂存表 → `trade_records` 字段映射 | **已完成完整映射规范**，详见 [brokers/ibkr/staging-schema.md § 五](../brokers/ibkr/staging-schema.md#五字段映射规范ibkr_staged_orders--trade_records) |
 | R-8 | 导入时的冲突处理策略 | **不做手动记录冲突匹配**。系统假设不存在手动录入的历史记录，去重仅依赖 `(external_broker, external_id)` 唯一索引。已有相同 `external_id` → SKIPPED。`CONFLICT` 状态仅保留为理论预留，当前不会触发 |
 | R-9 | 前端状态交互设计 | **已在 [import-consistency.md](./import-consistency.md) v2 完整定义**。三终态（`COMPLETED` / `FAILED` / `CLEANUP_FAILED`）+ 两活跃态（`PENDING` / `PROCESSING`）；失败即清理，不再有 Resume / 部分成功。`FAILED` → 用户可重新触发新 sync；`CLEANUP_FAILED` → 前端展示人工介入提示。（v1 曾设计的 "Resume 按钮 / PARTIAL 失败详情" 已整体废弃） |
+| R-10 | Tiger 同步后续（原 D-6） | **Phase 3 已完成**：两阶段导入（暂存 → `trade_records`）、去重、`preFilter` 与 fail-fast、`TigerTradeRecordMapper` 单元测试、v2.4.2 silent data-loss 消除均已落地。残留增量（`attrDesc` 期权事件映射等）归入 Phase 3.x。详见 [brokers/tiger/phase3-plan.md](../brokers/tiger/phase3-plan.md)、[brokers/tiger/staging-schema.md](../brokers/tiger/staging-schema.md) |

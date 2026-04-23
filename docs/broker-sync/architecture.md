@@ -1,8 +1,8 @@
 # 券商同步 — 架构概览
 
 > **创建日期**：2026-04-21
-> **最后更新**：2026-04-22（状态机与失败处理策略随 import-consistency.md v2 更新：`COMPLETED` / `FAILED` / `CLEANUP_FAILED` 三终态，失败即清理）
-> **状态**：✅ 架构骨架已实现（状态机语义待 import-consistency.md v2 实施完成后全面对齐）
+> **最后更新**：2026-04-23（Phase 3 状态同步：Tiger 两阶段导入 / v2 状态模型 / fail-fast cleanup / 前端 v2 UI 均已落地）
+> **状态**：✅ 架构已落地（Phase 1 / Phase 2 / Phase 3 均完成；后续为 Phase 3.x 等增量能力）
 > **关联**：[README.md](./README.md) | [framework/data-persistence.md](./framework/data-persistence.md) | [framework/import-consistency.md](./framework/import-consistency.md) | [framework/broker-registration.md](./framework/broker-registration.md)
 
 本文档给出券商同步模块的高层架构视图：包结构、数据流、异步执行模型。具体的表结构、字段映射、导入一致性、券商专属实现细节，分别参见 framework/ 和 brokers/ 目录下的专题文档。
@@ -151,5 +151,6 @@ IBKR Flex Query 需要 `SendRequest` → 轮询 `GetStatement`，耗时可能数
 | 阶段 | 范围 | 关键能力 | 状态 |
 |------|------|---------|------|
 | **Phase 1** | 老虎证券 + 手动触发 + 日志输出 | 跑通基本流程、核对原始数据 | ✅ 已完成 |
-| **Phase 2** | IBKR 适配 + 暂存入库 + 失败清理 + 前端管理 | 生产可用 | ✅ 已完成（待真实环境验证；失败清理机制待 import-consistency.md v2 实施完成） |
-| **Phase 3** | 自动同步 + 冲突处理 + 同步预览 | 完整体验 | 📋 待规划 |
+| **Phase 2** | IBKR 适配 + 暂存入库 + 失败清理 + 前端管理 | 生产可用 | ✅ 已完成（v2 失败清理机制已随 import-consistency.md v2 落地） |
+| **Phase 3** | Tiger 两阶段导入 + v2 状态模型 + DB 并发冲突 + 前端 v2 UI | Tiger 对齐 IBKR 全链路；完整体验 | ✅ 已完成（详见 [README.md § MVP 分期](./README.md)、[brokers/tiger/phase3-plan.md](./brokers/tiger/phase3-plan.md)、[framework/import-consistency.md](./framework/import-consistency.md)） |
+| **Phase 3.x**（增量） | 自动同步 / 同步预览 / `attrDesc` 期权事件映射 / Tiger staged 查看面板 等 | 完整运维体验 | 📋 待规划（非阻塞项，按需推进） |
