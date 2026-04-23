@@ -1,6 +1,6 @@
 # 证券类型分类与 UNKNOWN 兜底规则
 
-**状态**：📋 设计中（未实现）
+**状态**：✅ 已实现（2026-04-24）
 **适用范围**：所有 broker adapter（跨 broker 通用契约）
 **最后更新**：2026-04-24
 
@@ -80,9 +80,11 @@ broker 原始数据
 1. **输入**：broker 原始数据（至少包含 broker 自己的类型字段 + symbol 字符串 + 必要的辅助字段，如 IBKR 的 `putCall`）
 2. **输出**：
    - 该 adapter **自己声明支持的** `AssetType` 子集中的某一个
-   - 或抛出 `<Broker>SyncException(category=UNRECOGNIZED, externalId=...)`
+   - 或抛出 `CategorizedSyncException(FailureCategory.UNRECOGNIZED, externalId, reason)`（框架通用异常，定义在 `backend/src/main/java/com/vortex/sync/core/CategorizedSyncException.java`）
 
 **禁止**返回 `null` 或返回"该 adapter 声明不支持"的 `AssetType`——一旦识别为不支持的类型，直接抛 UNRECOGNIZED 异常，不要让上层去判断。
+
+**`externalId` 的填写**：映射器层（`<Broker>TradeRecordMapper` / `parse*Date` 等）通常不直接持有 staged 行对象，可以把 `externalId` 传 `null`；`<Broker>ImportService.formatStagedError` 会在捕获后按 staged 行回填（Tiger 用 `tigerId`，IBKR 用 `orderId`）。
 
 ### 4.1 伪代码模板
 
@@ -103,9 +105,9 @@ public AssetType classify(RawTradeRecord raw) {
     }
 
     // 未识别 / 该 adapter 当前版本不支持 → 统一走 UNRECOGNIZED
-    throw new <Broker>SyncException(
+    throw new CategorizedSyncException(
         FailureCategory.UNRECOGNIZED,
-        raw.getExternalId(),
+        null,    // externalId 留给 ImportService.formatStagedError 回填
         "sec_type not supported by this adapter version: raw_type=" + rawType + ", symbol=" + symbol
     );
 }

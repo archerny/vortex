@@ -4,6 +4,7 @@ import com.vortex.entity.TigerStagedOrder;
 import com.vortex.entity.TradeRecord;
 import com.vortex.repository.TigerStagedOrderRepository;
 import com.vortex.repository.TradeRecordRepository;
+import com.vortex.sync.core.CategorizedSyncException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -83,10 +84,13 @@ public class TigerImportWorker {
 
                 case FAILED:
                     staged.setStatus("FAILED");
-                    staged.setErrorMessage(filterResult.getMessage());
+                    staged.setErrorMessage(CategorizedSyncException.format(
+                            filterResult.getCategory(),
+                            staged.getTigerId(),
+                            filterResult.getMessage()));
                     stagedOrderRepository.save(staged);
-                    logger.warn("[TigerImport] Filter-failed: tigerId={}, reason={}",
-                            staged.getTigerId(), filterResult.getMessage());
+                    logger.warn("[TigerImport] Filter-failed: tigerId={}, category={}, reason={}",
+                            staged.getTigerId(), filterResult.getCategory(), filterResult.getMessage());
                     return;
 
                 case PASS:

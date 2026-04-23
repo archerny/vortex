@@ -11,6 +11,8 @@ import com.vortex.entity.enums.TriggerRefType;
 import com.vortex.repository.IbkrStagedOrderRepository;
 import com.vortex.repository.IbkrStagedTradeConfirmRepository;
 import com.vortex.repository.TradeRecordRepository;
+import com.vortex.sync.core.CategorizedSyncException;
+import com.vortex.sync.core.FailureCategory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -357,7 +359,8 @@ public class IbkrImportWorker {
 
     private LocalDate parseIbkrDate(String dateStr) {
         if (isBlank(dateStr) || "MULTI".equals(dateStr)) {
-            throw new IllegalArgumentException("Cannot parse trade date: " + dateStr);
+            throw new CategorizedSyncException(FailureCategory.UNRECOGNIZED, null,
+                    "Cannot parse trade date: " + dateStr);
         }
         return LocalDate.parse(dateStr, IBKR_DATE_FORMAT);
     }
@@ -368,14 +371,16 @@ public class IbkrImportWorker {
             case "USD" -> Currency.USD;
             case "HKD" -> Currency.HKD;
             case "CNY", "CNH" -> Currency.CNY;
-            default -> throw new IllegalArgumentException("Unsupported currency: " + ibkrCurrency);
+            default -> throw new CategorizedSyncException(FailureCategory.UNRECOGNIZED, null,
+                    "Unsupported currency: " + ibkrCurrency);
         };
     }
 
     private TradeType mapTradeType(String buySell) {
         if ("BUY".equalsIgnoreCase(buySell)) return TradeType.BUY;
         if ("SELL".equalsIgnoreCase(buySell)) return TradeType.SELL;
-        throw new IllegalArgumentException("Unknown buySell value: " + buySell);
+        throw new CategorizedSyncException(FailureCategory.UNRECOGNIZED, null,
+                "Unknown buySell value: " + buySell);
     }
 
     private AssetType mapAssetType(String assetCategory, String putCall) {
@@ -385,9 +390,11 @@ public class IbkrImportWorker {
         if ("OPT".equalsIgnoreCase(assetCategory)) {
             if ("C".equalsIgnoreCase(putCall)) return AssetType.OPTION_CALL;
             if ("P".equalsIgnoreCase(putCall)) return AssetType.OPTION_PUT;
-            throw new IllegalArgumentException("Option with unknown putCall: " + putCall);
+            throw new CategorizedSyncException(FailureCategory.UNRECOGNIZED, null,
+                    "Option with unknown putCall: " + putCall);
         }
-        throw new IllegalArgumentException("Unsupported assetCategory: " + assetCategory);
+        throw new CategorizedSyncException(FailureCategory.UNRECOGNIZED, null,
+                "Unsupported assetCategory: " + assetCategory);
     }
 
     private Integer parseAbsQuantity(String quantity) {

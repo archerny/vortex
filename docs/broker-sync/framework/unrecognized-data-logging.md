@@ -1,6 +1,6 @@
 # 未识别数据与失败日志规范
 
-**状态**：📋 设计中（未实现）
+**状态**：✅ 已实现（2026-04-24）
 **适用范围**：所有 broker adapter（跨 broker 通用契约）
 **最后更新**：2026-04-24
 
@@ -33,19 +33,25 @@
 2. "支持哪些类型"是 **per-broker** 的决策（例如 Tiger/IBKR 已支持 OPTION_CALL/OPTION_PUT，长桥 v0.2 暂时只支持 STOCK），在 framework 层做全局分类会引入错误假设
 3. 若某个 broker 后续需要"软降级"（识别但跳过+落 staged 归档），届时再针对该 broker 设计 `UNSUPPORTED` 分类
 
-**`error_message` 格式**：
+**`error_message` 格式**（由 `CategorizedSyncException.format(category, externalId, reason)` 统一生成，源码见 `backend/src/main/java/com/vortex/sync/core/CategorizedSyncException.java`）：
 
 ```
-[分类] <人类可读的短描述> | broker=<broker_code> | ext_id=<external_id or N/A> | <key>=<value> ...
+[分类] ext_id=<external_id> reason: <人类可读的短描述>
 ```
 
-示例：
+- 批次级消息（`broker_sync_batches.error_message`）通常 `ext_id` 段缺省，仅 `[分类] reason: ...`
+- 行级消息（`<broker>_staged_*.error_message`）必带 `ext_id`（由 `<Broker>ImportService.formatStagedError` 兜底从 staged 行回填）
+- broker 归属通过查询 `broker_sync_batches.broker_code` 字段获得，不需要再在消息里重复
+
+示例（Tiger / IBKR 实测输出）：
 
 ```
-[UNRECOGNIZED] unknown symbol type | broker=longbridge | ext_id=TR123456 | symbol=XYZ.HK | raw_type=FOO
-[UNRECOGNIZED] sec_type not supported by this adapter version | broker=longbridge | ext_id=TR789012 | symbol=TSLA240621C00200000 | raw_type=OPTION
-[AUTH] access token expired | broker=longbridge | ext_id=N/A
-[NETWORK] upstream timeout after 30s | broker=longbridge | ext_id=N/A | endpoint=/v1/trade/history
+[UNRECOGNIZED] ext_id=T-123456 reason: Unsupported sec_type (WAR; not equity/option)
+[UNRECOGNIZED] ext_id=ORD_998 reason: Unknown assetCategory: BOND
+[AUTH] reason: Tiger Open API credentials not configured. Please set vortex.sync.tiger.* in application-local.properties
+[NETWORK] reason: Flex query fetch failed: read timed out after 30s
+[INTERNAL] ext_id=T-555 reason: DB constraint violation: duplicate external_id
+[UNRECOGNIZED] reason: 3 record(s) failed import in batch 42 (imported=12, skipped=0, failed=0, residual_non_terminal=3, duration=1250ms)
 ```
 
 ---
@@ -107,18 +113,38 @@ Tiger / IBKR / 长桥等 adapter 使用两阶段模型（拉取 → staging → 
 | `INFO` | 批次级别的里程碑（开始、完成、进入 COMPLETED/FAILED） |
 | `DEBUG` | 单条数据处理详情（默认关闭，排查时开启） |
 
-### 4.2 ERROR 级别日志的必填字段
+### 4.2 ERROR 级别日志的字段约定
 
-任何 `log.error(...)` 必须在结构化 MDC 或 message 中包含：
+ERROR 日志按"**当前实现**"与"**目标态**"两层要求，作者至少对齐"当前实现"一栏：
 
-- `broker_code`：broker 标识
-- `batch_id`：`broker_sync_batches.id`
-- `account_id`：该次同步的账户（若已知）
-- `external_id`：出问题那条数据的 broker 侧 ID（未知则写 `N/A`）
-- `category`：失败分类（见第 2 节）
-- `raw_payload_snippet`：导致失败的原始数据的关键片段（**脱敏**后的；不超过 500 字符；超过则截断）
+**当前实现（强制）**：
 
-### 4.3 raw_payload 脱敏规则
+- **`broker_code`**：通过 logger prefix 体现，例如 `[TigerSync]` / `[IbkrSync]`（各 adapter 统一用自己的 camelCase prefix）
+- **`batch_id`**：message 中以 `batch={batchId}` 形式体现（现有所有 adapter 均遵循）
+- **`category`**：通过 `CategorizedSyncException.getFormattedMessage()` / `.format(...)` 输出的 `[CATEGORY]` 前缀体现
+- **`external_id`**（行级失败）：通过 `CategorizedSyncException` 或 `ImportService.formatStagedError` 兜底回填到 formatted message 的 `ext_id=...` 段
+
+示例（实测输出）：
+```
+ERROR [TigerSync] batch=42 [UNRECOGNIZED] ext_id=T-123 reason: Unsupported sec_type: WAR — triggering fail-fast cleanup
+ERROR [IbkrSync] batch=42 Sync failed: [NETWORK] reason: Read timed out
+```
+
+**目标态（未来演进，尚未实现）**：
+
+以下字段当前**未**实现，后续接入 MDC / 结构化日志后再统一补齐：
+
+- `account_id`：该次同步的账户（当前仅在 `TigerSyncAdapter` 客户端初始化日志里单独打一次，未随 ERROR 日志结构化携带）
+- `raw_payload_snippet`：导致失败的原始数据关键片段（脱敏后；当前完全不进日志——raw_payload 归档位置是 staged 表）
+- MDC / structured logging：当前所有 adapter 用 SLF4J 的 parameterized message，未引入 MDC
+
+**定位流程不依赖上述"目标态"字段**——缺失的 `account_id` 可从 `broker_sync_batches.account_id` 查回，`raw_payload` 可从 `<broker>_staged_*.raw_payload` 字段查回（见 §6.3）。引入 MDC 属于 observability 升级，不影响当前"任何失败都可追溯"的核心契约。
+
+### 4.3 raw_payload 脱敏规则（目标态）
+
+> **当前状态**：adapter ERROR 日志**不携带** raw_payload 片段（见 §4.2 当前实现），因此本节规则目前**无落地场景**。raw_payload 的实际归档位置是 `<broker>_staged_*` 表的 `raw_payload` 字段，由各 `<Broker>StagingService` 写入时就地处理敏感信息（若需要）。
+>
+> 本节保留为**未来接入结构化日志 / MDC 时的脱敏契约**。届时实现需遵循：
 
 打日志时**必须**脱敏以下字段：
 
@@ -126,24 +152,47 @@ Tiger / IBKR / 长桥等 adapter 使用两阶段模型（拉取 → staging → 
 - `account_number`（完整账号）→ 只保留后 4 位，前面打 `*`
 - 任何 PII（姓名、身份证、手机号、邮箱）→ 打 `***`
 
-**完整 raw_payload 不进日志**——它的归档位置是 `<broker>_staged_*` 表的 `raw_payload` 字段（参见 [`data-persistence.md`](./data-persistence.md) 和各 broker 的 `staging-schema.md`）。日志只记关键片段用于现场定位。
+**完整 raw_payload 始终不进日志**——它的归档位置永远是 `<broker>_staged_*` 表的 `raw_payload` 字段（参见 [`data-persistence.md`](./data-persistence.md) 和各 broker 的 `staging-schema.md`）。日志只记关键片段用于现场定位。
 
 ---
 
 ## 5. Adapter 实现约定
 
-每个 BrokerSyncAdapter 实现**必须**：
+### 5.1 共享异常类型
 
-1. 定义一个 `<Broker>SyncException extends RuntimeException`，构造函数强制传入 `category`（enum）和 `externalId`
-2. 在 adapter 的顶层 try/catch 捕获该异常，转成 `error_message` 写入 batch 并让 `SyncBatchFailureHandler` 走 FAILED 路径
-3. 在遇到 UNRECOGNIZED 数据时，**立即抛出**该异常，不继续循环
-4. 网络/鉴权异常由 adapter 自己的 retry 机制处理；超过 retry 次数后转成对应分类的异常上抛
+Framework 提供**单一通用异常** `com.vortex.sync.core.CategorizedSyncException`（而非 per-broker 子类）——`category`（`FailureCategory` 枚举，见 `backend/src/main/java/com/vortex/sync/core/FailureCategory.java`）和 `externalId` 直接作为字段携带。
+
+```java
+// 抛出：
+throw new CategorizedSyncException(
+        FailureCategory.UNRECOGNIZED,
+        externalId,         // 可为 null（批次级 / 映射器层未知 ext_id 时）
+        "Unknown assetCategory: " + raw);
+
+// 捕获 + 格式化（adapter 顶层 / ImportService 统一做）：
+catch (CategorizedSyncException e) {
+    String formatted = e.getFormattedMessage();          // "[UNRECOGNIZED] ext_id=xxx reason: ..."
+    return SyncResult.failure(brokerCode, formatted, durationMs);
+}
+```
+
+### 5.2 必守契约
+
+每个 `BrokerSyncAdapter` 实现**必须**：
+
+1. **映射器层（`<Broker>TradeRecordMapper` / `parse*Date` 等）**：遇到未识别的 symbol / currency / trade action / 日期格式，一律抛 `CategorizedSyncException(FailureCategory.UNRECOGNIZED, null, reason)`——`externalId` 留给上层回填（上层知道是哪条 staged 行）
+2. **Adapter 顶层**：`catch (CategorizedSyncException e)` → 用 `e.getFormattedMessage()` 作为 `SyncResult.failure` 的消息；其余未捕获的 `Throwable`，用启发式判断——若为网络类（`java.net.*` / `java.io.*` / `org.springframework.web.client.*` / `org.xml.sax.*` 等）→ `FailureCategory.NETWORK`，否则 → `FailureCategory.INTERNAL`，格式化同一套
+3. **`<Broker>ImportService`**：遇到 `ImportOneFailedException` 时调 `formatStagedError(staged, cause)` 兜底回填 `externalId`，再写入 staged 行的 `error_message`
+4. **鉴权失败**（例如启动时 `properties.isConfigured()` 返回 false）：直接 `SyncResult.failure(brokerCode, "[AUTH] reason: ...", durationMs)` 返回，不要继续 fetch
+5. **不要吞 `CategorizedSyncException`**——任何重新包装必须透传 `category` 和 `externalId`
 
 **反模式**（禁止）：
 
 - ❌ `catch (Exception e) { log.warn(...); continue; }` —— 静默吞掉异常
 - ❌ `if (unknownType) { skip(); }` —— 未识别数据静默跳过
 - ❌ `log.error("error: " + e.getMessage())` —— 没有分类前缀、没有 external_id
+- ❌ 为每个 broker 定义专属的 `<Broker>SyncException` —— framework 已经提供通用的 `CategorizedSyncException`，per-broker 子类毫无行为差异，只是额外维护成本
+- ❌ 映射器层 throw 时就手动拼 `[UNRECOGNIZED] ...` 字符串 —— 拼接统一交给 `CategorizedSyncException.getFormattedMessage()` / `.format(...)`
 
 ---
 

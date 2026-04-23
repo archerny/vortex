@@ -7,6 +7,8 @@ import com.vortex.entity.enums.Currency;
 import com.vortex.entity.enums.TradeTrigger;
 import com.vortex.entity.enums.TradeType;
 import com.vortex.entity.enums.TriggerRefType;
+import com.vortex.sync.core.CategorizedSyncException;
+import com.vortex.sync.core.FailureCategory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -229,6 +231,7 @@ class TigerTradeRecordMapperTest {
         s.setSecType("WAR");
         TigerTradeRecordMapper.FilterResult fr = mapper.preFilter(s, false);
         assertEquals(TigerTradeRecordMapper.FilterResult.Kind.FAILED, fr.getKind());
+        assertEquals(FailureCategory.UNRECOGNIZED, fr.getCategory());
         assertTrue(fr.getMessage().contains("Unsupported secType: WAR"));
     }
 
@@ -371,13 +374,18 @@ class TigerTradeRecordMapperTest {
         void lowercaseAccepted() { assertEquals(Currency.USD, mapper.mapCurrency("usd")); }
 
         @Test
-        void unknownThrows() {
-            assertThrows(IllegalArgumentException.class, () -> mapper.mapCurrency("EUR"));
+        void unknownThrowsCategorized() {
+            CategorizedSyncException ex = assertThrows(CategorizedSyncException.class,
+                    () -> mapper.mapCurrency("EUR"));
+            assertEquals(FailureCategory.UNRECOGNIZED, ex.getCategory());
+            assertTrue(ex.getMessage().contains("EUR"));
         }
 
         @Test
-        void nullThrows() {
-            assertThrows(IllegalArgumentException.class, () -> mapper.mapCurrency(null));
+        void nullThrowsCategorized() {
+            CategorizedSyncException ex = assertThrows(CategorizedSyncException.class,
+                    () -> mapper.mapCurrency(null));
+            assertEquals(FailureCategory.UNRECOGNIZED, ex.getCategory());
         }
     }
 

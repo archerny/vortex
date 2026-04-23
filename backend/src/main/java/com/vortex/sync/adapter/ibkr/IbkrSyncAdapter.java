@@ -3,6 +3,8 @@ package com.vortex.sync.adapter.ibkr;
 import com.vortex.repository.IbkrStagedOrderRepository;
 import com.vortex.service.BrokerSyncBatchService;
 import com.vortex.sync.core.BrokerSyncAdapter;
+import com.vortex.sync.core.CategorizedSyncException;
+import com.vortex.sync.core.FailureCategory;
 import com.vortex.sync.core.SyncRequest;
 import com.vortex.sync.core.SyncResult;
 import org.slf4j.Logger;
@@ -91,11 +93,12 @@ public class IbkrSyncAdapter implements BrokerSyncAdapter {
 
         // 1. Check configuration
         if (!properties.isConfigured()) {
-            logger.error("[IbkrSync] IBKR Flex Query credentials not configured. " +
+            logger.error("[IbkrSync] batch={} [AUTH] IBKR Flex Query credentials not configured. " +
                     "Please set broker.ibkr.flex-token and broker.ibkr.trade-confirm-query-id " +
-                    "in application-local.properties");
+                    "in application-local.properties", batchId);
             return SyncResult.failure(getBrokerCode(),
-                    "IBKR Flex Query credentials not configured",
+                    CategorizedSyncException.format(FailureCategory.AUTH, null,
+                            "IBKR Flex Query credentials not configured"),
                     System.currentTimeMillis() - startMs);
         }
 
@@ -103,29 +106,31 @@ public class IbkrSyncAdapter implements BrokerSyncAdapter {
             // 2. Resolve date range (phase=FETCHING already set by AsyncExecutor)
             LocalDate endDate = resolveEndDate(request);
             LocalDate startDate = resolveStartDate(request, endDate);
-            logger.info("[IbkrSync] Sync date range: {} ~ {}", startDate, endDate);
+            logger.info("[IbkrSync] batch={} Sync date range: {} ~ {}", batchId, startDate, endDate);
 
             // 3. Fetch all data in windows (≤365 days each)
-            List<FlexQueryParseResult> allResults = fetchInWindows(startDate, endDate);
+            List<FlexQueryParseResult> allResults = fetchInWindows(batchId, startDate, endDate);
             List<IbkrOrderRecord> allOrders = new ArrayList<>();
             List<IbkrTradeConfirm> allTradeConfirms = new ArrayList<>();
             for (FlexQueryParseResult result : allResults) {
                 allOrders.addAll(result.getOrders());
                 allTradeConfirms.addAll(result.getTradeConfirms());
             }
-            logger.info("[IbkrSync] Total fetched: {} orders, {} tradeConfirms",
-                    allOrders.size(), allTradeConfirms.size());
+            logger.info("[IbkrSync] batch={} Total fetched: {} orders, {} tradeConfirms",
+                    batchId, allOrders.size(), allTradeConfirms.size());
 
             // 4. Stage into ibkr_staged_* tables
             if (batchId != null) {
                 batchService.updatePhase(batchId, "STAGING");
             }
+            logger.info("[IbkrSync] batch={} Entering STAGING phase", batchId);
             stagingService.stageAll(batchId, allOrders, allTradeConfirms);
 
             // 5. Import from staged to trade_records
             if (batchId != null) {
                 batchService.updatePhase(batchId, "IMPORTING");
             }
+            logger.info("[IbkrSync] batch={} Entering IMPORTING phase", batchId);
             importService.importAll(batchId);
 
             // 6. Count results from DB (not from memory — accurate even after resume)
@@ -146,26 +151,24 @@ public class IbkrSyncAdapter implements BrokerSyncAdapter {
                 // Log a bounded sample of residual ids so operators have breadcrumbs.
                 List<Long> residualIds = stagedOrderRepository.findIdsByBatchIdAndStatusNotIn(
                         batchId, TERMINAL_STAGED_STATUSES, PageRequest.of(0, RESIDUAL_ID_LOG_CAP));
-                logger.warn("[IbkrSync] Residual non-terminal staged rows in batch {} " +
+                logger.warn("[IbkrSync] batch={} Residual non-terminal staged rows " +
                                 "(showing first {} of {} ids): {}",
                         batchId, residualIds.size(), residualCount, residualIds);
             }
 
             if (failedCount > 0 || residualCount > 0) {
                 // v2 fail-fast: any per-record failure (or residue that should have been
-                // terminal) escalates to whole-batch cleanup. Returning a failure result
-                // routes through BrokerSyncAsyncExecutor → SyncBatchFailureHandler, which
-                // wipes the staged rows + any partially imported trade_records and
-                // finalizes the batch as FAILED (or CLEANUP_FAILED if cleanup itself
-                // fails). We return failure directly (rather than throwing) so that the
-                // executor only sees one error path, not throw→catch→failure.
+                // terminal) escalates to whole-batch cleanup. Per-row details (with their
+                // own [CATEGORY] prefixes) live on the staged rows' error_message.
                 String reason = String.format(
                         "%d record(s) failed import in batch %d " +
                                 "(imported=%d, skipped=%d, failed=%d, residual_non_terminal=%d, duration=%dms)",
                         failedCount + residualCount, batchId,
                         importedCount, skippedCount, failedCount, residualCount, durationMs);
-                logger.error("[IbkrSync] {} — triggering fail-fast cleanup", reason);
-                return SyncResult.failure(getBrokerCode(), reason, durationMs);
+                String formatted = CategorizedSyncException.format(
+                        FailureCategory.UNRECOGNIZED, null, reason);
+                logger.error("[IbkrSync] batch={} {} — triggering fail-fast cleanup", batchId, formatted);
+                return SyncResult.failure(getBrokerCode(), formatted, durationMs);
             }
 
             return SyncResult.success(getBrokerCode(), totalCount,
@@ -173,9 +176,44 @@ public class IbkrSyncAdapter implements BrokerSyncAdapter {
 
         } catch (Exception e) {
             long durationMs = System.currentTimeMillis() - startMs;
-            logger.error("[IbkrSync] Sync failed with exception", e);
-            return SyncResult.failure(getBrokerCode(), e.getMessage(), durationMs);
+            String formatted;
+            if (e instanceof CategorizedSyncException) {
+                formatted = ((CategorizedSyncException) e).getFormattedMessage();
+            } else {
+                // Upstream network/XML-parse exceptions or anything else not
+                // explicitly categorised — default to NETWORK for IbkrFlexClient
+                // failures, INTERNAL otherwise so programming errors don't get
+                // silently mislabelled as transient.
+                FailureCategory category = isNetworkFailure(e)
+                        ? FailureCategory.NETWORK
+                        : FailureCategory.INTERNAL;
+                formatted = CategorizedSyncException.format(category, null,
+                        e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName());
+            }
+            logger.error("[IbkrSync] batch={} Sync failed: {}", batchId, formatted, e);
+            return SyncResult.failure(getBrokerCode(), formatted, durationMs);
         }
+    }
+
+    /**
+     * Heuristic for the outer catch: classify exceptions originating from
+     * IbkrFlexClient (HTTP / network) or FlexQueryParser (malformed XML) as
+     * NETWORK. Everything else stays INTERNAL.
+     */
+    private static boolean isNetworkFailure(Throwable e) {
+        if (e == null) {
+            return false;
+        }
+        String className = e.getClass().getName();
+        if (className.startsWith("java.net.")
+                || className.startsWith("java.io.")
+                || className.startsWith("org.springframework.web.client.")
+                || className.startsWith("org.xml.sax.")
+                || className.startsWith("javax.xml.")) {
+            return true;
+        }
+        String simpleName = e.getClass().getSimpleName();
+        return simpleName.contains("FlexQuery") || simpleName.contains("FlexClient");
     }
 
     // ============ Date Resolution ============
@@ -202,7 +240,7 @@ public class IbkrSyncAdapter implements BrokerSyncAdapter {
      * Split the date range into ≤365-day windows and fetch data for each window.
      * Returns the complete FlexQueryParseResult (orders + tradeConfirms) for each window.
      */
-    private List<FlexQueryParseResult> fetchInWindows(LocalDate startDate, LocalDate endDate) {
+    private List<FlexQueryParseResult> fetchInWindows(Long batchId, LocalDate startDate, LocalDate endDate) {
         List<FlexQueryParseResult> allResults = new ArrayList<>();
 
         LocalDate windowStart = startDate;
@@ -213,11 +251,12 @@ public class IbkrSyncAdapter implements BrokerSyncAdapter {
                 windowEnd = endDate;
             }
 
-            logger.info("[IbkrSync] Fetching window: {} ~ {}", windowStart, windowEnd);
-            FlexQueryParseResult parseResult = fetchForWindow(windowStart, windowEnd);
+            logger.info("[IbkrSync] batch={} Fetching window: {} ~ {}", batchId, windowStart, windowEnd);
+            FlexQueryParseResult parseResult = fetchForWindow(batchId, windowStart, windowEnd);
             allResults.add(parseResult);
-            logger.info("[IbkrSync] Window {} ~ {} returned {} orders, {} tradeConfirms",
-                    windowStart, windowEnd, parseResult.getOrderCount(), parseResult.getTradeConfirmCount());
+            logger.info("[IbkrSync] batch={} Window {} ~ {} returned {} orders, {} tradeConfirms",
+                    batchId, windowStart, windowEnd,
+                    parseResult.getOrderCount(), parseResult.getTradeConfirmCount());
 
             windowStart = windowEnd.plusDays(1);
         }
@@ -228,7 +267,7 @@ public class IbkrSyncAdapter implements BrokerSyncAdapter {
     /**
      * Fetch and parse data for a single date window.
      */
-    private FlexQueryParseResult fetchForWindow(LocalDate startDate, LocalDate endDate) {
+    private FlexQueryParseResult fetchForWindow(Long batchId, LocalDate startDate, LocalDate endDate) {
         // Convert to yyyyMMdd for IBKR Flex API
         String fromDate = startDate.format(IBKR_DATE_FORMATTER);
         String toDate = endDate.format(IBKR_DATE_FORMATTER);
@@ -239,7 +278,8 @@ public class IbkrSyncAdapter implements BrokerSyncAdapter {
         // Parse XML into structured result
         FlexQueryParseResult parseResult = flexQueryParser.parse(xmlReport);
 
-        logger.info("[IbkrSync] Parsed report: account={}, range={} ~ {}, orders={}, tradeConfirms={}",
+        logger.info("[IbkrSync] batch={} Parsed report: account={}, range={} ~ {}, orders={}, tradeConfirms={}",
+                batchId,
                 parseResult.getAccountId(),
                 parseResult.getFromDate(),
                 parseResult.getToDate(),

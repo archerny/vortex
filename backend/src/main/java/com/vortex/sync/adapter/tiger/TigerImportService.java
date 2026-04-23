@@ -4,6 +4,8 @@ import com.vortex.entity.Broker;
 import com.vortex.entity.TigerStagedOrder;
 import com.vortex.repository.BrokerRepository;
 import com.vortex.repository.TigerStagedOrderRepository;
+import com.vortex.sync.core.CategorizedSyncException;
+import com.vortex.sync.core.FailureCategory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -79,14 +81,14 @@ public class TigerImportService {
             try {
                 importWorker.importOne(batchId, brokerId, staged);
             } catch (ImportOneFailedException e) {
-                markFailedSafely(e.getStaged(), "Import error: " + rootMessage(e.getCause()));
+                markFailedSafely(e.getStaged(), formatStagedError(e.getStaged(), e.getCause()));
             } catch (Exception e) {
                 // Defensive: importOne should always wrap in
                 // ImportOneFailedException, but belt-and-suspenders in case a
                 // future change lets a raw exception escape.
                 logger.error("[TigerImport] Unexpected non-wrapped exception importing tigerId={}: {}",
                         staged.getTigerId(), e.getMessage(), e);
-                markFailedSafely(staged, "Unexpected error: " + e.getMessage());
+                markFailedSafely(staged, formatStagedError(staged, e));
             }
         }
 
@@ -115,6 +117,29 @@ public class TigerImportService {
         }
         String msg = cause.getMessage();
         return msg != null ? msg : cause.getClass().getSimpleName();
+    }
+
+    /**
+     * Format the staged row's {@code error_message} with the standard
+     * {@code [CATEGORY] ext_id=... reason: ...} prefix.
+     *
+     * <p>If the root cause is a {@link CategorizedSyncException} with an
+     * {@code externalId} already bound, use it as-is. Otherwise classify as
+     * {@link FailureCategory#INTERNAL} and attach the staged row's {@code tigerId}
+     * as ext_id so operators can still trace back to the raw payload.</p>
+     */
+    private static String formatStagedError(TigerStagedOrder staged, Throwable cause) {
+        if (cause instanceof CategorizedSyncException) {
+            CategorizedSyncException cse = (CategorizedSyncException) cause;
+            // Back-fill ext_id with tigerId if the mapper didn't attach one.
+            if (cse.getExternalId() == null || cse.getExternalId().isEmpty()) {
+                return CategorizedSyncException.format(
+                        cse.getCategory(), staged.getTigerId(), cse.getMessage());
+            }
+            return cse.getFormattedMessage();
+        }
+        return CategorizedSyncException.format(
+                FailureCategory.INTERNAL, staged.getTigerId(), rootMessage(cause));
     }
 
     // ============ Helpers ============

@@ -3,6 +3,8 @@ package com.vortex.sync.adapter.tiger;
 import com.vortex.repository.TigerStagedOrderRepository;
 import com.vortex.service.BrokerSyncBatchService;
 import com.vortex.sync.core.BrokerSyncAdapter;
+import com.vortex.sync.core.CategorizedSyncException;
+import com.vortex.sync.core.FailureCategory;
 import com.vortex.sync.core.SyncRequest;
 import com.vortex.sync.core.SyncResult;
 import com.tigerbrokers.stock.openapi.client.config.ClientConfig;
@@ -96,38 +98,42 @@ public class TigerSyncAdapter implements BrokerSyncAdapter {
 
         // 1. Check configuration
         if (!tigerApiProperties.isConfigured()) {
-            logger.error("[TigerSync] Tiger API credentials not configured. " +
-                    "Please set broker.tiger.* properties in application-local.properties");
+            logger.error("[TigerSync] batch={} [AUTH] Tiger API credentials not configured. " +
+                    "Please set broker.tiger.* properties in application-local.properties", batchId);
             return SyncResult.failure(getBrokerCode(),
-                    "Tiger API credentials not configured",
+                    CategorizedSyncException.format(FailureCategory.AUTH, null,
+                            "Tiger API credentials not configured"),
                     System.currentTimeMillis() - startMs);
         }
 
         try {
             // 2. Initialize client
             TigerHttpClient client = createClient();
-            logger.info("[TigerSync] Tiger API client initialized, account: {}", tigerApiProperties.getAccount());
+            logger.info("[TigerSync] batch={} Tiger API client initialized, account: {}",
+                    batchId, tigerApiProperties.getAccount());
 
             // 3. Resolve date range (phase=FETCHING already set by BrokerSyncAsyncExecutor)
             LocalDate endDate = resolveEndDate(request);
             LocalDate startDate = resolveStartDate(request, endDate);
-            logger.info("[TigerSync] Sync date range: {} ~ {}", startDate, endDate);
+            logger.info("[TigerSync] batch={} Sync date range: {} ~ {}", batchId, startDate, endDate);
 
             // 4. Fetch all filled orders in 90-day windows
-            List<TigerOrderRecord> allRecords = fetchOrdersInWindows(client, startDate, endDate);
-            logger.info("[TigerSync] Total fetched: {} filled orders", allRecords.size());
+            List<TigerOrderRecord> allRecords = fetchOrdersInWindows(client, batchId, startDate, endDate);
+            logger.info("[TigerSync] batch={} Total fetched: {} filled orders", batchId, allRecords.size());
             logRecordsForDebug(allRecords);
 
             // 5. Stage into tiger_staged_orders
             if (batchId != null) {
                 batchService.updatePhase(batchId, "STAGING");
             }
+            logger.info("[TigerSync] batch={} Entering STAGING phase", batchId);
             stagingService.stageAll(batchId, allRecords);
 
             // 6. Import from staged to trade_records
             if (batchId != null) {
                 batchService.updatePhase(batchId, "IMPORTING");
             }
+            logger.info("[TigerSync] batch={} Entering IMPORTING phase", batchId);
             importService.importAll(batchId);
 
             // 7. Re-count results from DB (accurate even after resume)
@@ -144,7 +150,7 @@ public class TigerSyncAdapter implements BrokerSyncAdapter {
             if (residualCount > 0) {
                 List<Long> residualIds = stagedOrderRepository.findIdsByBatchIdAndStatusNotIn(
                         batchId, TERMINAL_STAGED_STATUSES, PageRequest.of(0, RESIDUAL_ID_LOG_CAP));
-                logger.warn("[TigerSync] Residual non-terminal staged rows in batch {} " +
+                logger.warn("[TigerSync] batch={} Residual non-terminal staged rows " +
                                 "(showing first {} of {} ids): {}",
                         batchId, residualIds.size(), residualCount, residualIds);
             }
@@ -157,13 +163,21 @@ public class TigerSyncAdapter implements BrokerSyncAdapter {
                 // finalizes the batch as FAILED (or CLEANUP_FAILED if cleanup itself
                 // fails). We return failure directly (rather than throwing) so that the
                 // executor only sees one error path, not throw→catch→failure.
+                //
+                // Batch-level category is UNRECOGNIZED: per-row failures with category
+                // AUTH/NETWORK/INTERNAL should not be possible at this point (those
+                // kinds of failures abort the sync before the import loop). Per-row
+                // details (including their own [CATEGORY] prefixes) live on the
+                // staged rows' error_message fields.
                 String reason = String.format(
                         "%d record(s) failed import in batch %d " +
                                 "(imported=%d, skipped=%d, failed=%d, residual_non_terminal=%d, duration=%dms)",
                         failedCount + residualCount, batchId,
                         importedCount, skippedCount, failedCount, residualCount, durationMs);
-                logger.error("[TigerSync] {} — triggering fail-fast cleanup", reason);
-                return SyncResult.failure(getBrokerCode(), reason, durationMs);
+                String formatted = CategorizedSyncException.format(
+                        FailureCategory.UNRECOGNIZED, null, reason);
+                logger.error("[TigerSync] batch={} {} — triggering fail-fast cleanup", batchId, formatted);
+                return SyncResult.failure(getBrokerCode(), formatted, durationMs);
             }
 
             return SyncResult.success(getBrokerCode(), totalCount,
@@ -171,9 +185,56 @@ public class TigerSyncAdapter implements BrokerSyncAdapter {
 
         } catch (Exception e) {
             long durationMs = System.currentTimeMillis() - startMs;
-            logger.error("[TigerSync] Sync failed with exception", e);
-            return SyncResult.failure(getBrokerCode(), e.getMessage(), durationMs);
+            String formatted;
+            if (e instanceof CategorizedSyncException) {
+                formatted = ((CategorizedSyncException) e).getFormattedMessage();
+            } else {
+                // Upstream network/SDK exception or anything else we didn't explicitly
+                // categorise — default to NETWORK for the known API-call path (rethrown
+                // as RuntimeException in fetchFilledOrders), INTERNAL otherwise.
+                FailureCategory category = isNetworkFailure(e)
+                        ? FailureCategory.NETWORK
+                        : FailureCategory.INTERNAL;
+                formatted = CategorizedSyncException.format(category, null,
+                        e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName());
+            }
+            logger.error("[TigerSync] batch={} Sync failed: {}", batchId, formatted, e);
+            return SyncResult.failure(getBrokerCode(), formatted, durationMs);
         }
+    }
+
+    /**
+     * Heuristic for the outer catch: classify exceptions originating from the
+     * Tiger SDK or the JDK's network/IO stack as NETWORK. Everything else
+     * stays INTERNAL (our own bug) to avoid silently mislabelling a
+     * programming error as a transient network issue.
+     *
+     * <p>Mirrors {@code IbkrSyncAdapter.isNetworkFailure} so both adapters
+     * honour the same {@code java.net.*} / {@code java.io.*} / SSL /
+     * TLS-class fallback promised by
+     * {@code docs/broker-sync/framework/unrecognized-data-logging.md §5.2}.
+     */
+    private static boolean isNetworkFailure(Throwable e) {
+        if (e == null) {
+            return false;
+        }
+        // Our own rethrown wrapper messages from fetchFilledOrders (kept for
+        // backwards safety even though those paths now throw
+        // CategorizedSyncException directly).
+        String msg = e.getMessage();
+        if (msg != null && msg.startsWith("Tiger API ")) {
+            return true;
+        }
+        String className = e.getClass().getName();
+        if (className.startsWith("com.tigerbrokers.")
+                || className.startsWith("java.net.")
+                || className.startsWith("java.io.")
+                || className.startsWith("javax.net.ssl.")
+                || className.startsWith("org.springframework.web.client.")) {
+            return true;
+        }
+        String simpleName = e.getClass().getSimpleName();
+        return simpleName.contains("Timeout") || simpleName.contains("SSL");
     }
 
     // ============ Client Initialization ============
@@ -217,7 +278,8 @@ public class TigerSyncAdapter implements BrokerSyncAdapter {
      * <p>Tiger API's {@code get_filled_orders} requires start_time and end_time within 90 days.
      * The server returns the full list per window (no client-side pagination).
      */
-    private List<TigerOrderRecord> fetchOrdersInWindows(TigerHttpClient client, LocalDate startDate, LocalDate endDate) {
+    private List<TigerOrderRecord> fetchOrdersInWindows(TigerHttpClient client, Long batchId,
+                                                        LocalDate startDate, LocalDate endDate) {
         List<TigerOrderRecord> allRecords = new ArrayList<>();
 
         LocalDate windowStart = startDate;
@@ -231,11 +293,11 @@ public class TigerSyncAdapter implements BrokerSyncAdapter {
                 windowEnd = endDate;
             }
 
-            logger.info("[TigerSync] Fetching window: {} ~ {}", windowStart, windowEnd);
-            List<TigerOrderRecord> windowRecords = fetchFilledOrders(client, windowStart, windowEnd);
+            logger.info("[TigerSync] batch={} Fetching window: {} ~ {}", batchId, windowStart, windowEnd);
+            List<TigerOrderRecord> windowRecords = fetchFilledOrders(client, batchId, windowStart, windowEnd);
             allRecords.addAll(windowRecords);
-            logger.info("[TigerSync] Window {} ~ {} returned {} records",
-                    windowStart, windowEnd, windowRecords.size());
+            logger.info("[TigerSync] batch={} Window {} ~ {} returned {} records",
+                    batchId, windowStart, windowEnd, windowRecords.size());
 
             windowStart = windowEnd.plusDays(1);
         }
@@ -255,7 +317,8 @@ public class TigerSyncAdapter implements BrokerSyncAdapter {
      * <p>An empty result (response ok but zero orders) is still returned as an empty
      * list, which is the normal "no activity in this window" case.
      */
-    private List<TigerOrderRecord> fetchFilledOrders(TigerHttpClient client, LocalDate startDate, LocalDate endDate) {
+    private List<TigerOrderRecord> fetchFilledOrders(TigerHttpClient client, Long batchId,
+                                                     LocalDate startDate, LocalDate endDate) {
         QueryOrderRequest request = new QueryOrderRequest(MethodName.FILLED_ORDERS);
         String bizContent = AccountParamBuilder.instance()
                 .account(tigerApiProperties.getAccount())
@@ -268,30 +331,32 @@ public class TigerSyncAdapter implements BrokerSyncAdapter {
         try {
             response = client.execute(request);
         } catch (Exception e) {
-            // Network / SDK failure — rethrow so outer sync() catch escalates to fail-fast cleanup.
-            logger.error("[TigerSync] Exception while querying {} ~ {}: {}",
-                    startDate, endDate, e.getMessage(), e);
-            throw new RuntimeException(String.format(
-                    "Tiger API call threw exception for window %s ~ %s: %s",
-                    startDate, endDate, e.getMessage()), e);
+            // Network / SDK failure — rethrow as CategorizedSyncException so the
+            // outer sync() catch escalates to fail-fast cleanup. We deliberately
+            // do NOT log here: the outer catch already logs with full stack
+            // trace, and double-logging the same stack just adds noise.
+            throw new CategorizedSyncException(FailureCategory.NETWORK, null,
+                    String.format("Tiger API call threw exception for window %s ~ %s: %s",
+                            startDate, endDate, e.getMessage()), e);
         }
 
         if (response == null) {
-            throw new RuntimeException(String.format(
-                    "Tiger API returned null response for window %s ~ %s", startDate, endDate));
+            throw new CategorizedSyncException(FailureCategory.NETWORK, null,
+                    String.format("Tiger API returned null response for window %s ~ %s",
+                            startDate, endDate));
         }
         if (!response.isSuccess()) {
             // Non-success response (auth failure, rate limit, server error, etc.) must not be
             // silently treated as "no orders" — doing so would drop real trades from the sync.
-            throw new RuntimeException(String.format(
-                    "Tiger API returned error for window %s ~ %s: code=%s, message=%s",
-                    startDate, endDate, response.getCode(), response.getMessage()));
+            throw new CategorizedSyncException(FailureCategory.NETWORK, null,
+                    String.format("Tiger API returned error for window %s ~ %s: code=%s, message=%s",
+                            startDate, endDate, response.getCode(), response.getMessage()));
         }
 
         List<TigerOrderRecord> records = new ArrayList<>();
         BatchOrderItem orderItem = response.getItem();
         if (orderItem == null || orderItem.getOrders() == null) {
-            logger.info("[TigerSync] No filled orders in this window");
+            logger.info("[TigerSync] batch={} No filled orders in this window", batchId);
             return records;
         }
 

@@ -255,17 +255,17 @@ public class XxxCleanupStrategy implements BrokerCleanupStrategy {
 
 每个 adapter **至少**打以下几条 INFO（用于日志回放诊断生命周期卡在哪一步）。所有生命周期相关的 INFO / WARN / ERROR 都**必须带 `batchId`**，以便在多 batch 混合的日志里按 id 回放。
 
-| 时机 | 示例日志 |
-|------|---------|
-| `sync()` 入口 | `"[xxx-sync] batch={} start, range={}..{}"` |
-| Phase 切换前 | `"[xxx-sync] batch={} -> STAGING, fetched={} rows"` |
-| Phase 切换前 | `"[xxx-sync] batch={} -> IMPORTING, staged={} rows"` |
-| `sync()` 正常返回前 | `"[xxx-sync] batch={} done, imported={}"` |
-| 失败前（return failure / throw 之前） | `log.error("[xxx-sync] batch={} failed: {}", batchId, reason)` |
+| 时机 | 示例日志 | 谁来打 |
+|------|---------|--------|
+| `sync()` 入口 | `"[xxx-sync] batch={} start, range={}..{}"` | adapter |
+| Phase 切换前 | `"[xxx-sync] batch={} -> STAGING, fetched={} rows"` | adapter |
+| Phase 切换前 | `"[xxx-sync] batch={} -> IMPORTING, staged={} rows"` | adapter |
+| `sync()` 正常返回（batch 完成） | `"Async sync completed successfully: batchId={}"` | **`BrokerSyncAsyncExecutor`（框架）**——adapter 不需要在返回前自己再打一条 done 日志 |
+| 失败前（return failure / throw 之前） | `log.error("[xxx-sync] batch={} failed: {}", batchId, reason)` | adapter |
 
-> **已上线 adapter 现状对齐备注**（2026-04-24）：`TigerSyncAdapter` / `IbkrSyncAdapter` 的日志锚点**目前部分不符合本规范**——入口 / phase 切换 / 完成这几条 INFO 要么没带 `batchId`、要么直接缺失（batch 完成日志实际由 `BrokerSyncAsyncExecutor` 统一打，不是 adapter 自己）。本规范为**目标形态**，新增 adapter 必须遵守；Tiger/IBKR 的对齐工作作为独立 tech-debt 跟踪。
->
-> 同样地，[`unrecognized-data-logging.md`](./unrecognized-data-logging.md) 要求的 `[AUTH]` / `[NETWORK]` / `[UNRECOGNIZED]` / `[INTERNAL]` 失败分类前缀，以及 [`symbol-classification.md`](./symbol-classification.md) 要求的 `<Broker>SyncException(FailureCategory.UNRECOGNIZED, externalId, ...)` 异常类型，**Tiger/IBKR 目前均未实现**（它们走的是 `IllegalArgumentException` + staged 单行 FAILED + 汇总层 fail-fast 的旧路径——最终行为等价，但缺规范化的分类与 external_id 追溯信息）。
+> **"done" INFO 的职责归属**：批次完成日志由 `BrokerSyncAsyncExecutor.execute(...)` 在 `markAsCompleted` 之后统一打（消息格式 `Async sync completed successfully: batchId={batchId}`）。adapter 不需要也不应该在返回 `SyncResult.success(...)` 前再打一条"done"，以避免重复。Tiger/IBKR 当前即遵循此约定。
+
+所有**失败场景的日志消息** / `broker_sync_batches.error_message` / `<broker>_staged_*.error_message` **必须**带 `[AUTH]` / `[NETWORK]` / `[UNRECOGNIZED]` / `[INTERNAL]` 分类前缀——由 framework 通用异常 `com.vortex.sync.core.CategorizedSyncException` 统一格式化（格式：`[分类] ext_id=... reason: ...`；详见 [`unrecognized-data-logging.md § 2`](./unrecognized-data-logging.md#2-失败分类跨-broker-通用)）。Tiger/IBKR 两个现存 adapter 已完成迁移（参考 `TigerSyncAdapter` / `IbkrSyncAdapter` / `TigerImportService#formatStagedError` / `IbkrImportService#formatStagedError`）。
 
 ### 7.2 分级约定
 

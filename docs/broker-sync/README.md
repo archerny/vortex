@@ -15,8 +15,8 @@
 | [framework/import-consistency.md](./framework/import-consistency.md) | 数据一致性与失败清理设计（v2：失败即清理，三终态 `COMPLETED` / `FAILED` / `CLEANUP_FAILED`；v2.4.3 已合入 P0 数据丢失链修复） | ✅ v2 状态模型 + v2.4.2 架构加固 + v2.4.3 P0 修复已完整落地 |
 | [framework/broker-registration.md](./framework/broker-registration.md) | Broker Code 关联与同步器注册发现 | ✅ 已实现 |
 | [framework/sync-lifecycle.md](./framework/sync-lifecycle.md) | 同步生命周期流程手册（Controller→Async→Adapter→Cleanup 端到端时序；adapter 作者实现指南） | ✅ v1.0（2026-04-24） |
-| [framework/symbol-classification.md](./framework/symbol-classification.md) | Symbol / secType → `AssetType` 分类规则与扩展流程 | 📋 设计中（未实现；Tiger/IBKR 当前走的是 `IllegalArgumentException` 路径，行为等价于 fail-fast 但缺规范化的 `UNRECOGNIZED` 分类、external_id、per-broker Exception 类） |
-| [framework/unrecognized-data-logging.md](./framework/unrecognized-data-logging.md) | 无法识别数据的日志规范与 fail-fast 处理 | 📋 设计中（未实现；Tiger/IBKR 当前日志 / error_message 均未打 `[AUTH]` / `[NETWORK]` / `[UNRECOGNIZED]` / `[INTERNAL]` 分类前缀） |
+| [framework/symbol-classification.md](./framework/symbol-classification.md) | Symbol / secType → `AssetType` 分类规则与扩展流程 | ✅ 已实现（2026-04-24；Tiger/IBKR 已迁移到 `CategorizedSyncException(UNRECOGNIZED, externalId, ...)`） |
+| [framework/unrecognized-data-logging.md](./framework/unrecognized-data-logging.md) | 无法识别数据的日志规范与 fail-fast 处理 | ✅ 已实现（2026-04-24；Tiger/IBKR 的 `error_message` 与 adapter 日志均已带 `[AUTH]` / `[NETWORK]` / `[UNRECOGNIZED]` / `[INTERNAL]` 分类前缀 + `batchId=`） |
 | **券商层（各券商专属）** | | |
 | [brokers/tiger/README.md](./brokers/tiger/README.md) | 老虎证券同步状态页 | ✅ |
 | [brokers/tiger/open-api.md](./brokers/tiger/open-api.md) | 老虎证券同步方案（设计与实现记录） | ✅ Phase 1 已实现 |

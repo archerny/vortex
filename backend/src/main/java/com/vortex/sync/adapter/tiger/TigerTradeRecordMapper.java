@@ -7,6 +7,8 @@ import com.vortex.entity.enums.Currency;
 import com.vortex.entity.enums.TradeTrigger;
 import com.vortex.entity.enums.TradeType;
 import com.vortex.entity.enums.TriggerRefType;
+import com.vortex.sync.core.CategorizedSyncException;
+import com.vortex.sync.core.FailureCategory;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -173,11 +175,14 @@ public class TigerTradeRecordMapper {
      *   <li>{@code CNH → CNY} (offshore CNY normalized to onshore)</li>
      * </ul>
      *
-     * @throws IllegalArgumentException for any unsupported value
+     * @throws CategorizedSyncException ({@link FailureCategory#UNRECOGNIZED})
+     *         for any unsupported value. ext_id is not populated here; the
+     *         caller (import worker) can wrap if richer context is needed.
      */
     public Currency mapCurrency(String raw) {
         if (raw == null) {
-            throw new IllegalArgumentException("Unsupported currency: null");
+            throw new CategorizedSyncException(FailureCategory.UNRECOGNIZED, null,
+                    "Unsupported currency: null");
         }
         switch (raw.trim().toUpperCase()) {
             case "USD":
@@ -188,7 +193,8 @@ public class TigerTradeRecordMapper {
             case "CNY":
                 return Currency.CNY;
             default:
-                throw new IllegalArgumentException("Unsupported currency: " + raw);
+                throw new CategorizedSyncException(FailureCategory.UNRECOGNIZED, null,
+                        "Unsupported currency: " + raw);
         }
     }
 
@@ -254,7 +260,8 @@ public class TigerTradeRecordMapper {
                 return AssetType.OPTION_PUT;
             }
         }
-        throw new IllegalArgumentException("Unsupported secType/putCall: " + secType + "/" + putCall);
+        throw new CategorizedSyncException(FailureCategory.UNRECOGNIZED, null,
+                "Unsupported secType/putCall: " + secType + "/" + putCall);
     }
 
     TradeType mapTradeType(String action) {
@@ -264,7 +271,8 @@ public class TigerTradeRecordMapper {
         if ("SELL".equals(action)) {
             return TradeType.SELL;
         }
-        throw new IllegalArgumentException("Unsupported action: " + action);
+        throw new CategorizedSyncException(FailureCategory.UNRECOGNIZED, null,
+                "Unsupported action: " + action);
     }
 
     int parseAbsQuantity(String raw) {
@@ -288,10 +296,23 @@ public class TigerTradeRecordMapper {
     }
 
     java.time.LocalDate parseTradeTimeToLocalDate(String tradeTime) {
+        // Missing / unparseable trade_time is upstream-data trouble, not a
+        // programming error — classify as UNRECOGNIZED so it surfaces with
+        // the same [UNRECOGNIZED] prefix as other mapper-layer data issues
+        // (e.g. unsupported currency / secType). ext_id is left null here;
+        // TigerImportService.formatStagedError back-fills it from the
+        // staged row. Mirrors IbkrTradeRecordMapper.parseIbkrDate's contract.
         if (tradeTime == null || tradeTime.trim().isEmpty()) {
-            throw new IllegalArgumentException("trade_time is required");
+            throw new CategorizedSyncException(FailureCategory.UNRECOGNIZED, null,
+                    "trade_time is required");
         }
-        long epochMs = Long.parseLong(tradeTime.trim());
+        long epochMs;
+        try {
+            epochMs = Long.parseLong(tradeTime.trim());
+        } catch (NumberFormatException e) {
+            throw new CategorizedSyncException(FailureCategory.UNRECOGNIZED, null,
+                    "trade_time is not a valid epoch-millis long: " + tradeTime);
+        }
         return Instant.ofEpochMilli(epochMs).atZone(TIGER_ZONE).toLocalDate();
     }
 
@@ -332,6 +353,13 @@ public class TigerTradeRecordMapper {
 
     /**
      * Outcome of {@link TigerTradeRecordMapper#preFilter}.
+     *
+     * <p>When {@link Kind#FAILED}, a {@link FailureCategory} is attached so
+     * the import worker can format the staged row's {@code error_message}
+     * with the standard {@code [CATEGORY] ext_id=... reason: ...} prefix
+     * (see {@code docs/broker-sync/framework/unrecognized-data-logging.md}).
+     * All current failure rules are {@link FailureCategory#UNRECOGNIZED} —
+     * upstream data the adapter cannot map into the domain model.</p>
      */
     public static final class FilterResult {
 
@@ -346,22 +374,38 @@ public class TigerTradeRecordMapper {
 
         private final Kind kind;
         private final String message;
+        /** Non-null iff {@code kind == FAILED}. */
+        private final FailureCategory category;
 
-        private FilterResult(Kind kind, String message) {
+        private FilterResult(Kind kind, String message, FailureCategory category) {
             this.kind = kind;
             this.message = message;
+            this.category = category;
         }
 
         public static FilterResult pass() {
-            return new FilterResult(Kind.PASS, null);
+            return new FilterResult(Kind.PASS, null, null);
         }
 
         public static FilterResult skipped(String message) {
-            return new FilterResult(Kind.SKIPPED, message);
+            return new FilterResult(Kind.SKIPPED, message, null);
         }
 
+        /**
+         * Default failure factory — all existing pre-filter failure rules
+         * are {@link FailureCategory#UNRECOGNIZED} (unsupported secType /
+         * action / attrDesc / putCall / fractional share).
+         */
         public static FilterResult failed(String message) {
-            return new FilterResult(Kind.FAILED, message);
+            return new FilterResult(Kind.FAILED, message, FailureCategory.UNRECOGNIZED);
+        }
+
+        /** Failure with explicit category, for future rules that aren't UNRECOGNIZED. */
+        public static FilterResult failed(String message, FailureCategory category) {
+            if (category == null) {
+                throw new IllegalArgumentException("category is required for failed FilterResult");
+            }
+            return new FilterResult(Kind.FAILED, message, category);
         }
 
         public Kind getKind() {
@@ -370,6 +414,11 @@ public class TigerTradeRecordMapper {
 
         public String getMessage() {
             return message;
+        }
+
+        /** Non-null iff {@link #getKind()} is {@link Kind#FAILED}. */
+        public FailureCategory getCategory() {
+            return category;
         }
 
         public boolean isPass() {

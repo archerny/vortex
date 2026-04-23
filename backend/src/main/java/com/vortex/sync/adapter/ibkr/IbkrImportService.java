@@ -9,6 +9,8 @@ import com.vortex.entity.enums.TriggerRefType;
 import com.vortex.repository.BrokerRepository;
 import com.vortex.repository.IbkrStagedOrderRepository;
 import com.vortex.repository.TradeRecordRepository;
+import com.vortex.sync.core.CategorizedSyncException;
+import com.vortex.sync.core.FailureCategory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -89,14 +91,14 @@ public class IbkrImportService {
             try {
                 importWorker.importSingleOrder(batchId, brokerId, staged);
             } catch (ImportOneFailedException e) {
-                markFailedSafely(e.getStaged(), "Import error: " + rootMessage(e.getCause()));
+                markFailedSafely(e.getStaged(), formatStagedError(e.getStaged(), e.getCause()));
             } catch (Exception e) {
                 // Defensive: importSingleOrder should always wrap in
                 // ImportOneFailedException, but belt-and-suspenders in case a
                 // future change lets a raw exception escape.
                 logger.error("[IbkrImport] Unexpected non-wrapped exception importing orderId={}: {}",
                         staged.getOrderId(), e.getMessage(), e);
-                markFailedSafely(staged, "Unexpected error: " + e.getMessage());
+                markFailedSafely(staged, formatStagedError(staged, e));
             }
         }
 
@@ -128,6 +130,28 @@ public class IbkrImportService {
         }
         String msg = cause.getMessage();
         return msg != null ? msg : cause.getClass().getSimpleName();
+    }
+
+    /**
+     * Format the staged row's {@code error_message} with the standard
+     * {@code [CATEGORY] ext_id=... reason: ...} prefix.
+     *
+     * <p>If the root cause is a {@link CategorizedSyncException} with an
+     * {@code externalId} already bound, use it as-is. Otherwise classify as
+     * {@link FailureCategory#INTERNAL} and attach the staged row's
+     * {@code orderId} as ext_id so operators can trace back to the raw payload.</p>
+     */
+    private static String formatStagedError(IbkrStagedOrder staged, Throwable cause) {
+        if (cause instanceof CategorizedSyncException) {
+            CategorizedSyncException cse = (CategorizedSyncException) cause;
+            if (cse.getExternalId() == null || cse.getExternalId().isEmpty()) {
+                return CategorizedSyncException.format(
+                        cse.getCategory(), staged.getOrderId(), cse.getMessage());
+            }
+            return cse.getFormattedMessage();
+        }
+        return CategorizedSyncException.format(
+                FailureCategory.INTERNAL, staged.getOrderId(), rootMessage(cause));
     }
 
     // ============ STK-side trigger_ref_id Back-fill ============
