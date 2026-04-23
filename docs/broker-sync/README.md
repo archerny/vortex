@@ -23,6 +23,7 @@
 | [brokers/ibkr/flex-web-service.md](./brokers/ibkr/flex-web-service.md) | IBKR Flex Web Service 同步方案 | ✅ Phase 2 已实现 |
 | [brokers/ibkr/staging-schema.md](./brokers/ibkr/staging-schema.md) | IBKR 暂存表结构与字段映射规范 | ✅ 已实现 |
 | [brokers/ibkr/booktrade-mapping.md](./brokers/ibkr/booktrade-mapping.md) | BookTrade 触发判定与期权事件导入映射（含缺失/异常 TradeConfirm fail-fast 处理；GEA token 支持） | ✅ 已实现（2026-04-23 更新） |
+| [brokers/futu/README.md](./brokers/futu/README.md) | 富途证券同步设计稿（OpenD 本地网关 + `GetHistoryOrderFillList` + 综合账户×市场展开） | 📋 设计稿 v0.1（待 review） |
 
 ---
 
@@ -72,4 +73,4 @@
 | 老虎证券 | Phase 1 | Tiger Open API (REST) | `TigerSyncAdapter` |
 | 盈透证券 (IBKR) | Phase 2+ | Flex Web Service | `IbkrSyncAdapter` |
 | 嘉信证券 | Phase 2+ | Schwab API | `SchwabSyncAdapter` |
-| 富途证券 | Phase 2+ | OpenD + OpenAPI | `FutuSyncAdapter` |
+| 富途证券 | Phase 2+ | OpenD + OpenAPI | `FutuSyncAdapter`（设计稿：[brokers/futu/README.md](./brokers/futu/README.md)） |
