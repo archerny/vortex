@@ -21,6 +21,11 @@ import org.springframework.stereotype.Service;
  *       {@code uk_only_one_active}) until an operator resolves it.</li>
  * </ol>
  *
+ * <p>Cleanup is retried up to {@link #MAX_CLEANUP_ATTEMPTS} times with a
+ * fixed {@link #CLEANUP_RETRY_BACKOFF_MS} pause between attempts, so that
+ * transient DB issues (brief pool exhaustion, short-lived lock conflicts,
+ * serialization failures) can clear before we escalate.</p>
+ *
  * <p>See {@code docs/broker-sync/framework/import-consistency.md § 5.4}.</p>
  */
 @Service
@@ -30,6 +35,26 @@ public class SyncBatchFailureHandler {
 
     /** Number of times to attempt cleanup before giving up and escalating to CLEANUP_FAILED. */
     static final int MAX_CLEANUP_ATTEMPTS = 3;
+
+    /**
+     * Fixed backoff between cleanup retry attempts, in milliseconds.
+     *
+     * <p>Rationale: cleanup is a handful of DB-local DELETEs and normally
+     * completes in tens of milliseconds. The failure modes we want to absorb
+     * here are <em>transient</em>: a brief connection-pool exhaustion, a
+     * short-lived lock conflict, or a Postgres serialization failure that
+     * resolves within a second or two. A fixed 2s pause is long enough to
+     * let those clear without making the worst-case failure path feel slow
+     * (worst case: 2 sleeps = 4s before escalating to {@code CLEANUP_FAILED}).
+     * Exponential backoff would only help for remote-cascade scenarios that
+     * do not apply to a local DB; fixed spacing is simpler and more
+     * predictable in logs.
+     *
+     * <p>Package-private and non-final so tests can shorten it to 0 without
+     * paying real wall-clock time for retry scenarios. Production code must
+     * not mutate this.
+     */
+    static long CLEANUP_RETRY_BACKOFF_MS = 2000L;
 
     private final SyncBatchCleanupService cleanupService;
     private final BrokerSyncBatchService batchService;
@@ -75,11 +100,27 @@ public class SyncBatchFailureHandler {
                 lastCleanupException = e;
                 logger.error("Cleanup attempt {}/{} failed for batch {} ({}): {}",
                         attempt, MAX_CLEANUP_ATTEMPTS, batchId, brokerCode, e.getMessage(), e);
-                // Continue to next attempt (no backoff — cleanup is DB-local and fast)
+            }
+
+            // Sleep between attempts (but not after the last one) so that
+            // transient DB issues have a chance to clear. If the worker
+            // thread is interrupted (e.g. during shutdown), stop retrying
+            // immediately and escalate to CLEANUP_FAILED — continuing to
+            // sleep would violate graceful-shutdown semantics.
+            if (attempt < MAX_CLEANUP_ATTEMPTS) {
+                try {
+                    Thread.sleep(CLEANUP_RETRY_BACKOFF_MS);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    logger.warn("Cleanup retry for batch {} interrupted; "
+                            + "skipping remaining attempts and escalating to CLEANUP_FAILED",
+                            batchId);
+                    break;
+                }
             }
         }
 
-        // All attempts failed → CLEANUP_FAILED (preserves phase for diagnostics)
+        // All attempts failed (or we were interrupted) → CLEANUP_FAILED
         String cleanupMessage = lastCleanupException != null
                 ? lastCleanupException.getMessage()
                 : "unknown";

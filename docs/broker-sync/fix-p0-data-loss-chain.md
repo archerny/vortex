@@ -1,6 +1,7 @@
 # P0 Fix — Close the Data-Loss Chain in Import Workers
 
 **Status**: ✅ Implemented (2026-04-23) — all three P0 defects fixed, full test suite (242 tests) passing
+**Commit**: `65439f9` (`fix(backend): close P0 data-loss chain in broker import workers`)
 **Last-updated**: 2026-04-23
 **Scope**: Backend only (IBKR + Tiger import workers, BookTrade resolution)
 **Related**: `docs/broker-sync/framework/import-consistency.md` (v2.4.3) | `docs/broker-sync/brokers/ibkr/booktrade-mapping.md`
@@ -440,7 +441,7 @@ Confirmed current text that must change:
 ### 8.3 Out of scope (for this fix)
 
 - P1-1 (Tiger preFilter FAILED/SKIPPED classification) — user explicitly deferred.
-- P1-3 (cleanup retry backoff) — not touched.
+- P1-3 (cleanup retry backoff) — ✅ addressed in a follow-up change (fixed 2s backoff between cleanup attempts, interrupt-aware; see [framework/import-consistency.md § 5.4](./framework/import-consistency.md) "Cleanup retry policy"). This doc's original "not touched" statement is now obsolete.
 - P2-1 (Tiger staged-data frontend panel) — not touched.
 - P2-2 (doc self-contradiction on Phase 3 status) — not touched; this doc update may marginally improve it.
 - Historical data remediation — **not needed**; project not yet deployed to production (confirmed with user 2026-04-23).

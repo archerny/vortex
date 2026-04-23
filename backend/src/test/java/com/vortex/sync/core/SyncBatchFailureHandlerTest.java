@@ -1,6 +1,8 @@
 package com.vortex.sync.core;
 
 import com.vortex.service.BrokerSyncBatchService;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -26,11 +28,31 @@ import static org.mockito.Mockito.*;
  * - When all {@link SyncBatchFailureHandler#MAX_CLEANUP_ATTEMPTS} cleanup
  *   attempts fail: batch → CLEANUP_FAILED with a message that includes both
  *   the cleanup failure and the original error.
+ * - Between attempts, the handler sleeps for a fixed backoff; if the worker
+ *   thread is interrupted during the sleep, remaining retries are skipped
+ *   and the batch is escalated to CLEANUP_FAILED.
  * - Second-order failures (status updates throwing) must be swallowed — the
  *   handler never re-throws, because its callers have no recovery path.
+ *
+ * <p>The backoff is shortened to 0ms for tests so retry scenarios do not
+ * pay real wall-clock time. The original value is restored after the
+ * class finishes, to keep test-runtime state clean.
  */
 @ExtendWith(MockitoExtension.class)
 class SyncBatchFailureHandlerTest {
+
+    private static long originalBackoffMs;
+
+    @BeforeAll
+    static void shortenBackoff() {
+        originalBackoffMs = SyncBatchFailureHandler.CLEANUP_RETRY_BACKOFF_MS;
+        SyncBatchFailureHandler.CLEANUP_RETRY_BACKOFF_MS = 0L;
+    }
+
+    @AfterAll
+    static void restoreBackoff() {
+        SyncBatchFailureHandler.CLEANUP_RETRY_BACKOFF_MS = originalBackoffMs;
+    }
 
     @Mock
     private SyncBatchCleanupService cleanupService;
@@ -130,6 +152,47 @@ class SyncBatchFailureHandlerTest {
 
             verify(cleanupService, times(SyncBatchFailureHandler.MAX_CLEANUP_ATTEMPTS))
                     .cleanupBatchData(BATCH_ID, BROKER);
+        }
+    }
+
+    @Nested
+    @DisplayName("When the worker thread is interrupted during backoff")
+    class InterruptHandling {
+
+        @Test
+        @DisplayName("interrupt during backoff → skip remaining retries, escalate to CLEANUP_FAILED, preserve interrupt flag")
+        void interruptDuringBackoff_skipsRetriesAndEscalates() {
+            // Arrange: cleanup always fails, and we pre-set the thread's
+            // interrupt flag so that Thread.sleep(...) inside the handler
+            // throws InterruptedException on the first backoff.
+            doThrow(new RuntimeException("transient DB error"))
+                    .when(cleanupService).cleanupBatchData(BATCH_ID, BROKER);
+
+            // Force a non-zero backoff for this test so Thread.sleep actually
+            // checks the interrupt flag (sleep(0) returns immediately on some
+            // JVMs without throwing).
+            long savedBackoff = SyncBatchFailureHandler.CLEANUP_RETRY_BACKOFF_MS;
+            SyncBatchFailureHandler.CLEANUP_RETRY_BACKOFF_MS = 50L;
+            try {
+                Thread.currentThread().interrupt();
+
+                handler.handleFailure(BATCH_ID, BROKER, ORIGINAL_ERROR);
+
+                // After the first failed cleanup, the handler enters backoff,
+                // Thread.sleep throws, handler breaks out → exactly 1 attempt.
+                verify(cleanupService, times(1)).cleanupBatchData(BATCH_ID, BROKER);
+                verify(batchService, times(1)).markAsCleanupFailed(eq(BATCH_ID), anyString());
+                verify(batchService, never()).markAsFailed(anyLong(), anyString());
+
+                // Interrupt flag must be preserved (restored by the handler).
+                assertThat(Thread.currentThread().isInterrupted())
+                        .as("Handler must restore the interrupt flag")
+                        .isTrue();
+            } finally {
+                SyncBatchFailureHandler.CLEANUP_RETRY_BACKOFF_MS = savedBackoff;
+                // Clear the interrupt flag so it doesn't leak into later tests.
+                Thread.interrupted();
+            }
         }
     }
 

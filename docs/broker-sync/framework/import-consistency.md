@@ -1,8 +1,8 @@
 # 券商同步 — 数据一致性与失败清理设计文档
 
 > **创建日期**：2026-04-16（v1）
-> **最后更新**：2026-04-23（v2.4.3 — P0 数据丢失链修复：（1）import worker 的错误路径不再在 rolled-back REQUIRES_NEW 事务内 `save(FAILED)`，而是抛出 package-private `ImportOneFailedException(staged, cause)`；service 层 per-order 循环捕获后通过 AOP 代理调 `markFailed(...)` 以独立 `REQUIRES_NEW` 事务重读并持久化 staged=FAILED。（2）adapter 新增 residual（非终态）staged 计数：`failedCount + residualCount > 0` 即触发整批 fail-fast cleanup，并 WARN 日志 dump 前 20 个残留 id 样本。（3）`IbkrImportWorker.resolveBookTradeRefType` 由 silent-downgrade 为 MANUAL 改为 fail-fast throw（TradeConfirm 缺失 / code 为空 / 含未知 token 三种情况），异常经 P0-1 路径落为 staged=FAILED 并触发批级 cleanup。详见 [fix-p0-data-loss-chain.md](../fix-p0-data-loss-chain.md)。）
-> **状态**：✅ v2 状态模型已完整落地 + 架构加固 + P0 数据丢失链已修复
+> **最后更新**：2026-04-23（v2.4.4 — cleanup retry 加入固定 2s backoff：`SyncBatchFailureHandler` 在两次 cleanup 尝试之间 `Thread.sleep(2000)`，让瞬时 DB 抖动（连接池耗尽 / 短时锁冲突 / serialization failure）有机会自愈；中断时立即退出 retry 升级 `CLEANUP_FAILED`，保持优雅关停语义。§5.4 代码示例与 "Cleanup retry policy" 小节已同步更新；原 v2.4.3 P0 修复内容保持不变。）
+> **状态**：✅ v2 状态模型已完整落地 + 架构加固 + P0 数据丢失链已修复 + cleanup retry 加入 backoff
 > **关联**：[architecture.md](../architecture.md) | [data-persistence.md](./data-persistence.md) | [broker-registration.md](./broker-registration.md) | [../fix-p0-data-loss-chain.md](../fix-p0-data-loss-chain.md)
 > **取代**：本文档是 v1（2026-04-16）的完全重写。v1 设计的 `INTERRUPTED` / `PARTIAL` / Resume / 幂等续跑机制被整体废弃，历史版本可在 git log 中追溯。
 
@@ -43,7 +43,7 @@ v1（"两级状态 + 幂等 + Resume"）虽然理论上优雅，但在实际使�
 | 1 | 最终状态 | **三态：`COMPLETED` / `FAILED` / `CLEANUP_FAILED`**（活跃态另有 `PENDING` / `PROCESSING`） | 取代 v1 的六态，语义简化 |
 | 2 | 失败处理 | **失败 → 自动清理 → 标记 FAILED**（不保留残留） | 用户任何时候看到 FAILED 都表示"这次没留下任何痕迹" |
 | 3 | 清理原子性 | 用**单个事务包裹所有 DELETE**，任何一张表删不掉就整体回滚 | 不能留半清理状态 |
-| 4 | 清理失败重试 | **重试 3 次**（含原始尝试 = 最多 3 次事务执行），仍失败则进入 `CLEANUP_FAILED` | 容忍偶发 DB 抖动，又不无限阻塞 |
+| 4 | 清理失败重试 | **重试 3 次**（含原始尝试 = 最多 3 次事务执行），**两次尝试之间固定间隔 2 秒**；若仍失败则进入 `CLEANUP_FAILED` | 容忍偶发 DB 抖动（瞬时连接池耗尽 / 短时锁冲突 / Postgres serialization failure），又不无限阻塞 |
 | 5 | CLEANUP_FAILED 恢复 | **人工介入**：DBA 手动清理残留后，手动更新 status 为 FAILED | 小项目不做自动恢复机制 |
 | 6 | 并发控制 | **DB 级唯一约束**：同时只能有 1 个活跃 batch（PENDING / PROCESSING / CLEANUP_FAILED）| 应用层 check-then-insert 有 TOCTOU race；DB 约束绝对安全 |
 | 7 | 启动检测 | 扫 PENDING / PROCESSING → 走**完整清理流程** → 标记 FAILED / CLEANUP_FAILED | 和运行时失败处理统一 |
@@ -253,13 +253,16 @@ public class SyncBatchCleanupService {
 public class SyncBatchFailureHandler {
 
     private static final int MAX_CLEANUP_ATTEMPTS = 3;
+    private static final long CLEANUP_RETRY_BACKOFF_MS = 2000L;
 
     /**
      * 失败处理统一入口：清理数据 + 标记 FAILED（或 CLEANUP_FAILED）
      * 清理成功 → status = FAILED + errorMessage = 原因
      * 清理失败 3 次 → status = CLEANUP_FAILED + errorMessage = 清理失败原因 + 原始失败原因 (保留 phase)
+     * 两次尝试之间 sleep 固定 2s；线程被中断 → 立即退出 retry 升级为 CLEANUP_FAILED
      */
     public void handleFailure(Long batchId, String brokerCode, String originalError) {
+        Exception lastCleanupException = null;
         for (int attempt = 1; attempt <= MAX_CLEANUP_ATTEMPTS; attempt++) {
             try {
                 cleanupService.cleanupBatchData(batchId, brokerCode);
@@ -267,23 +270,42 @@ public class SyncBatchFailureHandler {
                 log.info("Batch {} cleaned up and marked FAILED (attempt {})", batchId, attempt);
                 return;
             } catch (Exception e) {
+                lastCleanupException = e;
                 log.error("Cleanup attempt {}/{} failed for batch {}: {}",
                         attempt, MAX_CLEANUP_ATTEMPTS, batchId, e.getMessage(), e);
-                if (attempt == MAX_CLEANUP_ATTEMPTS) {
-                    // 最后一次仍失败 → CLEANUP_FAILED
-                    batchService.markAsCleanupFailed(batchId,
-                            String.format("Cleanup failed after %d attempts: %s. Original error: %s",
-                                    MAX_CLEANUP_ATTEMPTS, e.getMessage(), originalError));
-                    return;
+            }
+            if (attempt < MAX_CLEANUP_ATTEMPTS) {
+                try {
+                    Thread.sleep(CLEANUP_RETRY_BACKOFF_MS);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    break;  // 中断 → 放弃剩余重试，走 CLEANUP_FAILED
                 }
-                // otherwise retry after small backoff (optional)
             }
         }
+        // 全部失败 → CLEANUP_FAILED
+        batchService.markAsCleanupFailed(batchId,
+                String.format("Cleanup failed after %d attempts: %s. Original error: %s",
+                        MAX_CLEANUP_ATTEMPTS,
+                        lastCleanupException != null ? lastCleanupException.getMessage() : "unknown",
+                        originalError));
     }
 }
 ```
 
 `markAsCleanupFailed` **保留** `phase` 值用于诊断（和 v1 的 INTERRUPTED 处理一样）；`markAsFailed` 清空 `phase`。
+
+#### Cleanup retry policy（重试策略细化）
+
+| 维度 | 选择 | 理由 |
+|------|------|------|
+| 重试次数 | **3**（含首次尝试） | 足以吸收典型的瞬时抖动；不至于拖长失败路径 |
+| 退避策略 | **固定 2 秒**（不做指数退避 / 抖动） | cleanup 是本地 DB 的若干 DELETE，失败模式是瞬时连接池耗尽 / 短时锁冲突 / Postgres serialization failure，2s 足以让它们自行恢复；指数退避面向"远端级联雪崩"，与本场景不匹配；固定间隔在日志里更好读 |
+| 最坏耗时 | **≤ 4 秒**（= 2 次 sleep × 2s） | 不会让前端 `/status` 轮询明显感知卡顿 |
+| 中断处理 | `Thread.sleep` 抛 `InterruptedException` → 恢复中断标志、跳出循环、升级为 `CLEANUP_FAILED` | 应用关停（`SIGTERM`）时必须立刻放弃重试，否则违反优雅关停语义 |
+| 兜底 | `CLEANUP_FAILED` 终态 + `uk_only_one_active` 唯一索引 | 即便重试全军覆没，也能通过"阻塞新 sync + 人工介入"保证不会错误累积 |
+
+**为何不把 backoff 暴露为配置项**：这是一个内部实现细节，调整它需要同时考虑 retry 次数、前端轮询节奏、`CLEANUP_FAILED` 升级时机三者的配合，直接改代码更稳妥。如果未来真的需要在运维层面临时调整，可以把 `CLEANUP_RETRY_BACKOFF_MS` 改为 `@Value` 注入。
 
 ### 5.5 清理触发时机
 
