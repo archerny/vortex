@@ -1,11 +1,11 @@
 # 长桥证券（Longbridge）同步
 
-> **状态**：📋 设计稿 v0.2.1（D1–D9 决策已锁定，待进入编码）
+> **状态**：📋 设计稿 v0.2.2（D1–D9 决策已锁定，待进入编码）
 > **适配器（规划）**：`LongbridgeSyncAdapter`
 > **API 类型**：Longbridge OpenAPI（HTTPS/JSON，官方 Java SDK，Rust JNI 底层）
 > **Broker Code**：`longbridge`
 > **账户前提**：单账户（一个 `APP_KEY / APP_SECRET / ACCESS_TOKEN` 对应一个长桥账户）
-> **最后更新**：2026-04-27（v0.2 → v0.2.1：修正 v0.2 中 cursor 事实错误、对齐 Tiger/IBKR 实际行为、DDL 改写为 PostgreSQL、staged 表结构补齐 v2 状态模型所需字段）
+> **最后更新**：2026-04-27（v0.2.1 → v0.2.2：D3 费用存储方式细化为"聚合列 `order_fee_total` + 专用 `charge_items` JSONB 列"；修正 review 暴露的一批文档瑕疵，见下表）
 
 ---
 
@@ -40,6 +40,21 @@
 | § 4.1 DDL 方言 | MySQL（`BIGINT AUTO_INCREMENT` / `DATETIME` / `JSON` / `ENGINE=InnoDB` / `KEY ...`） | **PostgreSQL**（`BIGSERIAL` / `TIMESTAMP` / `JSONB` / `CREATE INDEX` 外置） |
 | § 4.1 staged 表字段 | 缺 `status` / `imported_trade_id` / `error_message` / `updated_at`；raw 字段用强类型（`DECIMAL` / `DATETIME`） | **补齐 v2 状态模型所需字段**；raw 字段全部改为 `VARCHAR(255)`（参照 Tiger/IBKR 的"无损 staging"原则，类型转换只在 import 阶段） |
 | § 7 P2 描述 | "增量 cursor" | 删除（Tiger/IBKR 都没做，对齐即可；若真有需求放 P3.x） |
+
+### v0.2.1 → v0.2.2 修正
+
+| 位置 | v0.2.1 | v0.2.2（本次） |
+|---|---|---|
+| § 4.1 DDL / § 4.2 映射 / § 9 D3 | `raw_payload JSONB`（语义含糊，像是要存整包 payload） | **`order_fee_total VARCHAR(255)` 聚合列 + `charge_items JSONB` 专用明细列**（不存整包 payload，仅存 `charge_detail.items` 数组；导入路径只读聚合列，JSONB 只做 debug/审计） |
+| § 2.2 / § 3.1 | `TradeContext#orderDetail` | **`TradeContext#getOrderDetail`**（核对官方 Java SDK 文档 `trade-order-order_detail.md` L24、L102） |
+| § 3.3 / § 4.1 备注 | "`fee = Σ charge_detail.items[].amount`" | **以 `charge_detail.total_amount` 为聚合口径**（取绝对值、字符串化），`Σ items[].fees[].amount` 仅作校验；理由见 § 4.3 注释——长桥 `items` 是**分组层**（BROKER\_FEES / THIRD\_FEES / UNKNOWN），真正费目在 `items[].fees[]` |
+| § 5 步骤 4.a | "若 executions.size() == 1000 →..." | **以 `has_more=true` 为翻页终止条件**（官方 Schema 定义，文档 `trade-execution-history_executions.md` L266）；`size==1000` 仅作兜底告警 |
+| § 5 步骤 4.f | "对 unique orderIds 逐个调用 orderDetail" | 补充限频/失败处理：撞限频 → `CategorizedSyncException(NETWORK, ...)` 整批 fail-fast（与 § 3.3 对齐） |
+| § 4.1 DDL 列注释 / § 4.2 字段映射 | "按成交数量占比分摊到 execution" 写在 `order_fee_total` 列注释和映射表来源列混在一起 | 列注释只说"order 级总手续费"；分摊规则只保留在 § 4.1 备注块；映射表 `fee` 行简化为"来源列 + 分摊规则见 § 4.1 备注" |
+| § 7 P2 | "跨平台部署时的 Rust native 库检测" | 删除（与 D2 决策不符，归入 § 8 风险 #1） |
+| § 8 风险 1 | 与 § 9 D2 措辞重复 | 简化为"详见 D2"，不重复论据 |
+| § 4.3 | "与 framework 的一致性规则 trade off 后的必然选择" | **"与 framework 一致性规则权衡后的结果"**（中文语感修正） |
+| § 8 风险（新增） | —— | **新增 JSONB 相关两条**：PostgreSQL 方言锁定加深（低影响）、`charge_detail.total_amount` 与 `Σ fees[].amount` 不一致时的 WARN 策略 |
 
 ---
 
@@ -116,6 +131,7 @@ class LongbridgeClient implements AutoCloseable {
     List<Order>     historyOrders(Instant start, Instant end, List<OrderStatus> status);
 
     // 手续费：order 级明细（每个 order 调用一次），用于 D3 手续费同步
+    // 官方 Java SDK 方法：TradeContext.getOrderDetail(orderId)
     OrderDetail     orderDetail(String orderId);
 
     void close();
@@ -136,7 +152,7 @@ class LongbridgeClient implements AutoCloseable {
 |---|---|---|
 | **`GET /v1/trade/execution/history`** | `TradeContext#getHistoryExecutions` | **主源** —— 产出 `trade_records` 行（全账户拉，不按 symbol） |
 | **`GET /v1/trade/order/history`** | `TradeContext#getHistoryOrders` | **字段补充** —— 用 `order_id` 关联，取 `side` / `currency` / `stock_name` |
-| **`GET /v1/trade/order`（`order_detail`）** | `TradeContext#orderDetail` | **手续费** —— 逐 order 查 `charge_detail`，汇总后填 `trade_records.fee`（D3） |
+| **`GET /v1/trade/order`（`order_detail`）** | `TradeContext#getOrderDetail` | **手续费** —— 逐 order 查 `charge_detail`，取 `total_amount` 填 `trade_records.fee`（D3） |
 
 ### 3.2 为什么必须联合订单接口
 
@@ -153,7 +169,9 @@ v0.1 原本推荐"Phase 1 不同步手续费，与 IBKR / Tiger 对齐"。v0.2 �
 
 - **数据源**：`order_detail.charge_detail`
 - **调用粒度**：**per order**（不是 per execution）—— 一个 order 下 N 笔部分成交**只查 1 次**
-- **汇总规则**：`fee = Σ charge_detail.items[].amount`（所有费目累加，绝对值），参考 IBKR / Tiger 的"commission + 其它杂费"合并模型
+- **聚合口径**：直接取 `charge_detail.total_amount`（官方给出的订单总费用），取绝对值后字符串化存入 `order_fee_total`；`Σ items[].fees[].amount` 仅作**校验**用（不相等时打 WARN 日志，以 `total_amount` 为准）
+- **为什么不自己展开求和**：长桥 `charge_detail.items[]` 是**分组层**（`BROKER_FEES` / `THIRD_FEES` / `UNKNOWN` 三个枚举），真正的费目明细在 `items[].fees[]`。`total_amount` 是官方提供的顶层合计，直接用最简单；自己展开求和会多一层逻辑风险（如官方将来新增分组枚举会漏）
+- **明细存档**：`charge_detail.items` 原数组（含 `fees[]` 子数组）落到 staged 表的 `charge_items JSONB` 列，仅用于 debug/审计，import 阶段不消费
 - **性能评估**：单次 sync 的订单数远小于成交数；配合 § 5.1 的翻页硬上限 50 轮，实际 API 调用可控
 - **限频失败**：撞上限频 → `CategorizedSyncException(NETWORK, "order_detail rate limited")` → fail-fast，用户稍后重试
 
@@ -175,7 +193,11 @@ v0.1 原本推荐"Phase 1 不同步手续费，与 IBKR / Tiger 对齐"。v0.2 �
 
 1. **无损 staging**：所有来自上游 API 的 raw 字段统一存 `VARCHAR(255)`，类型转换（数字 / 时间戳 / 枚举）只在 import → `trade_records` 阶段做
 2. **v2 状态模型**：`status` / `imported_trade_id` / `error_message` / `updated_at` 配合 `framework/import-consistency.md` 的状态机（`PENDING` → `IMPORTED` / `FAILED` / `CLEANED`）
-3. **`raw_payload JSONB` 保留用途**：只存**变长结构无法平铺的数据** —— 即 `charge_detail.items` 费目明细数组（每项含 name / amount / currency），便于 debug 回查聚合前的原始费目
+3. **费用双列存储**（D3 细化）：
+   - `order_fee_total VARCHAR(255)` —— 聚合列，取自 `charge_detail.total_amount`（绝对值），**import 阶段只读这一列**
+   - `charge_items JSONB` —— 仅存 `charge_detail.items` 原数组（含分组 `code`/`name` 和 `fees[]` 子数组），仅用于 debug/审计，import 阶段不消费
+   - **不存** `charge_detail` 的父级 `total_amount` / `currency`（已由 `order_fee_total` 表达）
+   - **不存**整个 `order_detail` 返回体（避免把和费用无关的订单字段冗余落库）
 
 ```sql
 CREATE TABLE longbridge_staged_executions (
@@ -195,11 +217,10 @@ CREATE TABLE longbridge_staged_executions (
     stock_name             VARCHAR(255),
     outside_rth            VARCHAR(255),                         -- 盘前盘后（保留用，不入 trade_records）
     -- Fee: derived from order_detail.charge_detail (D3)
-    order_fee_total        VARCHAR(255),                         -- order 级总手续费（聚合值），按成交数量占比分摊到 execution
+    order_fee_total        VARCHAR(255),                         -- order 级总手续费，来自 charge_detail.total_amount（绝对值）
+    charge_items           JSONB,                                -- charge_detail.items 原数组（含 fees[] 子数组）；仅用于 debug/审计，import 阶段不消费
     -- Classification (由 SymbolClassifier 填，Phase 1 只有 STOCK 会落 staged)
     security_type          VARCHAR(255),                         -- "STOCK"
-    -- charge_detail.items 费目明细（变长数组，平铺不现实，保留 JSONB 便于 debug）
-    raw_payload            JSONB,
     -- v2 状态模型（对齐 tiger_staged_orders / ibkr_staged_trades）
     status                 VARCHAR(32)     NOT NULL DEFAULT 'PENDING',
     imported_trade_id      BIGINT,                               -- 回指 trade_records.id（import 成功后填）
@@ -213,21 +234,35 @@ CREATE INDEX idx_lb_staged_trade_id ON longbridge_staged_executions (trade_id);
 CREATE INDEX idx_lb_staged_status   ON longbridge_staged_executions (status);
 ```
 
-> **`raw_payload` 内容约定**（仅用于 debug，import 阶段不消费）：
+> **`charge_items` 内容约定**（仅用于 debug，import 阶段不消费）：
 > ```json
-> {
->   "charge_detail_items": [
->     { "code": "COMMISSION", "name": "佣金",     "amount": "1.99", "currency": "USD" },
->     { "code": "PLATFORM",   "name": "平台使用费", "amount": "1.00", "currency": "USD" }
->   ]
-> }
+> [
+>   {
+>     "code": "BROKER_FEES",
+>     "name": "收费明细",
+>     "fees": [
+>       { "code": "COMMISSION", "name": "佣金",     "amount": "15.00", "currency": "HKD" },
+>       { "code": "PLATFORM",   "name": "平台使用费", "amount": "15.00", "currency": "HKD" }
+>     ]
+>   },
+>   {
+>     "code": "THIRD_FEES",
+>     "name": "第三方收费明细",
+>     "fees": [
+>       { "code": "STAMP_DUTY", "name": "印花税", "amount": "5.00", "currency": "HKD" }
+>     ]
+>   }
+> ]
 > ```
-> 聚合后的 `order_fee_total` 是 `Σ items[].amount`（各费目绝对值累加）。
+> - 存完整 `items[]` 数组（含分组层 `code`/`name` + 子数组 `fees[]`），不做摊平
+> - "查过但 `items` 为空"时存 `[]`（区分"查过无费目" vs "没查过 NULL"）
+> - `charge_detail.total_amount` / `charge_detail.currency` 父级字段**不**存（已由 `order_fee_total` 表达）
+> - **校验**：若 `|Σ items[].fees[].amount| ≠ |total_amount|`，打 WARN 日志带 `order_id` + 两个值，**不阻断**导入，以 `total_amount` 为准
 
 > **手续费分摊说明**（D3）：
 > 长桥 `charge_detail` 是 order 级的，而 `trade_records.fee` 是 execution 级的。一个 order 如果有 N 笔部分成交，手续费按 **quantity 占比**分摊到每笔 execution：
 > `execution.fee = order_fee_total × (execution.quantity / order.total_filled_quantity)`
-> 分摊时对最后一笔用"余数兜底"以避免浮点累计误差。
+> 分摊时对最后一笔用"余数兜底"以避免浮点累计误差。分摊动作发生在 **import 阶段**（staged → `trade_records`），staged 表本身的 `order_fee_total` 列保持 order 级聚合值不变。
 
 ### 4.2 字段映射 → `trade_records`
 
@@ -242,7 +277,7 @@ CREATE INDEX idx_lb_staged_status   ON longbridge_staged_executions (status);
 | `quantity` | `quantity` | 直接用 |
 | `price` | `price` | 直接用 |
 | `currency` | `currency`（来自订单表） | 直接用 |
-| `fee` | `order_fee_total` 按 quantity 占比分摊（D3） | 和 Tiger/IBKR 的 `calculateFee` 语义对齐（各费目绝对值累加） |
+| `fee` | `order_fee_total` | import 阶段按 quantity 占比分摊到每笔 execution（规则见 § 4.1 备注块）；与 Tiger/IBKR 的 `calculateFee` 语义对齐 |
 | `source_batch_id` | `batch_id` | |
 
 ### 4.3 期权 / 窝轮事件处理（D7 修正）
@@ -256,7 +291,7 @@ CREATE INDEX idx_lb_staged_status   ON longbridge_staged_executions (status);
 - 整批 staged 行走 fail-fast cleanup 流程（与 Tiger / IBKR 完全一致）
 - 错误消息模板：`"Unrecognized symbol '<symbol>' in Longbridge execution <trade_id>; only STOCK is supported in Phase 1"`
 
-**用户影响**：如果账户里有期权/窝轮成交，整批 sync 会失败，直到 Phase 1 之后支持这些标的类型，或用户手动从时间窗中隔离出这些交易。这与 framework 的一致性规则 trade off 后的必然选择 —— **禁止"识别了但跳过"的软白名单**（`framework/symbol-classification.md § 3 / § 4.2`）。
+**用户影响**：如果账户里有期权/窝轮成交，整批 sync 会失败，直到 Phase 1 之后支持这些标的类型，或用户手动从时间窗中隔离出这些交易。这是**与 framework 一致性规则权衡后的结果** —— `framework/symbol-classification.md § 3 / § 4.2` 禁止"识别了但跳过"的软白名单。
 
 ### 4.4 Symbol 分类（`LongbridgeSymbolClassifier`）
 
@@ -281,22 +316,27 @@ Phase 1 使用**保守正则**识别股票，其他所有 symbol 形式一律 UN
 ```
 1. 加载 LongbridgeCredentials
 2. 通过 Config.fromApikey(...) 创建 TradeContext（try-with-resources）
-3. 从 SyncRequest 取同步窗口（startTime / endTime；未指定时默认 endDate=today、startDate=endDate-90d，
-   与 Tiger/IBKR 完全一致；用户想拉更长历史就在 UI 上填更早的 startTime），按 90 天拆分成 N 个子窗口
+3. 从 SyncRequest 取同步窗口（默认值见 § 5.3），按 90 天拆分成 N 个子窗口
 4. 对每个 90 天窗口：
-   a. 循环调用 historyExecutions(start, end)，处理 `has_more`：
+   a. 循环调用 historyExecutions(start, end)，以 `has_more` 为翻页终止条件：
       - 收集 executions
-      - 若 executions.size() == 1000 →
+      - 若响应 `has_more == true` →
            end = min(当前批次所有 trade_done_at)
            继续拉（允许秒级重叠，由 UNIQUE (batch_id, trade_id) dedup）
-      - 直到 executions.size() < 1000 或达到翻页硬上限（D6 = 50 轮）
+      - 若 `has_more == false` → 本窗口翻页完成
+      - 达到翻页硬上限（D6 = 50 轮）时 fail-fast（见 § 5.1）
+      - 兜底告警：若某轮响应 `has_more=false` 但 `trades.size() == 1000`（官方约定不会发生），打 WARN 日志
    b. 对 executions 中每个 symbol 先过 SymbolClassifier
       - 命中 UNRECOGNIZED → 抛 CategorizedSyncException(UNRECOGNIZED, ...) 整批 fail
    c. 从 executions 提取 unique orderIds
    d. 调用 historyOrders(start, end, status=[Filled, PartialFilled]) 一次性拉回
    e. 按 orderId join → 每笔 execution 补 side / currency / stock_name
       - 联合失败（orderId 缺失）→ 抛 CategorizedSyncException(INTERNAL, ...) 整批 fail
-   f. 对 unique orderIds 逐个调用 orderDetail(orderId) 取 charge_detail，汇总 order_fee_total（D3）
+   f. 对 unique orderIds 逐个调用 getOrderDetail(orderId) 取 charge_detail（D3）：
+      - 取 charge_detail.total_amount 的绝对值存入 order_fee_total
+      - 取 charge_detail.items 原数组存入 charge_items JSONB
+      - `|Σ items[].fees[].amount| ≠ |total_amount|` → WARN 日志，不阻断（以 total_amount 为准）
+      - 撞限频 / 5xx / 超时 → 抛 CategorizedSyncException(NETWORK, "order_detail rate limited or transient failure for order=<orderId>") 整批 fail-fast
    g. 写入 longbridge_staged_executions（status='PENDING'）
 5. Stage → trade_records 应用（复用 v2 状态模型 + fail-fast cleanup）
    - fee 按 quantity 占比分摊（见 § 4.1 备注）
@@ -305,12 +345,13 @@ Phase 1 使用**保守正则**识别股票，其他所有 symbol 形式一律 UN
 
 ### 5.1 翻页策略
 
-长桥没有 page_token，只有时间窗过滤。当 `has_more=true`：
+长桥没有 page_token，只有时间窗过滤。当响应的 `has_more=true`（官方 Schema `trade-execution-history_executions.md` L266：单次最多 1000 条，超过时 `has_more=true`）：
 
 - 在内存拿到当前批次**最早** `trade_done_at`
 - 下一轮用 `end_at = 最早.trade_done_at`（允许秒级重叠）
 - 重叠部分由 `trade_id` UNIQUE KEY 自动 dedup
 - 当一个 90 天窗口内嵌套翻页超过硬上限（**D6 = 50 轮，约 50000 条**）→ fail-fast，按 `CategorizedSyncException(INTERNAL, "Longbridge pagination exceeded 50 rounds in window [start, end]; shrink the sync window and retry")` 抛出
+- **终止条件只看 `has_more` 字段本身**，不以 `trades.size() == 1000` 推断（size 判断是兜底告警，非终止信号）
 
 ### 5.2 订单联合失败的处理（D4 锁定）
 
@@ -369,15 +410,15 @@ OAuth 流程需要**浏览器回跳 + 本地 callback 端口**（默认 `localho
 
 | Phase | 范围 | 产出 |
 |---|---|---|
-| **P1 (MVP)** | API Key 认证 / US + HK / `getHistoryExecutions` + `getHistoryOrders` + `orderDetail`（手续费）/ 手动触发 / 期权/窝轮 UNRECOGNIZED fail-fast / SymbolClassifier 保守正则 | 可导入账户最近 90 天的美股 + 港股**股票**成交到 `trade_records`（含手续费） |
-| **P2** | 90 天窗口拆分 + `has_more` 翻页硬上限 50 / v2 状态模型对齐 / `INTERNAL` & `AUTH` & `NETWORK` & `UNRECOGNIZED` 四类错误分类 / 跨平台部署时的 Rust native 库检测 | 生产可用 |
+| **P1 (MVP)** | API Key 认证 / US + HK / `getHistoryExecutions` + `getHistoryOrders` + `getOrderDetail`（手续费）/ 手动触发 / 期权/窝轮 UNRECOGNIZED fail-fast / SymbolClassifier 保守正则 | 可导入账户最近 90 天的美股 + 港股**股票**成交到 `trade_records`（含手续费） |
+| **P2** | 90 天窗口拆分 + `has_more` 翻页硬上限 50 / v2 状态模型对齐 / `INTERNAL` & `AUTH` & `NETWORK` & `UNRECOGNIZED` 四类错误分类 | 生产可用 |
 | **P3.x** | 凭证加密完善 / 期权 symbol 格式观察 + 接入（参考 IBKR BookTrade 模型）/ 窝轮支持 / OAuth 支持（如需要）/ 首次同步窗口硬上限（若 D9 暴露问题）/ 数据库侧增量水位线（若 Tiger/IBKR 未来也要做，统一框架层实现） | 对齐全家桶成熟度 |
 
 ---
 
 ## 8. 风险与已知约束
 
-1. **Rust native 库依赖（D2 决策：延后至真实跨平台部署时再做）**：Java SDK 基于 Rust JNI，依赖目标平台 native 库（`.so` / `.dylib` / `.dll`）。Phase 1 假设**开发机平台 = 部署机平台**；如跨平台部署，`TradeContext.create()` 首次调用会 fail-fast 暴露问题。deploy/ 的平台检测脚本等到真实跨平台部署场景出现时再加。
+1. **Rust native 库依赖**：详见 § 9 D2 决策（Phase 1 延后至真实跨平台部署时再做平台检测脚本；本地单机部署由 `TradeContext.create()` 自身 fail-fast 兜底）。
 2. **成交表无 `side` 是硬依赖**：任何 execution → order 联合缺失都会导致 staged 行 `side=NULL`，按 § 5.2 整批 fail（`INTERNAL`）。
 3. **1000 条上限 + `has_more`**：长桥独有复杂度，需在 90 天窗口内嵌套翻页，硬上限 50 轮/窗口。
 4. **Market 只有 US + HK**：夜盘（`outside_rth`）标记保留在 staged，但不进 `trade_records`。
@@ -385,6 +426,8 @@ OAuth 流程需要**浏览器回跳 + 本地 callback 端口**（默认 `localho
 6. **期权 / 窝轮走 UNRECOGNIZED（D7 决策）**：Phase 1 账户若含期权/窝轮成交，整批 sync 失败，需用户在时间窗上隔离或等待 P3.x 接入。
 7. **期权 symbol 格式未确认（D8）**：等编码 + 真实数据跑一遍后单独出"symbol 格式观察笔记"。
 8. **同步窗口来自 SyncRequest，无数据库水位线（D9 决策）**：与 Tiger/IBKR 完全一致；长历史场景下最坏首次同步耗时 10 分钟量级，已接受；若 P3.x 暴露问题再加硬上限或水位线。
+9. **JSONB 引入 PostgreSQL 方言锁定**（v0.2.2 新增）：`charge_items` 列是项目首个 JSONB 列。**缓解**：仅作 debug/审计字段，不参与业务查询路径；若未来需迁库，直接丢弃该列即可，不影响 `trade_records` 的导入逻辑（后者只读 `order_fee_total`）。
+10. **`charge_detail.total_amount` 与 `Σ items[].fees[].amount` 不一致**（v0.2.2 新增）：可能由官方新增费目分组、或 `total_amount` 取整误差引起。**策略**：以 `total_amount` 为准（官方顶层合计），不相等时打 WARN 日志带 `order_id` + 两个值，**不阻断**导入。如高频出现需另行 review 口径。
 
 ---
 
@@ -396,7 +439,7 @@ OAuth 流程需要**浏览器回跳 + 本地 callback 端口**（默认 `localho
 |---|---|---|---|
 | **D1** | 认证方式 | ✅ **Phase 1 只做 API Key**，OAuth 延后 | OAuth 要浏览器回跳 + 本地 callback 端口，不适合无头服务端；API Key 与 IBKR Flex Token / Tiger RSA 的服务端凭证模式一致 |
 | **D2** | Rust native 库检测 | ✅ **延后到真实跨平台部署时再做**，Phase 1 仅在 § 8 记录风险 | 本地单机部署下 `TradeContext.create()` 会自己 fail-fast；deploy/ 目前没有平台检测基础设施，单为长桥加不划算 |
-| **D3** | 手续费同步 | ✅ **Phase 1 同步**（从 `order_detail.charge_detail` 取，per-order 调用，按 quantity 占比分摊到 execution） | Tiger / IBKR 都已经同步手续费（`TigerTradeRecordMapper`、`IbkrImportWorker` 均用 `calculateFee`），长桥不跟上会破坏跨 broker 数据一致性 |
+| **D3** | 手续费同步 | ✅ **Phase 1 同步**（`getOrderDetail.charge_detail` per-order 调用；staged 表存**聚合列 `order_fee_total`**（取 `total_amount` 绝对值）+ **专用 `charge_items` JSONB 列**（仅 `items[]` 原数组，不存整包 payload）；import 阶段只读聚合列，按 quantity 占比分摊到 execution） | Tiger / IBKR 都已经同步手续费（`TigerTradeRecordMapper`、`IbkrImportWorker` 均用 `calculateFee`），长桥不跟上会破坏跨 broker 数据一致性；明细列仅作 debug/审计，不参与导入路径，保持方言锁定风险可控 |
 | **D4** | Order 联合缺字段 | ✅ **fail 整批**，分类 `INTERNAL`，错误消息指出具体 `trade_id`/`order_id` | 不允许 `direction=NULL` 的脏数据入 `trade_records`；已识别证券类型所以不是 UNRECOGNIZED |
 | **D5** | 市场覆盖 | ✅ **US + HK** | 官方 `Market` 枚举只有这两个 |
 | **D6** | `has_more` 翻页硬上限 | ✅ **50 轮/90 天窗口** | 50000 条成交对个人账户已远超正常量，作为防失控兜底 |
@@ -406,7 +449,7 @@ OAuth 流程需要**浏览器回跳 + 本地 callback 端口**（默认 `localho
 
 ### 编码前唯一剩下的前置动作
 
-设计稿 v0.2 已完整，可直接进入**编码阶段**。编码启动前只需：
+设计稿 v0.2.2 已完整，可直接进入**编码阶段**。编码启动前只需：
 
 1. 在 `BrokerDefinition` 里注册 `longbridge` broker code
 2. 按 § 2.1 的骨架创建 `backend/src/main/java/com/vortex/sync/adapter/longbridge/` 包
@@ -444,11 +487,11 @@ OAuth 流程需要**浏览器回跳 + 本地 callback 端口**（默认 `localho
 **设计要点 TL;DR**
 
 1. **成交字段极简**：长桥的 `getHistoryExecutions` 比 Futu 还瘦，必须联合 `getHistoryOrders` 才能取到 `side` / `currency` —— 这是硬依赖
-2. **1000 条 + `has_more`**：长桥独有的嵌套翻页复杂度，需在 90 天窗口内再翻页（硬上限 50 轮/窗口）
+2. **1000 条 + `has_more`**：长桥独有的嵌套翻页复杂度，以 `has_more` 为终止条件在 90 天窗口内再翻页（硬上限 50 轮/窗口）
 3. **Rust JNI SDK**：调用模型简单（无需回调适配），跨平台部署时再处理 native 库
 4. **Phase 1 只收股票**：期权/窝轮 → UNRECOGNIZED fail-fast，与 `framework/symbol-classification.md` 对齐
-5. **手续费同步**：从 `order_detail.charge_detail` 取，per-order 调用后按 quantity 占比分摊 —— 与 Tiger/IBKR 对齐
+5. **手续费同步**：`getOrderDetail.charge_detail.total_amount` per-order 取得，staged 落**聚合列 + `charge_items` JSONB 明细列**（仅 items 数组，非整包 payload），import 阶段按 quantity 占比分摊 —— 与 Tiger/IBKR 的 `calculateFee` 语义对齐
 
 ---
 
-v0.2 已完成 D1–D9 全部决策锁定，可直接进入编码。
+v0.2.2 已完成 D1–D9 全部决策锁定 + D3 细化（双列费用存储），可直接进入编码。

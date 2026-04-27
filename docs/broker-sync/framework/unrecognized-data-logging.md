@@ -2,7 +2,7 @@
 
 **状态**：✅ 已实现（2026-04-24）
 **适用范围**：所有 broker adapter（跨 broker 通用契约）
-**最后更新**：2026-04-24
+**最后更新**：2026-04-27（`raw_payload` 归档位置措辞软化：从"所有 broker 都有此列"改为"多数 broker 有，长桥 staged 只落 `charge_items` 子集"）
 
 ## 1. 背景与目标
 
@@ -138,7 +138,7 @@ ERROR [IbkrSync] batch=42 Sync failed: [NETWORK] reason: Read timed out
 - `raw_payload_snippet`：导致失败的原始数据关键片段（脱敏后；当前完全不进日志——raw_payload 归档位置是 staged 表）
 - MDC / structured logging：当前所有 adapter 用 SLF4J 的 parameterized message，未引入 MDC
 
-**定位流程不依赖上述"目标态"字段**——缺失的 `account_id` 可从 `broker_sync_batches.account_id` 查回，`raw_payload` 可从 `<broker>_staged_*.raw_payload` 字段查回（见 §6.3）。引入 MDC 属于 observability 升级，不影响当前"任何失败都可追溯"的核心契约。
+**定位流程不依赖上述"目标态"字段**——缺失的 `account_id` 可从 `broker_sync_batches.account_id` 查回，原始数据可从 `<broker>_staged_*` 表的 raw 字段查回（见 §6.3；各 broker staged 表是否有完整 `raw_payload` 归档列视具体设计而定——例如长桥 staged 表只落**费目明细**`charge_items` JSONB 列而非整包 payload，见 `docs/broker-sync/brokers/longbridge/README.md § 4.1`）。引入 MDC 属于 observability 升级，不影响当前"任何失败都可追溯"的核心契约。
 
 ### 4.3 raw_payload 脱敏规则（目标态）
 
@@ -226,8 +226,8 @@ ORDER BY broker_code, failure_count DESC;
 ### 6.3 UNRECOGNIZED 失败的定位流程
 
 1. 从 `error_message` 提取 `ext_id` 和 `broker_code`
-2. 去对应的 `<broker>_staged_*` 表查 `raw_payload`（按 `external_id + external_broker` 查）
-3. 分析 raw_payload，判断是 broker 加了新枚举/新字段，还是我们的分类器遗漏
+2. 去对应的 `<broker>_staged_*` 表查原始字段（按 `external_id + external_broker` 查）。大多数 broker 的 staged 表提供完整 `raw_payload` 归档列（Tiger / IBKR），少数只落子集（例如长桥只归档 `charge_items` 费目明细列）；具体字段以该 broker 的 design doc / staging schema 为准
+3. 分析原始字段，判断是 broker 加了新枚举/新字段，还是我们的分类器遗漏
 4. 更新 adapter 代码（白名单、分类器、或字段映射）
 5. 前端重新触发同一区间的 sync（框架当前无"自动重试失败 batch"入口；失败的 batch 已被清理，重触发是幂等的——见 [`sync-lifecycle.md § 6.2`](./sync-lifecycle.md#62-重跑安全)）
 
