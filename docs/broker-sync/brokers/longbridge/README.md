@@ -1,11 +1,11 @@
 # 长桥证券（Longbridge）同步
 
-> **状态**：📋 设计稿 v0.2（D1–D9 决策已锁定，待进入编码）
+> **状态**：📋 设计稿 v0.2.1（D1–D9 决策已锁定，待进入编码）
 > **适配器（规划）**：`LongbridgeSyncAdapter`
 > **API 类型**：Longbridge OpenAPI（HTTPS/JSON，官方 Java SDK，Rust JNI 底层）
 > **Broker Code**：`longbridge`
 > **账户前提**：单账户（一个 `APP_KEY / APP_SECRET / ACCESS_TOKEN` 对应一个长桥账户）
-> **最后更新**：2026-04-27（v0.1 → v0.2，§ 9 的 D1–D8 全部敲定 + 新增 D9，基于项目规则修正）
+> **最后更新**：2026-04-27（v0.2 → v0.2.1：修正 v0.2 中 cursor 事实错误、对齐 Tiger/IBKR 实际行为、DDL 改写为 PostgreSQL、staged 表结构补齐 v2 状态模型所需字段）
 
 ---
 
@@ -31,6 +31,15 @@
 | **D4 失败分类** | 未写分类 | **明确归类为 `INTERNAL`** |
 | **D8 symbol 识别** | OCC 期权正则预设 | **去预设**，只识别股票（保守正则），其他一切 UNRECOGNIZED |
 | **D9 首次同步窗口** | （未涉及） | **新增决策**：不做硬上限，接受首次同步可能较长的风险 |
+
+### v0.2 → v0.2.1 修正（事实错误修正，决策未变）
+
+| 位置 | v0.2（错误） | v0.2.1（修正） |
+|---|---|---|
+| § 5 / § 5.3 / § 8 / § 9（D9） | "按 cursor 从 `first_sync_start_date` 一路拉到 now / 和 Tiger/IBKR 的 cursor 行为一致" | **Tiger 和 IBKR 都没有数据库水位线 cursor**，窗口来自 `SyncRequest`（UI 提供 `startTime` / `endTime`），默认 `endDate=today` / `startDate=endDate-90d`；长桥 P1 与之完全对齐 |
+| § 4.1 DDL 方言 | MySQL（`BIGINT AUTO_INCREMENT` / `DATETIME` / `JSON` / `ENGINE=InnoDB` / `KEY ...`） | **PostgreSQL**（`BIGSERIAL` / `TIMESTAMP` / `JSONB` / `CREATE INDEX` 外置） |
+| § 4.1 staged 表字段 | 缺 `status` / `imported_trade_id` / `error_message` / `updated_at`；raw 字段用强类型（`DECIMAL` / `DATETIME`） | **补齐 v2 状态模型所需字段**；raw 字段全部改为 `VARCHAR(255)`（参照 Tiger/IBKR 的"无损 staging"原则，类型转换只在 import 阶段） |
+| § 7 P2 描述 | "增量 cursor" | 删除（Tiger/IBKR 都没做，对齐即可；若真有需求放 P3.x） |
 
 ---
 
@@ -162,35 +171,58 @@ v0.1 原本推荐"Phase 1 不同步手续费，与 IBKR / Tiger 对齐"。v0.2 �
 
 ### 4.1 Staged 表：`longbridge_staged_executions`
 
+**设计原则**（对齐 Tiger `tiger_staged_orders` / IBKR `ibkr_staged_trades`）：
+
+1. **无损 staging**：所有来自上游 API 的 raw 字段统一存 `VARCHAR(255)`，类型转换（数字 / 时间戳 / 枚举）只在 import → `trade_records` 阶段做
+2. **v2 状态模型**：`status` / `imported_trade_id` / `error_message` / `updated_at` 配合 `framework/import-consistency.md` 的状态机（`PENDING` → `IMPORTED` / `FAILED` / `CLEANED`）
+3. **`raw_payload JSONB` 保留用途**：只存**变长结构无法平铺的数据** —— 即 `charge_detail.items` 费目明细数组（每项含 name / amount / currency），便于 debug 回查聚合前的原始费目
+
 ```sql
 CREATE TABLE longbridge_staged_executions (
-    id                  BIGINT PRIMARY KEY AUTO_INCREMENT,
-    batch_id            VARCHAR(64)    NOT NULL,
-    -- Raw fields (1:1 from Execution)
-    trade_id            VARCHAR(64)    NOT NULL,           -- 成交 ID（dedup key）
-    order_id            VARCHAR(64)    NOT NULL,
-    symbol              VARCHAR(64)    NOT NULL,           -- "AAPL.US" / "700.HK"
-    trade_done_at       DATETIME       NOT NULL,           -- UTC
-    quantity            DECIMAL(20, 8) NOT NULL,
-    price               DECIMAL(20, 8) NOT NULL,
-    -- Enriched from Order (join by order_id)
-    side                VARCHAR(8),                         -- "Buy" / "Sell"
-    currency            VARCHAR(8),                         -- "USD" / "HKD"
-    order_status        VARCHAR(32),                        -- "FilledStatus" etc.
-    stock_name          VARCHAR(128),
-    outside_rth         VARCHAR(16),                        -- 盘前盘后（保留用，不入 trade_records）
+    id                     BIGSERIAL       PRIMARY KEY,
+    batch_id               BIGINT          NOT NULL,             -- 回指 broker_sync_batches.id
+    -- Raw fields (1:1 from Execution; 全部 VARCHAR，无损 staging)
+    trade_id               VARCHAR(255)    NOT NULL,             -- 成交 ID（dedup key）
+    order_id               VARCHAR(255)    NOT NULL,
+    symbol                 VARCHAR(255)    NOT NULL,             -- "AAPL.US" / "700.HK"
+    trade_done_at          VARCHAR(255)    NOT NULL,             -- ISO-8601 字符串，UTC
+    quantity               VARCHAR(255)    NOT NULL,
+    price                  VARCHAR(255)    NOT NULL,
+    -- Enriched from Order (join by order_id; 全部 VARCHAR，无损)
+    side                   VARCHAR(255),                         -- "Buy" / "Sell"
+    currency               VARCHAR(255),                         -- "USD" / "HKD"
+    order_status           VARCHAR(255),                         -- "FilledStatus" 等
+    stock_name             VARCHAR(255),
+    outside_rth            VARCHAR(255),                         -- 盘前盘后（保留用，不入 trade_records）
     -- Fee: derived from order_detail.charge_detail (D3)
-    order_fee_total     DECIMAL(20, 8),                     -- order 级总手续费，按成交数量占比分摊到 execution
+    order_fee_total        VARCHAR(255),                         -- order 级总手续费（聚合值），按成交数量占比分摊到 execution
     -- Classification (由 SymbolClassifier 填，Phase 1 只有 STOCK 会落 staged)
-    security_type       VARCHAR(16),                        -- "STOCK"
-    -- Sync metadata
-    raw_payload         JSON,                               -- Execution + Order + charge_detail 的合并 JSON
-    created_at          DATETIME       NOT NULL,
-    UNIQUE KEY uk_batch_trade (batch_id, trade_id),
-    KEY idx_batch (batch_id),
-    KEY idx_trade_id (trade_id)
-) ENGINE=InnoDB;
+    security_type          VARCHAR(255),                         -- "STOCK"
+    -- charge_detail.items 费目明细（变长数组，平铺不现实，保留 JSONB 便于 debug）
+    raw_payload            JSONB,
+    -- v2 状态模型（对齐 tiger_staged_orders / ibkr_staged_trades）
+    status                 VARCHAR(32)     NOT NULL DEFAULT 'PENDING',
+    imported_trade_id      BIGINT,                               -- 回指 trade_records.id（import 成功后填）
+    error_message          TEXT,                                 -- 失败原因（带 [CATEGORY] 前缀）
+    created_at             TIMESTAMP       NOT NULL,
+    updated_at             TIMESTAMP       NOT NULL,
+    CONSTRAINT uk_lb_staged_batch_trade UNIQUE (batch_id, trade_id)
+);
+CREATE INDEX idx_lb_staged_batch    ON longbridge_staged_executions (batch_id);
+CREATE INDEX idx_lb_staged_trade_id ON longbridge_staged_executions (trade_id);
+CREATE INDEX idx_lb_staged_status   ON longbridge_staged_executions (status);
 ```
+
+> **`raw_payload` 内容约定**（仅用于 debug，import 阶段不消费）：
+> ```json
+> {
+>   "charge_detail_items": [
+>     { "code": "COMMISSION", "name": "佣金",     "amount": "1.99", "currency": "USD" },
+>     { "code": "PLATFORM",   "name": "平台使用费", "amount": "1.00", "currency": "USD" }
+>   ]
+> }
+> ```
+> 聚合后的 `order_fee_total` 是 `Σ items[].amount`（各费目绝对值累加）。
 
 > **手续费分摊说明**（D3）：
 > 长桥 `charge_detail` 是 order 级的，而 `trade_records.fee` 是 execution 级的。一个 order 如果有 N 笔部分成交，手续费按 **quantity 占比**分摊到每笔 execution：
@@ -249,13 +281,14 @@ Phase 1 使用**保守正则**识别股票，其他所有 symbol 形式一律 UN
 ```
 1. 加载 LongbridgeCredentials
 2. 通过 Config.fromApikey(...) 创建 TradeContext（try-with-resources）
-3. 计算待同步时间窗（from cursor → now），按 90 天拆分（无硬上限，D9）
+3. 从 SyncRequest 取同步窗口（startTime / endTime；未指定时默认 endDate=today、startDate=endDate-90d，
+   与 Tiger/IBKR 完全一致；用户想拉更长历史就在 UI 上填更早的 startTime），按 90 天拆分成 N 个子窗口
 4. 对每个 90 天窗口：
    a. 循环调用 historyExecutions(start, end)，处理 `has_more`：
       - 收集 executions
       - 若 executions.size() == 1000 →
            end = min(当前批次所有 trade_done_at)
-           继续拉（允许秒级重叠，由 UNIQUE KEY(batch_id, trade_id) dedup）
+           继续拉（允许秒级重叠，由 UNIQUE (batch_id, trade_id) dedup）
       - 直到 executions.size() < 1000 或达到翻页硬上限（D6 = 50 轮）
    b. 对 executions 中每个 symbol 先过 SymbolClassifier
       - 命中 UNRECOGNIZED → 抛 CategorizedSyncException(UNRECOGNIZED, ...) 整批 fail
@@ -264,10 +297,10 @@ Phase 1 使用**保守正则**识别股票，其他所有 symbol 形式一律 UN
    e. 按 orderId join → 每笔 execution 补 side / currency / stock_name
       - 联合失败（orderId 缺失）→ 抛 CategorizedSyncException(INTERNAL, ...) 整批 fail
    f. 对 unique orderIds 逐个调用 orderDetail(orderId) 取 charge_detail，汇总 order_fee_total（D3）
-   g. 写入 longbridge_staged_executions
+   g. 写入 longbridge_staged_executions（status='PENDING'）
 5. Stage → trade_records 应用（复用 v2 状态模型 + fail-fast cleanup）
    - fee 按 quantity 占比分摊（见 § 4.1 备注）
-6. 推进 cursor，关闭 TradeContext
+6. 关闭 TradeContext
 ```
 
 ### 5.1 翻页策略
@@ -287,12 +320,15 @@ Execution 已到手但对应 Order 没查到（`side` / `currency` 缺失）：
 - **失败分类**：`INTERNAL`（我们已识别证券类型，只是 order 表关联失败 —— 不属于 UNRECOGNIZED）
 - **错误消息模板**：`"Longbridge execution <trade_id> references order <order_id> which is missing from history_orders response"`
 
-### 5.3 首次同步窗口（D9 锁定）
+### 5.3 同步窗口来源（D9 锁定）
 
-- **策略**：首次同步**不做窗口硬上限**，按 cursor 从 `first_sync_start_date`（用户建 broker 账号时填写）一路拉到 now
-- **理由**：和 Tiger / IBKR 的 cursor 行为一致；对个人账户来说，即便账户历史 5 年，实际成交笔数也远小于"50 轮 × 若干 90 天窗口"的理论上限
-- **已接受的风险**：最坏情况（高频账户 + 多年历史）首次同步时长可能达到 10 分钟量级。若 P3.x 用户反馈问题，再新增 D9 的硬上限配置
-- **翻页硬上限仍按窗口生效**（§ 5.1），仅作为防失控的兜底
+- **策略**：同步窗口完全来自 `SyncRequest.startTime` / `SyncRequest.endTime`，**不引入数据库侧的水位线 cursor**
+- **默认值**（UI 未填时，`SyncRequest` 层或 adapter 层补齐）：`endTime = now`；`startTime = endTime - 90 days` —— 与 `TigerSyncAdapter#resolveStartDate` / `IbkrSyncAdapter#resolveStartDate` 完全对齐
+- **长窗口（例如 3 年历史）**：用户在 UI 上手动填 `startTime` 为 3 年前的日期，本 adapter 会自动按 90 天切成若干子窗口逐个拉（§ 5 步骤 3+4），**不存在"长桥 90 天 API 上限 → 只能同步 90 天"的退化**
+- **已接受的风险**（D9）：长窗口 + 高频账户场景下，首次同步可能达到 10 分钟量级；若 P3.x 用户反馈问题，再新增"单次 sync 最大总窗口"或"每次 sync 最多 N 个 90 天窗口"的硬上限配置
+- **翻页硬上限（D6 = 50 轮/窗口）仍生效**，作为防 API 异常（例如长桥始终返 `has_more=true`）的兜底
+
+> 📌 与 v0.2 的差异：v0.2 误将本节描述为"按数据库 cursor 从 `first_sync_start_date` 拉到 now / 与 Tiger/IBKR 的 cursor 行为一致"。实际上 Tiger/IBKR 都**没有**数据库 cursor，窗口均来自 `SyncRequest`；长桥 P1 完全跟随此模式，v0.2.1 修正以消除混淆。
 
 ---
 
@@ -334,8 +370,8 @@ OAuth 流程需要**浏览器回跳 + 本地 callback 端口**（默认 `localho
 | Phase | 范围 | 产出 |
 |---|---|---|
 | **P1 (MVP)** | API Key 认证 / US + HK / `getHistoryExecutions` + `getHistoryOrders` + `orderDetail`（手续费）/ 手动触发 / 期权/窝轮 UNRECOGNIZED fail-fast / SymbolClassifier 保守正则 | 可导入账户最近 90 天的美股 + 港股**股票**成交到 `trade_records`（含手续费） |
-| **P2** | 90 天窗口拆分 + `has_more` 翻页硬上限 50 / 增量 cursor / v2 状态模型对齐 / `INTERNAL` & `AUTH` & `NETWORK` & `UNRECOGNIZED` 四类错误分类 / 跨平台部署时的 Rust native 库检测 | 生产可用 |
-| **P3.x** | 凭证加密完善 / 期权 symbol 格式观察 + 接入（参考 IBKR BookTrade 模型）/ 窝轮支持 / OAuth 支持（如需要）/ 首次同步窗口硬上限（若 D9 暴露问题） | 对齐全家桶成熟度 |
+| **P2** | 90 天窗口拆分 + `has_more` 翻页硬上限 50 / v2 状态模型对齐 / `INTERNAL` & `AUTH` & `NETWORK` & `UNRECOGNIZED` 四类错误分类 / 跨平台部署时的 Rust native 库检测 | 生产可用 |
+| **P3.x** | 凭证加密完善 / 期权 symbol 格式观察 + 接入（参考 IBKR BookTrade 模型）/ 窝轮支持 / OAuth 支持（如需要）/ 首次同步窗口硬上限（若 D9 暴露问题）/ 数据库侧增量水位线（若 Tiger/IBKR 未来也要做，统一框架层实现） | 对齐全家桶成熟度 |
 
 ---
 
@@ -348,7 +384,7 @@ OAuth 流程需要**浏览器回跳 + 本地 callback 端口**（默认 `localho
 5. **Token 过期**：fail-fast，`AUTH` 分类，日志明确提示用户手动更新 `ACCESS_TOKEN`。
 6. **期权 / 窝轮走 UNRECOGNIZED（D7 决策）**：Phase 1 账户若含期权/窝轮成交，整批 sync 失败，需用户在时间窗上隔离或等待 P3.x 接入。
 7. **期权 symbol 格式未确认（D8）**：等编码 + 真实数据跑一遍后单独出"symbol 格式观察笔记"。
-8. **首次同步窗口不设上限（D9）**：最坏情况首次同步耗时 10 分钟量级，已接受。
+8. **同步窗口来自 SyncRequest，无数据库水位线（D9 决策）**：与 Tiger/IBKR 完全一致；长历史场景下最坏首次同步耗时 10 分钟量级，已接受；若 P3.x 暴露问题再加硬上限或水位线。
 
 ---
 
@@ -366,7 +402,7 @@ OAuth 流程需要**浏览器回跳 + 本地 callback 端口**（默认 `localho
 | **D6** | `has_more` 翻页硬上限 | ✅ **50 轮/90 天窗口** | 50000 条成交对个人账户已远超正常量，作为防失控兜底 |
 | **D7** | 期权/窝轮 Phase 1 策略 | ✅ **UNRECOGNIZED fail-fast**（修正 v0.1 方案） | `framework/symbol-classification.md § 3 / § 4.2` 禁止"识别了但跳过"的软白名单；与 Tiger / IBKR UNRECOGNIZED 行为对齐 |
 | **D8** | 期权 symbol 格式 | ✅ **Phase 1 不预设**，SymbolClassifier 只用保守正则识别股票（`^[A-Z]+\.US$` / `^\d{1,5}\.HK$`），其他全部 UNRECOGNIZED | 没真实跑过长桥账户，不提前猜期权格式；等 debug 出真实数据后单独出"symbol 格式观察笔记"再扩展 |
-| **D9** | 首次同步窗口上限 | ✅ **不设硬上限**，接受最坏情况 10 分钟量级 | 与 Tiger / IBKR 的 cursor 行为一致；翻页硬上限（D6）已作为兜底 |
+| **D9** | 同步窗口上限 | ✅ **不设硬上限**，窗口完全来自 `SyncRequest`（默认最近 90 天），接受最坏情况 10 分钟量级 | 与 Tiger/IBKR 完全一致：`SyncRequest.startTime/endTime` 由 UI 提供，无数据库水位线 cursor；翻页硬上限（D6）作为防失控兜底 |
 
 ### 编码前唯一剩下的前置动作
 
