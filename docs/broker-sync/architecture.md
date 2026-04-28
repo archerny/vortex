@@ -1,7 +1,7 @@
 # 券商同步 — 架构概览
 
 > **创建日期**：2026-04-21
-> **最后更新**：2026-04-23（Phase 3 状态同步：Tiger 两阶段导入 / v2 状态模型 / fail-fast cleanup / 前端 v2 UI 均已落地）
+> **最后更新**：2026-04-28（包结构补充 longbridge / futu adapter 占位；Phase 3 状态保持已落地）
 > **状态**：✅ 架构已落地（Phase 1 / Phase 2 / Phase 3 均完成；后续为 Phase 3.x 等增量能力）
 > **关联**：[README.md](./README.md) | [framework/data-persistence.md](./framework/data-persistence.md) | [framework/import-consistency.md](./framework/import-consistency.md) | [framework/broker-registration.md](./framework/broker-registration.md)
 
@@ -48,16 +48,18 @@ com.vortex
         ├── tiger/
         │   ├── TigerSyncAdapter.java
         │   └── TigerOrderRecord.java       ← 老虎证券专属原始模型
-        └── ibkr/
-            ├── IbkrSyncAdapter.java
-            ├── IbkrFlexClient.java
-            ├── IbkrFlexQueryProperties.java
-            ├── FlexQueryParser.java
-            ├── FlexQueryParseResult.java
-            ├── IbkrOrderRecord.java        ← IBKR 专属原始模型（Order 粒度）
-            ├── IbkrTradeConfirm.java       ← IBKR 执行明细模型
-            ├── IbkrStagingService.java     ← 暂存表写入
-            └── IbkrImportService.java      ← 暂存 → trade_records 导入
+        ├── ibkr/
+        │   ├── IbkrSyncAdapter.java
+        │   ├── IbkrFlexClient.java
+        │   ├── IbkrFlexQueryProperties.java
+        │   ├── FlexQueryParser.java
+        │   ├── FlexQueryParseResult.java
+        │   ├── IbkrOrderRecord.java        ← IBKR 专属原始模型（Order 粒度）
+        │   ├── IbkrTradeConfirm.java       ← IBKR 执行明细模型
+        │   ├── IbkrStagingService.java     ← 暂存表写入
+        │   └── IbkrImportService.java      ← 暂存 → trade_records 导入
+        ├── longbridge/                     ← 📋 设计稿 v0.2.3，未编码（占位）
+        └── futu/                           ← 📋 设计稿 v0.1，未编码（占位）
 ```
 
 ---

@@ -507,7 +507,7 @@ COMMENT ON INDEX uk_only_one_active IS
 
 ## 十一、和 v1 的对照（给 reviewer 的快速指南）
 
-| 方面 | v1 (2026-04-16) | v2 (2026-04-22) |
+| 方面 | v1 (2026-04-16) | v2 (2026-04-22 起；当前 v2.4.4 / 2026-04-23) |
 |------|----------------|----------------|
 | 状态数量 | 6 种 | 5 种（少了 INTERRUPTED/PARTIAL，多了 CLEANUP_FAILED） |
 | 失败批次数据 | 保留，等 resume 续跑 | 立即清理，无残留（CLEANUP_FAILED 除外） |

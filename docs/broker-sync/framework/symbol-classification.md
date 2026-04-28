@@ -2,7 +2,7 @@
 
 **状态**：✅ 已实现（2026-04-24）
 **适用范围**：所有 broker adapter（跨 broker 通用契约）
-**最后更新**：2026-04-24
+**最后更新**：2026-04-28（H6 修正：长桥分类描述与 README v0.2.3 对齐——只用 symbol 后缀正则，stock_type 不参与决策）
 
 ## 1. 背景
 
@@ -10,7 +10,7 @@
 
 - 老虎（Tiger）：`secType` 字段，取值 `STK` / `OPT` / `WAR` / `FUT` / ...
 - IBKR：`assetCategory` 字段，取值 `STK` / `OPT` / `FUT` / `CASH` / `FUND` / ...
-- 长桥（Longbridge）：`stock_type` / `symbol` 后缀混合表达
+- 长桥（Longbridge）：**仅按 symbol 后缀正则识别**（`^[A-Z]+\.US$` / `^\d{1,5}\.HK$`）；上游 `stock_type` 仅作 debug 副路径，不参与分类决策
 - 未来接入的 broker：又是另一套
 
 本文档定义：
@@ -66,7 +66,7 @@ broker 原始数据
 
 **跨 broker 通用原则**：
 
-1. **adapter 只返回"自己支持的 `AssetType`"**。例如 IBKR/Tiger 返回 `STOCK` / `OPTION_CALL` / `OPTION_PUT`；长桥 v0.2 只返回 `STOCK`。
+1. **adapter 只返回"自己支持的 `AssetType`"**。例如 IBKR/Tiger 返回 `STOCK` / `OPTION_CALL` / `OPTION_PUT`；长桥 v0.2.3 只返回 `STOCK`。
 2. **不维护"识别了但跳过"的软白名单**。反模式详见 §4.2。
 3. **不允许"best-effort 继续"**。任何单条无法分类的数据都走 UNRECOGNIZED 路径，整批 cleanup。
 4. **"能支持的 `AssetType` 子集"由 broker 自己决定**，framework 不预设范围。

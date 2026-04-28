@@ -1,6 +1,6 @@
 # 老虎证券同步
 
-> **状态**：✅ Phase 1 已实现（API → 日志输出）；📋 Phase 3 设计稿已定（两阶段导入），待编码
+> **状态**：✅ Phase 3 已完成（API → `tiger_staged_orders` → `trade_records` 两阶段导入全链路落地，已与 IBKR 完全对齐 v2 状态模型 + fail-fast cleanup + P0 数据丢失链修复）
 > **适配器**：`TigerSyncAdapter`
 > **API 类型**：Tiger Open API（REST，官方 Java SDK）
 > **Broker Code**：`tiger`
@@ -15,9 +15,11 @@
 | Tiger Open API 调用（`get_filled_orders`） | ✅ | `TigerSyncAdapter` |
 | 反序列化为 `TigerOrderRecord` | ✅ | `TigerOrderRecord` |
 | 90 天时间窗口自动拆分 | ✅ | `TigerSyncAdapter.fetchOrdersInWindows` |
-| 日志逐条打印（核对原始数据） | ✅ | `TigerSyncAdapter` |
-| 暂存表 `tiger_staged_orders` | 📋 设计稿已定，待编码 | — |
-| 导入 `trade_records`（含去重、过滤） | 📋 设计稿已定，待编码 | — |
+| 暂存表 `tiger_staged_orders` | ✅ | Flyway V26 / `TigerStagedOrder` / `TigerStagedOrderRepository` |
+| 暂存表 → `trade_records` 字段映射 | ✅ | `TigerTradeRecordMapper` + `TigerImportWorker` |
+| 导入 `trade_records`（含去重、过滤） | ✅ | `TigerImportService` + `TigerImportWorker` |
+| 失败清理对齐 v2 状态模型 | ✅ | `TigerCleanupStrategy` + `SyncBatchFailureHandler` |
+| P0 数据丢失链修复（FAILED 持久化 / residual 计数 / fail-fast）| ✅ | 详见 [../../fix-p0-data-loss-chain.md](../../fix-p0-data-loss-chain.md) |
 | `attrDesc` 期权事件映射 | ⏭️ 延后（Phase 3.x 等真实样本） | — |
 
 ---
@@ -45,8 +47,8 @@
 
 ### 已知限制
 
-- **当前已部署**：Phase 1（日志输出），不写入数据库
-- **Phase 3 实施中**：设计稿已定稿，编码待开工，详见 [phase3-plan.md](./phase3-plan.md)
+- **Phase 3 已落地**：API → 暂存 → 导入 全链路已上线，详见 [phase3-plan.md](./phase3-plan.md)（阶段 1-5 全部 ✅）
+- **期权事件订单**（`attrDesc` 非空）当前统一标记 `FAILED`，等真实样本到位后在 Phase 3.x 补映射
 
 ---
 

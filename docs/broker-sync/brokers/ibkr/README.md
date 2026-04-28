@@ -1,6 +1,6 @@
 # IBKR（盈透证券）同步
 
-> **状态**：✅ Phase 2 已实现（API → 暂存 → 导入 全链路），待真实环境验证；🔧 失败清理机制待 [import-consistency.md](../../framework/import-consistency.md) v2 实施完成后全面对齐
+> **状态**：✅ Phase 2 已实现（API → 暂存 → 导入 全链路），失败清理与 [import-consistency.md](../../framework/import-consistency.md) v2.4.4 + P0 数据丢失链修复（[../../fix-p0-data-loss-chain.md](../../fix-p0-data-loss-chain.md)）已完整对齐
 > **适配器**：`IbkrSyncAdapter`
 > **API 类型**：Flex Web Service（REST + XML）
 > **Broker Code**：`ibkr`

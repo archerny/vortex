@@ -48,7 +48,7 @@ Futu 的后端**不直连富途云端**，而是连到用户本机 / 局域网�
 ### 2.1 包结构（沿用 IBKR / Tiger 骨架）
 
 ```
-backend/src/main/java/com/vortex/sync/broker/futu/
+backend/src/main/java/com/vortex/sync/adapter/futu/
 ├── FutuSyncAdapter.java              # BrokerSyncAdapter 实现
 ├── FutuOpenDClient.java              # OpenD 连接 / 解锁 / 请求封装（回调 → CompletableFuture）
 ├── FutuCredentials.java              # host / port / unlockPwdMd5 / accFilter / trdMarkets
@@ -57,8 +57,11 @@ backend/src/main/java/com/vortex/sync/broker/futu/
 ├── FutuAccount.java                  # 综合账户 + 市场权限
 ├── FutuRawFillParser.java            # Protobuf → FutuOrderFill
 ├── FutuStagedFillRepository.java     # staged 表读写
-└── FutuTradeRecordMapper.java        # staged → trade_records 的字段映射
+├── FutuTradeRecordMapper.java        # staged → trade_records 的字段映射
+└── FutuCleanupStrategy.java          # ★ BrokerCleanupStrategy 实现：清理 futu_staged_order_fills（framework 硬约束，缺则启动失败）
 ```
+
+> **framework 约束**：每个 broker adapter 必须配套提供 `BrokerCleanupStrategy` 实现并注册为 `@Component`，`SyncBatchCleanupService` 在 `@PostConstruct` 阶段会做 coverage check，缺失任何一个 adapter 的 strategy 会导致应用启动失败。详见 [`framework/import-consistency.md` § 5.3](../../framework/import-consistency.md#53-清理事务设计)。
 
 ### 2.2 OpenD 调用模型
 
@@ -117,6 +120,13 @@ FutuOpenDClient.getHistoryOrderFillList(accId, trdMarket, beginTime, endTime)
 ## 4. 数据模型
 
 ### 4.1 Staged 表：`futu_staged_order_fills`
+
+> **⚠️ 当前 DDL 已知问题（v0.2 必须修）**：下方 SQL 是 v0.1 早期草稿，与项目实际约定有以下偏差，编码前必须重写：
+> 1. **方言错误**：项目用 PostgreSQL（参见 V19–V28 Flyway），但下方 DDL 是 MySQL 方言（`AUTO_INCREMENT` / `TINYINT` / `DATETIME` / `JSON` / `KEY ...` / `ENGINE=InnoDB`）—— 长桥 v0.2.1 已修过同款问题
+> 2. **缺 v2 状态字段**：未包含 `status` / `imported_trade_id` / `error_message` / `updated_at`（对照 [`tiger/staging-schema.md § 3.1`](../tiger/staging-schema.md) / [`ibkr/staging-schema.md`](../ibkr/staging-schema.md)）
+> 3. **raw 字段类型与 staging 框架冲突**：使用了 `DECIMAL(20,8)` / `DATETIME` / `TINYINT` 等强类型，与 framework 约定的 "staged 表 raw 字段一律 `VARCHAR` 保持数据无损" 原则冲突（见 [`framework/data-persistence.md`](../../framework/data-persistence.md)）
+>
+> v0.2 review 时务必参照 IBKR / Tiger 现有 staging-schema 文档重写 DDL。
 
 沿用"每券商一张 staged 表，1:1 对应原始接口字段"约定：
 
@@ -185,18 +195,23 @@ CREATE TABLE futu_staged_order_fills (
 2. 连接 OpenD → initConnect → unlockTrade
 3. GetAccList（仅初次 / 凭证变更时）→ 过滤出启用的综合账户 × trdMarket 组合
 4. 对每个 (accId, trdMarket) 组合：
-   a. 计算待同步时间窗（from cursor → now），按 90 天拆分
+   a. 按调用方给定的时间窗（startTime → endTime），按 90 天拆分（不维护增量 cursor）
    b. 对每个 90 天窗口：
       - GetHistoryOrderFillList → List<FutuOrderFill>
       - GetHistoryOrderList     → Map<orderId, {currency, session}>
       - 合并 → 写入 futu_staged_order_fills
       - 限频：两次调用之间至少 3.5s（30s / 10 次 + 安全边际）
-   c. 推进 cursor
 5. Stage → trade_records 应用（与 IBKR / Tiger 同一套机制）
 6. 关闭 OpenD 连接
 ```
 
 **限频实现**：在 `FutuOpenDClient` 内置 `RateLimiter`（Guava 或 `Semaphore` + 滑动窗口），每个协议 ID 独立计数。
+
+**失败路径**（与 IBKR / Tiger 完全一致，不需要 Futu 专属逻辑）：
+- 单条映射失败 → `CategorizedSyncException(...)` 冒泡 → `ImportOneFailedException` → service `markFailed` 持久化 staged=FAILED
+- adapter 检测 `failedCount > 0 || residualCount > 0` → 返回 `SyncResult.failure(...)`
+- `BrokerSyncAsyncExecutor` → `SyncBatchFailureHandler.handleFailure` → `FutuCleanupStrategy.deleteStagedRows` + `trade_records` 清理 → `FAILED`（清理失败兜底 `CLEANUP_FAILED`）
+- `error_message` 用 `[AUTH]` / `[NETWORK]` / `[UNRECOGNIZED]` / `[INTERNAL]` 分类前缀（见 [`framework/unrecognized-data-logging.md`](../../framework/unrecognized-data-logging.md)）
 
 ---
 
@@ -227,8 +242,10 @@ record FutuCredentials(
 | Phase | 范围 | 产出 |
 |---|---|---|
 | **P1 (MVP)** | 仅实盘 / 仅 US + HK 市场 / 仅 `GetHistoryOrderFillList` + `GetHistoryOrderList` / 手动触发 | 可导入一个综合账户最近 90 天的美股 + 港股成交到 `trade_records` |
-| **P2** | 多综合账户 / 多市场（CN / SG / JP）/ 时间窗口拆分 / 限频保护 / 增量 cursor | 生产可用 |
+| **P2** | 多综合账户 / 多市场（CN / SG / JP）/ 时间窗口拆分 / 限频保护 | 生产可用 |
 | **P3.x** | 凭证加密完善 / OpenD 健康检查 / 对齐 v2 失败处理 / 期权事件补偿（如需要） | 对齐 IBKR / Tiger 成熟度 |
+
+> **不做"增量 cursor"**：板块统一约定每次按调用方给定的时间窗做幂等同步，不维护增量游标（参见长桥 v0.2.1 D-增量策略；Tiger / IBKR 也无 cursor）。重复同步靠"staged 表的 dedup key + `existsByExternalBrokerAndExternalId`"保证。
 
 ---
 

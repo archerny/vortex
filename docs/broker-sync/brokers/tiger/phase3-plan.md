@@ -1,7 +1,7 @@
 # Tiger Phase 3 — 编码与工作计划
 
 > **创建日期**：2026-04-21
-> **最近更新**：2026-04-23（Tiger 两阶段导入 + v2 状态模型 + 前端对齐全部完成；fail-fast 路径与 IBKR 完全对齐）
+> **最近更新**：2026-04-28（板块 review 同步：阶段 1/2 残留 checkbox 勾选；§ 七提交粒度表加状态列；§ 五阶段 7 文档同步 checklist 全部勾选）
 > **状态**：✅ 已完成 — 阶段 1-5 全部落地，与 IBKR 对齐的代码 review 与修复（窗口循环边界、ImportResult 契约、fail-fast 返回 failure 路径）均已合并
 > **目标**：将老虎证券同步从 Phase 1（API → 日志）升级为与 IBKR 对齐的两阶段导入（API → `tiger_staged_orders` → `trade_records`）
 > **关联**：[staging-schema.md](./staging-schema.md) | [open-api.md](./open-api.md) | [../../framework/data-persistence.md](../../framework/data-persistence.md) | [../../framework/import-consistency.md](../../framework/import-consistency.md) | [../ibkr/flex-web-service.md](../ibkr/flex-web-service.md)
@@ -89,7 +89,7 @@
   - `List<TigerStagedOrder> findByBatchIdAndStatus(Long batchId, String status)`
   - `long countByBatchIdAndStatus(Long batchId, String status)`
 - [x] 编译通过（`mvn -q -DskipTests compile` 本地验证通过，2026-04-22）
-- [ ] 启动本地环境验证 Flyway 正常执行，表结构正确（延后到阶段 5 端到端验证时一并完成）
+- [x] 启动本地环境验证 Flyway 正常执行，表结构正确（已随阶段 5 端到端验证 + 真实环境运行确认通过）
 
 **产出**：编译通过 ✅；Entity 与 Repository 就绪；Flyway 迁移就位等待首次启动执行。
 
@@ -113,7 +113,7 @@
   - 返回 `StagingResult { attempted, inserted, skipped }`（`attempted == inserted + skipped` 不变量；正常返回即表示无失败）
   - **不负责** API 调用，纯处理内存数据 → DB
 - [x] 编译通过（`mvn -q -DskipTests compile` 本地验证通过，2026-04-22）
-- [ ] 单元测试（`TigerStagingWorkerTest`）：本阶段未写；计划中本身将其标为"可选"，实际可放在 Stage 3 的单测批次里或延后
+- [⏭️] 单元测试（`TigerStagingWorkerTest`）：本阶段未写；计划中本身将其标为"可选"，已由 Stage 3 的 `TigerTradeRecordMapperTest` + Stage 4 的 `TigerImportWorkerTest` 集体覆盖等价行为，单独写 worker 测试不再补
 
 **产出**：Stage 2 代码就绪；等阶段 3 的 Mapper 单测完成后，再在集成/冒烟测试中验证"mock 一组 `TigerOrderRecord` → 正确写入 `tiger_staged_orders` 且幂等"。
 
@@ -273,14 +273,14 @@
 
 严格执行项目 **Documentation Sync — Zero Debt Policy**。每次提交都必须同步更新相关文档，而不是留到最后。
 
-提交前 checklist：
+提交前 checklist（✅ 全部完成 2026-04-28 板块 review 时已对齐）：
 
-- [ ] `docs/broker-sync/brokers/tiger/staging-schema.md` — 随实现调整（如字段长度实际用了 VARCHAR(50) 等）
-- [ ] `docs/broker-sync/brokers/tiger/phase3-plan.md`（本文件）— 勾选已完成阶段，状态行更新
-- [ ] `docs/broker-sync/brokers/tiger/README.md` — 能力表 Phase 3 从 📋 改 ✅，移除"Phase 3 规划项"遗留条目
-- [ ] `docs/broker-sync/brokers/tiger/open-api.md` — "后续待办"中已完成项打勾；追加 "Phase 3 实现记录" 章节
-- [ ] `docs/broker-sync/README.md` — 文档索引状态、分期计划的 Phase 3 状态
-- [ ] `docs/broker-sync/framework/data-persistence.md` — `trade_records` 字段映射章节加 Tiger 行；D-6 从"可后续再说"移到"已解决"
+- [x] `docs/broker-sync/brokers/tiger/staging-schema.md` — 随实现调整（如字段长度实际用了 VARCHAR(50) 等）
+- [x] `docs/broker-sync/brokers/tiger/phase3-plan.md`（本文件）— 勾选已完成阶段，状态行更新
+- [x] `docs/broker-sync/brokers/tiger/README.md` — 能力表 Phase 3 从 📋 改 ✅，移除"Phase 3 规划项"遗留条目（2026-04-28 板块 review 修正）
+- [x] `docs/broker-sync/brokers/tiger/open-api.md` — "后续待办"中已完成项打勾；同步把 brokerName→brokerCode、架构图、curl 示例等过期描述刷新
+- [x] `docs/broker-sync/README.md` — 文档索引状态、分期计划的 Phase 3 状态
+- [x] `docs/broker-sync/framework/data-persistence.md` — `trade_records` 字段映射章节加 Tiger 行；D-6 从"可后续再说"移到"已解决"
 
 ---
 
@@ -343,14 +343,14 @@
 
 按 Conventional Commits 拆分，**每阶段一条提交**，便于回滚与代码评审：
 
-| 提交 | 类型 | 建议 message |
-|------|------|-------------|
-| 1 | feat(backend) | `feat(backend): create tiger_staged_orders table and seed broker_code` |
-| 2 | feat(backend) | `feat(backend): add attrDesc to TigerOrderRecord and stage tiger orders to DB` |
-| 3 | feat(backend) | `feat(backend): add TigerTradeRecordMapper with unit tests` |
-| 4 | feat(backend) | `feat(backend): import tiger staged orders into trade_records` |
-| 5 | feat(backend) | `feat(backend): wire TigerSyncAdapter with staging and import services` |
-| 6 | docs | `docs(broker-sync): mark tiger phase 3 complete in status pages` |
+| 提交 | 类型 | 建议 message | 状态 |
+|------|------|-------------|------|
+| 1 | feat(backend) | `feat(backend): create tiger_staged_orders table and seed broker_code` | ✅ 已落地 |
+| 2 | feat(backend) | `feat(backend): add attrDesc to TigerOrderRecord and stage tiger orders to DB` | ✅ 已落地 |
+| 3 | feat(backend) | `feat(backend): add TigerTradeRecordMapper with unit tests` | ✅ 已落地 |
+| 4 | feat(backend) | `feat(backend): import tiger staged orders into trade_records` | ✅ 已落地 |
+| 5 | feat(backend) | `feat(backend): wire TigerSyncAdapter with staging and import services` | ✅ 已落地 |
+| 6 | docs | `docs(broker-sync): mark tiger phase 3 complete in status pages` | ✅ 已并入 2026-04-28 板块 review commit |
 
 **每次提交前必须：**
 1. 单测跑通

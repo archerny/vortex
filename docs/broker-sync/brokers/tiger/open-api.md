@@ -1,7 +1,7 @@
 # 老虎证券同步方案（设计与实现记录）
 
-> **状态**: Phase 1 已实现（API 调通 → 日志输出）；Phase 3 两阶段导入设计稿已定（见 [phase3-plan.md](./phase3-plan.md)）
-> **日期**: 2026-03-14（方案讨论） → 2026-03-31（Phase 1 实现完成） → 2026-04-21（Phase 3 设计稿定稿）
+> **状态**: ✅ Phase 1 + Phase 3 均已实现（API → `tiger_staged_orders` → `trade_records` 两阶段导入全链路落地，对齐 v2 状态模型 + fail-fast cleanup + P0 修复）
+> **日期**: 2026-03-14（方案讨论） → 2026-03-31（Phase 1 实现完成） → 2026-04-21（Phase 3 设计稿定稿） → 2026-04-22（Phase 3 编码完成）
 > **关联**: [../../architecture.md](../../architecture.md) | [../../README.md](../../README.md) | [staging-schema.md](./staging-schema.md) | [phase3-plan.md](./phase3-plan.md)
 
 ---
@@ -35,17 +35,18 @@
                              │ SyncRequest
                              ▼
                   ┌──────────────────────┐
-                  │  BrokerSyncService   │  按 brokerName 路由到适配器
+                  │  BrokerSyncService   │  按 brokerCode 路由到适配器
                   │  (编排服务)           │  自动发现所有 BrokerSyncAdapter
                   └──────────┬───────────┘
                              │
-              ┌──────────────┼──────────────┐
-              ▼              ▼              ▼
-     ┌─────────────┐  ┌───────────┐  ┌───────────┐
-     │TigerSync    │  │ (ibkr)    │  │ (futu)    │  ← 未来扩展
-     │Adapter      │  │ 预留      │  │ 预留      │
-     └──────┬──────┘  └───────────┘  └───────────┘
-            │
+        ┌────────────┬───────┴──────┬─────────────┬─────────────┐
+        ▼            ▼              ▼             ▼             ▼
+  ┌──────────┐ ┌───────────┐ ┌───────────┐ ┌───────────┐ ┌───────────┐
+  │TigerSync │ │ IbkrSync  │ │ (longbr)  │ │ (futu)    │ │ (schwab)  │
+  │Adapter ✅│ │ Adapter ✅│ │ 设计稿 📋  │ │ 设计稿 📋  │ │ 待启动    │
+  └─────┬────┘ └───────────┘ └───────────┘ └───────────┘ └───────────┘
+        │
+        ▼
             ▼
      ┌─────────────────────────────────┐
      │ Tiger Open API (SDK v2.4.7)     │
@@ -116,32 +117,32 @@ com.vortex
 
 ```java
 public interface BrokerSyncAdapter {
-    String getBrokerName();        // 返回券商标识（如 "tiger"）
+    String getBrokerCode();        // 返回券商标识（如 "tiger"）
     SyncResult sync(SyncRequest request);  // 执行同步
 }
 ```
 
 #### `BrokerSyncService.java` — 编排服务
 
-- 构造方法通过 Spring IoC 自动注入所有 `BrokerSyncAdapter` 实现，构建 `Map<String, BrokerSyncAdapter>` 索引
-- `sync(SyncRequest)` 根据 `brokerName` 路由到对应适配器
+- 构造方法通过 Spring IoC 自动注入所有 `BrokerSyncAdapter` 实现，构建 `Map<String, BrokerSyncAdapter>` 索引（key 为 `brokerCode`）
+- `sync(SyncRequest)` 根据 `brokerCode` 路由到对应适配器
 - `getSupportedBrokers()` 返回已注册券商列表
 
 #### `SyncRequest.java` — 请求模型
 
 | 字段 | 类型 | 必填 | 说明 |
 |------|------|------|------|
-| `brokerName` | String | ✅ | 券商标识，用于匹配适配器 |
+| `brokerCode` | String | ✅ | 券商标识，用于匹配适配器 |
 | `startTime` | String | ❌ | 同步起始时间，格式 `yyyy-MM-dd`，默认由适配器决定 |
 | `endTime` | String | ❌ | 同步截止时间，格式 `yyyy-MM-dd`，默认由适配器决定 |
 
 #### `SyncResult.java` — 结果模型
 
 通过静态工厂方法创建：
-- `SyncResult.success(brokerName, totalRecords, durationMs)`
-- `SyncResult.failure(brokerName, errorMessage, durationMs)`
+- `SyncResult.success(brokerCode, totalRecords, durationMs)`
+- `SyncResult.failure(brokerCode, errorMessage, durationMs)`
 
-字段：`success`、`brokerName`、`totalRecords`、`message`、`durationMs`
+字段：`success`、`brokerCode`、`totalRecords`、`message`、`durationMs`
 
 ### 4.2 Tiger 适配器（`sync/adapter/tiger/`）
 
@@ -245,12 +246,12 @@ Tiger API 限制 `start_time` 和 `end_time` 之间的间隔不能超过 90 天�
 # 最简请求（默认查最近 90 天）
 curl -X POST http://localhost:8080/api/broker-sync/trigger \
   -H "Content-Type: application/json" \
-  -d '{"brokerName":"tiger"}'
+  -d '{"brokerCode":"tiger"}'
 
 # 指定时间范围
 curl -X POST http://localhost:8080/api/broker-sync/trigger \
   -H "Content-Type: application/json" \
-  -d '{"brokerName":"tiger","startTime":"2025-01-01","endTime":"2025-03-31"}'
+  -d '{"brokerCode":"tiger","startTime":"2025-01-01","endTime":"2025-03-31"}'
 
 # 查询支持的券商
 curl http://localhost:8080/api/broker-sync/brokers
@@ -260,7 +261,7 @@ curl http://localhost:8080/api/broker-sync/brokers
 
 ```json
 // 成功
-{"status":"SUCCESS", "message":"同步完成", "data": {"success":true, "brokerName":"tiger", "totalRecords":42, "durationMs":1234, "message":"..."}}
+{"status":"SUCCESS", "message":"同步完成", "data": {"success":true, "brokerCode":"tiger", "totalRecords":42, "durationMs":1234, "message":"..."}}
 
 // 失败
 {"status":"ERROR", "message":"同步失败 [tiger]：API 凭证未配置（耗时 0 ms）"}
@@ -339,10 +340,10 @@ broker.tiger.account=your_account_here
 ## 8. 后续待办
 
 - [x] `application-local.properties` 中补充 Tiger 凭证配置（Phase 1 已完成）
-- [ ] **Phase 3（设计稿已定，待编码）**：
-  - 暂存表 + 两阶段导入 `trade_records`
-  - 基于 Tiger `id`（全局唯一订单 ID）的去重
-  - `TigerTradeRecordMapper` 单元测试
+- [x] **Phase 3（已完成 2026-04-22）**：
+  - [x] 暂存表 + 两阶段导入 `trade_records`
+  - [x] 基于 Tiger `id`（全局唯一订单 ID）的去重
+  - [x] `TigerTradeRecordMapper` 单元测试（25 个用例全绿）
   - 详细阶段与任务拆分见 [phase3-plan.md](./phase3-plan.md)
 - [ ] **Phase 3.x（延后，等真实样本）**：
   - `attrDesc` 枚举值收集 + 期权事件映射补齐

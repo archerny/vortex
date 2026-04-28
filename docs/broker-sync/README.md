@@ -27,7 +27,7 @@
 | [brokers/ibkr/staging-schema.md](./brokers/ibkr/staging-schema.md) | IBKR 暂存表结构与字段映射规范 | ✅ 已实现 |
 | [brokers/ibkr/booktrade-mapping.md](./brokers/ibkr/booktrade-mapping.md) | BookTrade 触发判定与期权事件导入映射（含缺失/异常 TradeConfirm fail-fast 处理；GEA token 支持） | ✅ 已实现（2026-04-23 更新） |
 | [brokers/futu/README.md](./brokers/futu/README.md) | 富途证券同步设计稿（OpenD 本地网关 + `GetHistoryOrderFillList` + 综合账户×市场展开） | 📋 设计稿 v0.1（待 review） |
-| [brokers/longbridge/README.md](./brokers/longbridge/README.md) | 长桥证券同步设计稿（Rust JNI SDK + `getHistoryExecutions` + 订单表补字段 + `has_more` 嵌套翻页 + 手续费从 `order_detail` 取 + 期权/窝轮 UNRECOGNIZED fail-fast） | 📋 设计稿 v0.2.1（D1–D9 决策已锁定，可进入编码） |
+| [brokers/longbridge/README.md](./brokers/longbridge/README.md) | 长桥证券同步设计稿（Java SDK + `getHistoryExecutions`/`getHistoryOrders` 1000 条 + `has_more` 双接口翻页 + 同秒 ≥1000 死循环守卫 + `charge_detail` 聚合费用 + 期权/窝轮 UNRECOGNIZED fail-fast） | 📋 设计稿 v0.2.3（H1–H4/M1–M5 review 修正已合入，可进入编码） |
 
 ---
 
@@ -44,7 +44,7 @@
 
 ## 开放问题快速索引
 
-> **最后整理**：2026-04-23
+> **最后整理**：2026-04-28
 
 所有待讨论问题汇总在 [framework/data-persistence.md § 九、开放问题与待后续讨论](./framework/data-persistence.md#九开放问题与待后续讨论)，按优先级分类：
 
