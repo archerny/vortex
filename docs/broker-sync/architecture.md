@@ -1,7 +1,7 @@
 # 券商同步 — 架构概览
 
 > **创建日期**：2026-04-21
-> **最后更新**：2026-04-28（包结构补充 longbridge / futu adapter 占位；Phase 3 状态保持已落地）
+> **最后更新**：2026-04-30（M8：包结构补 v2 cleanup 框架核心类——core/ 增 BrokerCleanupStrategy / SyncBatchCleanupService / SyncBatchFailureHandler / SyncBatchRecoveryRunner / SyncResult；ibkr/ 与 tiger/ 各补 XxxCleanupStrategy 与遗漏的 worker / mapper 文件）
 > **状态**：✅ 架构已落地（Phase 1 / Phase 2 / Phase 3 均完成；后续为 Phase 3.x 等增量能力）
 > **关联**：[README.md](./README.md) | [framework/data-persistence.md](./framework/data-persistence.md) | [framework/import-consistency.md](./framework/import-consistency.md) | [framework/broker-registration.md](./framework/broker-registration.md)
 
@@ -43,11 +43,27 @@ com.vortex
     │   ├── BrokerSyncAdapter.java          ← 统一适配器接口
     │   ├── BrokerSyncService.java          ← 核心同步编排逻辑
     │   ├── BrokerSyncAsyncExecutor.java    ← @Async 异步执行器（独立 Bean）
-    │   └── SyncRequest.java                ← 同步请求参数
+    │   ├── BrokerSyncInfo.java             ← 适配器自描述（前端发现用）
+    │   ├── SyncRequest.java                ← 同步请求参数
+    │   ├── SyncResult.java                 ← 同步结果（success / failure 工厂）
+    │   ├── CategorizedSyncException.java   ← 跨 broker 通用异常（带 category + ext_id）
+    │   ├── FailureCategory.java            ← AUTH / NETWORK / UNRECOGNIZED / INTERNAL
+    │   ├── BrokerCleanupStrategy.java      ← v2 失败清理契约（每个 broker 必须实现）
+    │   ├── SyncBatchCleanupService.java    ← v2 清理服务，@PostConstruct 校验 strategy 全覆盖
+    │   ├── SyncBatchFailureHandler.java    ← 统一失败入口，调度 cleanup + 状态跃迁
+    │   └── SyncBatchRecoveryRunner.java    ← 启动时扫描遗留中间态批次并恢复
     └── adapter/
         ├── tiger/
         │   ├── TigerSyncAdapter.java
-        │   └── TigerOrderRecord.java       ← 老虎证券专属原始模型
+        │   ├── TigerApiProperties.java
+        │   ├── TigerOrderRecord.java       ← 老虎证券专属原始模型
+        │   ├── TigerStagingService.java    ← 暂存表写入（编排）
+        │   ├── TigerStagingWorker.java     ← staging 单条事务边界
+        │   ├── TigerImportService.java     ← 暂存 → trade_records（编排）
+        │   ├── TigerImportWorker.java      ← import 单条事务边界
+        │   ├── TigerTradeRecordMapper.java ← Tiger raw → trade_records 映射
+        │   ├── TigerCleanupStrategy.java   ← Tiger 专属 cleanup 实现
+        │   └── ImportOneFailedException.java
         ├── ibkr/
         │   ├── IbkrSyncAdapter.java
         │   ├── IbkrFlexClient.java
@@ -56,8 +72,12 @@ com.vortex
         │   ├── FlexQueryParseResult.java
         │   ├── IbkrOrderRecord.java        ← IBKR 专属原始模型（Order 粒度）
         │   ├── IbkrTradeConfirm.java       ← IBKR 执行明细模型
-        │   ├── IbkrStagingService.java     ← 暂存表写入
-        │   └── IbkrImportService.java      ← 暂存 → trade_records 导入
+        │   ├── IbkrStagingService.java     ← 暂存表写入（编排）
+        │   ├── IbkrStagingWorker.java      ← staging 单条事务边界
+        │   ├── IbkrImportService.java      ← 暂存 → trade_records（编排）
+        │   ├── IbkrImportWorker.java       ← import 单条事务边界
+        │   ├── IbkrCleanupStrategy.java    ← IBKR 专属 cleanup 实现
+        │   └── ImportOneFailedException.java
         ├── longbridge/                     ← 📋 设计稿 v0.2.3，未编码（占位）
         └── futu/                           ← 📋 设计稿 v0.1，未编码（占位）
 ```
