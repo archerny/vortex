@@ -2,7 +2,7 @@
 
 **状态**：✅ 已实现（2026-04-24）
 **适用范围**：所有 broker adapter（跨 broker 通用契约）
-**最后更新**：2026-04-27（`raw_payload` 归档位置措辞软化：从"所有 broker 都有此列"改为"多数 broker 有，长桥 staged 只落 `charge_items` 子集"）
+**最后更新**：2026-04-30（M7：长桥版本号 v0.2 → v0.2.3，与 longbridge/README.md 自身对齐）
 
 ## 1. 背景与目标
 
@@ -30,7 +30,7 @@
 **通用简化原则**：adapter **不维护"已识别但不支持"的白名单**。凡是该 adapter 当前版本不映射到合法 `AssetType` 的数据，一律按 `UNRECOGNIZED` 处理。理由：
 
 1. 所有"不能落库"的数据都走同样的 fail-fast 路径，再细分分类不产生行为差异，只会增加维护成本
-2. "支持哪些类型"是 **per-broker** 的决策（例如 Tiger/IBKR 已支持 OPTION_CALL/OPTION_PUT，长桥 v0.2 暂时只支持 STOCK），在 framework 层做全局分类会引入错误假设
+2. "支持哪些类型"是 **per-broker** 的决策（例如 Tiger/IBKR 已支持 OPTION_CALL/OPTION_PUT，长桥 v0.2.3 暂时只支持 STOCK），在 framework 层做全局分类会引入错误假设
 3. 若某个 broker 后续需要"软降级"（识别但跳过+落 staged 归档），届时再针对该 broker 设计 `UNSUPPORTED` 分类
 
 **`error_message` 格式**（由 `CategorizedSyncException.format(category, externalId, reason)` 统一生成，源码见 `backend/src/main/java/com/vortex/sync/core/CategorizedSyncException.java`）：
@@ -64,7 +64,7 @@
 
 1. **证券类型无法映射到合法 `AssetType`**：
    - 完全没见过的 raw_type（如 `FOO`）
-   - 见过但该 broker adapter 当前版本未实现处理（例如长桥 v0.2 未处理 OPTION；IBKR/Tiger 已处理 OPTION）
+   - 见过但该 broker adapter 当前版本未实现处理（例如长桥 v0.2.3 未处理 OPTION；IBKR/Tiger 已处理 OPTION）
    - 判定规则参见 `symbol-classification.md` 和对应 broker 的 design doc
 2. **枚举值未见过**：例如 trade 的 `side` 字段出现非 `BUY`/`SELL` 的值
 3. **必填字段缺失**：broker 文档说一定有但实际没有的字段

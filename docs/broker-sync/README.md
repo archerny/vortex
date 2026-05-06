@@ -90,7 +90,7 @@
 |---------|:---:|:---:|:---:|:---:|------|
 | `TigerSyncAdapter` | ✅ | ✅ | ✅ | ➖ | 上游 secType `STK`/`OPT`；ETF 当前归入 STOCK |
 | `IbkrSyncAdapter` | ✅ | ✅ | ✅ | ➖ | 上游 assetCategory `STK`/`OPT`（`putCall=C/P` 区分）；ETF 当前归入 STOCK |
-| `LongbridgeSyncAdapter` | ✅ (v0.2) | ❌ | ❌ | ❌ | 设计稿 v0.2 仅支持股票，期权后续版本再加 |
+| `LongbridgeSyncAdapter` | ✅ (v0.2.3) | ❌ | ❌ | ❌ | 设计稿 v0.2.3 仅支持股票，期权后续版本再加 |
 | `FutuSyncAdapter` | 📋 | 📋 | 📋 | 📋 | 设计稿，未落地 |
 | `SchwabSyncAdapter` | 📋 | 📋 | 📋 | 📋 | 尚未启动 |
 

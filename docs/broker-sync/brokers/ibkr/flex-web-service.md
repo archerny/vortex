@@ -206,7 +206,7 @@ Portal 配置了 37 个字段，以下是完整的字段列表、Portal 配置�
 #### 4.3.4 ✅ 同步适配器 `IbkrSyncAdapter`
 
 - 实现 `BrokerSyncAdapter` 接口
-- `getBrokerName()` → `"ibkr"`
+- `getBrokerCode()` → `"ibkr"`
 - `sync(SyncRequest)` → 调用 FlexClient → 解析 XML 报告 → 日志输出
 - **分段请求**：当 `SyncRequest` 的日期范围超过 365 天时，自动按 ≤365 天的窗口拆分为多次请求，逐段调用 FlexClient 并汇总结果（与 Tiger 适配器中 `fetchOrdersInWindows()` 的 90 天窗口拆分逻辑类似）
 - **速率限制**：由 `IbkrFlexClient` 内部统一管控 rate limiter，确保请求频率不超过每秒 1 次
