@@ -1,5 +1,6 @@
 # Vortex
 
+
 A personal investment portfolio management system designed for individual investors who trade across multiple brokers and markets. Vortex provides a unified platform to manage trade records, cash flows, position snapshots, and market events — with the goal of accurate profit & loss analysis.
 
 ## Features
