@@ -1,45 +1,35 @@
-# ========== OS ==========
+# Operating system files
 .DS_Store
 Thumbs.db
 
-# ========== IDE ==========
+# Editor and agent files
 .idea/
-*.iml
 .vscode/
-*.swp
-*.swo
 .codebuddy/
+*.iml
+*.swo
+*.swp
 
-# ========== Java / JVM ==========
+# Local development environment
+/.dev-environment.local.md
+/.venv/
+.firecrawl/
+
+# Java and Maven build output
+target/
 *.class
+*.ear
 *.jar
 *.war
-*.ear
+
+# Node.js dependencies and build output
+node_modules/
+dist/
+
+# Deployment output
+/deploy/output/
+
+# Logs and JVM diagnostics
+*.log
 hs_err_pid*
 replay_pid*
-
-# ========== Maven ==========
-**/target/
-
-# ========== Node.js ==========
-**/node_modules/
-**/dist/
-
-# ========== Logs ==========
-*.log
-
-# ========== Archives ==========
-*.zip
-*.tar.gz
-*.rar
-
-# ========== Project-specific: deploy artifacts ==========
-deploy/output/
-deploy/*.tar.gz
-deploy/*.zip
-
-# ========== Project-specific: local development environment ==========
-/.dev-environment.local.md
-
-# ========== Project-specific: Firecrawl temp data ==========
-.firecrawl/
