@@ -3,9 +3,9 @@
 > **创建日期**：2026-04-13
 > **最后更新**：2026-04-23（D-6 归档至已解决；Phase 3 后清单同步）
 > **状态**：✅ 表结构与 Entity 已实现（DB 迁移 V19 + V22-V24 + V28）；✅ 应用层与前端行为已完整切换到 v2（fail-fast cleanup + 409 conflict + 无 resume）
-> **关联**：[architecture.md](../architecture.md) | [import-consistency.md](./import-consistency.md) | [broker-registration.md](./broker-registration.md) | [brokers/ibkr/staging-schema.md](../brokers/ibkr/staging-schema.md)
+> **关联**：[architecture.md](../knowledge/broker-sync/README.md) | [import-consistency.md](0018-2026-04-22-broker-import-consistency-v2.md) | [broker-registration.md](0011-2026-04-17-broker-registration.md) | [brokers/ibkr/staging-schema.md](0013-2026-04-21-ibkr-staging-schema.md)
 
-本文档定义**框架层通用**的数据持久化方案：`broker_sync_batches`（通用批次表）、`trade_records` 扩展字段、以及所有券商共同遵守的「暂存 → 导入」两阶段原则。各券商专属的暂存表结构与字段映射在各自的 `brokers/<code>/staging-schema.md` 中定义（如 [brokers/ibkr/staging-schema.md](../brokers/ibkr/staging-schema.md)）。
+本文档定义**框架层通用**的数据持久化方案：`broker_sync_batches`（通用批次表）、`trade_records` 扩展字段、以及所有券商共同遵守的「暂存 → 导入」两阶段原则。各券商专属的暂存表结构与字段映射在各自的 `brokers/<code>/staging-schema.md` 中定义（如 [brokers/ibkr/staging-schema.md](0013-2026-04-21-ibkr-staging-schema.md)）。
 
 ---
 
@@ -43,8 +43,8 @@ Phase 1 已跑通「券商 API → 解析 → 日志输出」的基本流程，�
 |------|------|------|
 | `broker_sync_batches` | 新建表 | 通用同步批次元信息表（本文档定义） |
 | `trade_records` 扩展 | 新增字段 | 新增 `external_id`、`external_broker`、`sync_batch_id` 三个字段（本文档定义） |
-| `ibkr_staged_orders` | 新建表 | IBKR 核心暂存表 —— 详见 [brokers/ibkr/staging-schema.md](../brokers/ibkr/staging-schema.md) |
-| `ibkr_staged_trade_confirms` | 新建表 | IBKR 执行明细附表 —— 详见 [brokers/ibkr/staging-schema.md](../brokers/ibkr/staging-schema.md) |
+| `ibkr_staged_orders` | 新建表 | IBKR 核心暂存表 —— 详见 [brokers/ibkr/staging-schema.md](0013-2026-04-21-ibkr-staging-schema.md) |
+| `ibkr_staged_trade_confirms` | 新建表 | IBKR 执行明细附表 —— 详见 [brokers/ibkr/staging-schema.md](0013-2026-04-21-ibkr-staging-schema.md) |
 
 ---
 
@@ -57,7 +57,7 @@ Phase 1 已跑通「券商 API → 解析 → 日志输出」的基本流程，�
 | 列名 | 类型 | 约束 | 说明 |
 |------|------|------|------|
 | `id` | BIGSERIAL | PK | 主键 |
-| `broker_code` | VARCHAR(50) | NOT NULL | 券商技术标识（如 `ibkr`、`tiger`），详见 [broker-registration.md](./broker-registration.md) |
+| `broker_code` | VARCHAR(50) | NOT NULL | 券商技术标识（如 `ibkr`、`tiger`），详见 [broker-registration.md](0011-2026-04-17-broker-registration.md) |
 | `sync_date_from` | DATE | NOT NULL | 同步数据的起始日期 |
 | `sync_date_to` | DATE | NOT NULL | 同步数据的结束日期 |
 | `total_count` | INTEGER | NOT NULL DEFAULT 0 | 同步记录总数 |
@@ -65,7 +65,7 @@ Phase 1 已跑通「券商 API → 解析 → 日志输出」的基本流程，�
 | `skipped_count` | INTEGER | NOT NULL DEFAULT 0 | 跳过的数量（重复记录等） |
 | ~~`failed_count`~~ | ~~INTEGER~~ | — | **已由 V28 删除**（v2：没有"部分失败"概念，任一记录失败会触发整批清理。保留该行仅为历史参考；V19-V27 时期存在此列） |
 | `status` | VARCHAR(32) | NOT NULL | 批次状态（见下方状态枚举） |
-| `phase` | VARCHAR(32) | | `PROCESSING` 时表示当前阶段（FETCHING/STAGING/IMPORTING）；`CLEANUP_FAILED` 时保留清理发起时的阶段用于诊断；其他状态为 NULL。详见 [import-consistency.md](./import-consistency.md) |
+| `phase` | VARCHAR(32) | | `PROCESSING` 时表示当前阶段（FETCHING/STAGING/IMPORTING）；`CLEANUP_FAILED` 时保留清理发起时的阶段用于诊断；其他状态为 NULL。详见 [import-consistency.md](0018-2026-04-22-broker-import-consistency-v2.md) |
 | `error_message` | TEXT | | 批次级错误信息 |
 | `started_at` | TIMESTAMP | | 同步开始时间 |
 | `completed_at` | TIMESTAMP | | 同步完成时间 |
@@ -84,7 +84,7 @@ Phase 1 已跑通「券商 API → 解析 → 日志输出」的基本流程，�
 | `FAILED` | 失败且数据已清理（终态，保证无残留） |
 | `CLEANUP_FAILED` | 失败且清理本身失败，数据可能有残留，阻塞所有新 sync 直到人工介入（活跃态） |
 
-> 状态机细节、Phase 字段含义、并发控制（DB 级唯一约束）、清理机制、CLEANUP_FAILED 人工处理 SOP 详见 [import-consistency.md](./import-consistency.md)。
+> 状态机细节、Phase 字段含义、并发控制（DB 级唯一约束）、清理机制、CLEANUP_FAILED 人工处理 SOP 详见 [import-consistency.md](0018-2026-04-22-broker-import-consistency-v2.md)。
 >
 > **v1 → v2 对照**（仅供历史追溯，v1 的 `PARTIAL` / `INTERRUPTED` 不再使用）：
 > - v1 `PARTIAL`（部分成功） → v2：整批 `FAILED` + 清理
@@ -175,8 +175,8 @@ trade_records.(external_broker + external_id) ←→ <broker>_staged_orders.orde
 ```
 
 各券商专属暂存表的详细结构参见：
-- IBKR：[brokers/ibkr/staging-schema.md](../brokers/ibkr/staging-schema.md)
-- Tiger：（暂存表 Phase 3 接入，参考 [brokers/tiger/open-api.md](../brokers/tiger/open-api.md)）
+- IBKR：[brokers/ibkr/staging-schema.md](0013-2026-04-21-ibkr-staging-schema.md)
+- Tiger：（暂存表 Phase 3 接入，参考 [brokers/tiger/open-api.md](0006-2026-03-14-tiger-open-api.md)）
 
 ---
 
@@ -192,19 +192,19 @@ schwab_staged_orders            → 字段 1:1 对应 SchwabTradeRecord
 futu_staged_orders              → 字段 1:1 对应 FutuOrderRecord
 ```
 
-`broker_sync_batches` 表通用，无需修改。`trade_records` 扩展字段也通用（`external_broker` 区分来源，`external_id` 存各券商的订单 ID）。每个新券商应在 `brokers/<code>/` 目录下新建一份类似 [brokers/ibkr/staging-schema.md](../brokers/ibkr/staging-schema.md) 的文档，定义自己的暂存表结构与字段映射规范。
+`broker_sync_batches` 表通用，无需修改。`trade_records` 扩展字段也通用（`external_broker` 区分来源，`external_id` 存各券商的订单 ID）。每个新券商应在 `brokers/<code>/` 目录下新建一份类似 [brokers/ibkr/staging-schema.md](0013-2026-04-21-ibkr-staging-schema.md) 的文档，定义自己的暂存表结构与字段映射规范。
 
 ### 8.2 Flyway 迁移脚本
 
 | 脚本 | 内容 | 状态 |
 |------|------|------|
 | `V19__create_broker_sync_batches.sql` | 创建 `broker_sync_batches` 表 | ✅ 已完成 |
-| `V20__create_ibkr_staged_orders.sql` | 创建 `ibkr_staged_orders` 表（IBKR 专属，见 [brokers/ibkr/staging-schema.md](../brokers/ibkr/staging-schema.md)） | ✅ 已完成 |
+| `V20__create_ibkr_staged_orders.sql` | 创建 `ibkr_staged_orders` 表（IBKR 专属，见 [brokers/ibkr/staging-schema.md](0013-2026-04-21-ibkr-staging-schema.md)） | ✅ 已完成 |
 | `V21__create_ibkr_staged_trade_confirms.sql` | 创建 `ibkr_staged_trade_confirms` 表（IBKR 专属） | ✅ 已完成 |
 | `V22__add_external_fields_to_trade_records.sql` | 为 `trade_records` 新增 `external_id`、`external_broker`、`sync_batch_id` 字段 | ✅ 已完成 |
-| `V23__add_broker_code_and_rename_batch_broker_name.sql` | `brokers` 新增 `broker_code` 列（UNIQUE 部分索引）+ `broker_sync_batches.broker_name` → `broker_code` 改名 | ✅ 已完成，详见 [broker-registration.md](./broker-registration.md) |
-| `V24__add_phase_and_expand_batch_status.sql` | `broker_sync_batches` 新增 `phase` 列 + `status` 枚举扩展（引入 `PROCESSING` / `PARTIAL` / `INTERRUPTED`） | ✅ 已执行（**历史脚本，`PARTIAL` / `INTERRUPTED` 已由 V28 在 v2 模型中废弃**），详见 [import-consistency.md](./import-consistency.md) |
-| `V28__simplify_sync_batch_state_model.sql` | 删除 `failed_count` 列；刷新 `status` / `phase` 注释（5 态模型）；新增部分唯一索引 `uk_only_one_active`（PostgreSQL 部分索引，约束"至多一个活跃 batch"） | ✅ 已执行，详见 [import-consistency.md § 四 / § 六](./import-consistency.md) |
+| `V23__add_broker_code_and_rename_batch_broker_name.sql` | `brokers` 新增 `broker_code` 列（UNIQUE 部分索引）+ `broker_sync_batches.broker_name` → `broker_code` 改名 | ✅ 已完成，详见 [broker-registration.md](0011-2026-04-17-broker-registration.md) |
+| `V24__add_phase_and_expand_batch_status.sql` | `broker_sync_batches` 新增 `phase` 列 + `status` 枚举扩展（引入 `PROCESSING` / `PARTIAL` / `INTERRUPTED`） | ✅ 已执行（**历史脚本，`PARTIAL` / `INTERRUPTED` 已由 V28 在 v2 模型中废弃**），详见 [import-consistency.md](0018-2026-04-22-broker-import-consistency-v2.md) |
+| `V28__simplify_sync_batch_state_model.sql` | 删除 `failed_count` 列；刷新 `status` / `phase` 注释（5 态模型）；新增部分唯一索引 `uk_only_one_active`（PostgreSQL 部分索引，约束"至多一个活跃 batch"） | ✅ 已执行，详见 [import-consistency.md § 四 / § 六](0018-2026-04-22-broker-import-consistency-v2.md) |
 
 ### 8.3 JPA Entity 与 Repository（框架层）
 
@@ -214,7 +214,7 @@ futu_staged_orders              → 字段 1:1 对应 FutuOrderRecord
 | `BrokerSyncBatchRepository` | 批次表的 Repository | ✅ 已完成 |
 | `TradeRecord` (Entity 扩展) | 新增 `externalId`、`externalBroker`、`syncBatchId` 字段 | ✅ 已完成 |
 
-（IBKR 专属 Entity/Repository 见 [brokers/ibkr/staging-schema.md](../brokers/ibkr/staging-schema.md)）
+（IBKR 专属 Entity/Repository 见 [brokers/ibkr/staging-schema.md](0013-2026-04-21-ibkr-staging-schema.md)）
 
 ---
 
@@ -234,21 +234,21 @@ _（当前无待解决项，所有阻塞性问题已解决）_
 |---|------|------|------|
 | D-1 | 暂存表数据的清理策略 | 保留多久、是否归档、自动清理还是手动 | 系统跑起来之后根据实际数据量再定 |
 | D-2 | 是否需要"同步预览"功能 | 在正式导入前展示待导入数据供用户确认 | Phase 3.x 增量能力（Phase 3 核心已完成） |
-| D-3 | XML 解析方案选型 | DOM 解析 vs SAX 解析 vs JAXB | Phase 1 已跑通（当前 DOM），性能优化后续考虑，详见 [flex-web-service.md](../brokers/ibkr/flex-web-service.md) |
-| D-4 | Token 存储方式 | 当前 properties 文件，后续是否迁移到数据库 | 详见 [flex-web-service.md](../brokers/ibkr/flex-web-service.md) |
-| D-5 | Activity Flex Query 支持 | 除 Trade Confirmation 外的其他 IBKR 报告类型 | 详见 [flex-web-service.md](../brokers/ibkr/flex-web-service.md) |
+| D-3 | XML 解析方案选型 | DOM 解析 vs SAX 解析 vs JAXB | Phase 1 已跑通（当前 DOM），性能优化后续考虑，详见 [flex-web-service.md](0009-2026-04-14-ibkr-flex-web-service.md) |
+| D-4 | Token 存储方式 | 当前 properties 文件，后续是否迁移到数据库 | 详见 [flex-web-service.md](0009-2026-04-14-ibkr-flex-web-service.md) |
+| D-5 | Activity Flex Query 支持 | 除 Trade Confirmation 外的其他 IBKR 报告类型 | 详见 [flex-web-service.md](0009-2026-04-14-ibkr-flex-web-service.md) |
 
 ### ✅ 已解决（归档）
 
 | # | 问题 | 解决方式 |
 |---|------|---------|
-| R-1 | 批次导入事务策略 | **逐条独立事务 + 幂等**，详见 [import-consistency.md](./import-consistency.md) |
-| R-2 | `brokerId` 查找策略 | `brokers` 表新增 `broker_code` 列，通过 `findByBrokerCode()` 直接查找，详见 [broker-registration.md](./broker-registration.md) |
+| R-1 | 批次导入事务策略 | **逐条独立事务 + 幂等**，详见 [import-consistency.md](0018-2026-04-22-broker-import-consistency-v2.md) |
+| R-2 | `brokerId` 查找策略 | `brokers` 表新增 `broker_code` 列，通过 `findByBrokerCode()` 直接查找，详见 [broker-registration.md](0011-2026-04-17-broker-registration.md) |
 | R-3 | ETF 识别 | `assetCategory = STK` 时统一默认为 `STOCK`，历史 ETF 数据已由用户手动修正为 STOCK（ETF 枚举值保留） |
 | R-4 | `trade_trigger` 是否新增 `BROKER_SYNC` | **否**，`trade_trigger` 描述"交易为什么发生"，不描述"记录来源"。通过 `external_id IS NULL` 区分手动/同步 |
-| R-5 | BookTrade 的 `tradeTrigger` 判定 | 通过 `orderTime` + `orderType` 为空识别 BookTrade，再查关联 TradeConfirm 的 `code` 字段判定具体期权事件类型。详见 [booktrade-mapping.md](../brokers/ibkr/booktrade-mapping.md) |
+| R-5 | BookTrade 的 `tradeTrigger` 判定 | 通过 `orderTime` + `orderType` 为空识别 BookTrade，再查关联 TradeConfirm 的 `code` 字段判定具体期权事件类型。详见 [booktrade-mapping.md](0012-2026-04-18-ibkr-booktrade-mapping.md) |
 | R-6 | 期权 symbol 格式转换 | **无需额外设计**。IBKR 暂存表已存 `strike`、`expiry`、`putCall` 为独立字段，导入时直接拼接为系统格式 `{underlying}-{expiry}-{putCall}{strike}`（如 `AAPL-20260130-C265`） |
-| R-7 | 暂存表 → `trade_records` 字段映射 | **已完成完整映射规范**，详见 [brokers/ibkr/staging-schema.md § 五](../brokers/ibkr/staging-schema.md#五字段映射规范ibkr_staged_orders--trade_records) |
+| R-7 | 暂存表 → `trade_records` 字段映射 | **已完成完整映射规范**，详见 [brokers/ibkr/staging-schema.md § 五](0013-2026-04-21-ibkr-staging-schema.md#五字段映射规范ibkr_staged_orders--trade_records) |
 | R-8 | 导入时的冲突处理策略 | **不做手动记录冲突匹配**。系统假设不存在手动录入的历史记录，去重仅依赖 `(external_broker, external_id)` 唯一索引。已有相同 `external_id` → SKIPPED。`CONFLICT` 状态仅保留为理论预留，当前不会触发 |
-| R-9 | 前端状态交互设计 | **已在 [import-consistency.md](./import-consistency.md) v2 完整定义**。三终态（`COMPLETED` / `FAILED` / `CLEANUP_FAILED`）+ 两活跃态（`PENDING` / `PROCESSING`）；失败即清理，不再有 Resume / 部分成功。`FAILED` → 用户可重新触发新 sync；`CLEANUP_FAILED` → 前端展示人工介入提示。（v1 曾设计的 "Resume 按钮 / PARTIAL 失败详情" 已整体废弃） |
-| R-10 | Tiger 同步后续（原 D-6） | **Phase 3 已完成**：两阶段导入（暂存 → `trade_records`）、去重、`preFilter` 与 fail-fast、`TigerTradeRecordMapper` 单元测试、v2.4.2 silent data-loss 消除均已落地。残留增量（`attrDesc` 期权事件映射等）归入 Phase 3.x。详见 [brokers/tiger/phase3-plan.md](../brokers/tiger/phase3-plan.md)、[brokers/tiger/staging-schema.md](../brokers/tiger/staging-schema.md) |
+| R-9 | 前端状态交互设计 | **已在 [import-consistency.md](0018-2026-04-22-broker-import-consistency-v2.md) v2 完整定义**。三终态（`COMPLETED` / `FAILED` / `CLEANUP_FAILED`）+ 两活跃态（`PENDING` / `PROCESSING`）；失败即清理，不再有 Resume / 部分成功。`FAILED` → 用户可重新触发新 sync；`CLEANUP_FAILED` → 前端展示人工介入提示。（v1 曾设计的 "Resume 按钮 / PARTIAL 失败详情" 已整体废弃） |
+| R-10 | Tiger 同步后续（原 D-6） | **Phase 3 已完成**：两阶段导入（暂存 → `trade_records`）、去重、`preFilter` 与 fail-fast、`TigerTradeRecordMapper` 单元测试、v2.4.2 silent data-loss 消除均已落地。残留增量（`attrDesc` 期权事件映射等）归入 Phase 3.x。详见 [brokers/tiger/phase3-plan.md](0017-2026-04-21-tiger-phase3-plan.md)、[brokers/tiger/staging-schema.md](0016-2026-04-21-tiger-staging-schema.md) |

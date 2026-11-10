@@ -4,7 +4,7 @@
 > **最近更新**：2026-04-28（板块 review 同步：阶段 1/2 残留 checkbox 勾选；§ 七提交粒度表加状态列；§ 五阶段 7 文档同步 checklist 全部勾选）
 > **状态**：✅ 已完成 — 阶段 1-5 全部落地，与 IBKR 对齐的代码 review 与修复（窗口循环边界、ImportResult 契约、fail-fast 返回 failure 路径）均已合并
 > **目标**：将老虎证券同步从 Phase 1（API → 日志）升级为与 IBKR 对齐的两阶段导入（API → `tiger_staged_orders` → `trade_records`）
-> **关联**：[staging-schema.md](./staging-schema.md) | [open-api.md](./open-api.md) | [../../framework/data-persistence.md](../../framework/data-persistence.md) | [../../framework/import-consistency.md](../../framework/import-consistency.md) | [../ibkr/flex-web-service.md](../ibkr/flex-web-service.md)
+> **关联**：[staging-schema.md](0016-2026-04-21-tiger-staging-schema.md) | [open-api.md](0006-2026-03-14-tiger-open-api.md) | [../../framework/data-persistence.md](0008-2026-04-13-broker-sync-data-persistence.md) | [../../framework/import-consistency.md](0018-2026-04-22-broker-import-consistency-v2.md) | [../ibkr/flex-web-service.md](0009-2026-04-14-ibkr-flex-web-service.md)
 >
 > **✅ 与 import-consistency.md v2 的一致性说明**：v2 状态模型已在后端完整落地（Phase 1a/1b/2/3 Commit A+B 均已合并），批次仅收敛到 `COMPLETED` / `FAILED` / `CLEANUP_FAILED`，应用不再产生 `PARTIAL` / `INTERRUPTED`，也不再提供 resume 端点。Tiger 侧的 `TigerStagingService` 幂等性无需改动——它在 v2 下仍然避免重试时的重复插入，只是语义由"用户手动 resume 时复用"变为"启动恢复清理后的下一次同步自然复用"。
 
@@ -23,7 +23,7 @@
 | 5 | 文档路径 | `docs/broker-sync/brokers/tiger/staging-schema.md` + 本文件 |
 | 6 | 单元测试 | **需要**：至少覆盖字段映射的纯函数逻辑 |
 
-完整数据契约见 [staging-schema.md](./staging-schema.md)。
+完整数据契约见 [staging-schema.md](0016-2026-04-21-tiger-staging-schema.md)。
 
 ---
 
@@ -76,7 +76,7 @@
 **目标**：数据库骨架就绪，可在后续阶段中读写。
 
 - [x] 编写 `V26__create_tiger_staged_orders.sql`
-  - 字段顺序、长度、约束严格按 [staging-schema.md § 3](./staging-schema.md#三tiger_staged_orders--tiger-核心暂存表order-粒度)
+  - 字段顺序、长度、约束严格按 [staging-schema.md § 3](0016-2026-04-21-tiger-staging-schema.md#三tiger_staged_orders--tiger-核心暂存表order-粒度)
   - 创建 `UNIQUE(tiger_id)`、`INDEX(batch_id)`、`INDEX(status)`、FK→`broker_sync_batches.id`
 - [x] 编写 `V27__seed_tiger_broker_code.sql`
   - 幂等：仅当 `brokers` 表中存在 Tiger 记录且 `broker_code` 为 NULL 或不等于 `tiger` 时更新
@@ -124,7 +124,7 @@
 **目标**：纯函数的字段映射逻辑完备且被测试覆盖。
 
 - [x] 新建 `TigerTradeRecordMapper`
-  - 方法 1：`FilterResult preFilter(TigerStagedOrder s, boolean alreadyImported)` — 返回 `PASS` / `SKIPPED` / `FAILED(msg)`，覆盖 [§ 5.1](./staging-schema.md#51-前置过滤不映射直接-failed-或-skipped) 七条规则
+  - 方法 1：`FilterResult preFilter(TigerStagedOrder s, boolean alreadyImported)` — 返回 `PASS` / `SKIPPED` / `FAILED(msg)`，覆盖 [§ 5.1](0016-2026-04-21-tiger-staging-schema.md#51-前置过滤不映射直接-failed-或-skipped) 七条规则
   - 方法 2：`TradeRecord toTradeRecord(TigerStagedOrder s, Long brokerId, Long batchId)` — 覆盖 5.2 / 5.3
   - 方法 3：`String buildOptionSymbol(String underlying, String expiry, String putCall, String strike)` — 独立可测
   - 方法 4：`Currency mapCurrency(String raw)` — `USD/HKD/CNH→CNY`，其他抛 `IllegalArgumentException`
@@ -262,7 +262,7 @@
 
 - [ ] 从生产/真实 Tiger 环境抓取若干期权事件订单（行权、被指派、到期作废）
 - [ ] 从 `tiger_staged_orders` 中筛选 `status=FAILED AND error_message LIKE '%Option event attrDesc%'`，汇总 `attr_desc` 实际取值
-- [ ] 编写 `attrDesc → TriggerRefType` 映射表，更新 [staging-schema.md § 5.1 规则 5](./staging-schema.md#51-前置过滤不映射直接-failed-或-skipped) 和 `TigerTradeRecordMapper`
+- [ ] 编写 `attrDesc → TriggerRefType` 映射表，更新 [staging-schema.md § 5.1 规则 5](0016-2026-04-21-tiger-staging-schema.md#51-前置过滤不映射直接-failed-或-skipped) 和 `TigerTradeRecordMapper`
 - [ ] 补充 STK 侧 `trigger_ref_id` 回填（如 Put 被行权得到股票），参考 `IbkrImportService.backfillStockSideTriggerRefId`
 - [ ] 补齐单测用例
 - [ ] 新建独立的小版本发布（不放进 Phase 3 主干）
@@ -361,7 +361,7 @@
 
 ## 八、已知限制清单（Phase 3 交付后的对外说明）
 
-> 发布时同步更新到 [README.md](./README.md) 与 [open-api.md](./open-api.md)。
+> 发布时同步更新到 [README.md](../docs/broker-sync/brokers/tiger/README.md) 与 [open-api.md](0006-2026-03-14-tiger-open-api.md)。
 
 - ✅ 支持：STK（美股/港股/A 股连通）、OPT（CALL/PUT 正常交易）
 - ❌ 本期不支持：

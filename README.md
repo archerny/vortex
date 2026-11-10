@@ -15,10 +15,10 @@ A personal investment portfolio management system designed for individual invest
 
 ### Market Event Processing
 
-- **Stock Splits** — Auto-generates BUY records to adjust positions based on split ratios.
+- **Stock Splits** — Generates zero-cost BUY records when the split ratio increases the share count.
 - **Symbol Changes** — Generates SELL (old symbol) + BUY (new symbol) records to seamlessly transfer cost basis (e.g., FB → META).
 - **Dividends in Kind** — Generates BUY records for dividend securities with fair-value cost basis.
-- **Cascading Recalculation** — Back-filling a historical event automatically recalculates all subsequent events, fully protected by database transactions.
+- **Historical Recalculation** — Changing an event recalculates events selected by affected symbols and dates in the same transaction. Calculations use prior-day positions. [Market Event Knowledge](knowledge/market-events.md)
 
 ### Trade Origin Tracking
 
@@ -27,11 +27,10 @@ Every trade record carries explicit origin metadata:
 - `triggerRefType` — Specific sub-type (e.g., `STOCK_SPLIT`, `OPTION_EXERCISE`, `OPTION_ASSIGNED`)
 - `triggerRefId` — Links to the originating event or trade record
 
-### Broker Data Sync (In Progress)
+### Broker Data Sync
 
-- **Tiger Brokers** — Phase 1 complete (manual trigger + log output via Tiger Open API)
-- **Interactive Brokers (IBKR)** — Flex Web Service integration with async execution, staged data tables, and frontend management UI. Data import logic is pending.
-- **Adapter Pattern** — Extensible `BrokerSyncAdapter` interface for adding new brokers (Schwab, Futu planned)
+- **IBKR and Tiger** — Both adapters have asynchronous fetch, staging and import code. The staged-data viewer currently exposes IBKR data. [Broker Sync Knowledge](knowledge/broker-sync/README.md)
+- **Batch management** — The UI shows batch status and errors. The framework cleans up failed batches and blocks new submissions while a batch requires manual recovery. [Broker Sync Guide](docs/broker-sync/README.md)
 
 ### Data Verification
 
@@ -45,7 +44,7 @@ Six built-in verification rules for trade data anomaly detection:
 
 ### Frontend
 
-- Dashboard with investment overview
+- Dashboard and profit-analysis page placeholders
 - Trade record list with detail pages, statistics panel, and related trades display
 - Cash flow management
 - Market event management (Stock Split / Symbol Change / Dividend in Kind tabs)
@@ -61,7 +60,7 @@ Six built-in verification rules for trade data anomaly detection:
 | **Build (Backend)** | Maven | 3.6+ |
 | **ORM** | Spring Data JPA (Hibernate) | — |
 | **Database** | PostgreSQL | 12+ |
-| **Migrations** | Flyway | 22 migration scripts |
+| **Migrations** | Flyway | V1–V28 |
 | **Connection Pool** | HikariCP | — |
 | **Frontend** | React | 18.2 |
 | **UI Library** | Ant Design | 5.12 |
@@ -84,28 +83,12 @@ Six built-in verification rules for trade data anomaly detection:
 
 ### Database Setup
 
-```bash
-psql -U postgres
-
-CREATE DATABASE ledgerdb;
-CREATE USER ledger WITH PASSWORD 'your_password';
-GRANT ALL PRIVILEGES ON DATABASE ledgerdb TO ledger;
-```
-
-Database tables are created automatically by Flyway migrations on first startup.
+Set up an isolated database for development and configure the `dev` profile before starting the backend. Flyway applies migrations at startup. Verify the datasource first, especially when using the `local` profile for a real ledger. [Database Setup](docs/database-setup.md) · [Local Config Guide](docs/local-config-guide.md)
 
 ### Backend
 
 ```bash
-cd backend
-
-# Create local config with your database password (gitignored)
-cp src/main/resources/application-local.properties.template \
-   src/main/resources/application-local.properties
-# Edit application-local.properties with your actual credentials
-
-# Start with local profile
-mvn spring-boot:run -Dspring-boot.run.profiles=local
+mvn -f backend/pom.xml spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
 The backend starts at `http://localhost:8080`.
@@ -124,11 +107,11 @@ The frontend starts at `http://localhost:3000` and proxies API requests to the b
 ### Running Tests
 
 ```bash
-# Backend unit tests (pure in-memory, no database required)
-cd backend && mvn test
+# Backend unit tests
+mvn -f backend/pom.xml test
 
 # Frontend unit tests
-cd frontend && npm test
+npm --prefix frontend test
 ```
 
 > **Testing philosophy**: All unit tests run in pure memory with no database connections. Backend tests use Mockito for repository isolation; frontend tests focus on constant/config layer validation. See [Unit Test Spec](docs/unit-test-spec.md) for details.
@@ -152,9 +135,9 @@ vortex/
 │       │   └── sync/                   # Broker sync module
 │       │       ├── core/               # Sync core (adapter interface, async executor)
 │       │       └── adapter/            # Broker adapters (Tiger, IBKR)
-│       └── src/main/resources/
+│       └── main/resources/
 │           ├── application.properties  # Base config (no secrets)
-│           └── db/migration/           # Flyway migrations (V1 ~ V22)
+│           └── db/migration/           # Flyway migrations
 ├── frontend/                           # React + Vite frontend
 │   ├── package.json
 │   └── src/
@@ -171,17 +154,9 @@ vortex/
 ├── deploy/                             # Build scripts
 │   ├── build-backend.sh                # Backend build → JAR + start script
 │   └── build-frontend.sh              # Frontend build → static files
-├── docs/                               # Project documentation
-│   ├── backend-guide.md
-│   ├── frontend-guide.md
-│   ├── database-setup.md
-│   ├── local-config-guide.md
-│   ├── unit-test-spec.md
-│   ├── market-event-processing-design.md
-│   ├── trade-trigger-design.md
-│   ├── trade-type-refactor-discussion.md
-│   ├── related-trades-display-design.md
-│   └── broker-sync/                    # Broker sync design docs (8 files)
+├── docs/                               # Setup, usage and recovery guides
+├── knowledge/                          # Current capabilities and architecture
+├── design/                             # Historical decisions and proposals
 ├── e2e/                                # E2E test scripts
 │   └── reset-dev-db.sh                 # Dev database reset utility
 └── external-resource/                  # Broker API reference docs
@@ -201,20 +176,9 @@ vortex/
 
 # Frontend (outputs static files + archive)
 ./deploy/build-frontend.sh
-./deploy/build-frontend.sh -a http://api.example.com   # custom API URL
 ```
 
-Build artifacts are output to `deploy/output/`.
-
-## Key Design Decisions
-
-| Decision | Rationale |
-|----------|-----------|
-| **Minimalist TradeType** — Only `BUY` and `SELL` | Options events and market events all reuse BUY/SELL. "Why it happened" is expressed via `trade_trigger` + `trigger_ref_type`, keeping concerns cleanly separated. |
-| **Market events → trade records** | Events generate system trade records on write, so position calculation has zero additional overhead and `PositionService` needs no modification. |
-| **Cascading recalculation** | Back-filling a historical event recalculates all subsequent events in a single transaction, ensuring data consistency. |
-| **Weighted average cost** | Current cost basis calculation uses moving weighted average. Future expansion may add FIFO, LIFO, or specific lot identification. |
-| **Adapter pattern for broker sync** | `BrokerSyncAdapter` interface enables plugging in new brokers without modifying core sync logic. |
+Build artifacts are written to `deploy/output/`. For distribution, use a worktree without local credentials in backend resources and inject configuration at runtime. Serve the frontend with `/api` routed to the backend. [Backend Guide](docs/backend-guide.md) · [Frontend Guide](docs/frontend-guide.md)
 
 ## Configuration
 
@@ -231,22 +195,19 @@ See [Local Config Guide](docs/local-config-guide.md) for details.
 |----------|-------------|
 | [Backend Guide](docs/backend-guide.md) | Backend tech stack, startup instructions, project structure |
 | [Frontend Guide](docs/frontend-guide.md) | Frontend tech stack, startup instructions, debugging guide |
-| [Frontend Structure](docs/frontend-structure.md) | Frontend directory layout and component overview |
+| [Frontend Structure](docs/frontend-structure.md) | Guide for adding frontend pages |
 | [Database Setup](docs/database-setup.md) | PostgreSQL installation and configuration |
 | [Local Config Guide](docs/local-config-guide.md) | Spring Boot profile mechanism and secret management |
 | [Unit Test Spec](docs/unit-test-spec.md) | Testing standards and conventions |
-| [Market Event Processing](docs/market-event-processing-design.md) | Stock split / symbol change / dividend-in-kind processing design |
-| [Trade Trigger Design](docs/trade-trigger-design.md) | Trade origin tracking field design |
-| [Trade Type Refactor](docs/trade-type-refactor-discussion.md) | TradeType enum simplification discussion |
-| [Related Trades Display](docs/related-trades-display-design.md) | Option contract trade chain display design |
-| [Broker Sync Docs](docs/broker-sync/) | Broker data sync design documents (8 files) |
+| [Current Knowledge](knowledge/README.md) | Implemented behavior, architecture and code references |
+| [Design History](design/README.md) | Numbered design records and pending proposals |
+| [Broker Sync Guide](docs/broker-sync/README.md) | Broker setup, synchronization and recovery |
 
 ## Roadmap
 
 - [ ] Profit & loss analysis module (per-stock, per-strategy, per-account)
 - [ ] Chart-based analysis (profit trends, asset distribution)
-- [ ] IBKR data import logic (staged data → trade records)
-- [ ] Additional broker adapters (Schwab, Futu)
+- [ ] Additional broker adapters (Futu, Longbridge)
 - [ ] Automatic sync scheduling with conflict resolution
 - [ ] Data export functionality
 

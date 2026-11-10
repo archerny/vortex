@@ -97,5 +97,6 @@ Vortex 是投资记账与盈亏分析系统。`backend/` 使用 Java 17、Spring
 ## 按任务查阅
 
 - 项目启动和代码目录。 [README](README.md) · [后端指南](docs/backend-guide.md) · [前端指南](docs/frontend-guide.md)
-- 交易来源与历史事件重算。 [交易触发设计](docs/trade-trigger-design.md) · [市场事件处理](docs/market-event-processing-design.md)
-- 券商适配、失败处理和数据清理。 [同步文档索引](docs/broker-sync/README.md) · [导入一致性](docs/broker-sync/framework/import-consistency.md)
+- 交易来源与历史事件重算。 [交易与持仓](knowledge/trades-and-positions.md) · [市场事件](knowledge/market-events.md)
+- 券商适配、失败处理和数据清理。 [券商同步知识](knowledge/broker-sync/README.md) · [故障排查与恢复](docs/broker-sync/recovery.md)
+- 现行架构与历史决策。 [当前知识索引](knowledge/README.md) · [设计方案索引](design/README.md)

@@ -2,7 +2,7 @@
 
 > **状态**: ✅ Phase 1 已实现（API 调通 → 日志输出），待真实环境验证  
 > **日期**: 2026-04-14  
-> **关联**: [../../architecture.md](../../architecture.md) | [staging-schema.md](./staging-schema.md) | [booktrade-mapping.md](./booktrade-mapping.md)  
+> **关联**: [../../architecture.md](../knowledge/broker-sync/README.md) | [staging-schema.md](0013-2026-04-21-ibkr-staging-schema.md) | [booktrade-mapping.md](0012-2026-04-18-ibkr-booktrade-mapping.md)  
 > **总体规划对应**: 本文档的 Phase 1 对应总体规划（README.md）中的 **Phase 2**（多券商适配阶段）
 
 ---
@@ -44,7 +44,7 @@ Step 2: GET /GetStatement?t={token}&q={referenceCode}&v=3
 
 **Base URL**: `https://ndcdyn.interactivebrokers.com/AccountManagement/FlexWebService`
 
-> **异步执行**：上述两步 HTTP 请求耗时可能数十秒（含轮询等待），因此同步任务在后台异步线程中执行。前端提交同步请求后 Controller 立即返回 batch 信息（status=PENDING），实际的 Flex Query 调用由 `BrokerSyncAsyncExecutor` 在独立线程池中完成。详见 [architecture.md § 四 异步执行模型](../../architecture.md#四异步执行模型)。
+> **异步执行**：上述两步 HTTP 请求耗时可能数十秒（含轮询等待），因此同步任务在后台异步线程中执行。前端提交同步请求后 Controller 立即返回 batch 信息（status=PENDING），实际的 Flex Query 调用由 `BrokerSyncAsyncExecutor` 在独立线程池中完成。详见 [architecture.md § 四 异步执行模型](../knowledge/broker-sync/lifecycle.md#异步执行)。
 
 ### 阶段三：解析报告数据
 
@@ -243,31 +243,31 @@ SendRequest 后轮询 GetStatement：
 
 **GetStatement 响应（Trade Confirmation 报告）**：
 ```xml
-<FlexQueryResponse queryName="..." type="TCF">
+<FlexQueryResponse queryName="Example Trade Confirmations" type="TC">
     <FlexStatements count="1">
-        <FlexStatement accountId="U18316975" fromDate="20260101" toDate="20260331" period="" whenGenerated="20260405;124357">
+        <FlexStatement accountId="DEMO_ACCOUNT" fromDate="20260102" toDate="20260102" period="Example" whenGenerated="20260103;120000">
             <TradeConfirms>
                 <!-- 三层嵌套：SymbolSummary（标的汇总）→ Order（订单汇总）→ TradeConfirm（逐笔成交） -->
-                <SymbolSummary ... settleDate="MULTI" tradeDate="MULTI" exchange="MULTI" ... />
+                <SymbolSummary ... settleDate="20260105" tradeDate="20260102" exchange="DEMO" ... />
                 <Order ... />
                 <TradeConfirm
-                    accountId="U18316975" acctAlias="" currency="USD"
-                    assetCategory="STK" symbol="AAPL" description="APPLE INC"
-                    conid="265598" securityID="US0378331005" securityIDType="ISIN"
-                    multiplier="1" strike="" expiry="" putCall=""
+                    accountId="DEMO_ACCOUNT" acctAlias="Example" currency="USD"
+                    assetCategory="OPT" symbol="DEMO" description="Synthetic option"
+                    conid="10001" securityID="" securityIDType=""
+                    multiplier="100" strike="25" expiry="20260220" putCall="C"
                     transactionType="ExchTrade"
-                    tradeID="8856974303" orderID="4797726468"
-                    execID="0001f951.6970fa43.01.01"
-                    brokerageOrderID="02130ad4.0001f3aa.6970c818.0001"
-                    orderReference="" orderTime="20260121;111309"
-                    dateTime="20260121;111310" settleDate="20260122"
-                    tradeDate="20260121" exchange="DARK"
-                    buySell="BUY" quantity="100" price="247.41"
-                    amount="24741" proceeds="-24741"
-                    netCash="-24741.37025725"
-                    commission="-0.37025725" commissionCurrency="USD"
+                    tradeID="10002" orderID="10003"
+                    execID="DEMO_EXEC"
+                    brokerageOrderID="DEMO_ORDER"
+                    orderReference="" orderTime="20260102;103000"
+                    dateTime="20260102;103100" settleDate="20260105"
+                    tradeDate="20260102" exchange="DEMO"
+                    buySell="BUY" quantity="1" price="1.25"
+                    amount="125" proceeds="-125"
+                    netCash="-125.50"
+                    commission="-0.50" commissionCurrency="USD"
                     tradeCharge="0" code="O" orderType="LMT"
-                    traderID="" isAPIOrder="N" />
+                    traderID="DEMO" isAPIOrder="N" />
             </TradeConfirms>
         </FlexStatement>
     </FlexStatements>

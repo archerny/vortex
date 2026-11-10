@@ -1,10 +1,10 @@
 # BookTrade 触发判定与期权事件导入映射设计
 
 > **创建日期**：2026-04-18  
-> **最后更新**：2026-04-23（缺失/空/未知 TradeConfirm 分支由 "默认 MANUAL" 改为 **fail-fast throw**，配合 [fix-p0-data-loss-chain.md](../../fix-p0-data-loss-chain.md) 的 P0 修复；`GEA` 正式并入 `A` 的 ASSIGNED 匹配分支）  
+> **最后更新**：2026-04-23（缺失/空/未知 TradeConfirm 分支由 "默认 MANUAL" 改为 **fail-fast throw**，配合 [fix-p0-data-loss-chain.md](0019-2026-04-23-broker-import-data-loss-fix.md) 的 P0 修复；`GEA` 正式并入 `A` 的 ASSIGNED 匹配分支）  
 > **状态**：✅ 已实现（IbkrImportWorker: BookTrade 判定 + code 解析 + triggerRefId 回填 + STK 侧语义匹配 + 歧义消解 + 异常 code fail-fast）  
-> **关联**：[data-persistence.md](../../framework/data-persistence.md) | [trade-trigger-design.md](../../../trade-trigger-design.md) | [trade-type-refactor-discussion.md](../../../trade-type-refactor-discussion.md) | [flex-web-service.md](./flex-web-service.md) | [fix-p0-data-loss-chain.md](../../fix-p0-data-loss-chain.md)  
-> **解决问题**：[data-persistence.md § R-5](../../framework/data-persistence.md#九开放问题与待后续讨论)（BookTrade 的 `tradeTrigger` 判定）
+> **关联**：[data-persistence.md](0008-2026-04-13-broker-sync-data-persistence.md) | [trade-trigger-design.md](0001-2026-03-08-trade-trigger.md) | [trade-type-refactor-discussion.md](0003-2026-03-09-trade-type-refactor.md) | [flex-web-service.md](0009-2026-04-14-ibkr-flex-web-service.md) | [fix-p0-data-loss-chain.md](0019-2026-04-23-broker-import-data-loss-fix.md)  
+> **解决问题**：[data-persistence.md § R-5](0008-2026-04-13-broker-sync-data-persistence.md#九开放问题与待后续讨论)（BookTrade 的 `tradeTrigger` 判定）
 
 ---
 
@@ -119,7 +119,7 @@ LIMIT 1
 
 ### 2.4 缺失或异常的 TradeConfirm 处理（fail-fast）
 
-> **变更历史**：2026-04-23 之前，以下三种情况采用 "默认 MANUAL（保守策略）" 的 silent downgrade。由于该策略会把期权事件静默误分类为手动交易，导致下游财务语义错误，2026-04-23 起改为 **fail-fast throw**，与 P0 修复保持一致。详见 [fix-p0-data-loss-chain.md § P0-3](../../fix-p0-data-loss-chain.md)。
+> **变更历史**：2026-04-23 之前，以下三种情况采用 "默认 MANUAL（保守策略）" 的 silent downgrade。由于该策略会把期权事件静默误分类为手动交易，导致下游财务语义错误，2026-04-23 起改为 **fail-fast throw**，与 P0 修复保持一致。详见 [fix-p0-data-loss-chain.md § P0-3](0019-2026-04-23-broker-import-data-loss-fix.md)。
 
 被识别为 BookTrade 后，查询 TradeConfirm 时若出现以下任意一种情况，`resolveBookTradeRefType` 会抛出 `IllegalStateException` 而非返回任何默认值：
 
@@ -248,7 +248,7 @@ matchedOptRecords.stream()
 | 仍然多条（完全无法区分） | 按顺序一一配对（业务上等价），WARNING 日志 |
 | 未匹配到任何记录 | 保持 `trigger_ref_id = 0`，WARNING 日志 |
 
-> **匹配失败保持 `trigger_ref_id = 0` 的设计意图**：后续 `TradeVerificationService` 的核对规则可以检测出"股票侧 trigger_ref_id=0"的异常记录（参见 [trade-trigger-design.md § 3.7](../trade-trigger-design.md) 校验规则：`OPTION` 股票侧记录的 `trigger_ref_id` 不应为 0）。
+> **匹配失败保持 `trigger_ref_id = 0` 的设计意图**：后续 `TradeVerificationService` 的核对规则可以检测出"股票侧 trigger_ref_id=0"的异常记录（参见 [trade-trigger-design.md § 3.7](0001-2026-03-08-trade-trigger.md) 校验规则：`OPTION` 股票侧记录的 `trigger_ref_id` 不应为 0）。
 
 ---
 
@@ -404,9 +404,9 @@ WHERE trade_trigger = 'OPTION'
 
 | 文档 | 相关章节 | 一致性 |
 |------|---------|--------|
-| [trade-trigger-design.md](../trade-trigger-design.md) | § 3.4 字段组合语义 | ✅ |
-| [trade-type-refactor-discussion.md](../trade-type-refactor-discussion.md) | § 三、重构后的期权操作场景映射 | ✅ |
-| [trade-trigger-design.md](../trade-trigger-design.md) | § 3.7 应用层校验规则 | ✅ |
+| [trade-trigger-design.md](0001-2026-03-08-trade-trigger.md) | § 3.4 字段组合语义 | ✅ |
+| [trade-type-refactor-discussion.md](0003-2026-03-09-trade-type-refactor.md) | § 三、重构后的期权操作场景映射 | ✅ |
+| [trade-trigger-design.md](0001-2026-03-08-trade-trigger.md) | § 3.7 应用层校验规则 | ✅ |
 
 ---
 

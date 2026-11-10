@@ -1,25 +1,25 @@
 # Vortex Backend
 
-A simple backend service based on Spring Boot for managing investment profit and loss.
+The Spring Boot backend provides APIs for trades, positions, cash flows, market events, and broker synchronization.
 
 ## Technology Stack
 
 - Java 17
 - Spring Boot 3.2.0
 - Maven
+- PostgreSQL, Spring Data JPA, and Flyway
 
 ## Getting Started
 
 ### Prerequisites
 
-Before running the project, ensure the following environment is installed:
+Select the execution environment and check its tools as described in [AGENTS.md](../AGENTS.md#1-环境隔离).
 
 - **JDK 17 or higher**
   ```bash
   # Check Java version
   java -version
   ```
-  
 - **Maven 3.6+**
   ```bash
   # Check Maven version
@@ -28,54 +28,34 @@ Before running the project, ensure the following environment is installed:
 
 ### Running the Application
 
-#### Option 1: Run Directly with Maven (Recommended for Development)
+Application startup connects to PostgreSQL and may run Flyway migrations. Set up a confirmed, isolated database and the `dev` profile before starting the application for integration work. The `local` profile is for the real ledger. [Database setup](database-setup.md) · [Profile configuration](local-config-guide.md)
 
-This is the simplest approach, suitable for development and debugging:
+#### Run with Maven
 
 ```bash
-# Navigate to backend directory
-cd backend
-
-# Run using Maven Spring Boot plugin
-mvn spring-boot:run
+mvn -f backend/pom.xml spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
-#### Option 2: Build and Run JAR
+#### Build and run the JAR
 
-This approach compiles and packages the application into a JAR file before running, suitable for production environments:
+Maven packages files from `backend/src/main/resources/`, including local profile files present at build time. Build distributable artifacts from a checkout without credential files in that directory, and supply database credentials and profile settings through the runtime environment.
 
 ```bash
-# Navigate to backend directory
-cd backend
-
-# Clean and package the project
-mvn clean package
-
-# Run the generated JAR file
-java -jar target/vortex-backend-1.0.0.jar
+mvn -f backend/pom.xml clean package
+java -jar backend/target/vortex-backend-1.0.0.jar --spring.profiles.active=dev
 ```
 
-#### Option 3: Quick Start with Skipping Tests
+The deployment script also copies the JAR into `deploy/output/` and archives it. Choose the profile when running the generated `start.sh` or JAR.
 
-If you have test cases but want to start quickly:
-
-```bash
-# Run with Maven and skip tests
-cd backend
-mvn spring-boot:run -DskipTests
-```
-
-Or skip tests during packaging:
+To package without running unit tests, use the explicit Maven option.
 
 ```bash
-# Package with skipping tests
-mvn clean package -DskipTests
-java -jar target/vortex-backend-1.0.0.jar
+mvn -f backend/pom.xml clean package -DskipTests
 ```
 
 ### Verifying the Service
 
-After the service starts, it runs by default at `http://localhost:8080`
+The service defaults to `http://localhost:8080`.
 
 #### 1. Check Console Logs
 
@@ -84,25 +64,19 @@ Upon successful startup, the console should display information similar to:
 Started Application in X.XXX seconds
 ```
 
-#### 2. Test API Endpoints
+#### 2. Check the health endpoint
 
-- **Health Check Endpoint**: 
-  ```bash
-  curl http://localhost:8080/api/health
-  ```
-  Or open in browser: `http://localhost:8080/api/health`
+```bash
+curl http://localhost:8080/api/health
+```
 
-- **Hello Endpoint**: 
-  ```bash
-  curl http://localhost:8080/api/hello
-  ```
-  Or open in browser: `http://localhost:8080/api/hello`
+The endpoint returns the application status. Review startup logs separately for the database connection, Flyway migration, and JPA initialization.
 
 ### Troubleshooting
 
 #### Port Already in Use
 
-If port 8080 is already occupied, modify the `src/main/resources/application.properties` file:
+If port 8080 is occupied, set `server.port` in the selected profile's local override. If you also use the frontend, update the Vite proxy target for that session to match.
 
 ```properties
 server.port=8081
@@ -114,17 +88,14 @@ Ensure you are using JDK 17 or higher, as required by the project configuration.
 
 #### Slow Maven Dependency Download
 
-The first run will download dependencies, which may take some time. If the download is too slow, consider configuring a Maven mirror.
+The first run downloads dependencies. Check the configured repository and any existing Maven mirror in the selected environment. Changes to user-wide Maven configuration require approval under the repository's environment rules.
 
 ### Integration with Frontend
 
-After the backend starts (default `http://localhost:8080`), you can start the frontend project:
+After the backend starts at `http://localhost:8080`, start the frontend from the same execution environment. Follow the dependency setup in the [frontend guide](frontend-guide.md).
 
 ```bash
-# In another terminal window
-cd frontend
-npm install
-npm run dev
+npm --prefix frontend run dev
 ```
 
 The frontend will start at `http://localhost:3000` and automatically proxy API requests to the backend.
@@ -139,18 +110,15 @@ backend/
 │   │   │   └── com/
 │   │   │       └── vortex/
 │   │   │           ├── Application.java          # Main application entry point
-│   │   │           └── controller/
-│   │   │               └── HelloController.java  # Sample controller
+│   │   │           ├── controller/               # REST endpoints, including HealthController
+│   │   │           ├── service/                  # Business rules and transactions
+│   │   │           ├── repository/               # Database access
+│   │   │           └── sync/                     # Broker adapters and sync orchestration
 │   │   └── resources/
-│   │       └── application.properties            # Configuration file
+│   │       ├── application.properties           # Base configuration and placeholders
+│   │       └── db/migration/                     # Versioned Flyway migrations
 │   └── test/
-│       └── java/
-│           └── com/
-│               └── vortex/
-│                   └── service/
-│                       ├── TradeVerificationServiceTest.java
-│                       ├── TradeRecordServiceTest.java
-│                       └── PositionServiceTest.java
+│       └── java/com/vortex/                      # Controller, service, and sync unit tests
 └── pom.xml                                        # Maven configuration
 ```
 
@@ -166,23 +134,21 @@ backend/
 ### 运行测试
 
 ```bash
-cd backend
-
-# 运行所有测试
-mvn test
+# 在工作树根目录运行所有测试
+mvn -f backend/pom.xml test
 
 # 运行指定测试类
-mvn test -Dtest=TradeVerificationServiceTest
+mvn -f backend/pom.xml -Dtest=TradeVerificationServiceTest test
 
 # 运行指定测试方法
-mvn test -Dtest=TradeVerificationServiceTest#validCallOptionSymbol_shouldPass
+mvn -f backend/pom.xml '-Dtest=TradeVerificationServiceTest#validCallOptionSymbol_shouldPass' test
 ```
 
 ### 测试思路
 
-后端采用**纯单元测试**策略，使用 Mockito 隔离外部依赖（数据库 Repository），专注于测试 Service 层的核心业务逻辑。不依赖 Spring 容器启动和真实数据库，测试执行速度快。
+后端单测使用 Mockito 隔离 Repository、券商客户端等外部依赖，无需启动应用或连接数据库。以下列出交易核对、交易服务和持仓服务的用例示例，同步与控制器用例见 `backend/src/test/java/com/vortex/`。
 
-### 测试清单
+### 业务测试示例
 
 #### 1. TradeVerificationServiceTest（交易数据核对验证）
 

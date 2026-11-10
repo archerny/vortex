@@ -3,9 +3,9 @@
 > **创建日期**：2026-04-21（从 `framework/data-persistence.md` 拆分）
 > **最后更新**：2026-04-21
 > **状态**：✅ 已实现（DB 迁移 V20-V22 + Entity + Repository + IbkrStagingService + IbkrImportService）
-> **关联**：[framework/data-persistence.md](../../framework/data-persistence.md) | [flex-web-service.md](./flex-web-service.md) | [booktrade-mapping.md](./booktrade-mapping.md)
+> **关联**：[framework/data-persistence.md](0008-2026-04-13-broker-sync-data-persistence.md) | [flex-web-service.md](0009-2026-04-14-ibkr-flex-web-service.md) | [booktrade-mapping.md](0012-2026-04-18-ibkr-booktrade-mapping.md)
 
-本文档定义 IBKR 专属的暂存表结构（`ibkr_staged_orders` + `ibkr_staged_trade_confirms`），以及从暂存表映射到 `trade_records` 的字段规范。框架层通用内容（`broker_sync_batches`、`trade_records` 扩展字段、两阶段导入原则）参见 [framework/data-persistence.md](../../framework/data-persistence.md)。
+本文档定义 IBKR 专属的暂存表结构（`ibkr_staged_orders` + `ibkr_staged_trade_confirms`），以及从暂存表映射到 `trade_records` 的字段规范。框架层通用内容（`broker_sync_batches`、`trade_records` 扩展字段、两阶段导入原则）参见 [framework/data-persistence.md](0008-2026-04-13-broker-sync-data-persistence.md)。
 
 ---
 
@@ -260,7 +260,7 @@ trade_records.(external_broker + external_id) ←→ ibkr_staged_orders.order_id
 | 14 | `symbol` | `String` | **STK**：`symbol.trim()`（如 `AAPL`）<br>**OPT**：`{underlying}-{expiry}-{putCall}{normalizedStrike}`<br>示例：`AAPL-20260130-C265`，`TSM-20260320-P320` |
 | 15 | `underlying_symbol` | `String` | **STK**：与 `symbol` 相同（`symbol.trim()`）<br>**OPT**：从 `description` 字段提取第一个空格前的 token（如 `"AAPL 30JAN26 265 C"` → `"AAPL"`） |
 | 16 | `name` | `String` | 直接取 `description` 完整值（如 `"APPLE INC"`、`"TSM 20MAR26 320 P"`） |
-| 17 | `trade_trigger` | `TradeTrigger` (enum) | 按 [booktrade-mapping.md](./booktrade-mapping.md) 判定：<br>`orderTime` 非空 → `MANUAL`<br>`orderTime` 为空（BookTrade）→ 查关联 TradeConfirm `code` → `OPTION` |
+| 17 | `trade_trigger` | `TradeTrigger` (enum) | 按 [booktrade-mapping.md](0012-2026-04-18-ibkr-booktrade-mapping.md) 判定：<br>`orderTime` 非空 → `MANUAL`<br>`orderTime` 为空（BookTrade）→ 查关联 TradeConfirm `code` → `OPTION` |
 | 18 | `trigger_ref_type` | `TriggerRefType` (enum) | 随 `trade_trigger` 一起判定（MANUAL → `NONE`，BookTrade 按 code 映射到具体类型） |
 | 19 | `trigger_ref_id` | `Long` | 初始为 `0`；STK 侧 BookTrade 在批次导入完成后回填对应期权 trade_records.id |
 | 20 | `strategy_id` | `Long` (nullable) | 固定为 `null`（同步导入无法自动关联策略） |
@@ -312,7 +312,7 @@ String optionSymbol = underlying + "-" + expiry + "-" + putCall + normalizedStri
 | `V20__create_ibkr_staged_orders.sql` | 创建 `ibkr_staged_orders` 表 | ✅ 已完成 |
 | `V21__create_ibkr_staged_trade_confirms.sql` | 创建 `ibkr_staged_trade_confirms` 表 | ✅ 已完成 |
 
-（`V19`、`V22`、`V23`、`V24` 属于框架层通用变更，见 [framework/data-persistence.md](../../framework/data-persistence.md#flyway-迁移脚本)）
+（`V19`、`V22`、`V23`、`V24` 属于框架层通用变更，见 [framework/data-persistence.md](0008-2026-04-13-broker-sync-data-persistence.md#82-flyway-迁移脚本)）
 
 ## 七、JPA Entity 与 Repository
 

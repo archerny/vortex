@@ -441,7 +441,7 @@ Confirmed current text that must change:
 ### 8.3 Out of scope (for this fix)
 
 - P1-1 (Tiger preFilter FAILED/SKIPPED classification) — user explicitly deferred.
-- P1-3 (cleanup retry backoff) — ✅ addressed in a follow-up change (fixed 2s backoff between cleanup attempts, interrupt-aware; see [framework/import-consistency.md § 5.4](./framework/import-consistency.md) "Cleanup retry policy"). This doc's original "not touched" statement is now obsolete.
+- P1-3 (cleanup retry backoff) — ✅ addressed in a follow-up change (fixed 2s backoff between cleanup attempts, interrupt-aware; see [framework/import-consistency.md § 5.4](0018-2026-04-22-broker-import-consistency-v2.md) "Cleanup retry policy"). This doc's original "not touched" statement is now obsolete.
 - P2-1 (Tiger staged-data frontend panel) — not touched.
 - P2-2 (doc self-contradiction on Phase 3 status) — not touched; this doc update may marginally improve it.
 - Historical data remediation — **not needed**; project not yet deployed to production (confirmed with user 2026-04-23).

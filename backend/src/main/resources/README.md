@@ -67,3 +67,4 @@ mvn spring-boot:run -Dspring-boot.run.profiles=dev
 - `application-local.properties` and `application-dev.properties` are **gitignored** — they contain sensitive credentials
 - **NEVER** commit real passwords or API tokens to Git
 - `application.properties` (base config) uses empty placeholders for all secrets and is safe to commit
+- Maven packages files in this resource directory. Build distributable JARs from a worktree without local credential files here, and supply deployment configuration at runtime. [Local Config Guide](../../../../docs/local-config-guide.md)

@@ -1,161 +1,52 @@
-# Vortex Backend - 本地配置指南
+# Vortex 后端配置指南
 
-## 📝 本地开发环境配置说明
+## 选择 profile
 
-为了保护敏感信息（如数据库密码）不被提交到代码仓库，本项目采用了 **Spring Boot Profile** 机制来管理本地配置。
+| Profile | 用途 |
+| --- | --- |
+| `dev` | 使用隔离开发库和合成数据进行联调或迁移验证。启动前确认连接目标。 |
+| `local` | 运行使用真实账本的应用。启动时可能触发 Flyway 迁移。 |
 
----
+单元测试通过模拟对象隔离数据库和券商服务。从工作树根目录执行 `mvn -f backend/pom.xml test` 即可。 [验证与数据安全](../AGENTS.md#验证与数据安全)
 
-## 🚀 快速开始
+## 配置文件
 
-### 1️⃣ 创建本地配置文件
+| 文件 | 用途 |
+| --- | --- |
+| [`application.properties`](../backend/src/main/resources/application.properties) | 受版本控制的基础配置，包含默认值和凭据占位符。 |
+| `application-dev.properties` | 被 Git 忽略的开发库配置，按需创建。 |
+| `application-local.properties` | 被 Git 忽略的真实账本配置，按需创建。 |
 
-项目已经为你创建了 `application-local.properties` 文件，你需要修改其中的配置：
-
-```bash
-cd backend/src/main/resources
-# 文件已存在，直接编辑即可
-```
-
-### 2️⃣ 修改本地配置
-
-编辑 `application-local.properties` 文件，填入你的实际数据库信息：
+可在 `backend/src/main/resources/` 创建所选 profile 的文件，填写该环境的数据库连接配置。下例使用开发库占位符。真实凭据通过本地文件或运行环境的秘密存储提供。 [数据库配置指南](database-setup.md)
 
 ```properties
-# 数据库配置 - 本地环境
-spring.datasource.url=jdbc:postgresql://localhost:5432/ledgerdb
-spring.datasource.username=ledger
-spring.datasource.password=你的实际密码
+spring.datasource.url=jdbc:postgresql://<db-host>:5432/<dev-db>
+spring.datasource.username=<dev-user>
+spring.datasource.password=<dev-password>
 ```
 
-### 3️⃣ 启动应用（使用本地配置）
+在本项目的启动方式下，常用配置来源的覆盖顺序从低到高为基础配置、所选 profile 的配置、环境变量、启动命令参数。可通过环境变量 `SPRING_PROFILES_ACTIVE` 选择 profile，通过 `SPRING_DATASOURCE_URL`、`SPRING_DATASOURCE_USERNAME` 和 `SPRING_DATASOURCE_PASSWORD` 注入数据库设置。 [配置文件说明](../backend/src/main/resources/README.md)
 
-**方式一：Maven 命令启动**
+## 启动与检查
+
+核对目标开发库后，从工作树根目录通过 Maven 启动应用。
+
 ```bash
-cd backend
-mvn spring-boot:run -Dspring-boot.run.profiles=local
+mvn -f backend/pom.xml spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
-**方式二：IDE 启动（推荐）**
+在 IDE 中运行 `com.vortex.Application` 时，将 `SPRING_PROFILES_ACTIVE` 设置为 `dev`。运行 JAR 时，通过命令参数选择 `dev`。
 
-在 IDE 中设置环境变量：
-- **IntelliJ IDEA**：Run → Edit Configurations → Environment variables → 添加 `SPRING_PROFILES_ACTIVE=local`
-- **VSCode**：在 launch.json 中添加：
-  ```json
-  {
-    "type": "java",
-    "name": "Application",
-    "request": "launch",
-    "mainClass": "com.vortex.Application",
-    "env": {
-      "SPRING_PROFILES_ACTIVE": "local"
-    }
-  }
-  ```
-
-**方式三：JAR 包启动**
 ```bash
-java -jar target/vortex-backend-1.0.0.jar --spring.profiles.active=local
+java -jar backend/target/vortex-backend-1.0.0.jar --spring.profiles.active=dev
 ```
 
----
+Maven 会将资源目录中存在的 profile 文件打包。构建分发用 JAR 前，确认资源目录没有本地凭据文件，部署时从运行环境注入配置。 [后端指南](backend-guide.md#build-and-run-the-jar)
 
-## 📂 配置文件说明
-
-| 文件名 | 用途 | 是否提交到代码仓库 |
-|--------|------|-------------------|
-| `application.properties` | 通用配置模板，不包含敏感信息 | ✅ 是 |
-| `application-local.properties` | 本地开发配置，包含真实密码 | ❌ 否（已在 .gitignore 中） |
-| `application-local.properties.template` | 本地配置模板，供参考 | ✅ 是 |
-
----
-
-## 🔒 安全机制
-
-1. **`.gitignore` 已配置**：`application-local.properties` 不会被 Git 追踪
-2. **模板文件**：`application-local.properties.template` 提供配置参考，但不含真实密码
-3. **配置优先级**：`application-local.properties` 会覆盖 `application.properties` 中的同名配置
-
----
-
-## ✅ 验证配置
-
-启动应用后，检查日志中的数据库连接信息：
+检查启动日志中的 profile、Flyway 迁移和 JPA 初始化。应用就绪后，可在同一执行环境查询服务状态。
 
 ```bash
-# 访问健康检查接口
 curl http://localhost:8080/api/health
 ```
 
-若应用启动日志中 Flyway 迁移与 JPA 初始化均正常完成，且健康检查返回 200，说明配置成功！
-
----
-
-## 🎯 配置优先级
-
-Spring Boot 配置加载顺序（后面的会覆盖前面的）：
-
-1. `application.properties`（通用配置）
-2. `application-{profile}.properties`（环境特定配置）
-3. 环境变量
-4. 命令行参数
-
----
-
-## 💡 最佳实践
-
-### ✅ 推荐做法
-
-- ✅ 在 `application-local.properties` 中配置本地数据库密码
-- ✅ 使用 `--spring.profiles.active=local` 启动应用
-- ✅ 团队成员各自维护自己的 `application-local.properties`
-
-### ❌ 不推荐做法
-
-- ❌ 直接在 `application.properties` 中写真实密码
-- ❌ 将 `application-local.properties` 提交到代码仓库
-- ❌ 在代码中硬编码敏感信息
-
----
-
-## 🔧 其他环境配置
-
-你可以创建更多环境配置文件：
-
-- `application-dev.properties`：开发环境
-- `application-test.properties`：测试环境
-- `application-prod.properties`：生产环境
-
-启动时指定对应的 profile 即可：
-```bash
-mvn spring-boot:run -Dspring-boot.run.profiles=dev
-```
-
----
-
-## ❓ 常见问题
-
-### Q1: 启动时提示数据库连接失败？
-**A**: 检查是否使用了 `local` profile 启动：
-```bash
-mvn spring-boot:run -Dspring-boot.run.profiles=local
-```
-
-### Q2: 如何确认使用了哪个配置文件？
-**A**: 查看启动日志，会显示：
-```
-The following profiles are active: local
-```
-
-### Q3: 配置文件没有生效？
-**A**: 确保：
-1. 文件名正确：`application-local.properties`
-2. 文件位置正确：`src/main/resources/`
-3. 启动时指定了 profile：`--spring.profiles.active=local`
-
----
-
-## 📚 参考资料
-
-- [Spring Boot 配置文件](https://docs.spring.io/spring-boot/docs/current/reference/html/features.html#features.external-config)
-- [Spring Boot Profiles](https://docs.spring.io/spring-boot/docs/current/reference/html/features.html#features.profiles)
+连接失败时，核对启动参数、生效的 profile 文件、数据库目标和凭据来源。向他人转发日志前移除真实凭据及账户数据。

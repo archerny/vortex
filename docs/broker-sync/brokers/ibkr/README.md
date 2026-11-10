@@ -1,51 +1,20 @@
-# IBKR（盈透证券）同步
-
-> **状态**：✅ Phase 2 已实现（API → 暂存 → 导入 全链路），失败清理与 [import-consistency.md](../../framework/import-consistency.md) v2.4.4 + P0 数据丢失链修复（[../../fix-p0-data-loss-chain.md](../../fix-p0-data-loss-chain.md)）已完整对齐
-> **适配器**：`IbkrSyncAdapter`
-> **API 类型**：Flex Web Service（REST + XML）
-> **Broker Code**：`ibkr`
-
----
-
-## 当前实现
-
-| 能力 | 状态 | 实现位置 |
-|------|------|----------|
-| Flex Web Service API 调用（SendRequest + GetStatement 轮询） | ✅ | `IbkrFlexClient` |
-| XML 解析为 `IbkrOrderRecord` / `IbkrTradeConfirm` | ✅ | `FlexQueryParser` |
-| 写入暂存表 `ibkr_staged_orders` + `ibkr_staged_trade_confirms` | ✅ | `IbkrStagingService` |
-| 暂存表 → `trade_records` 字段映射 | ✅ | `IbkrImportService` |
-| BookTrade 触发判定（期权到期/行权/被指派） | ✅ | `IbkrImportService` + [booktrade-mapping.md](./booktrade-mapping.md) |
-| `triggerRefId` 反向回填（STK 侧关联期权 trade_records.id） | ✅ | `IbkrImportService` |
-| 异步执行（后台线程池 + 前端提交后立即返回） | ✅ | 详见 [architecture.md § 四](../../architecture.md#四异步执行模型) |
-
----
-
-## 文档索引
-
-| 文档 | 说明 |
-|------|------|
-| [flex-web-service.md](./flex-web-service.md) | IBKR Flex Web Service 接入方案（Token/Query ID 获取、两步 HTTP 流程、XML 解析） |
-| [staging-schema.md](./staging-schema.md) | IBKR 暂存表结构（`ibkr_staged_orders` + `ibkr_staged_trade_confirms`）与字段映射规范 |
-| [booktrade-mapping.md](./booktrade-mapping.md) | BookTrade 识别、code 解析、期权事件 trigger 映射、反向回填 |
-
----
-
-## 已知限制
-
-- **XML 解析器**：当前使用 DOM 解析（`javax.xml.parsers.DocumentBuilder`），大批量数据下可考虑改 SAX/JAXB（详见 data-persistence.md D-3）
-- **Token 存储**：当前放在 `application-local.properties`，后续可能迁移到数据库（D-4）
-- **仅支持 Trade Confirmation Flex Query**：Activity Flex Query（分红、利息等）暂未支持（D-5）
-- **冲突检测**：当前仅依赖 `(external_broker, external_id)` 唯一索引做去重，不做手动记录的冲突匹配（R-8）
-
----
+# IBKR 接入与使用
 
 ## 配置
 
-```properties
-# application-local.properties
-broker.ibkr.token=<your_24_digit_token>
-broker.ibkr.query-id=<your_query_id>
-```
+1. 在 IBKR Client Portal 配置 Flex Web Service token，并创建 Trade Confirmation Flex Query。查询应包含当前适配器需要的订单和成交确认字段。 [查询配置参考](../../../../external-resource/ibkr-api/docs/flex/create-trade-confirmation-flex-query.md) · [项目接入方案](../../../../design/0009-2026-04-14-ibkr-flex-web-service.md)
+2. 在使用的 Spring profile 中注入以下属性。示例均为占位符，真实值存放在版本控制之外。 [配置说明](../../../local-config-guide.md)
 
-详见 [flex-web-service.md § 用户配置](./flex-web-service.md)。
+   ```properties
+   broker.ibkr.flex-token=<flex-token>
+   broker.ibkr.trade-confirm-query-id=<trade-confirm-query-id>
+   ```
+
+3. 在券商管理中确认有 Broker Code 为 `ibkr` 的记录。新建券商时填写代码。已有记录的修改以实际保存结果为准，当前编辑接口不会更新 Broker Code。
+4. 通过 [同步批次入口](../../README.md#提交与查看批次) 提交 IBKR 同步。Activity Flex Query 不在当前适配器的同步范围内。
+
+## 查看暂存数据
+
+打开**同步管理 → 原始数据**，选择 IBKR，再查看订单或成交确认。可填入批次 ID 缩小查询范围。表格只读，正常清理后的失败批次可能已经没有暂存记录。成交确认也为 BookTrade 导入提供触发类型判定。
+
+批次排障见 [故障排查与恢复](../../recovery.md)。字段和映射细节见 [IBKR 适配器知识](../../../../knowledge/broker-sync/brokers/ibkr.md)。

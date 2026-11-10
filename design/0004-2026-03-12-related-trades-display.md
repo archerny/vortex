@@ -26,13 +26,13 @@
 |------|------|---------|
 | `assetType` | 证券类型：`STOCK`（股票）、`ETF`（ETF基金）、`OPTION_CALL`（看涨期权）、`OPTION_PUT`（看跌期权） | — |
 | `symbol` | 证券代码，期权合约的唯一标识（如 `TSLA 240119C210`） | — |
-| `tradeTrigger` | 交易触发来源：`MANUAL`（手动）、`OPTION`（期权事件）、`MARKET_EVENT`（市场事件） | [trade-trigger-design.md](trade-trigger-design.md) |
-| `triggerRefId` | 触发来源的关联记录 ID，`0` 表示无关联 | [trade-trigger-design.md](trade-trigger-design.md) |
-| `triggerRefType` | 触发来源的关联记录类型：`OPTION_EXPIRE`、`OPTION_EXERCISE`、`OPTION_ASSIGNED` 等 | [trade-trigger-design.md](trade-trigger-design.md) |
+| `tradeTrigger` | 交易触发来源：`MANUAL`（手动）、`OPTION`（期权事件）、`MARKET_EVENT`（市场事件） | [trade-trigger-design.md](0001-2026-03-08-trade-trigger.md) |
+| `triggerRefId` | 触发来源的关联记录 ID，`0` 表示无关联 | [trade-trigger-design.md](0001-2026-03-08-trade-trigger.md) |
+| `triggerRefType` | 触发来源的关联记录类型：`OPTION_EXPIRE`、`OPTION_EXERCISE`、`OPTION_ASSIGNED` 等 | [trade-trigger-design.md](0001-2026-03-08-trade-trigger.md) |
 
 ### 2.2 期权与股票/ETF的关联模式
 
-根据 [trade-trigger-design.md](trade-trigger-design.md) 中的设计：
+根据 [trade-trigger-design.md](0001-2026-03-08-trade-trigger.md) 中的设计：
 
 - **期权侧记录**（触发源头）：`tradeTrigger = OPTION`，`triggerRefId = 0`
 - **股票/ETF侧记录**（被触发方）：`tradeTrigger = OPTION`，`triggerRefId = 期权侧交易记录ID`

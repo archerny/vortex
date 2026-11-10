@@ -14,7 +14,7 @@
 - `autoFillFromExistingTradeRecord()` **仅保留 `currency` 自动填充**，不再处理任何名称字段。
 - 前端表单不再提供「分红证券名称」输入项；表格不再展示「底层证券名称」、「分红证券名称」两列。
 
-详见：[`drop-symbol-name-fields.md`](./drop-symbol-name-fields.md)
+详见：[`drop-symbol-name-fields.md`](0014-2026-04-21-drop-symbol-name-fields.md)
 
 本文档其余部分（分红比例整数化设计、编辑/删除功能移除、Modal 简化等）**仍然有效**。
 

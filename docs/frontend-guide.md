@@ -1,6 +1,6 @@
 # Vortex Frontend
 
-A frontend application for managing investment profit and loss.
+The frontend provides views for trading records, cash flows, positions, market events, and broker synchronization. [Frontend architecture](../knowledge/frontend-architecture.md)
 
 ## Technology Stack
 
@@ -14,15 +14,15 @@ A frontend application for managing investment profit and loss.
 
 ### Prerequisites
 
-Before running the project, ensure you have:
+Select the execution environment and check its tools as described in [AGENTS.md](../AGENTS.md#1-环境隔离).
 
-- **Node.js >= 16.0.0**
+- **Node.js 18.x or 20 and newer**, as required by the locked Vite version
   ```bash
   # Check Node.js version
   node -v
   ```
 
-- **npm or yarn**
+- **npm**, which the repository scripts use with `package-lock.json`
   ```bash
   # Check npm version
   npm -v
@@ -30,19 +30,14 @@ Before running the project, ensure you have:
 
 ### Installation
 
-```bash
-# Navigate to frontend directory
-cd frontend
+With project dependencies already installed, use the commands below from the worktree root. To set up dependencies for the first time, check that `frontend/package.json` and `frontend/package-lock.json` agree before running `npm --prefix frontend ci`.
 
-# Install dependencies
-npm install
-```
+The checked-in lockfile currently omits Vitest, which the manifest declares and `npm test` invokes. This can block a clean installation and the deployment script's `npm ci` step. Review the lockfile separately if dependency changes are in scope.
 
 ### Running in Development Mode
 
 ```bash
-# Start development server
-npm run dev
+npm --prefix frontend run dev
 ```
 
 The application will start at `http://localhost:3000`
@@ -50,17 +45,17 @@ The application will start at `http://localhost:3000`
 ### Building for Production
 
 ```bash
-# Build the project
-npm run build
+npm --prefix frontend run build
 ```
 
-Build artifacts will be generated in the `dist` directory.
+Vite writes static assets to `frontend/dist/`. The deployment script copies and archives them in `deploy/output/`.
+
+Serve the static files alongside a same-origin `/api` endpoint or reverse proxy. The deployment script's `-a` option sets `VITE_API_BASE_URL`, which current frontend requests do not read.
 
 ### Preview Production Build
 
 ```bash
-# Preview the production build locally
-npm run preview
+npm --prefix frontend run preview
 ```
 
 ## Debugging Guide
@@ -79,9 +74,6 @@ npm run preview
 ```javascript
 // Check if backend is accessible
 fetch('/api/health').then(r => r.json()).then(console.log)
-
-// View current React version
-console.log(React.version)
 ```
 
 #### 2. Vite Hot Module Replacement (HMR)
@@ -103,13 +95,10 @@ proxy: {
 }
 ```
 
-**Testing API Endpoints:**
-```bash
-# Test backend health check
-curl http://localhost:3000/api/health
+Check the health endpoint through the frontend proxy.
 
-# Or use browser
-open http://localhost:3000/api/hello
+```bash
+curl http://localhost:3000/api/health
 ```
 
 #### 4. Common Debugging Scenarios
@@ -124,16 +113,9 @@ open http://localhost:3000/api/hello
 2. Verify component state management
 3. Use React DevTools to inspect component props and state
 
-**Build Errors:**
-```bash
-# Clear node_modules and reinstall
-rm -rf node_modules package-lock.json
-npm install
+**Build errors**
 
-# Clear Vite cache
-rm -rf node_modules/.vite
-npm run dev
-```
+Check that the installed dependencies match the manifest. If Vite's dependency cache is stale, restart the development server with `npm --prefix frontend run dev -- --force`.
 
 ### IDE Configuration
 
@@ -161,44 +143,11 @@ npm run dev
 
 ## Project Structure
 
-```
-frontend/
-├── src/
-│   ├── main.jsx              # Application entry point
-│   ├── App.jsx               # Main application component
-│   ├── App.css               # Application styles
-│   └── index.css             # Global styles
-├── index.html                # HTML template
-├── vite.config.js            # Vite configuration
-└── package.json              # Project configuration
-```
-
-## Features
-
-### Current Features
-
-- Investment statistics dashboard
-- Investment records list display
-- Profit and loss data visualization
-- Backend service connection status detection
-- Responsive layout
-
-### Planned Features
-
-- Add/Edit/Delete investment records
-- Chart analysis (profit trends, asset distribution, etc.)
-- Data filtering and search
-- Data import/export
-- System settings
+The app starts at `frontend/src/main.jsx`. Layout, navigation, pages, request wrappers, and the current feature boundaries are documented in [Frontend architecture](../knowledge/frontend-architecture.md). See [Adding a page](frontend-structure.md#添加页面) for the navigation wiring.
 
 ## API Endpoints
 
-The frontend accesses backend APIs through proxy (configured in `vite.config.js`):
-
-- `/api/health` - Health check endpoint
-- `/api/hello` - Test endpoint
-
-More endpoints will be added during development.
+The layout checks backend availability with `GET /api/health`. Domain APIs are wrapped in [frontend/src/services/](../frontend/src/services/). The Vite development proxy forwards requests under `/api` to the backend.
 
 ## Development Guidelines
 
@@ -213,24 +162,15 @@ More endpoints will be added during development.
 
 ### Port Already in Use
 
-If port 3000 is occupied, modify `vite.config.js`:
+If port 3000 is occupied, pass a port for the current session.
 
-```javascript
-server: {
-  port: 3001,  // Change to another port
-  // ...
-}
+```bash
+npm --prefix frontend run dev -- --port 3001
 ```
 
 ### Dependency Installation Issues
 
-```bash
-# Clear npm cache
-npm cache clean --force
-
-# Use alternative registry (if needed)
-npm install --registry=https://registry.npmjs.org/
-```
+Check the npm registry, network access, and lockfile in the selected environment. Changes to user-wide npm configuration or caches require approval under the repository's environment rules.
 
 ### Hot Reload Not Working
 
@@ -263,16 +203,12 @@ export default defineConfig({
 ### 运行测试
 
 ```bash
+# 在工作树根目录运行所有测试
+npm --prefix frontend test
+
+# 已安装项目依赖时，使用项目内的 Vitest 进入监听模式
 cd frontend
-
-# 安装依赖（首次或新增 vitest 后需要执行）
-npm install
-
-# 运行所有测试
-npm test
-
-# 监听模式运行测试（开发时推荐）
-npx vitest
+./node_modules/.bin/vitest
 ```
 
 ### 测试思路
@@ -306,7 +242,7 @@ npx vitest
 
 | 测试模块 | 测试场景 |
 |---|---|
-| 路由映射 | `menuKeyToPath` 包含所有页面路由、`pathToMenuKey` 双向映射一致性、条目数量一致 |
+| 路由映射 | `menuKeyToPath` 包含测试列举的页面路由、`pathToMenuKey` 双向映射一致性、条目数量一致 |
 | 父菜单映射 | 子菜单 key 都存在于 `menuKeyToPath` 中、账户管理/交易管理/盈亏分析子菜单正确映射到父组 |
 | 菜单项结构 | `menuItems` 非空数组、顶级项有 key/icon/label、含子菜单项的 children 非空且结构正确、包含仪表盘/交易管理/盈亏分析/账户管理/系统设置五大模块 |
 
@@ -319,16 +255,18 @@ npx vitest
 
 ### Full Stack Development Workflow
 
-**Terminal 1 - Backend:**
+Start both processes from the worktree root in the selected execution environment. The backend uses the configured isolated database. [Backend guide](backend-guide.md) · [Database setup](database-setup.md)
+
+**Terminal 1 — Backend**
+
 ```bash
-cd backend
-mvn spring-boot:run
+mvn -f backend/pom.xml spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
-**Terminal 2 - Frontend:**
+**Terminal 2 — Frontend**
+
 ```bash
-cd frontend
-npm run dev
+npm --prefix frontend run dev
 ```
 
 **Verify Integration:**

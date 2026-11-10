@@ -1,151 +1,51 @@
 # PostgreSQL 数据库配置指南
 
-## 1. 数据库准备
+## 选择数据库
 
-### 1.1 安装 PostgreSQL
-确保已安装 PostgreSQL 数据库（推荐版本 12 或更高）。
+后端使用 PostgreSQL。联调和迁移验证前，先确认数据库主机、端口、库名和用户。开发与测试使用隔离的开发库、合成数据和 `dev` profile。`local` profile 面向真实账本，启动应用时可能运行 Flyway 迁移。后端单测通过 Mockito 隔离数据库依赖，可直接运行 `mvn -f backend/pom.xml test`。 [验证与数据安全](../AGENTS.md#验证与数据安全)
 
-### 1.2 数据库已创建
-数据库 `ledgerdb` 已通过手动操作创建完成。
-数据库用户 `ledger` 已通过手动操作创建完成。
+## 准备开发库
 
-如需授予权限，可执行：
+由数据库管理员按环境创建开发库和专用用户。用于 Flyway 迁移的数据库用户需要在目标 schema 中创建和修改对象的权限。以下示例在连接到已确认的隔离 PostgreSQL 实例后执行，库名和角色名按环境替换。
+
 ```sql
--- 连接到 PostgreSQL
-psql -U postgres
-
--- 授予权限
-GRANT ALL PRIVILEGES ON DATABASE ledgerdb TO ledger;
+CREATE ROLE vortex_dev LOGIN;
+\password vortex_dev
+CREATE DATABASE vortex_dev OWNER vortex_dev;
 ```
 
-## 2. 配置数据库连接
-
-编辑 `src/main/resources/application.properties` 文件，修改以下配置：
+`\password` 在 `psql` 中交互输入密码。应用端使用 `backend/src/main/resources/application-dev.properties` 或由运行环境注入配置。填写实际连接信息前，先确认目标库可用于开发测试。受版本控制的 `application.properties` 保留默认值与占位符。 [本地配置指南](local-config-guide.md)
 
 ```properties
-# 数据库连接 URL（修改为你的数据库地址）
-spring.datasource.url=jdbc:postgresql://your-host:5432/ledgerdb
-
-# 数据库用户名
-spring.datasource.username=ledger
-
-# 数据库密码
-spring.datasource.password=your_password
+spring.datasource.url=jdbc:postgresql://<db-host>:5432/<dev-db>
+spring.datasource.username=<dev-user>
+spring.datasource.password=<dev-password>
 ```
 
-### 配置说明
+## 表结构与默认配置
 
-| 配置项 | 说明 | 示例 |
-|--------|------|------|
-| `your-host` | 数据库服务器地址 | `localhost` 或 `192.168.1.100` |
-| `5432` | PostgreSQL 默认端口 | 可根据实际情况修改 |
-| `ledgerdb` | 数据库名称 | 已手动创建 |
-| `ledger` | 数据库用户名 | 已手动创建 |
-| `your_password` | 数据库密码 | 用户 ledger 的密码 |
+- Flyway 通过 [`db/migration/`](../backend/src/main/resources/db/migration/) 下的脚本初始化空库并升级已有数据库。新结构变更通过追加迁移完成。
+- `spring.jpa.hibernate.ddl-auto=validate` 让 Hibernate 检查实体映射与数据库结构。表结构变更由 Flyway 管理。
+- HikariCP 的连接池配置和 Hibernate 的 JDBC 时区设置见 [application.properties](../backend/src/main/resources/application.properties)。需要覆盖时写入所选 profile 的配置。
+- [旧库手动基线脚本](../backend/src/main/resources/db/manual/flyway_baseline_for_existing_db.sql) 只适用于已经人工应用 V1 至 V18、尚无 Flyway 记录的旧库。使用前须逐项核对目标库结构与迁移记录。
 
-## 3. 连接池配置
+## 启动与验证
 
-HikariCP 连接池配置（已在 application.properties 中配置）：
+确认 `dev` 配置指向隔离开发库后，从工作树根目录启动后端。
 
-```properties
-# 最大连接数
-spring.datasource.hikari.maximum-pool-size=10
-
-# 最小空闲连接数
-spring.datasource.hikari.minimum-idle=5
-
-# 连接超时时间（毫秒）
-spring.datasource.hikari.connection-timeout=30000
-
-# 空闲连接超时时间（毫秒）
-spring.datasource.hikari.idle-timeout=600000
-
-# 连接最大生命周期（毫秒）
-spring.datasource.hikari.max-lifetime=1800000
+```bash
+mvn -f backend/pom.xml spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
-## 4. JPA 配置说明
-
-```properties
-# Hibernate 方言（PostgreSQL）
-spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
-
-# 显示 SQL 语句（开发环境建议开启）
-spring.jpa.show-sql=true
-
-# DDL 自动更新策略
-# - none: 不做任何操作
-# - validate: 验证表结构
-# - update: 更新表结构（推荐开发环境使用）
-# - create: 每次启动创建表（会删除原有数据）
-# - create-drop: 启动时创建，关闭时删除
-spring.jpa.hibernate.ddl-auto=update
-
-# 格式化 SQL 输出
-spring.jpa.properties.hibernate.format_sql=true
-
-# 时区设置
-spring.jpa.properties.hibernate.jdbc.time_zone=UTC+8
-```
-
-## 5. 验证数据库连接
-
-启动应用后，若 Flyway 迁移与 JPA 初始化正常完成，即表示数据库连接成功。可通过健康检查接口进一步确认应用已就绪：
+从启动日志核对生效的 profile、数据库连接、Flyway 和 JPA 初始化结果。应用启动后可查询服务状态。
 
 ```bash
 curl http://localhost:8080/api/health
 ```
 
-若数据库连接失败，应用会在启动阶段直接抛出异常并在日志中打印详细错误（如 `Connection refused`、`password authentication failed` 等），据此排查配置即可。
+## 排查与重置
 
-## 6. 项目结构
-
-```
-backend/
-├── src/main/java/com/vortex/
-│   ├── config/
-│   │   └── DatabaseConfig.java          # 数据库配置类
-│   ├── entity/
-│   │   └── BaseEntity.java              # 基础实体类
-│   └── repository/
-│       └── BaseRepository.java          # 基础 Repository 接口
-└── src/main/resources/
-    └── application.properties           # 数据库配置文件
-```
-
-## 7. 常见问题
-
-### 7.1 连接被拒绝
-- 检查 PostgreSQL 服务是否启动
-- 检查防火墙设置
-- 检查 `pg_hba.conf` 配置文件，确保允许远程连接
-
-### 7.2 认证失败
-- 检查用户名和密码是否正确
-- 检查用户是否有访问数据库的权限
-
-### 7.3 数据库不存在
-- 数据库 `ledgerdb` 已手动创建
-- 检查数据库名称拼写是否正确（应为 `ledgerdb`）
-
-### 7.4 时区问题
-- 已配置时区为 UTC+8
-- 如需修改，调整 `spring.jpa.properties.hibernate.jdbc.time_zone` 配置
-
-## 8. 下一步
-
-现在数据库框架已经搭建完成，你可以：
-
-1. 创建具体的实体类（Entity）
-2. 创建对应的 Repository 接口
-3. 创建 Service 层处理业务逻辑
-4. 创建 Controller 提供 REST API
-
-示例：创建出入金记录实体
-```java
-@Entity
-@Table(name = "cash_flow")
-public class CashFlow extends BaseEntity {
-    // 字段定义...
-}
-```
+- 连接被拒绝时，检查 PostgreSQL 服务、目标端口和所选环境到数据库的网络路径。
+- 认证失败时，检查生效的 profile、数据库用户和凭据来源。库不存在时，检查配置中的库名和创建记录。
+- Flyway 或 JPA 校验失败时，核对迁移历史、目标 schema 和实体映射。保留已应用迁移的原样。
+- 开发库重置脚本会删除并重建目标库的 `public` schema。运行前须确认目标库可丢弃，并获得本次清空授权。 [脚本说明](../e2e/README.md)
