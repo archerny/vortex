@@ -10,13 +10,13 @@
 # Required environment variables:
 #   VORTEX_DEV_DB_HOST     - PostgreSQL host     (e.g. 10.211.55.3)
 #   VORTEX_DEV_DB_PORT     - PostgreSQL port     (e.g. 5432)
-#   VORTEX_DEV_DB_NAME     - Database name       (e.g. vtxdev)
-#   VORTEX_DEV_DB_USER     - Database user       (e.g. vtxdev)
+#   VORTEX_DEV_DB_NAME     - Database name       (e.g. vortex_dev)
+#   VORTEX_DEV_DB_USER     - Database user       (e.g. vortex_dev)
 #   VORTEX_DEV_DB_PASSWORD - Database password
 #
 # Usage:
 #   export VORTEX_DEV_DB_HOST=10.211.55.3 VORTEX_DEV_DB_PORT=5432 \
-#          VORTEX_DEV_DB_NAME=vtxdev VORTEX_DEV_DB_USER=vtxdev VORTEX_DEV_DB_PASSWORD=xxx
+#          VORTEX_DEV_DB_NAME=vortex_dev VORTEX_DEV_DB_USER=vortex_dev VORTEX_DEV_DB_PASSWORD=xxx
 #   ./e2e/reset-dev-db.sh
 # ============================================================
 

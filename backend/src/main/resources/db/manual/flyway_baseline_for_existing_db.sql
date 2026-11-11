@@ -3,7 +3,7 @@
 -- ============================================================
 -- Purpose: Initialize flyway_schema_history table in a database
 --          that already has all V1~V18 migrations applied manually.
--- Usage:   Run this SQL ONCE against your existing database (e.g. ledgerdb).
+-- Usage:   Run this SQL ONCE against your existing database (e.g. vortex).
 --          Do NOT run this on a fresh/empty database — Flyway will handle it automatically.
 -- ============================================================
 

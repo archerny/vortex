@@ -10,3 +10,5 @@
 | [前端架构](frontend-architecture.md) | 应用入口、菜单路由、页面分层、API 封装和界面能力 |
 
 资金流水、策略和券商基础管理的服务端入口分别是 [CashFlowRecordController](../backend/src/main/java/com/vortex/controller/CashFlowRecordController.java)、[StrategyController](../backend/src/main/java/com/vortex/controller/StrategyController.java) 和 [BrokerController](../backend/src/main/java/com/vortex/controller/BrokerController.java)。
+
+后端基础配置的默认库名为 `vortex`，开发测试库约定为 `vortex_dev`，实际连接按执行环境配置。用户名单独指定。 [配置指南](../docs/local-config-guide.md) · [命名方案](../design/0023-2026-11-11-database-names.md)

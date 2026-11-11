@@ -17,6 +17,8 @@
 | `application-dev.properties` | 被 Git 忽略的开发库配置，按需创建。 |
 | `application-local.properties` | 被 Git 忽略的真实账本配置，按需创建。 |
 
+基础配置的默认库名为 `vortex`，开发测试库约定为 `vortex_dev`。创建 `dev` 配置时，将连接 URL 覆盖为实际开发库地址。数据库用户名与库名独立，按实际角色设置。外部 profile、环境变量和命令行中的连接配置也须与目标库一致。 [命名方案](../design/0023-2026-11-11-database-names.md)
+
 可在 `backend/src/main/resources/` 创建所选 profile 的文件，填写该环境的数据库连接配置。下例使用开发库占位符。真实凭据通过本地文件或运行环境的秘密存储提供。 [数据库配置指南](database-setup.md)
 
 ```properties
