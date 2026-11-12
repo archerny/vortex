@@ -201,6 +201,7 @@ See [Local Config Guide](docs/local-config-guide.md) for details.
 | [Unit Test Spec](docs/unit-test-spec.md) | Testing standards and conventions |
 | [Current Knowledge](knowledge/README.md) | Implemented behavior, architecture and code references |
 | [Design History](design/README.md) | Numbered design records and pending proposals |
+| [TODO](docs/TODO.md) | Open defects, code references and acceptance criteria |
 | [Broker Sync Guide](docs/broker-sync/README.md) | Broker setup, synchronization and recovery |
 
 ## Roadmap

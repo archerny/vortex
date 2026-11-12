@@ -114,8 +114,6 @@ public class IbkrFlexClient {
         String url = String.format("%s/SendRequest?t=%s&q=%s&fd=%s&td=%s&v=3",
                 properties.getBaseUrl(), token, queryId, fromDate, toDate);
 
-        logger.debug("[IbkrFlexClient] SendRequest full URL (for curl debugging): {}", url);
-
         String responseBody = executeHttpGet(url, "SendRequest");
         Document doc = parseXmlResponse(responseBody, "SendRequest");
 
@@ -146,8 +144,6 @@ public class IbkrFlexClient {
     private String pollGetStatement(String token, String referenceCode) {
         String url = String.format("%s/GetStatement?t=%s&q=%s&v=3",
                 properties.getBaseUrl(), token, referenceCode);
-
-        logger.debug("[IbkrFlexClient] GetStatement full URL (for curl debugging): {}", url);
 
         for (int attempt = 1; attempt <= MAX_RETRIES; attempt++) {
             logger.debug("[IbkrFlexClient] GetStatement attempt {}/{}", attempt, MAX_RETRIES);
@@ -220,6 +216,9 @@ public class IbkrFlexClient {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new IbkrFlexClientException(operation + " interrupted", e);
+        } catch (IllegalArgumentException e) {
+            // URI validation errors may contain the complete URL, including the token.
+            throw new IbkrFlexClientException(operation + " failed: invalid HTTP request configuration");
         } catch (Exception e) {
             throw new IbkrFlexClientException(operation + " failed: " + e.getMessage(), e);
         }

@@ -17,6 +17,8 @@
 
 ## 验证边界
 
+请求 URL 的 DEBUG 日志统一由 `executeHttpGet` 输出，其中 Token 参数通过 `maskToken` 隐藏。非法请求配置使用固定错误消息，避免原始 URI 异常携带 Token。客户端回归测试使用模拟 HTTP 响应和合成 Token，覆盖 SendRequest、GetStatement 两阶段，并核对非法 URL 的异常链。 [日志回归测试](../../../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrFlexClientTest.java) · [日志修复方案](../../../design/0024-2026-11-12-ibkr-token-log-redaction.md)
+
 [适配器测试](../../../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrSyncAdapterTest.java)和 [导入 Worker 测试](../../../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrImportWorkerTest.java)覆盖分窗、失败残留、映射与 BookTrade 边界。解析器测试中部分用例依赖被 Git 忽略的本地 XML。本次文档迁移仅核对源码，未运行这些用例或连通真实账户。
 
 历史方案见 [Flex Web Service](../../../design/0009-2026-04-14-ibkr-flex-web-service.md)、[BookTrade](../../../design/0012-2026-04-18-ibkr-booktrade-mapping.md)、[IBKR 暂存](../../../design/0013-2026-04-21-ibkr-staging-schema.md)和 [原始数据查看](../../../design/0015-2026-04-21-sync-staged-data-viewer.md)。

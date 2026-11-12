@@ -29,3 +29,4 @@
 | 0021 | 2026-04-24 | [长桥同步草案](0021-2026-04-24-longbridge-sync.md) | 待实现 | `a6623dd` · `docs/broker-sync/brokers/longbridge/README.md` |
 | 0022 | 2026-11-11 | [历史文档迁移与当前知识初始化](0022-2026-11-11-documentation-migration.md) | 本次文档整理 | 本次新增 |
 | 0023 | 2026-11-11 | [统一数据库命名](0023-2026-11-11-database-names.md) | 默认连接与开发环境命名约定 | 本次新增 |
+| 0024 | 2026-11-12 | [IBKR 请求日志 Token 脱敏](0024-2026-11-12-ibkr-token-log-redaction.md) | 请求日志修复与回归验证 | 本次新增 |
