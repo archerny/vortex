@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { lazy, Suspense, useState, useEffect, useRef } from 'react';
 import { Layout, Menu, theme, Space, Button, Tag, Tooltip, message } from 'antd';
 import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 import { TbTornado } from 'react-icons/tb';
@@ -25,6 +25,7 @@ import { PageHeaderBreadcrumb } from './PageHeader';
 import './AppLayout.css';
 
 const { Header, Content, Sider } = Layout;
+const ChartSelectionDemo = lazy(() => import('../pages/profit/chart-demo/ChartSelectionDemo'));
 
 const AppLayout = () => {
   const {
@@ -130,6 +131,8 @@ const AppLayout = () => {
         return <StrategyProfitAnalysis />;
       case '4-3':
         return <AccountProfitAnalysis />;
+      case '4-4':
+        return <Suspense fallback={<div role="status">正在加载图表实验室…</div>}><ChartSelectionDemo /></Suspense>;
       case '5':
         return <Settings />;
       case '7':

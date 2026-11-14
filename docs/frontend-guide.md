@@ -32,7 +32,7 @@ Select the execution environment and check its tools as described in [AGENTS.md]
 
 With project dependencies already installed, use the commands below from the worktree root. To set up dependencies for the first time, check that `frontend/package.json` and `frontend/package-lock.json` agree before running `npm --prefix frontend ci`.
 
-The checked-in lockfile currently omits Vitest, which the manifest declares and `npm test` invokes. This can block a clean installation and the deployment script's `npm ci` step. Review the lockfile separately if dependency changes are in scope.
+The lockfile includes Vitest and the chart demo dependencies. Use `npm --prefix frontend ci` to reproduce the locked installation.
 
 ### Running in Development Mode
 
@@ -41,6 +41,21 @@ npm --prefix frontend run dev
 ```
 
 The application will start at `http://localhost:3000`
+
+### Chart Selection Demo
+
+Open **盈亏分析 → 技术选型 Demo**, or visit `http://localhost:3000/#/profit-chart-demo`. Replace the port when running Vite with a custom port.
+
+The page uses fixed synthetic data and two fictional symbols. Its four tabs demonstrate:
+
+- Lightweight Charts: candlesticks, moving averages, volume panes and trade markers.
+- Apache ECharts: normalized NAV/drawdown, strategy expiry payoff, synthetic Delta/Gamma, volatility smiles and an IV heatmap.
+- Plotly.js: interactive 3D volatility and illustrative payoff surfaces. WebGL is required for this tab.
+- Ant Design Table: an option chain with expiry/strike filters, sorting, optional Greeks, virtual scrolling and contract details.
+
+Try changing the symbol and chart parameters, toggling legends or averages, rotating the 3D surface, and selecting option-chain rows. These controls operate on frontend samples; they do not fetch ledger or broker data. Prices and sensitivities are illustrative, not a production pricing model. The existing layout health check remains active.
+
+The page and its chart panels load dynamically. The Plotly 3D distribution is intentionally isolated in its own panel chunk; production builds can report a large-chunk warning. See [frontend architecture](../knowledge/frontend-architecture.md#图表技术选型演示) and [design 0026](../design/0026-2026-11-15-frontend-chart-selection-demo.md).
 
 ### Building for Production
 

@@ -29,6 +29,7 @@ export const menuKeyToPath = {
   '4-1': 'profit-stock',
   '4-2': 'profit-strategy',
   '4-3': 'profit-account',
+  '4-4': 'profit-chart-demo',
   '5': 'settings',
 };
 
@@ -49,6 +50,7 @@ export const menuKeyToParent = {
   '4-1': 'profit',
   '4-2': 'profit',
   '4-3': 'profit',
+  '4-4': 'profit',
 };
 
 // 菜单项配置
@@ -109,6 +111,11 @@ export const menuItems = [
         key: '4-3',
         icon: React.createElement(FundOutlined),
         label: '账户盈亏分析',
+      },
+      {
+        key: '4-4',
+        icon: React.createElement(ExperimentOutlined),
+        label: '技术选型 Demo',
       },
     ],
   },

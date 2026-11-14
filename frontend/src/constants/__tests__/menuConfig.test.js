@@ -11,7 +11,7 @@ describe('menuConfig - 路由映射', () => {
     const expectedPaths = [
       'dashboard', 'cashflow', 'broker', 'trades', 'strategy',
       'anomaly', 'market-events', 'profit-stock', 'profit-strategy',
-      'profit-account', 'settings',
+      'profit-account', 'profit-chart-demo', 'settings',
     ];
     const actualPaths = Object.values(menuKeyToPath);
     expectedPaths.forEach((path) => {
@@ -52,6 +52,7 @@ describe('menuConfig - 父菜单映射', () => {
     expect(menuKeyToParent['4-1']).toBe('profit');
     expect(menuKeyToParent['4-2']).toBe('profit');
     expect(menuKeyToParent['4-3']).toBe('profit');
+    expect(menuKeyToParent['4-4']).toBe('profit');
   });
 });
 
