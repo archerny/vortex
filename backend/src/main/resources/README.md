@@ -47,6 +47,7 @@ mvn spring-boot:run -Dspring-boot.run.profiles=dev
 | Aspect             | local (production-like)         | dev (development/test)          |
 |--------------------|---------------------------------|---------------------------------|
 | Database           | `vortex` (real data)            | `vortex_dev` (test data)        |
+| Database username  | `dermesos` by default, configurable | `dermesos` by default, configurable |
 | JPA ddl-auto       | `validate` (check only, never modify) | `validate` (same as local) |
 | Schema management  | Flyway auto-migration           | Flyway auto-migration           |
 | Broker credentials | Real API tokens                 | Empty (not needed)              |

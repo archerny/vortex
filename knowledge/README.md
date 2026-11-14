@@ -11,4 +11,4 @@
 
 资金流水、策略和券商基础管理的服务端入口分别是 [CashFlowRecordController](../backend/src/main/java/com/vortex/controller/CashFlowRecordController.java)、[StrategyController](../backend/src/main/java/com/vortex/controller/StrategyController.java) 和 [BrokerController](../backend/src/main/java/com/vortex/controller/BrokerController.java)。
 
-后端基础配置的默认库名为 `vortex`，开发测试库约定为 `vortex_dev`，实际连接按执行环境配置。用户名单独指定。 [配置指南](../docs/local-config-guide.md) · [命名方案](../design/0023-2026-11-11-database-names.md)
+后端基础配置的默认库名为 `vortex`，开发测试库约定为 `vortex_dev`，默认数据库用户名为 `dermesos`。实际连接和用户名可按执行环境覆盖。 [配置指南](../docs/local-config-guide.md) · [库名方案](../design/0023-2026-11-11-database-names.md) · [用户名方案](../design/0025-2026-11-15-database-username.md)
