@@ -20,3 +20,5 @@
 券商各自映射原始资产类别。内部 `AssetType` 包含 `STOCK`、`ETF`、`OPTION_CALL`、`OPTION_PUT`。当前 IBKR 和 Tiger 的常规同步映射覆盖股票和期权，ETF 没有单独的映射分支。
 
 `FailureCategory` 定义 `AUTH`、`NETWORK`、`UNRECOGNIZED`、`INTERNAL`。适配器用 `CategorizedSyncException` 或其格式化方法生成带分类的原因。错误行的导入服务可补充 `ext_id`。批次失败消息还会由 `SyncResult.failure` 包装，清理失败时另有清理错误前缀。排查时不要假设 `broker_sync_batches.error_message` 以分类开头。见 [错误分类](../../backend/src/main/java/com/vortex/sync/core/FailureCategory.java)、[分类异常](../../backend/src/main/java/com/vortex/sync/core/CategorizedSyncException.java)和 [同步结果](../../backend/src/main/java/com/vortex/sync/core/SyncResult.java)。
+
+IBKR 对正式导入的订单数量执行整数校验，不支持的小数、零、非法或超范围数量按 UNRECOGNIZED 拒绝。失败时，Adapter 在清理前按批次、FAILED 状态及 ID 升序读取首条暂存记录，将非空错误说明附在批次计数摘要的 `first failure:` 后；不存在记录或说明为空时仅保留计数摘要。这样不改变整批清理规则，又能在暂存行删除后保留一条可操作的原因。见 [0027 数量校验方案](../../design/0027-2026-11-16-ibkr-reject-fractional-quantities.md)。

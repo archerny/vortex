@@ -398,8 +398,32 @@ public class IbkrImportWorker {
     }
 
     private Integer parseAbsQuantity(String quantity) {
-        if (isBlank(quantity)) return 0;
-        return Math.abs(new BigDecimal(quantity).intValue());
+        if (isBlank(quantity)) {
+            throw new CategorizedSyncException(FailureCategory.UNRECOGNIZED, null,
+                    "IBKR quantity is required");
+        }
+
+        BigDecimal absoluteQuantity;
+        try {
+            absoluteQuantity = new BigDecimal(quantity).abs();
+        } catch (NumberFormatException e) {
+            throw new CategorizedSyncException(FailureCategory.UNRECOGNIZED, null,
+                    "IBKR quantity is not a valid decimal");
+        }
+        if (absoluteQuantity.signum() == 0) {
+            throw new CategorizedSyncException(FailureCategory.UNRECOGNIZED, null,
+                    "IBKR quantity must be greater than zero");
+        }
+        if (absoluteQuantity.stripTrailingZeros().scale() > 0) {
+            throw new CategorizedSyncException(FailureCategory.UNRECOGNIZED, null,
+                    "Fractional IBKR quantities are not supported; no truncation or rounding is allowed");
+        }
+        try {
+            return absoluteQuantity.intValueExact();
+        } catch (ArithmeticException e) {
+            throw new CategorizedSyncException(FailureCategory.UNRECOGNIZED, null,
+                    "IBKR quantity exceeds the supported maximum of 2147483647");
+        }
     }
 
     private BigDecimal parseBigDecimal(String value) {

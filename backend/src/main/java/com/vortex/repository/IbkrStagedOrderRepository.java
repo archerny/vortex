@@ -31,6 +31,9 @@ public interface IbkrStagedOrderRepository extends JpaRepository<IbkrStagedOrder
      */
     List<IbkrStagedOrder> findByBatchIdAndStatus(Long batchId, String status);
 
+    /** Retain a bounded failure explanation before failed-batch rows are deleted. */
+    Optional<IbkrStagedOrder> findFirstByBatchIdAndStatusOrderByIdAsc(Long batchId, String status);
+
     /**
      * Find a staged order by IBKR order ID (for deduplication).
      */

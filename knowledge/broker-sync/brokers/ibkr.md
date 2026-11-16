@@ -9,16 +9,22 @@
 ## 导入映射
 
 - 正式交易以订单为粒度。`STK` 映射到股票，`OPT` 按 `putCall` 的 `C` 或 `P` 映射到期权。期权 symbol 使用 `description` 的首个词作为标的，再拼到期日、方向和去掉尾零的行权价。
-- `tradeDate` 使用 `yyyyMMdd`。`BUY`、`SELL` 分别映射为买卖方向。`CNH` 与 `CNY` 都映射为 `CNY`，`USD` 和 `HKD` 保持原值。金额取原始 `amount` 的绝对值，费用为佣金和附加费的绝对值之和。数量按当前实现从十进制转为整数再取绝对值。
+- `tradeDate` 使用 `yyyyMMdd`。`BUY`、`SELL` 分别映射为买卖方向。`CNH` 与 `CNY` 都映射为 `CNY`，`USD` 和 `HKD` 保持原值。金额取原始 `amount` 的绝对值，费用为佣金和附加费的绝对值之和。数量先取 BigDecimal 绝对值，只接受非零且不超过 2147483647 的数值整数，再用 `intValueExact()` 无损转换；拒绝小数、零、缺失、非法与超范围数量，不截断或舍入。
 - `order_time` 和 `order_type` 同时为空时，订单进入 BookTrade 分支，交易触发来源为 `OPTION`。其他订单使用 `MANUAL/NONE`。BookTrade 按 `order_id` 读取第一条成交确认的 `code`，按分号拆分后精确匹配。`Ex`、`MEx`、`AEx` 的行权判定优先于 `Ep` 的到期判定，后者优先于 `A`、`GEA` 的指派判定。确认记录缺失、code 为空或无法识别时，该订单失败并最终触发整批清理。
 - 期权事件初始 `trigger_ref_id` 为 0。导入后，对本批股票侧行权或指派记录回填关联的期权交易 ID。期权候选按事件类型、标的和交易日查询，可能来自其他批次。多候选时优先匹配行权价，其次匹配数量，仍无法区分时取首条。找不到候选则保留 0 并记录警告。
 
 映射和回填见 [导入 Worker](../../../backend/src/main/java/com/vortex/sync/adapter/ibkr/IbkrImportWorker.java)、[导入服务](../../../backend/src/main/java/com/vortex/sync/adapter/ibkr/IbkrImportService.java)及 [交易仓储查询](../../../backend/src/main/java/com/vortex/repository/TradeRecordRepository.java)。
 
+## 数量限制与失败说明
+
+当前不支持小数股或小数合约数量。`100`、`100.000`、`-100.000` 都可按数值整数导入；`1.5`、`-1.5`、`0.25` 等非整数以 UNRECOGNIZED 拒绝，错误说明为 `Fractional IBKR quantities are not supported; no truncation or rounding is allowed`。原始文本在解析和暂存时保留，不修改源数量、价格或金额。此检查针对正式导入所使用的订单汇总数量，成交确认仍为原始明细暂存。
+
+数量不支持的订单不会保存正式交易。ImportService 在独立事务中记录失败，Adapter 沿用失败计数触发整批清理；本批其他已导入订单也会被清理，其他批次不受影响。Adapter 在清理前按批次读取首条 FAILED 记录，将其已有错误附在批次摘要的 `first failure:` 后，清理后仍能查看原因；没有可用说明时保留计数摘要。同样的数据重新同步仍会拒绝。已有订单继续沿用原有去重规则，本次不修正历史账本。设计与未来升级边界见 [0027](../../../design/0027-2026-11-16-ibkr-reject-fractional-quantities.md)。
+
 ## 验证边界
 
 请求 URL 的 DEBUG 日志统一由 `executeHttpGet` 输出，其中 Token 参数通过 `maskToken` 隐藏。非法请求配置使用固定错误消息，避免原始 URI 异常携带 Token。客户端回归测试使用模拟 HTTP 响应和合成 Token，覆盖 SendRequest、GetStatement 两阶段，并核对非法 URL 的异常链。 [日志回归测试](../../../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrFlexClientTest.java) · [日志修复方案](../../../design/0024-2026-11-12-ibkr-token-log-redaction.md)
 
-[适配器测试](../../../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrSyncAdapterTest.java)和 [导入 Worker 测试](../../../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrImportWorkerTest.java)覆盖分窗、失败残留、映射与 BookTrade 边界。解析器测试中部分用例依赖被 Git 忽略的本地 XML。本次文档迁移仅核对源码，未运行这些用例或连通真实账户。
+[适配器测试](../../../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrSyncAdapterTest.java)和 [导入 Worker 测试](../../../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrImportWorkerTest.java)覆盖分窗、失败残留、映射与 BookTrade 边界。[数量回归测试](../../../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrQuantityValidationTest.java)覆盖整数、小数、非法值、溢出，以及真实解析／暂存／导入／异步执行／清理组件配合模拟仓储的调用链。2026-11-16 在 `ubuntu-dev` 运行数量与相关同步测试共 104 项，全部断言通过，Maven 退出 0；未连接真实数据库或账户，不代表已验证数据库事务。解析器测试中部分用例依赖被 Git 忽略的本地 XML，本轮未运行这些个人夹具用例。完整命令及运行限制随数量问题的验收记录保留。
 
 历史方案见 [Flex Web Service](../../../design/0009-2026-04-14-ibkr-flex-web-service.md)、[BookTrade](../../../design/0012-2026-04-18-ibkr-booktrade-mapping.md)、[IBKR 暂存](../../../design/0013-2026-04-21-ibkr-staging-schema.md)和 [原始数据查看](../../../design/0015-2026-04-21-sync-staged-data-viewer.md)。

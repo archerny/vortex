@@ -158,13 +158,23 @@ public class IbkrSyncAdapter implements BrokerSyncAdapter {
 
             if (failedCount > 0 || residualCount > 0) {
                 // v2 fail-fast: any per-record failure (or residue that should have been
-                // terminal) escalates to whole-batch cleanup. Per-row details (with their
-                // own [CATEGORY] prefixes) live on the staged rows' error_message.
+                // terminal) escalates to whole-batch cleanup. Keep one explanation
+                // because cleanup deletes the staged rows and their error messages.
                 String reason = String.format(
                         "%d record(s) failed import in batch %d " +
                                 "(imported=%d, skipped=%d, failed=%d, residual_non_terminal=%d, duration=%dms)",
                         failedCount + residualCount, batchId,
                         importedCount, skippedCount, failedCount, residualCount, durationMs);
+                if (failedCount > 0) {
+                    String firstError = stagedOrderRepository
+                            .findFirstByBatchIdAndStatusOrderByIdAsc(batchId, "FAILED")
+                            .map(order -> order.getErrorMessage())
+                            .filter(message -> !message.isBlank())
+                            .orElse(null);
+                    if (firstError != null) {
+                        reason += "; first failure: " + firstError;
+                    }
+                }
                 String formatted = CategorizedSyncException.format(
                         FailureCategory.UNRECOGNIZED, null, reason);
                 logger.error("[IbkrSync] batch={} {} — triggering fail-fast cleanup", batchId, formatted);
