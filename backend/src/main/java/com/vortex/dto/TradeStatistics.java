@@ -1,5 +1,6 @@
 package com.vortex.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
@@ -107,6 +108,21 @@ public class TradeStatistics {
 
     public void setTotalFeeHKD(BigDecimal totalFeeHKD) {
         this.totalFeeHKD = totalFeeHKD;
+    }
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    public String getTotalFeeUSDExact() {
+        return totalFeeUSD == null ? null : totalFeeUSD.toPlainString();
+    }
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    public String getTotalFeeCNYExact() {
+        return totalFeeCNY == null ? null : totalFeeCNY.toPlainString();
+    }
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    public String getTotalFeeHKDExact() {
+        return totalFeeHKD == null ? null : totalFeeHKD.toPlainString();
     }
 
     public Long getDistinctSymbolCount() {

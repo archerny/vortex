@@ -1,6 +1,7 @@
 import React from 'react';
 import { Tag } from 'antd';
 import { assetTypeMap, tradeTypeMap, assetTypeColorMap, tradeTypeColorMap, amountColorMap } from '../../constants/tradeConstants';
+import { feeText, compareFees } from '../../utils/tradeFee';
 
 /**
  * 交易记录表格列定义
@@ -97,8 +98,8 @@ const getTradeColumns = (amountVisible, brokerMap, strategyMap, onViewDetail) =>
     title: '费用',
     dataIndex: 'fee',
     key: 'fee',
-    render: (fee) => amountVisible ? (fee != null ? Number(fee).toFixed(2) : '-') : '****',
-    sorter: (a, b) => a.fee - b.fee,
+    render: (_, record) => amountVisible ? (feeText(record) ?? '-') : '****',
+    sorter: compareFees,
     width: 80,
   },
   {

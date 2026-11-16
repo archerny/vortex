@@ -18,4 +18,6 @@
 
 V28 移除了批次表的 `failed_count`，用部分唯一索引保护活跃批次。当前模式没有 `active_flag`，批次表也没有 `account_id`。现行状态及恢复见 [生命周期](lifecycle.md#状态与恢复)。
 
+V29 将共享正式费用列 `trade_records.fee` 从两位小数扩展为不固定 precision/scale 的 `NUMERIC`，保留非空、非负和默认零约束。IBKR、Tiger 和手工交易均可保存来源费用的小数精度，后端汇总不舍入；成交价、成交金额及券商费用组成规则不变。迁移不更改旧费用的数值，不包含历史回填。空库初始化、带两位合成历史数据升级、真实 ORM 费用保存读取及仓储汇总、迁移失败回滚重试已在独立临时 PostgreSQL 集群验证；没有连接现有账本。 [V29](../../backend/src/main/resources/db/migration/V29__preserve_trade_fee_precision.sql) · [0029](../../design/0029-2026-11-17-preserve-trade-fee-precision.md) · [验证入口](../../e2e/README.md#fee-precision-migration-check)
+
 历史背景见 [数据持久化方案](../../design/0008-2026-04-13-broker-sync-data-persistence.md)、[Broker Code 注册方案](../../design/0011-2026-04-17-broker-registration.md)、[IBKR 暂存设计](../../design/0013-2026-04-21-ibkr-staging-schema.md)和 [Tiger 暂存设计](../../design/0016-2026-04-21-tiger-staging-schema.md)。

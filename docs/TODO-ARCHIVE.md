@@ -2,9 +2,34 @@
 
 这里保留已完成、已取消或已合并事项的背景、处理历史和验证证据。当前需要继续处理的事项见 [待办事项](TODO.md)，维护规则见 [项目研发约定](../AGENTS.md#todo-维护与完成)。
 
-本次归档日期：2026-11-16。进展记录保留当时的状态，以条目最后的完成或处置记录为准；取消、合并不代表已修复并通过验收。
+最近归档日期：2026-11-17。进展记录保留当时的状态，以条目最后的完成或处置记录为准；取消、合并不代表已修复并通过验收。
 
 ## 已完成
+
+- [x] **P2 明确并实现 IBKR 费用精度与舍入口径**
+
+  本次 XML 的 295 条订单费用超过两位小数，佣金最多 8 位；当前 mapper 保留源精度，正式表 fee 却为 `DECIMAL(12,2)`，按声明 schema 写入将逐单舍入。此为文件统计及静态 schema 结论，未实际插库。是否接受按分舍入仍待用户确认。 [费用列](../backend/src/main/resources/db/migration/V3__create_trade_records.sql#L66) · [审阅 R1](audits/2026-11-16-ibkr-sync-review.md#r1--p2正式费用列会丢失样例中的佣金精度)
+
+  验收需明确存储、计算、展示的精度与舍入时点。以含 8 位小数佣金的合成订单验证保存后读取及汇总对账；若保留两位，应明确并验证允许的对账差额，不能依赖未说明的数据库舍入。若修改 schema，新增迁移并验证空库、历史库升级及恢复。本条待业务口径确认，尚未修复。
+
+  2026-11-17 范围确认：用户要求费用在数据库与后端完整保留来源精度，不截断、不舍入；前端列表、详情和统计仍显示两位，仅限展示，编辑和提交不得反向降低精度。用户说明此前 Tiger 历史费用不超过两位，本次不修复历史数据。按 [0029](../design/0029-2026-11-17-preserve-trade-fee-precision.md) 验证高精度费用计算、保存读取、汇总及编辑往返，保留空库初始化、两位合成历史数据升级与失败恢复验收；完成前继续未勾选。
+
+  2026-11-17 完成：新增 [V29](../backend/src/main/resources/db/migration/V29__preserve_trade_fee_precision.sql)，将正式费用列改为不指定 precision/scale 的 `NUMERIC`，同步实体映射，保留非空、非负及默认零约束。后端费用计算和分币种汇总继续使用完整精度 `BigDecimal`，不改变佣金及附加费的绝对值之和、币种或去重规则。保留 JSON 数字 `fee`，新增只读十进制字符串 `feeExact`；前端费用输入使用 `stringMode`，编辑按原始字符串回填和提交，列表／详情／统计仍仅显示两位。原始数值精度在 PostgreSQL 支持范围内保留，不要求尾零的文本形式相同；不调整其他金额字段。
+
+  验证环境：`ubuntu-dev`，Ubuntu 26.04.1、Temurin 25.0.5、Maven 3.10.0、Node 26.13.0、npm 11.20.0、Python 3.14.4、PostgreSQL 18.6，工作树 `/home/bytedance.guest/workspace/private/vortex`。使用既有依赖缓存，`TMPDIR=/tmp`、`MAVEN_OPTS=-Djava.io.tmpdir=/tmp`；后端构建产物在 `backend/target/`，本轮日志在 `backend/target/` 和 `frontend/target/`，前端构建产物在 `frontend/dist/`，没有安装工具或升级依赖。
+
+  - `mvn -o -f backend/pom.xml -Dtest=TradeFeePrecisionTest,IbkrImportWorkerTest,TradeRecordServiceTest,MarketEventProcessingServiceTest,TigerTradeRecordMapperTest test`：退出 0，85 项通过，含新增 [费用回归](../backend/src/test/java/com/vortex/sync/adapter/ibkr/TradeFeePrecisionTest.java) 9 项。覆盖 8 位及更多小数、极小值、相加进位、零／缺省费用、API 数字与字符串往返、交易新增／更新及统计；仓储全部 Mockito，不连接数据库。首轮 85 项中有 1 项将无损的科学计数法输出误判为损失，改为反序列化后精确数值比较，完整复跑通过。
+  - `npm --prefix frontend test`：退出 0，37 项通过，含新增 [模拟 API 回归](../frontend/src/services/__tests__/tradeFeePrecision.test.js) 6 项。`npm --prefix frontend run build`：退出 0。保留既有 Vite CJS API 弃用与大分块提示，未修改依赖。
+  - `python3 -B e2e/verify-fee-precision.py`：退出 0。脚本先通过上述新增 9 项内存测试，再启动 `/tmp` 下的新 PostgreSQL 集群，核对数据目录后运行 [独立检查](../e2e/FeePrecisionCheck.java)。空库 V1→V29、V28 两位合成历史行升级后逐字段不变、实际 ORM 高精度保存／读取和仓储分币种汇总、非空／非负／默认值、重复迁移无操作、锁超时失败回滚及重试，三组检查全部通过。旧 V28 写入合成 `1.12345678` 得到 `1.12`，实际复现原舍入；V29 可保存超过 8 位的小数并精确汇总。集群随后停止并删除。既有 Flyway 9.22.3 提示 PostgreSQL 18 超出其已测试版本，未阻止本次用例通过；未据此升级框架。
+  - 实际浏览器使用真实 React 页面和仅含合成交易的临时接口：详情展示 `1.12`，仅将 `symbol` 改为 `SYNTH-UPDATED` 并保存，实际 PUT 的 `fee` 为字符串 `1.1234567890123456789`，重新打开表单后输入仍完整。没有真实后端连接；临时前端进程和监听端口均已关闭。
+
+  独立复核已覆盖实现、测试、迁移检查脚本、方案、知识文档和运行证据，无可行动发现；文档链接与 `git diff --check` 通过。未连接现有 `vortex`／`vortex_dev`、真实券商或个人 XML，未做历史修复、重同步或重算；生产数据对账与实际部署锁等待不属于本次验证。部署先应用 V29，失败时由事务回滚后重试，应用回退保留扩展列。原审阅的“未实际插库”只描述当时的审计状态，不代表本次未验证数据库。
+
+  2026-11-17 展示口径修订：用户进一步要求前端也直接保留原始数字精度，不再固定展示两位。按新增 [0030](../design/0030-2026-11-17-display-exact-trade-fees.md) 实现列表、关联交易表、详情和统计直接显示精确十进制文本，输入／保存沿用同一原值；统计响应补充各币种只读精确文本并兼容原数字字段，费用排序按十进制数值精确比较，遮罩、零费用和空值语义保留。此前两位展示决定及其验收记录作为历史保留，当前展示以本修订为准。未修改 0029 正文、V29 或 ORM，不新增迁移、不操作历史账本。
+
+  同环境重新执行 `mvn -o -f backend/pom.xml -Dtest=TradeFeePrecisionTest,IbkrImportWorkerTest,TradeRecordServiceTest,MarketEventProcessingServiceTest,TigerTradeRecordMapperTest test`，退出 0，86 项通过，其中费用回归 10 项；`npm --prefix frontend test` 退出 0，51 项通过，包含新增 14 项真实列渲染、统计组件、精确排序及极小值／零／遮罩回归；`npm --prefix frontend run build` 退出 0，既有 CJS API 和大分块提示保留。日志分别位于 `backend/target/fee-exact-display-tests.log`、`frontend/target/fee-exact-display-tests.log`、`frontend/target/fee-exact-display-build.log`。实际浏览器在仅含合成记录的临时接口上确认列表、详情及统计均展示完整的 `1.1234567890123456789`；临时前端已停止。本次未重跑无改动的数据库迁移，沿用上次隔离验证结果。
+
+  本修订的完整 24 文件差异、当前知识、归档和运行证据已由未参与实现的 Agent 独立复核，无可行动发现；217 处本地链接及新增文件空白检查通过，`git diff --check` 退出 0。
 
 - [x] **P1 消除清仓后的平均成本残差**
 

@@ -15,6 +15,8 @@
 
 映射和回填见 [导入 Worker](../../../backend/src/main/java/com/vortex/sync/adapter/ibkr/IbkrImportWorker.java)、[导入服务](../../../backend/src/main/java/com/vortex/sync/adapter/ibkr/IbkrImportService.java)及 [交易仓储查询](../../../backend/src/main/java/com/vortex/repository/TradeRecordRepository.java)。
 
+费用计算继续使用原始十进制文本构造 `BigDecimal`，按既有绝对值之和计算，不设置固定小数位或有限有效位数。V29 解除正式费用列的两位限制，保存、读取和分币种汇总均保留来源数值精度；前端展示与编辑也使用原始费用精度。新订单适用新精度，不修复或重放历史数据，既有订单去重及费用组成／币种规则保持原样。 [0029 费用精度方案](../../../design/0029-2026-11-17-preserve-trade-fee-precision.md) · [0030 展示修订](../../../design/0030-2026-11-17-display-exact-trade-fees.md) · [V29](../../../backend/src/main/resources/db/migration/V29__preserve_trade_fee_precision.sql)
+
 ## 数量限制与失败说明
 
 当前不支持小数股或小数合约数量。`100`、`100.000`、`-100.000` 都可按数值整数导入；`1.5`、`-1.5`、`0.25` 等非整数以 UNRECOGNIZED 拒绝，错误说明为 `Fractional IBKR quantities are not supported; no truncation or rounding is allowed`。原始文本在解析和暂存时保留，不修改源数量、价格或金额。此检查针对正式导入所使用的订单汇总数量，成交确认仍为原始明细暂存。
@@ -28,3 +30,5 @@
 [适配器测试](../../../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrSyncAdapterTest.java)和 [导入 Worker 测试](../../../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrImportWorkerTest.java)覆盖分窗、失败残留、映射与 BookTrade 边界。[数量回归测试](../../../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrQuantityValidationTest.java)覆盖整数、小数、非法值、溢出，以及真实解析／暂存／导入／异步执行／清理组件配合模拟仓储的调用链。2026-11-16 在 `ubuntu-dev` 运行数量与相关同步测试共 104 项，全部断言通过，Maven 退出 0；未连接真实数据库或账户，不代表已验证数据库事务。解析器测试中部分用例依赖被 Git 忽略的本地 XML，本轮未运行这些个人夹具用例。完整命令及运行限制随数量问题的验收记录保留。
 
 历史方案见 [Flex Web Service](../../../design/0009-2026-04-14-ibkr-flex-web-service.md)、[BookTrade](../../../design/0012-2026-04-18-ibkr-booktrade-mapping.md)、[IBKR 暂存](../../../design/0013-2026-04-21-ibkr-staging-schema.md)和 [原始数据查看](../../../design/0015-2026-04-21-sync-staged-data-viewer.md)。
+
+2026-11-17 在 `ubuntu-dev` 运行 [费用精度回归](../../../backend/src/test/java/com/vortex/sync/adapter/ibkr/TradeFeePrecisionTest.java) 及相关 IBKR 导入、Tiger 映射、交易和市场事件服务单测，展示修订后共 86 项全部通过，费用用例 10 项。单测全部使用内存模拟仓储；0029 已通过 [独立迁移脚本](../../../e2e/README.md#fee-precision-migration-check) 在 PostgreSQL 18.6 临时集群验证实际落库和汇总，复现旧 V28 的两位舍入并确认 V29 无此损失。0030 未修改迁移或 ORM，沿用该隔离验证；临时服务已停止且清理。未执行真实券商同步、个人 XML 导入或历史账本对账。

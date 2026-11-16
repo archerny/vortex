@@ -15,6 +15,7 @@ import {
   amountColorMap,
 } from '../../constants/tradeConstants';
 import getTradeColumns from './TradeColumns';
+import { feeForInput, feeText } from '../../utils/tradeFee';
 
 /* 统一 Descriptions 表格列宽的样式 */
 const descriptionsTableStyle = `
@@ -221,7 +222,7 @@ const TradeRecordDetail = ({ recordId, onBack }) => {
       tradeType: record.tradeType,
       quantity: record.quantity,
       price: record.price != null ? Number(record.price) : null,
-      fee: record.fee != null ? Number(record.fee) : 0,
+      fee: feeForInput(record),
       currency: record.currency,
       strategyId: record.strategyId || undefined,
       tradeTrigger: record.tradeTrigger || 'MANUAL',
@@ -247,7 +248,7 @@ const TradeRecordDetail = ({ recordId, onBack }) => {
         quantity: values.quantity,
         price: values.price,
         amount: null, // 由后端自动计算
-        fee: values.fee || 0,
+        fee: values.fee ?? '0',
         currency: values.currency,
         strategyId: values.strategyId || null,
         tradeTrigger: values.tradeTrigger,
@@ -417,7 +418,7 @@ const TradeRecordDetail = ({ recordId, onBack }) => {
             : '****'}
         </Descriptions.Item>
         <Descriptions.Item label="交易费用">
-          {amountVisible ? (record.fee != null ? Number(record.fee).toFixed(2) : '-') : '****'}
+          {amountVisible ? (feeText(record) ?? '-') : '****'}
         </Descriptions.Item>
       </Descriptions>
 
@@ -568,7 +569,7 @@ const TradeRecordDetail = ({ recordId, onBack }) => {
             </Col>
             <Col span={8}>
               <Form.Item label="交易费用" name="fee">
-                <InputNumber min={0} step={0.01} style={{ width: '100%' }} placeholder="手续费（选填）" />
+                <InputNumber stringMode min="0" step="0.01" style={{ width: '100%' }} placeholder="手续费（选填）" />
               </Form.Item>
             </Col>
           </Row>

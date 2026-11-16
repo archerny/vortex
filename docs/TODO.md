@@ -36,12 +36,6 @@
 
   验收需区分合法零交易与缺少导出层级、错误查询类型、异常响应和不支持的多报表结构。明确支持范围并完整处理，或清楚报错；不得静默丢弃后续内容。用可提交的合成 XML 验证完整解析→暂存／导入入口的结果，覆盖第一份为空而后续非空，以及非空成交明细但无订单层。本条尚未修复；下一步新增 design。
 
-- [ ] **P2 明确并实现 IBKR 费用精度与舍入口径**
-
-  本次 XML 的 295 条订单费用超过两位小数，佣金最多 8 位；当前 mapper 保留源精度，正式表 fee 却为 `DECIMAL(12,2)`，按声明 schema 写入将逐单舍入。此为文件统计及静态 schema 结论，未实际插库。是否接受按分舍入仍待用户确认。 [费用列](../backend/src/main/resources/db/migration/V3__create_trade_records.sql#L66) · [审阅 R1](audits/2026-11-16-ibkr-sync-review.md#r1--p2正式费用列会丢失样例中的佣金精度)
-
-  验收需明确存储、计算、展示的精度与舍入时点。以含 8 位小数佣金的合成订单验证保存后读取及汇总对账；若保留两位，应明确并验证允许的对账差额，不能依赖未说明的数据库舍入。若修改 schema，新增迁移并验证空库、历史库升级及恢复。本条待业务口径确认，尚未修复。
-
 - [ ] **P2 对齐 IBKR Flex 错误码、分类与重试语义**
 
   客户端把 1005、1006、1012 分别描述为 Token 无效、限流、查询不存在，与官方的交割数据未就绪、FIFO 盈亏数据未就绪、Token 过期不一致；1006 还进入限流异常分支。适配器把所有客户端异常统一分类为 NETWORK。此项为源码与官方文档静态对照，尚未逐码运行响应复现。 [客户端错误处理](../backend/src/main/java/com/vortex/sync/adapter/ibkr/IbkrFlexClient.java#L303) · [官方错误码](https://www.ibkrguides.com/orgportal/performanceandstatements/flex3error.htm) · [审阅 R7](audits/2026-11-16-ibkr-sync-review.md#r7--p2flex-错误码说明与官方定义不符)

@@ -1,4 +1,5 @@
 import React from 'react';
+import { feeText, hasFee } from '../../utils/tradeFee';
 import { Card, Row, Col, Statistic, Divider } from 'antd';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 
@@ -83,22 +84,22 @@ const TradeStatisticsPanel = ({ statistics, amountVisible }) => {
             <div style={{ color: 'rgba(0, 0, 0, 0.45)', marginBottom: 8, fontSize: 14 }}>总交易费用</div>
             {amountVisible ? (
               <div style={{ fontSize: 16 }}>
-                {statistics.totalFeeUSD > 0 && (
+                {hasFee(statistics, 'totalFeeUSD') && (
                   <div style={{ marginBottom: 4 }}>
-                    <span style={{ color: '#9254de', fontWeight: 'bold' }}>US$ {Number(statistics.totalFeeUSD).toFixed(2)}</span>
+                    <span style={{ color: '#9254de', fontWeight: 'bold' }}>US$ {feeText(statistics, 'totalFeeUSD')}</span>
                   </div>
                 )}
-                {statistics.totalFeeCNY > 0 && (
+                {hasFee(statistics, 'totalFeeCNY') && (
                   <div style={{ marginBottom: 4 }}>
-                    <span style={{ color: '#69b1ff', fontWeight: 'bold' }}>CN¥ {Number(statistics.totalFeeCNY).toFixed(2)}</span>
+                    <span style={{ color: '#69b1ff', fontWeight: 'bold' }}>CN¥ {feeText(statistics, 'totalFeeCNY')}</span>
                   </div>
                 )}
-                {statistics.totalFeeHKD > 0 && (
+                {hasFee(statistics, 'totalFeeHKD') && (
                   <div style={{ marginBottom: 4 }}>
-                    <span style={{ color: '#95de64', fontWeight: 'bold' }}>HK$ {Number(statistics.totalFeeHKD).toFixed(2)}</span>
+                    <span style={{ color: '#95de64', fontWeight: 'bold' }}>HK$ {feeText(statistics, 'totalFeeHKD')}</span>
                   </div>
                 )}
-                {statistics.totalFeeUSD <= 0 && statistics.totalFeeCNY <= 0 && statistics.totalFeeHKD <= 0 && (
+                {!['totalFeeUSD', 'totalFeeCNY', 'totalFeeHKD'].some((field) => hasFee(statistics, field)) && (
                   <span style={{ color: '#999' }}>暂无费用数据</span>
                 )}
               </div>

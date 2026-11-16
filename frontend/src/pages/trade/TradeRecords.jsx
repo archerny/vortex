@@ -387,10 +387,9 @@ const TradeRecords = () => {
                     name="fee"
                     rules={[
                       { required: true, message: '请输入交易费用' },
-                      { type: 'number', min: 0, message: '费用不能为负数' },
                     ]}
                   >
-                    <InputNumber style={{ width: '100%' }} placeholder="请输入费用" min={0} precision={2} />
+                    <InputNumber stringMode style={{ width: '100%' }} placeholder="请输入费用" min="0" step="0.01" />
                   </Form.Item>
                 </Col>
           </Row>

@@ -24,7 +24,11 @@
 
 [services/](../frontend/src/services/) 按领域封装 Axios 请求，使用相对的 `/api` 路径并返回响应体。布局直接查询 `GET /api/health`。开发模式下，[Vite 配置](../frontend/vite.config.js) 默认监听 3000 端口，并把 `/api` 代理到 `http://localhost:8080`。发布时应让静态页面的同源服务处理 `/api`。前端部署脚本的 `-a` 只注入 `VITE_API_BASE_URL`，当前请求代码未读取该变量。
 
+交易费用在列表、详情、统计及编辑中统一保留原始数字精度，不固定显示两位小数。页面使用后端的精确十进制字符串，兼容旧数字字段；统计仍在后端按币种汇总。新增和编辑使用 `InputNumber.stringMode`，以原字符串提交，展示与保存使用同一数值。费用列按精确十进制比较排序，极小费用不会因 JavaScript 数字下溢被隐藏；原有遮罩、缺省值和零费用提示保留。相关契约见 [0029](../design/0029-2026-11-17-preserve-trade-fee-precision.md)、[0030 展示修订](../design/0030-2026-11-17-display-exact-trade-fees.md) 与 [交易与持仓](trades-and-positions.md)。
+
 [package.json](../frontend/package.json) 定义开发、构建和测试命令，`package-lock.json` 包含 Vitest 和图表依赖的锁定记录。Vitest 在 Node 环境中运行，[常量测试](../frontend/src/constants/__tests__/) 覆盖菜单映射和交易常量，[演示数据测试](../frontend/src/pages/profit/chart-demo/__tests__/mockData.test.js) 覆盖合成价格、报价、收益边界和曲面维度。运行和排查步骤见 [前端指南](../docs/frontend-guide.md)。
+
+[费用 API 回归](../frontend/src/services/__tests__/tradeFeePrecision.test.js) 通过模拟 Axios 验证高精度费用读取、回填和提交；[展示及排序回归](../frontend/src/utils/__tests__/tradeFee.test.jsx) 使用真实列表列和统计组件，覆盖完整小数、极小费用、零／缺省值、遮罩、精确排序及旧响应兼容。2026-11-17 修订后 51 项前端单测及构建通过；实际浏览器在独立合成接口上确认列表、详情和统计均展示 `1.1234567890123456789`。此前仅修改证券代码再保存的浏览器验收也已确认费用字符串无损。未连接真实后端或用户账本。
 
 ## 图表技术选型演示
 

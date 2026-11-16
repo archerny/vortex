@@ -4,7 +4,9 @@
 
 `/api/trade-records` 支持新增、修改、软删除和查询。查询可按券商、证券类型、策略、证券代码或日期范围筛选。交易日期使用 `LocalDate`，数据库存储为 `DATE`。交易支持股票、ETF、看涨期权和看跌期权，币种为 `CNY`、`HKD` 或 `USD`。底层证券代码 `underlyingSymbol` 必填，交易记录不再保存证券名称。 [交易 API](../backend/src/main/java/com/vortex/controller/TradeRecordController.java) · [交易实体](../backend/src/main/java/com/vortex/entity/TradeRecord.java) · [V5 底层证券代码约束](../backend/src/main/resources/db/migration/V5__alter_underlying_symbol_not_null.sql) · [V25 删除名称列](../backend/src/main/resources/db/migration/V25__drop_symbol_name_fields.sql)
 
-通过交易 API 新增或修改记录时，服务端按数量 × 单价计算成交金额。看涨和看跌期权再乘合约乘数 100，费用单列。交易数量为整数，数据库中的单价保留 4 位小数，金额和费用各保留 2 位。券商同步和市场事件有各自的记录生成入口。 [交易服务](../backend/src/main/java/com/vortex/service/TradeRecordService.java) · [交易表定义](../backend/src/main/resources/db/migration/V3__create_trade_records.sql) · [市场事件](market-events.md)
+通过交易 API 新增或修改记录时，服务端按数量 × 单价计算成交金额。看涨和看跌期权再乘合约乘数 100，费用单列。交易数量为整数，数据库中的单价保留 4 位小数，成交金额保留 2 位。费用从 V29 起使用不固定小数位的 PostgreSQL `NUMERIC`，后端以 `BigDecimal` 传递及汇总，不截断或舍入，在数据库支持范围内保留来源数值精度。券商同步和市场事件有各自的记录生成入口。 [交易服务](../backend/src/main/java/com/vortex/service/TradeRecordService.java) · [交易表定义](../backend/src/main/resources/db/migration/V3__create_trade_records.sql) · [费用迁移](../backend/src/main/resources/db/migration/V29__preserve_trade_fee_precision.sql) · [市场事件](market-events.md)
+
+交易响应保留原 JSON 数字字段 `fee`，另提供只读十进制字符串 `feeExact`；统计同样为各币种保留原数字字段并补充对应的 `totalFeeUSDExact`、`totalFeeCNYExact`、`totalFeeHKDExact`。前端列表、详情、统计和编辑统一使用原始精确费用文本，不固定小数位、不补齐两位；编辑以原字符串提交 `fee`，避免 JavaScript 浮点转换，旧数字请求仍可接收。费用列排序也按十进制精确值比较。V29 只扩展列类型，不修复、重新同步或重算历史交易，原两位费用数值保持不变。部署先应用迁移，再导入高精度费用；应用回退时保留扩展后的列，避免降精度。 [0029 费用精度方案](../design/0029-2026-11-17-preserve-trade-fee-precision.md) · [0030 完整精度展示](../design/0030-2026-11-17-display-exact-trade-fees.md) · [独立迁移验证](../e2e/README.md#fee-precision-migration-check)
 
 统计接口 `GET /api/trade-records/statistics` 统计未软删除记录的总数、各证券类型的记录数、分币种的费用，以及底层证券去重数和按交易次数排名的前 10 个底层证券。 [统计查询](../backend/src/main/java/com/vortex/repository/TradeRecordRepository.java) · [交易统计面板](../frontend/src/pages/trade/TradeStatisticsPanel.jsx)
 

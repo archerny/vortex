@@ -1,5 +1,6 @@
 package com.vortex.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.vortex.entity.enums.AssetType;
 import com.vortex.entity.enums.Currency;
 import com.vortex.entity.enums.TradeTrigger;
@@ -87,9 +88,9 @@ public class TradeRecord extends BaseEntity {
     private BigDecimal amount;
 
     /**
-     * 交易费用（精度2位小数）
+     * 交易费用（保留来源小数精度，不舍入）
      */
-    @Column(name = "fee", nullable = false, precision = 12, scale = 2)
+    @Column(name = "fee", nullable = false, columnDefinition = "numeric")
     private BigDecimal fee = BigDecimal.ZERO;
 
     /**
@@ -251,6 +252,13 @@ public class TradeRecord extends BaseEntity {
 
     public void setFee(BigDecimal fee) {
         this.fee = fee;
+    }
+
+    /** Exact decimal text for clients that cannot represent JSON decimals losslessly. */
+    @Transient
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    public String getFeeExact() {
+        return fee == null ? null : fee.toPlainString();
     }
 
     public Currency getCurrency() {
