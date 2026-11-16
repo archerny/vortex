@@ -449,7 +449,7 @@ public class MarketEventProcessingService {
      *
      * 使用移动加权平均法：
      * - BUY:  持仓成本池 += 买入金额，持仓数量 += 买入数量
-     * - SELL: 持仓成本池 -= 卖出数量 × 当前平均成本，持仓数量 -= 卖出数量
+     * - SELL: 部分卖出按当前平均成本减记，完全清仓结清剩余成本池，持仓数量 -= 卖出数量
      * 最终平均成本 = 持仓成本池 / 当前持仓数量
      *
      * TODO: 当前使用移动加权平均法，未来在做盈亏分析时需要深度考虑成本计算方式，
@@ -471,7 +471,10 @@ public class MarketEventProcessingService {
                 costPool = costPool.add(amount);
                 holdingQty += record.getQuantity();
             } else if (record.getTradeType() == TradeType.SELL) {
-                if (holdingQty > 0) {
+                if (holdingQty > 0 && record.getQuantity() == holdingQty) {
+                    // Final disposal consumes the remaining cost, including rounding tails.
+                    costPool = BigDecimal.ZERO;
+                } else if (holdingQty > 0) {
                     // 卖出时按当前平均成本减少成本池
                     BigDecimal avgCostBeforeSell = costPool.divide(BigDecimal.valueOf(holdingQty), 6, RoundingMode.HALF_UP);
                     costPool = costPool.subtract(avgCostBeforeSell.multiply(BigDecimal.valueOf(record.getQuantity())));

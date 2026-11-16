@@ -16,7 +16,9 @@
 | 代码变更 | 对持有旧代码的非期权持仓生成等量的旧代码 `SELL` 和新代码 `BUY`。两笔交易都以旧证券截至前一日的移动加权平均成本计价。 |
 | 实物分红 | 分红数量为 `floor(持仓数量 × ratioTo / ratioFrom)`。数量为正时生成分红证券的股票 `BUY`，币种取 `dividendCurrency`。价格取 `fairValuePerShare`，缺省时按 0，金额为价格 × 分红数量。 |
 
-代码变更的平均成本按原证券和券商计算。买入金额增加成本池，卖出按当时平均成本减记。最终平均成本以 4 位小数、`HALF_UP` 舍入。该成本计算用于代码变更交易定价。 [平均成本实现](../backend/src/main/java/com/vortex/service/MarketEventProcessingService.java) · [交易与持仓](trades-and-positions.md)
+代码变更的平均成本按原证券和券商回放历史交易计算。买入金额增加成本池；当前正持仓恰好全部卖出时，直接结清成本池并将数量减为零，后续建仓不再携带旧的舍入尾差。部分卖出仍按 6 位小数、`HALF_UP` 的均价减记，最终均价仍以 4 位小数、`HALF_UP` 舍入，两笔转移交易的金额仍为该均价乘持仓数量。此处成本池仅为回放中的局部变量，计算用于代码变更交易定价，不是日常持仓查询维护的成本账户。 [平均成本实现](../backend/src/main/java/com/vortex/service/MarketEventProcessingService.java) · [0028 清仓成本池方案](../design/0028-2026-11-16-clear-cost-pool-on-liquidation.md) · [交易与持仓](trades-and-positions.md)
+
+[市场事件回归测试](../backend/src/test/java/com/vortex/service/MarketEventProcessingServiceTest.java) 使用真实事件处理与持仓计算、Mockito 仓储及合成交易，从证券代码变更入口验证清仓、重新建仓和生成交易。2026-11-16 在 `ubuntu-dev` 中，新增 8 项及相关持仓、交易服务测试共 33 项通过，Maven 退出 0；仅为纯内存回归，未验证真实数据库事务，也未读取或重算用户历史账本。卖超、负持仓、同日成交排序及更广的计价精度规则保持原有边界，本次只修复清仓尾差。
 
 ## 历史重算的范围
 
