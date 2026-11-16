@@ -202,6 +202,7 @@ See [Local Config Guide](docs/local-config-guide.md) for details.
 | [Current Knowledge](knowledge/README.md) | Implemented behavior, architecture and code references |
 | [Design History](design/README.md) | Numbered design records and pending proposals |
 | [TODO](docs/TODO.md) | Open defects, code references and acceptance criteria |
+| [TODO Archive](docs/TODO-ARCHIVE.md) | Completed, cancelled and merged items with decisions and verification records |
 | [Broker Sync Guide](docs/broker-sync/README.md) | Broker setup, synchronization and recovery |
 
 ## Roadmap
