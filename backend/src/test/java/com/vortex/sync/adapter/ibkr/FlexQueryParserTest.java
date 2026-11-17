@@ -1,5 +1,7 @@
 package com.vortex.sync.adapter.ibkr;
 
+import com.vortex.sync.core.CategorizedSyncException;
+import com.vortex.sync.core.FailureCategory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -192,7 +194,7 @@ class FlexQueryParserTest {
     }
 
     @Test
-    @DisplayName("验证解析无 TradeConfirms 节点的 XML")
+    @DisplayName("拒绝缺少 TradeConfirms 节点的 XML")
     void parseXmlWithoutTradeConfirms() {
         String xml = """
                 <FlexQueryResponse queryName="TEST" type="TCF">
@@ -203,11 +205,9 @@ class FlexQueryParserTest {
                 </FlexQueryResponse>
                 """;
 
-        FlexQueryParseResult result = parser.parse(xml);
-
-        assertNotNull(result);
-        assertEquals(0, result.getOrderCount());
-        assertEquals(0, result.getTradeConfirmCount());
+        CategorizedSyncException failure = assertThrows(CategorizedSyncException.class, () -> parser.parse(xml));
+        assertEquals(FailureCategory.UNRECOGNIZED, failure.getCategory());
+        assertTrue(failure.getMessage().contains("TradeConfirms"));
     }
 
     @Test

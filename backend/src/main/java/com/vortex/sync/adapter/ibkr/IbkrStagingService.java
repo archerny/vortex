@@ -14,7 +14,8 @@ import java.util.List;
  *
  * Each record is written in an independent transaction (REQUIRES_NEW)
  * via {@link IbkrStagingWorker} for idempotent, crash-safe staging.
- * Duplicate records are detected via orderId / tradeId and silently skipped.
+ * Existing orderId / tradeId records are skipped only when source content matches;
+ * a content conflict aborts staging and follows the existing batch failure cleanup.
  *
  * Note: Per-record transactional methods are in {@link IbkrStagingWorker}
  * (a separate Spring bean) to ensure that {@code @Transactional(REQUIRES_NEW)}

@@ -13,6 +13,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -81,7 +83,6 @@ class IbkrStagingWorkerTest {
         @DisplayName("should map all fields correctly from IbkrOrderRecord to IbkrStagedOrder")
         void shouldMapFieldsCorrectly() {
             IbkrOrderRecord order = buildOrder("ORD_MAP");
-            when(stagedOrderRepository.existsByOrderId("ORD_MAP")).thenReturn(false);
 
             stagingWorker.stageOrder(1L, order);
 
@@ -112,9 +113,14 @@ class IbkrStagingWorkerTest {
         @Test
         @DisplayName("should skip existing order and return false")
         void shouldSkipExistingOrder() {
-            when(stagedOrderRepository.existsByOrderId("ORD_EXISTS")).thenReturn(true);
+            IbkrOrderRecord order = buildOrder("ORD_EXISTS");
+            stagingWorker.stageOrder(1L, order);
+            ArgumentCaptor<IbkrStagedOrder> captor = ArgumentCaptor.forClass(IbkrStagedOrder.class);
+            verify(stagedOrderRepository).save(captor.capture());
+            when(stagedOrderRepository.findByOrderId("ORD_EXISTS")).thenReturn(Optional.of(captor.getValue()));
+            clearInvocations(stagedOrderRepository);
 
-            boolean result = stagingWorker.stageOrder(1L, buildOrder("ORD_EXISTS"));
+            boolean result = stagingWorker.stageOrder(2L, order);
 
             assertFalse(result);
             verify(stagedOrderRepository, never()).save(any());
@@ -123,7 +129,6 @@ class IbkrStagingWorkerTest {
         @Test
         @DisplayName("should save new order and return true")
         void shouldSaveNewOrder() {
-            when(stagedOrderRepository.existsByOrderId("ORD_NEW")).thenReturn(false);
 
             boolean result = stagingWorker.stageOrder(1L, buildOrder("ORD_NEW"));
 
@@ -142,9 +147,14 @@ class IbkrStagingWorkerTest {
         @Test
         @DisplayName("should skip existing trade confirm and return false")
         void shouldSkipExistingConfirm() {
-            when(stagedTradeConfirmRepository.existsByTradeId("TC_EXISTS")).thenReturn(true);
+            IbkrTradeConfirm confirm = buildConfirm("TC_EXISTS");
+            stagingWorker.stageTradeConfirm(1L, confirm);
+            ArgumentCaptor<IbkrStagedTradeConfirm> captor = ArgumentCaptor.forClass(IbkrStagedTradeConfirm.class);
+            verify(stagedTradeConfirmRepository).save(captor.capture());
+            when(stagedTradeConfirmRepository.findByTradeId("TC_EXISTS")).thenReturn(Optional.of(captor.getValue()));
+            clearInvocations(stagedTradeConfirmRepository);
 
-            boolean result = stagingWorker.stageTradeConfirm(1L, buildConfirm("TC_EXISTS"));
+            boolean result = stagingWorker.stageTradeConfirm(2L, confirm);
 
             assertFalse(result);
             verify(stagedTradeConfirmRepository, never()).save(any());
@@ -153,7 +163,6 @@ class IbkrStagingWorkerTest {
         @Test
         @DisplayName("should save new trade confirm and return true")
         void shouldSaveNewConfirm() {
-            when(stagedTradeConfirmRepository.existsByTradeId("TC_NEW")).thenReturn(false);
 
             boolean result = stagingWorker.stageTradeConfirm(1L, buildConfirm("TC_NEW"));
 

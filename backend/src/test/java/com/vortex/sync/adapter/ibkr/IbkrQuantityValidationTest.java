@@ -150,7 +150,11 @@ class IbkrQuantityValidationTest {
         properties.setFlexToken("synthetic-token");
         properties.setTradeConfirmQueryId("synthetic-query");
         IbkrFlexClient client = mock(IbkrFlexClient.class);
-        when(client.fetchReport(anyString(), anyString())).thenReturn("<FlexQueryResponse/>");
+        when(client.fetchReport(anyString(), anyString())).thenReturn("""
+                <FlexQueryResponse type="TCF"><FlexStatements count="1">
+                  <FlexStatement accountId="synthetic-account"><TradeConfirms/></FlexStatement>
+                </FlexStatements></FlexQueryResponse>
+                """);
         IbkrStagedOrder failed = order("1.5");
         failed.setErrorMessage(explanation);
         when(orders.countByBatchIdAndStatus(100L, "IMPORTED")).thenReturn(0L);
@@ -185,8 +189,8 @@ class IbkrQuantityValidationTest {
         previous.setSyncBatchId(99L);
         persisted.put(10L, previous);
 
-        when(orders.existsByOrderId(anyString())).thenAnswer(i -> staged.values().stream()
-                .anyMatch(o -> o.getOrderId().equals(i.getArgument(0))));
+        when(orders.findByOrderId(anyString())).thenAnswer(i -> staged.values().stream()
+                .filter(o -> o.getOrderId().equals(i.getArgument(0))).findFirst());
         when(orders.save(any())).thenAnswer(i -> {
             IbkrStagedOrder value = i.getArgument(0);
             if (value.getId() == null) value.setId(ids.incrementAndGet());
@@ -237,7 +241,7 @@ class IbkrQuantityValidationTest {
         when(brokers.findByBrokerCode("ibkr")).thenReturn(Optional.of(broker));
         IbkrFlexClient client = mock(IbkrFlexClient.class);
         when(client.fetchReport(anyString(), anyString())).thenReturn("""
-                <FlexQueryResponse type="TCF"><FlexStatement accountId="synthetic-account">
+                <FlexQueryResponse type="TCF"><FlexStatements count="1"><FlexStatement accountId="synthetic-account">
                   <TradeConfirms>
                     <Order orderID="synthetic-good" assetCategory="STK" symbol="SYNTH" currency="USD"
                       tradeDate="20260105" buySell="BUY" orderType="LMT" orderTime="20260105;100000"
@@ -247,7 +251,7 @@ class IbkrQuantityValidationTest {
                       quantity="%s" price="10" amount="15"/>
                     <TradeConfirm tradeID="synthetic-fill" orderID="synthetic-invalid" quantity="%s"/>
                   </TradeConfirms>
-                </FlexStatement></FlexQueryResponse>
+                </FlexStatement></FlexStatements></FlexQueryResponse>
                 """.formatted(raw, raw));
         IbkrFlexQueryProperties properties = new IbkrFlexQueryProperties();
         properties.setFlexToken("synthetic-token");

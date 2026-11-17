@@ -6,6 +6,57 @@
 
 ## 已完成
 
+- [x] **P1 校验 IBKR 报表结构及导出层级**
+
+  解析器只读第一份 FlexStatement 和第一组 TradeConfirms；缺少节点时返回空结果，不校验报告类型。合成两份 statement 只解析一份；不含所需节点的 AF 报表、含成交但无订单层的 TCF 报表均可由适配器报告成功 0。上述结果在 `ubuntu-dev` 通过真实解析器与模拟仓储复现；本次真实文件的结构完整，未触发。 [解析入口](../backend/src/main/java/com/vortex/sync/adapter/ibkr/FlexQueryParser.java#L107) · [审阅 R4](audits/2026-11-16-ibkr-sync-review.md#r4--p1不支持的报表结构会被静默截断或当成零条成功)
+
+  验收需区分合法零交易与缺少导出层级、错误查询类型、异常响应和不支持的多报表结构。明确支持范围并完整处理，或清楚报错；不得静默丢弃后续内容。用可提交的合成 XML 验证完整解析→暂存／导入入口的结果，覆盖第一份为空而后续非空，以及非空成交明细但无订单层。本条尚未修复；下一步新增 design。
+
+  2026-11-17 范围确认：用户采用单账户、单份规定结构的 TCF 报表，超出范围或缺少必要层级时报错；不新增多账户或多 statement 导入。按 [0034](../design/0034-2026-11-17-ibkr-single-account-tcf-validation.md) 要求完整容器、账户及单组 TradeConfirms，非空报表同时具备订单和成交层，完整空报表允许成功零条。日期分窗仍逐份下载、逐份校验，结构错误不能被当作正常零交易；原发现和验收历史保留，回归及独立复核完成前继续未勾选。
+
+  2026-11-17 完成：按 [0034](../design/0034-2026-11-17-ibkr-single-account-tcf-validation.md) 在字符串和流两个解析入口统一校验 TCF 类型、唯一直接封套、可选 count、非空报表账户及记录账户一致性；拒绝未知层级、嵌套记录和非空文本。非空报表同时要求 Order 与 TradeConfirm，合法的完整空报表仍成功零条。结构错误为 UNRECOGNIZED，使用固定、可定位的配置原因，不输出账户或 XML 值；不再取第一份或将缺层级当作零交易。日期窗口分别校验，任一文件不支持时，在暂存前使整批失败并执行既有清理，原成功批次保留。
+
+  验证环境：`ubuntu-dev`，Ubuntu 26.04.1、Temurin 25.0.5、Maven 3.10.0，工作树 `/home/bytedance.guest/workspace/private/vortex`。沿用既有离线缓存，`TMPDIR=/tmp`、`MAVEN_OPTS=-Djava.io.tmpdir=/tmp`，日志和构建产物位于 `backend/target/`，没有安装工具或修改依赖。
+
+  - 原实现运行 `mvn -o -f backend/pom.xml -Dtest=IbkrReportStructureTest test`：退出 1，63 项中 54 项因未拒绝结构异常失败，0 错误，其余控制场景通过。日志为 `backend/target/ibkr-structure-red-tests.log`。
+  - 修复后运行 `mvn -o -f backend/pom.xml -Dtest=IbkrReportStructureTest,IbkrDuplicateBatchTest,IbkrQuantityValidationTest test`：退出 0，107 项全部通过，日志为 `backend/target/ibkr-structure-focused-tests.log`。首轮同命令有 3 项既有错误摘要用例因使用不完整简写 XML 提前失败；仅将夹具改成合法空 TCF，保留原摘要断言，首轮证据在 `backend/target/ibkr-structure-focused-first-tests.log`。
+  - `mvn -o -f backend/pom.xml -Dtest=IbkrReportStructureTest,IbkrDuplicateConsistencyTest,IbkrDuplicateBatchTest,IbkrStagingWorkerTest,IbkrStagingServiceTest,IbkrImportWorkerTest,IbkrImportServiceTest,IbkrSyncAdapterTest,IbkrQuantityValidationTest,TradeFeePrecisionTest,BrokerSyncAsyncExecutorTest,SyncBatchCleanupServiceTest,SyncBatchFailureHandlerTest test`：退出 0，300 项全部通过，无失败、错误或跳过，日志为 `backend/target/ibkr-structure-green-tests.log`。逐类核对原有相关套件的全部测试类及嵌套类，包含新增结构 63 项和新增批次 8 项。
+  - `mvn -o -f backend/pom.xml -Dtest=FlexQueryParserTest#parseEmptyTradeConfirms+parseXmlWithoutTradeConfirms+parseInvalidXmlShouldThrow test`：退出 0，旧解析器的 3 个纯合成方法通过，正常结束，日志为 `backend/target/ibkr-structure-legacy-tests.log`。仅更新缺少 TradeConfirms 的旧断言为明确拒绝；4 个依赖个人 XML 的方法未改动、未运行，个人夹具 TODO 继续保留。
+
+  曾把方法选择器和多个类放在同一命令中，228 项虽通过，但 Surefire 遗漏了嵌套测试；该轮日志保留为 `backend/target/ibkr-structure-selected-tests.log`，不作为完整验收。最终按上述两个独立命令验证全部 300 项及旧解析 3 项。完整组和 focused 仍有既有 Surefire 在退出握手等待 30 秒后终止子 JVM 的提示，Maven 均为 BUILD SUCCESS；旧解析 3 项单独运行无该提示，未据此改动框架或运行时。
+
+  [结构回归](../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrReportStructureTest.java) 覆盖两种入口、第一份为空后续非空、多份容器／报表／成交组、错误类型／count、账户缺失或混用、仅订单／成交／汇总、未知或嵌套节点、非空文本、非法 XML、DOCTYPE，以及合法空／非空、注释和完整精度原值。[批次回归](../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrDuplicateBatchTest.java) 使用真实解析、暂存、导入、异步执行和清理组件，覆盖同报表重复、非法输入与重试、合法空报表、后续日期窗口失败；检查暂存前拒绝、当前批次清理和原成功批次逐字段不变。既有数量、费用、失败及清理回归继续通过。
+
+  仓储及网络全部 Mockito，数据全部合成，未连接真实数据库、券商、个人 XML 或现有账本；不将内存链路表述为真实数据库事务或并发验证。账户范围限单份文件，不新增跨窗口／独立请求的账户绑定或成交集合完整性证明；保留历史已执行前提及 Code=P 行为。没有数据库迁移、前端/API 结构变化、历史数据修复或重算，输入结构收紧需要查询配置符合规定封套及两个导出层级。知识、接入和恢复说明已同步；实现、测试、文档与运行证据经未参与实现的 Agent 独立复核通过，最终归档随本变更交付。
+
+
+  最终 26 文件差异及归档已独立复核，无剩余可行动问题；13 份文档的 210 处本地链接、源码行号及新增文件空白检查通过，`git diff --check` 退出 0。活动 TODO 保留 5 项未完成事项。
+
+- [x] **P1 IBKR 重复记录内容一致性校验**
+
+  暂存仅按 orderID 是否存在决定跳过，不比较内容。后续同 ID 订单的数量、金额或费用变化不会更新正式交易，新 tradeID 的成交却可能继续进入暂存表，造成明细与账本不一致，批次仍成功。合成数量 10→20 的同 ID 订单已在 `ubuntu-dev` 复现第二次跳过；本次真实文件没有同 ID 不同快照，未证明已有账本发生漏单。 [暂存去重](../backend/src/main/java/com/vortex/sync/adapter/ibkr/IbkrStagingWorker.java#L51) · [审阅 R2](audits/2026-11-16-ibkr-sync-review.md#r2--p1同订单后续新增成交或修正会被直接跳过)
+
+  验收需先明确订单快照更新、跨窗口成交和券商修正的业务键及处理方式。覆盖完全相同报表重复同步、部分成交后新增成交、跨日／跨窗口同订单、费用修正、失败后重试，确认不重复、不静默漏更新，正式交易与成交明细可对账。涉及替换历史数据时须验证批次失败恢复及后续重算。本条尚未修复；下一步新增 design。
+
+  2026-11-17 范围调整：用户决定默认相信 IBKR 报表中的订单及成交均已执行完成，见 [0031](../design/0031-2026-11-17-trust-ibkr-reported-completion.md)。不查询订单终态、不维护未完成订单生命周期、不因 `Code=P` 或多笔成交拒绝导入。后续本项聚焦重复业务 ID 的内容一致性：保留相同数据重复同步、同 ID 新增成交或数量／金额／费用变化、跨窗口差异及失败重试的防御性验收，不要求跟踪或自动合并真实未完成订单。原合成复现与历史验收记录保留；如何比较并处理差异须另写实施方案。本次只确认业务前提，未修改去重或导入代码，本条继续未勾选。
+
+  用户补充决策原因：实际只同步历史交易记录，关注已经发生的成交，不管理实时挂单，因此默认按已执行完成的记录导入。本说明补充上述业务前提的依据，不增加实时订单跟踪或日期校验，也不将本条标记为已修复。
+
+  2026-11-17 实施口径：用户明确要求“ID 相同、内容一致则跳过；ID 相同、内容不同则报错，暂不自动覆盖或重算”。据此将原“处理 IBKR 同订单的后续成交与内容修正”改名，按 [0032](../design/0032-2026-11-17-ibkr-duplicate-content-consistency.md) 校验两种暂存及正式入库重复分支；验收聚焦语义一致的重复、业务字段冲突、诊断、整批清理与原成功批次保留，不要求自动接受券商修正或合并未完成订单。原发现和合成复现保留，完成实际回归和独立复核前保持未勾选。
+
+  2026-11-17 完成：按 [0032](../design/0032-2026-11-17-ibkr-duplicate-content-consistency.md) 在订单暂存、成交暂存及正式交易重复分支比较业务内容；同 ID 且内容相同跳过，内容不同以 UNRECOGNIZED 报错，沿既有失败链路清理当前整批，不覆盖、重算或修改原成功批次。比较全部已持久化来源字段，排除处理状态、批次及审计字段；数值按完整精度比较，普通文本统一空白语义，Code 按分号集合比较。错误给出内部行引用及差异字段名，不输出字段前后值。独立复核发现标识首尾空白可绕过去重，先新增 [0033](../design/0033-2026-11-17-ibkr-strict-duplicate-identifiers.md)，再将订单 ID、成交 ID 及父订单 ID 的缺失和首尾空白在查询／保存前拒绝，正式导入共用同一校验，不修剪或改写来源 ID。
+
+  验证环境：`ubuntu-dev`，Ubuntu 26.04.1、Temurin 25.0.5、Maven 3.10.0，工作树 `/home/bytedance.guest/workspace/private/vortex`。沿用 Maven 离线缓存，`TMPDIR=/tmp`、`MAVEN_OPTS=-Djava.io.tmpdir=/tmp`，产物及日志位于 `backend/target/`；没有安装工具、修改依赖或新增迁移。
+
+  - 原算法先运行 `mvn -o -f backend/pom.xml -Dtest=IbkrDuplicateConsistencyTest test`，退出 1，当时新增的 2 项用例均因未抛出冲突异常而失败，无运行错误；复现同订单数量变化、同成交佣金变化仍被跳过。日志为 `backend/target/ibkr-duplicate-red-tests.log`。
+  - 最终运行 `mvn -o -f backend/pom.xml -Dtest=IbkrDuplicateConsistencyTest,IbkrDuplicateBatchTest test`，退出 0，新增 115 项测试全部通过且正常退出，日志为 `backend/target/ibkr-duplicate-focused-tests.log`。
+  - 运行 `mvn -o -f backend/pom.xml -Dtest=IbkrDuplicateConsistencyTest,IbkrDuplicateBatchTest,IbkrStagingWorkerTest,IbkrStagingServiceTest,IbkrImportWorkerTest,IbkrImportServiceTest,IbkrSyncAdapterTest,IbkrQuantityValidationTest,TradeFeePrecisionTest,BrokerSyncAsyncExecutorTest,SyncBatchCleanupServiceTest,SyncBatchFailureHandlerTest test`，退出 0，229 项全部通过，无失败、错误或跳过，日志为 `backend/target/ibkr-duplicate-green-tests.log`。整组保留既有 Surefire 退出握手等待 30 秒的提示，线程转储停在 ForkedBooter 退出确认阶段；Maven 为 BUILD SUCCESS，新增 115 项单独运行无该提示，未据此修改框架或运行时。
+
+  [内容回归](../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrDuplicateConsistencyTest.java) 覆盖全部已持久化来源字段、数值表示与微小差异、空值、Code、元数据、同／跨批异常 ID、正式交易投影及旧记录不被保存。[批次回归](../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrDuplicateBatchTest.java) 使用真实解析、暂存、导入、适配器、执行与清理组件，覆盖相同报表、同批重复、订单／成交冲突、跨窗口、重试、缺失暂存基线的正式冲突及清理失败；逐字段检查原成功批次不变，清理失败保留 CLEANUP_FAILED。仓储和网络全部 Mockito、数据全部合成，未连接真实数据库、券商、个人 XML 或现有账本，不将内存调用链验证表述为真实数据库事务或并发唯一约束验证。
+
+  边界：暂存基线存在时比较来源记录，不反向校验用户编辑后的正式交易；基线缺失时只比较正式表保留的业务投影，无法证明账号、费用组成、来源符号等未保留字段一致，旧列精度或旧费用舍入造成的差异也会安全拒绝。新 tradeID 仍作为新明细，不校验完整成交子集，不查询订单终态。自动接受券商修正、合并未完成订单、修改历史数据及真实数据库并发不属于用户修订后的验收范围。当前规则与恢复办法已同步到 knowledge 和恢复指南；实现、回归和运行证据经未参与实现的 Agent 独立复核通过，空白 ID 发现已修复并回归。最终 21 文件差异及文档归档复核通过，无剩余可行动问题；11 份文档的 185 处本地链接、全部新增文件空白检查和 `git diff --check` 通过。
+
+
 - [x] **P2 明确并实现 IBKR 费用精度与舍入口径**
 
   本次 XML 的 295 条订单费用超过两位小数，佣金最多 8 位；当前 mapper 保留源精度，正式表 fee 却为 `DECIMAL(12,2)`，按声明 schema 写入将逐单舍入。此为文件统计及静态 schema 结论，未实际插库。是否接受按分舍入仍待用户确认。 [费用列](../backend/src/main/resources/db/migration/V3__create_trade_records.sql#L66) · [审阅 R1](audits/2026-11-16-ibkr-sync-review.md#r1--p2正式费用列会丢失样例中的佣金精度)

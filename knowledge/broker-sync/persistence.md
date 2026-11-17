@@ -12,7 +12,7 @@
 ## 暂存与导入
 
 - 三张暂存表以 `batch_id` 引用批次表，保留解析后的结构化字段。当前表结构无 `raw_payload` 列。IBKR 成交确认以 `order_id` 与订单关联，无订单表外键，也无导入状态字段。
-- 新订单暂存为 `PENDING`。暂存阶段遇到已存在的业务键时跳过，原记录仍属于原批次。导入阶段只读取当前批次的 `PENDING` 订单，按券商和原始订单 ID 检查正式表重复项。结果写入 `IMPORTED`、`SKIPPED` 或 `FAILED`。`imported_trade_id` 记录成功导入的交易 ID，当前 SQL 未为该字段定义外键。
+- 新订单暂存为 `PENDING`。IBKR 暂存遇到已存在的订单或成交业务键时比较来源内容，只有一致才跳过，差异导致本批失败；原记录仍属于原批次。Tiger 暂存维持原有按键跳过规则。导入阶段只读取当前批次的 `PENDING` 订单，按券商和原始订单 ID 检查正式表重复项；IBKR 在命中时还比较正式业务投影，一致才 SKIPPED，不同则 FAILED。结果写入 `IMPORTED`、`SKIPPED` 或 `FAILED`。`imported_trade_id` 记录成功导入的交易 ID，当前 SQL 未为该字段定义外键。 [0032 比较范围与边界](../../design/0032-2026-11-17-ibkr-duplicate-content-consistency.md)
 - `trade_records` 的部分唯一索引只检查 `external_id IS NOT NULL`，键为 `(external_broker, external_id)`。软删除的交易仍受该索引约束。手动录入、事件生成等交易可无券商来源字段。`trade_trigger` 与 `trigger_ref_type` 表示交易为什么发生，导入来源单独由上述字段记录。
 - 适配器按当前批次的暂存订单统计导入结果。暂存时已跳过的重复订单不进入本批计数。`FAILED` 或残留非终态订单导致整批清理。清理成功后保留批次记录，删除该批暂存和正式交易。成功批次的暂存记录继续可供查询。
 

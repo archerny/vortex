@@ -161,6 +161,9 @@ public interface TradeRecordRepository extends BaseRepository<TradeRecord, Long>
      */
     boolean existsByExternalBrokerAndExternalId(String externalBroker, String externalId);
 
+    /** Load the existing broker trade to verify duplicate business content. */
+    Optional<TradeRecord> findByExternalBrokerAndExternalId(String externalBroker, String externalId);
+
     /**
      * Find STK-side BookTrade records that need trigger_ref_id back-fill.
      * These are records where:

@@ -84,10 +84,17 @@ public class IbkrImportWorker {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void importSingleOrder(Long batchId, Long brokerId, IbkrStagedOrder staged) {
         try {
+            IbkrRecordContent.requireId("orderID", staged.getOrderId());
             // Deduplication check
             if (tradeRecordRepository.existsByExternalBrokerAndExternalId(BROKER_CODE, staged.getOrderId())) {
+                TradeRecord existing = tradeRecordRepository
+                        .findByExternalBrokerAndExternalId(BROKER_CODE, staged.getOrderId())
+                        .orElseThrow(() -> new CategorizedSyncException(FailureCategory.INTERNAL, null,
+                                "Existing IBKR trade disappeared during duplicate content validation"));
+                TradeRecord candidate = mapToTradeRecord(batchId, brokerId, staged);
+                IbkrRecordContent.requireSameTrade(existing, candidate);
                 staged.setStatus("SKIPPED");
-                staged.setErrorMessage("Duplicate: already exists in trade_records");
+                staged.setErrorMessage("Duplicate: matching business content already exists in trade_records");
                 stagedOrderRepository.save(staged);
                 logger.debug("[IbkrImport] Skipped duplicate: orderId={}", staged.getOrderId());
                 return;
@@ -108,8 +115,8 @@ public class IbkrImportWorker {
             // Do NOT save staged here — this tx is already rollback-only.
             // Propagate to the service, which invokes markFailed() via the AOP
             // proxy so the FAILED write runs in a fresh REQUIRES_NEW tx.
-            logger.warn("[IbkrImport] Failed to import orderId={}: {}",
-                    staged.getOrderId(), e.getMessage(), e);
+            logger.warn("[IbkrImport] Failed to import staged id={}: {}",
+                    staged.getId(), e.getMessage(), e);
             throw new ImportOneFailedException(staged, e);
         }
     }

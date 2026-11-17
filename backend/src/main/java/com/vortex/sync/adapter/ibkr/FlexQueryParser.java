@@ -1,5 +1,7 @@
 package com.vortex.sync.adapter.ibkr;
 
+import com.vortex.sync.core.CategorizedSyncException;
+import com.vortex.sync.core.FailureCategory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -14,6 +16,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * IBKR Flex Query XML 解析器
@@ -41,6 +45,7 @@ import java.io.StringReader;
  * </pre>
  *
  * 解析策略：
+ * - 仅接受单账户、单份完整结构的 TCF 报表；非空报表必须含订单和成交层
  * - 只解析 {@code <Order>} 和 {@code <TradeConfirm>} 节点
  * - 忽略 {@code <SymbolSummary>} 节点（汇总数据可从明细聚合）
  * - 所有字段以 String 形式原样保留，业务转换交给模型类的方法
@@ -68,7 +73,7 @@ public class FlexQueryParser {
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document document = builder.parse(new InputSource(new StringReader(xmlContent)));
             return parseDocument(document);
-        } catch (FlexQueryParseException e) {
+        } catch (CategorizedSyncException | FlexQueryParseException e) {
             throw e;
         } catch (Exception e) {
             throw new FlexQueryParseException("Failed to parse Flex Query XML: " + e.getMessage(), e);
@@ -92,7 +97,7 @@ public class FlexQueryParser {
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document document = builder.parse(inputStream);
             return parseDocument(document);
-        } catch (FlexQueryParseException e) {
+        } catch (CategorizedSyncException | FlexQueryParseException e) {
             throw e;
         } catch (Exception e) {
             throw new FlexQueryParseException("Failed to parse Flex Query XML from InputStream: " + e.getMessage(), e);
@@ -107,45 +112,43 @@ public class FlexQueryParser {
     private FlexQueryParseResult parseDocument(Document document) {
         FlexQueryParseResult result = new FlexQueryParseResult();
 
-        // 解析根元素 <FlexQueryResponse>
+        // Validate the complete envelope before returning anything to staging.
         Element root = document.getDocumentElement();
+        if (!"FlexQueryResponse".equals(root.getTagName()) || !"TCF".equals(getAttr(root, "type"))) {
+            throw structureError("expected FlexQueryResponse with type=TCF");
+        }
         result.setQueryName(getAttr(root, "queryName"));
         result.setType(getAttr(root, "type"));
 
-        // 解析 <FlexStatement>
-        NodeList statementNodes = root.getElementsByTagName("FlexStatement");
-        if (statementNodes.getLength() == 0) {
-            logger.warn("[FlexQueryParser] FlexStatement node not found in XML");
-            return result;
+        Element statements = requireSingleChild(root, "FlexStatements");
+        if (statements.hasAttribute("count") && !"1".equals(statements.getAttribute("count"))) {
+            throw structureError("FlexStatements count must be 1 when present");
         }
-
-        Element statement = (Element) statementNodes.item(0);
-        result.setAccountId(getAttr(statement, "accountId"));
+        Element statement = requireSingleChild(statements, "FlexStatement");
+        String accountId = getAttr(statement, "accountId");
+        if (accountId == null || accountId.isBlank()) {
+            throw structureError("FlexStatement accountId is required for a single-account report");
+        }
+        result.setAccountId(accountId);
         result.setFromDate(getAttr(statement, "fromDate"));
         result.setToDate(getAttr(statement, "toDate"));
         result.setWhenGenerated(getAttr(statement, "whenGenerated"));
 
-        // 解析 <TradeConfirms> 下的子节点
-        NodeList tradeConfirmsNodes = statement.getElementsByTagName("TradeConfirms");
-        if (tradeConfirmsNodes.getLength() == 0) {
-            logger.warn("[FlexQueryParser] TradeConfirms node not found in XML");
-            return result;
-        }
-
-        Element tradeConfirmsElement = (Element) tradeConfirmsNodes.item(0);
-        NodeList children = tradeConfirmsElement.getChildNodes();
+        Element tradeConfirmsElement = requireSingleChild(statement, "TradeConfirms");
 
         int orderCount = 0;
         int tradeConfirmCount = 0;
         int symbolSummaryCount = 0;
 
-        for (int i = 0; i < children.getLength(); i++) {
-            Node node = children.item(i);
-            if (node.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
+        for (Element element : childElements(tradeConfirmsElement)) {
+            if (!childElements(element).isEmpty()) {
+                throw structureError("trade records must use attributes without nested elements");
             }
-
-            Element element = (Element) node;
+            String recordAccount = getAttr(element, "accountId");
+            if (recordAccount != null && !recordAccount.isBlank()
+                    && !recordAccount.strip().equals(accountId.strip())) {
+                throw structureError("record accountId must match the single FlexStatement account");
+            }
             String tagName = element.getTagName();
 
             switch (tagName) {
@@ -162,9 +165,13 @@ public class FlexQueryParser {
                     symbolSummaryCount++;
                     break;
                 default:
-                    logger.debug("[FlexQueryParser] Ignoring unknown node: {}", tagName);
-                    break;
+                    throw structureError("TradeConfirms supports only Order, TradeConfirm and SymbolSummary records");
             }
+        }
+
+        if ((orderCount > 0 || tradeConfirmCount > 0 || symbolSummaryCount > 0)
+                && (orderCount == 0 || tradeConfirmCount == 0)) {
+            throw structureError("non-empty reports require both Order and TradeConfirm levels; check Flex query configuration");
         }
 
         logger.info("[FlexQueryParser] Parse complete - account: {}, range: {} ~ {}, " +
@@ -293,6 +300,34 @@ public class FlexQueryParser {
     }
 
     // ============ 工具方法 ============
+
+    private static Element requireSingleChild(Element parent, String expected) {
+        List<Element> children = childElements(parent);
+        if (children.size() != 1 || !expected.equals(children.get(0).getTagName())) {
+            throw structureError("expected exactly one " + expected + " section at its prescribed level");
+        }
+        return children.get(0);
+    }
+
+    private static List<Element> childElements(Element parent) {
+        List<Element> children = new ArrayList<>();
+        NodeList nodes = parent.getChildNodes();
+        for (int i = 0; i < nodes.getLength(); i++) {
+            Node node = nodes.item(i);
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                children.add((Element) node);
+            } else if ((node.getNodeType() == Node.TEXT_NODE || node.getNodeType() == Node.CDATA_SECTION_NODE)
+                    && !node.getNodeValue().isBlank()) {
+                throw structureError("unexpected text content; reports must use the supported attribute-based structure");
+            }
+        }
+        return children;
+    }
+
+    private static CategorizedSyncException structureError(String reason) {
+        return new CategorizedSyncException(FailureCategory.UNRECOGNIZED, null,
+                "Unsupported IBKR TCF report structure: " + reason);
+    }
 
     /**
      * 安全获取 XML 元素的属性值

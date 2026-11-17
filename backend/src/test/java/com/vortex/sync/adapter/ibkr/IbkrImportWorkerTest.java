@@ -24,6 +24,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -203,6 +204,10 @@ class IbkrImportWorkerTest {
         void shouldSkipDuplicateRecords() {
             IbkrStagedOrder staged = buildStkOrder("ORD_DUP");
             when(tradeRecordRepository.existsByExternalBrokerAndExternalId("ibkr", "ORD_DUP")).thenReturn(true);
+            TradeRecord existing = importWorker.mapToTradeRecord(99L, 1L, staged);
+            existing.setId(99L);
+            when(tradeRecordRepository.findByExternalBrokerAndExternalId("ibkr", "ORD_DUP"))
+                    .thenReturn(Optional.of(existing));
 
             importWorker.importSingleOrder(1L, 1L, staged);
 

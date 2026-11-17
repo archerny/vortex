@@ -36,7 +36,7 @@ public class IbkrStagingWorker {
     }
 
     /**
-     * Stage a single order record. Idempotent: skips if orderId already exists.
+     * Stage an order, skipping an existing ID only when its source content matches.
      * Runs in its own transaction (REQUIRES_NEW).
      *
      * @param batchId the batch ID
@@ -46,21 +46,23 @@ public class IbkrStagingWorker {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public boolean stageOrder(Long batchId, IbkrOrderRecord order) {
         String orderId = order.getOrderID();
+        IbkrRecordContent.requireId("orderID", orderId);
+        IbkrStagedOrder staged = mapToStagedOrder(batchId, order);
 
-        // Idempotent check: skip if already staged
-        if (stagedOrderRepository.existsByOrderId(orderId)) {
+        var existing = stagedOrderRepository.findByOrderId(orderId);
+        if (existing.isPresent()) {
+            IbkrRecordContent.requireSameOrder(existing.get(), staged);
             logger.debug("[IbkrStaging] Order already staged, skipping: orderId={}", orderId);
             return false;
         }
 
-        IbkrStagedOrder staged = mapToStagedOrder(batchId, order);
         stagedOrderRepository.save(staged);
         logger.debug("[IbkrStaging] Staged order: orderId={}", orderId);
         return true;
     }
 
     /**
-     * Stage a single trade confirm record. Idempotent: skips if tradeId already exists.
+     * Stage a confirmation, skipping an existing ID only when source content matches.
      * Runs in its own transaction (REQUIRES_NEW).
      *
      * @param batchId the batch ID
@@ -70,14 +72,17 @@ public class IbkrStagingWorker {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public boolean stageTradeConfirm(Long batchId, IbkrTradeConfirm confirm) {
         String tradeId = confirm.getTradeID();
+        IbkrRecordContent.requireId("tradeID", tradeId);
+        IbkrRecordContent.requireId("orderID", confirm.getOrderID());
+        IbkrStagedTradeConfirm staged = mapToStagedTradeConfirm(batchId, confirm);
 
-        // Idempotent check: skip if already staged
-        if (stagedTradeConfirmRepository.existsByTradeId(tradeId)) {
+        var existing = stagedTradeConfirmRepository.findByTradeId(tradeId);
+        if (existing.isPresent()) {
+            IbkrRecordContent.requireSameConfirm(existing.get(), staged);
             logger.debug("[IbkrStaging] TradeConfirm already staged, skipping: tradeId={}", tradeId);
             return false;
         }
 
-        IbkrStagedTradeConfirm staged = mapToStagedTradeConfirm(batchId, confirm);
         stagedTradeConfirmRepository.save(staged);
         logger.debug("[IbkrStaging] Staged trade confirm: tradeId={}", tradeId);
         return true;
