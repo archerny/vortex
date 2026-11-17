@@ -23,9 +23,3 @@
   客户端把 1005、1006、1012 分别描述为 Token 无效、限流、查询不存在，与官方的交割数据未就绪、FIFO 盈亏数据未就绪、Token 过期不一致；1006 还进入限流异常分支。适配器把所有客户端异常统一分类为 NETWORK。此项为源码与官方文档静态对照，尚未逐码运行响应复现。 [客户端错误处理](../backend/src/main/java/com/vortex/sync/adapter/ibkr/IbkrFlexClient.java#L303) · [官方错误码](https://www.ibkrguides.com/orgportal/performanceandstatements/flex3error.htm) · [审阅 R7](audits/2026-11-16-ibkr-sync-review.md#r7--p2flex-错误码说明与官方定义不符)
 
   验收需用模拟 HTTP 响应覆盖生成中、数据未就绪、Token 过期／无效、查询无效、限流和未知错误码，验证说明、认证／网络分类、重试及退出条件，并保证日志与异常链继续脱敏。本条尚未修复；下一步新增 design。
-
-- [ ] **P2 用可提交的合成数据替换解析测试对个人夹具的依赖**
-
-  `FlexQueryParserTest` 从 classpath 读取一个被 Git 忽略的个人 XML 文件，并断言该资源存在。干净检出缺少资源会导致测试失败，开发者还需要自行提供账户样本。 [解析测试](../backend/src/test/java/com/vortex/sync/adapter/ibkr/FlexQueryParserTest.java) · [个人夹具忽略规则](../backend/.gitignore)
-
-  验收需使用可提交的合成 XML 或测试内构造的数据，覆盖当前解析断言和必要的异常输入。干净检出应能离线运行解析测试，并且夹具、断言及测试输出均使用合成数据。

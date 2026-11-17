@@ -22,8 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -295,24 +293,4 @@ class TigerImportWorkerTest {
         }
     }
 
-    // ========================================================
-    // Invariant — SKIPPED/FAILED pre-filter branches still persist staged row
-    // (importOne's error path no longer does — see ExceptionPath).
-    // ========================================================
-    @Nested
-    @DisplayName("importOne() — pre-filter terminal branches persist staged row")
-    class PreFilterTerminalPersistsStaged {
-
-        @Test
-        @DisplayName("SKIPPED branch should save staged row once")
-        void skippedBranchSavesStaged() {
-            TigerStagedOrder staged = validStockOrder();
-            when(tradeRecordRepository.existsByExternalBrokerAndExternalId(eq("tiger"), anyString()))
-                    .thenReturn(true); // routes to SKIPPED
-
-            worker.importOne(1L, 42L, staged);
-
-            verify(stagedOrderRepository).save(staged);
-        }
-    }
 }

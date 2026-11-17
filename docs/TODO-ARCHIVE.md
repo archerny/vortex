@@ -6,6 +6,18 @@
 
 ## 已完成
 
+- [x] **P2 用可提交的合成数据替换解析测试对个人夹具的依赖**
+
+  `FlexQueryParserTest` 从 classpath 读取一个被 Git 忽略的个人 XML 文件，并断言该资源存在。干净检出缺少资源会导致测试失败，开发者还需要自行提供账户样本。 [解析测试](../backend/src/test/java/com/vortex/sync/adapter/ibkr/FlexQueryParserTest.java) · [个人夹具忽略规则](../backend/.gitignore)
+
+  验收需使用可提交的合成 XML 或测试内构造的数据，覆盖当前解析断言和必要的异常输入。干净检出应能离线运行解析测试，并且夹具、断言及测试输出均使用合成数据。
+
+  2026-11-17 完成：按 [0039](../design/0039-2026-11-17-test-suite-maintenance.md)，移除 4 个个人资源方法，使用测试内最小合成 TCF 报表覆盖字符串／流两个入口、封套元数据、Order、ExchTrade、BookTrade、费用原值及日期／时间转换；保留合法零交易、缺层级诊断，非法 XML／DOCTYPE 由既有 63 项结构回归覆盖。去掉个人数据和调试明细输出，Maven 显式排除个人 XML 测试资源；原个人文件未读取、改动或删除。默认后端全量命令无需筛选方法，测试源码不再访问该文件，生成测试资源中也没有该文件。未另建干净 checkout，验证不依赖个人夹具的依据是合成代码、资源排除和默认实际运行结果。
+
+  验证环境：`ubuntu-dev` 当前工作树 `/home/bytedance.guest/workspace/private/vortex`，Java 25.0.5、Maven 3.10.0、Node 26.13.0、npm 11.20.0；`TMPDIR=/tmp`、`MAVEN_OPTS=-Djava.io.tmpdir=/tmp`，沿用已有工具和缓存，没有安装或连接数据库／券商。`mvn -o -f backend/pom.xml test` 最终 496 项通过，失败／错误／跳过均为 0，BUILD SUCCESS；`npm --prefix frontend test` 为 6 文件、54 项通过，退出 0。日志为 `backend/target/test-cleanup-final.log`、`frontend/test-cleanup-after.log`；默认全量仍有既有 Surefire 退出握手提示，未通过缩小测试范围或改超时规避。
+
+  本次同时清理已证实重复的测试。逐项对照、保留断言及验证限制见 [测试核对记录](audits/2026-11-17-test-suite-review.md)，执行清单为 `backend/target/test-cleanup-final-manifest.json`：31 个后端源测试类全部执行，原 504 个实际案例仅移除 10 项、增加 2 个合成入口案例，无其他缺失或跳过。当前运行说明、单测维护规范和 IBKR knowledge 已同步；既有数量、费用和结构验收记录保持当时原貌。
+
 - [x] **P1 市场事件改为顺序处理并锁定关联证券历史**
 
   普通交易新增、修改或软删除后，后续市场事件的派生交易仍保留旧结果。事件重算也只查询初始标的集合，未继续追踪代码变更或分红引出的新标的。例如已有 100 股、后续两倍拆股，再补录拆股前的 100 股买入，当前可能得到 300 股。另一个场景是 A 变更为 B 后 B 再拆股，补录 A 的早期拆股只重算到 A→B，B 的拆股结果仍旧。 [普通交易写入](../backend/src/main/java/com/vortex/service/TradeRecordService.java) · [事件重算](../backend/src/main/java/com/vortex/service/MarketEventProcessingService.java) · [代码变更事件查询](../backend/src/main/java/com/vortex/repository/SymbolChangeEventRepository.java)

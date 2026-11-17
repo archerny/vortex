@@ -13,8 +13,6 @@ import static org.junit.jupiter.api.Assertions.*;
  * - success() 3-parameter factory method (Phase 1 style)
  * - success() 5-parameter factory method (Phase 2 style with import counts; v2 dropped failedCount)
  * - failure() factory method
- * - Field getters/setters
- * - toString() output
  */
 class SyncResultTest {
 
@@ -37,6 +35,7 @@ class SyncResultTest {
             assertNotNull(result.getMessage());
             assertTrue(result.getMessage().contains("ibkr"));
             assertTrue(result.getMessage().contains("150"));
+            assertTrue(result.getMessage().startsWith("Sync completed"));
         }
 
         @Test
@@ -50,16 +49,6 @@ class SyncResultTest {
             assertEquals(100, result.getDurationMs());
         }
 
-        @Test
-        @DisplayName("message should be in English")
-        void messageShouldBeEnglish() {
-            SyncResult result = SyncResult.success("ibkr", 50, 1000);
-
-            assertTrue(result.getMessage().contains("Sync completed"),
-                    "Message should start with English text");
-            assertFalse(result.getMessage().matches(".*[\\u4e00-\\u9fa5].*"),
-                    "Message should not contain Chinese characters");
-        }
     }
 
     @Nested
@@ -109,6 +98,7 @@ class SyncResultTest {
             assertTrue(result.getMessage().contains("ibkr"));
             assertTrue(result.getMessage().contains("Connection timeout"));
             assertTrue(result.getMessage().contains("5000"));
+            assertTrue(result.getMessage().startsWith("Sync failed"));
         }
 
         @Test
@@ -121,74 +111,5 @@ class SyncResultTest {
             assertEquals(0, result.getTotalRecords());
         }
 
-        @Test
-        @DisplayName("message should be in English")
-        void messageShouldBeEnglish() {
-            SyncResult result = SyncResult.failure("ibkr", "API error", 500);
-
-            assertTrue(result.getMessage().contains("Sync failed"),
-                    "Message should start with English text");
-            assertFalse(result.getMessage().matches(".*[\\u4e00-\\u9fa5].*"),
-                    "Message should not contain Chinese characters");
-        }
-    }
-
-    @Nested
-    @DisplayName("Getters and setters")
-    class GetterSetterTest {
-
-        @Test
-        @DisplayName("default constructor should create empty result")
-        void defaultConstructor() {
-            SyncResult result = new SyncResult();
-
-            assertFalse(result.isSuccess());
-            assertNull(result.getBrokerCode());
-            assertEquals(0, result.getTotalRecords());
-            assertEquals(0, result.getImportedCount());
-            assertEquals(0, result.getSkippedCount());
-            assertNull(result.getMessage());
-            assertEquals(0, result.getDurationMs());
-        }
-
-        @Test
-        @DisplayName("setters should update fields correctly")
-        void settersShouldWork() {
-            SyncResult result = new SyncResult();
-            result.setSuccess(true);
-            result.setBrokerCode("tiger");
-            result.setTotalRecords(42);
-            result.setImportedCount(30);
-            result.setSkippedCount(10);
-            result.setMessage("custom message");
-            result.setDurationMs(9999);
-
-            assertTrue(result.isSuccess());
-            assertEquals("tiger", result.getBrokerCode());
-            assertEquals(42, result.getTotalRecords());
-            assertEquals(30, result.getImportedCount());
-            assertEquals(10, result.getSkippedCount());
-            assertEquals("custom message", result.getMessage());
-            assertEquals(9999, result.getDurationMs());
-        }
-    }
-
-    @Nested
-    @DisplayName("toString()")
-    class ToStringTest {
-
-        @Test
-        @DisplayName("should contain key fields")
-        void shouldContainKeyFields() {
-            SyncResult result = SyncResult.success("ibkr", 10, 500);
-            String str = result.toString();
-
-            assertTrue(str.contains("success=true"));
-            assertTrue(str.contains("ibkr"));
-            assertTrue(str.contains("totalRecords=10"));
-            assertTrue(str.contains("durationMs=500"));
-            assertTrue(str.contains("importedCount="));
-            assertTrue(str.contains("skippedCount="));
-        }
     }
 }

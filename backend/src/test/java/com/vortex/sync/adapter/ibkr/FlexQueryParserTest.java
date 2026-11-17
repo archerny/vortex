@@ -2,221 +2,127 @@ package com.vortex.sync.adapter.ibkr;
 
 import com.vortex.sync.core.CategorizedSyncException;
 import com.vortex.sync.core.FailureCategory;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
-import java.io.InputStream;
-import java.util.List;
+import java.io.ByteArrayInputStream;
+import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * FlexQueryParser 单元测试
- *
- * 使用真实的 Flex Query XML 样本文件进行解析测试，
- * 验证解析逻辑的正确性并打印所有交易记录。
- */
+/** Field mapping and conversion contracts; structure/security cases live in IbkrReportStructureTest. */
 class FlexQueryParserTest {
+    private final FlexQueryParser parser = new FlexQueryParser();
 
-    private FlexQueryParser parser;
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void shouldParseSyntheticTradeFields(boolean fromStream) {
+        String xml = """
+                <FlexQueryResponse queryName="SYNTHETIC_TCF" type="TCF">
+                  <FlexStatements count="1">
+                    <FlexStatement accountId="SYNTH-ACCOUNT" fromDate="20260101" toDate="20260131" whenGenerated="20260201;090000">
+                      <TradeConfirms>
+                        <Order accountId="SYNTH-ACCOUNT" orderID="SYNTH-ORDER" currency="USD" assetCategory="STK"
+                          symbol="SYNTH" buySell="BUY" quantity="25" price="42.1250" commission="-0.12345678"/>
+                        <Order accountId="SYNTH-ACCOUNT" orderID="SYNTH-BOOK-ORDER" currency="USD" assetCategory="STK"
+                          symbol="SYNTH-BOOK" buySell="BUY" quantity="10" price="0"/>
+                        <TradeConfirm accountId="SYNTH-ACCOUNT" tradeID="SYNTH-TRADE" orderID="SYNTH-ORDER"
+                          currency="USD" assetCategory="STK" symbol="SYNTH" transactionType="ExchTrade"
+                          buySell="BUY" quantity="25" price="42.1250" code="O"
+                          tradeDate="20260105" dateTime="20260105;153045"/>
+                        <TradeConfirm accountId="SYNTH-ACCOUNT" tradeID="SYNTH-BOOK-TRADE" orderID="SYNTH-BOOK-ORDER"
+                          currency="USD" assetCategory="STK" symbol="SYNTH-BOOK" transactionType="BookTrade"
+                          buySell="BUY" quantity="10" price="0" code="A"/>
+                      </TradeConfirms>
+                    </FlexStatement>
+                  </FlexStatements>
+                </FlexQueryResponse>
+                """;
+        FlexQueryParseResult result = fromStream
+                ? parser.parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8))) : parser.parse(xml);
 
-    @BeforeEach
-    void setUp() {
-        parser = new FlexQueryParser();
-    }
+        assertEquals("SYNTHETIC_TCF", result.getQueryName());
+        assertEquals("TCF", result.getType());
+        assertEquals("SYNTH-ACCOUNT", result.getAccountId());
+        assertEquals("20260101", result.getFromDate());
+        assertEquals("20260131", result.getToDate());
+        assertEquals("20260201;090000", result.getWhenGenerated());
+        assertEquals(2, result.getOrderCount());
+        assertEquals(2, result.getTradeConfirmCount());
 
-    @Test
-    @DisplayName("解析真实的 IBKR Flex Query Trade Confirms XML 文件")
-    void parseRealFlexQueryXml() {
-        // 加载测试资源文件
-        InputStream inputStream = getClass().getResourceAsStream("/ibkr-flex-trade-confirms.xml");
-        assertNotNull(inputStream, "测试资源文件 ibkr-flex-trade-confirms.xml 应存在");
+        IbkrOrderRecord order = result.getOrders().get(0);
+        assertEquals("SYNTH-ACCOUNT", order.getAccountId());
+        assertEquals("SYNTH-ORDER", order.getOrderID());
+        assertEquals("SYNTH", order.getSymbol());
+        assertEquals("BUY", order.getBuySell());
+        assertEquals("USD", order.getCurrency());
+        assertEquals("STK", order.getAssetCategory());
+        assertEquals("25", order.getQuantity());
+        assertEquals("42.1250", order.getPrice());
+        assertEquals(new BigDecimal("42.1250"), order.getPriceBigDecimal());
+        assertEquals(new BigDecimal("25"), order.getAbsQuantity());
+        assertEquals(new BigDecimal("0.12345678"), order.getAbsCommission());
+        assertTrue(order.isBuy());
+        assertTrue(order.isStock());
+        assertFalse(order.isOption());
 
-        // 解析
-        FlexQueryParseResult result = parser.parse(inputStream);
+        IbkrTradeConfirm trade = result.getTradeConfirms().get(0);
+        assertEquals("SYNTH-ACCOUNT", trade.getAccountId());
+        assertEquals("SYNTH-TRADE", trade.getTradeID());
+        assertEquals("SYNTH-ORDER", trade.getOrderID());
+        assertEquals("SYNTH", trade.getSymbol());
+        assertEquals("ExchTrade", trade.getTransactionType());
+        assertEquals("BUY", trade.getBuySell());
+        assertEquals("25", trade.getQuantity());
+        assertEquals("42.1250", trade.getPrice());
+        assertEquals("O", trade.getCode());
+        assertTrue(trade.isBuy());
+        assertTrue(trade.isExchangeTrade());
+        assertFalse(trade.isBookTrade());
+        assertTrue(trade.isOpening());
+        assertFalse(trade.isClosing());
+        assertEquals(LocalDate.of(2026, 1, 5), trade.getTradeDateAsLocalDate());
+        assertEquals(LocalDateTime.of(2026, 1, 5, 15, 30, 45), trade.getDateTimeAsLocalDateTime());
 
-        // ====== 验证元数据 ======
-        assertNotNull(result, "解析结果不应为 null");
-        assertEquals("IBKR_TC_BACKFILL", result.getQueryName(), "queryName 应为 IBKR_TC_BACKFILL");
-        assertEquals("TCF", result.getType(), "type 应为 TCF");
-        assertEquals("U18316975", result.getAccountId(), "accountId 应正确解析");
-        assertEquals("20260101", result.getFromDate(), "fromDate 应为 20260101");
-        assertEquals("20260331", result.getToDate(), "toDate 应为 20260331");
-        assertNotNull(result.getWhenGenerated(), "whenGenerated 不应为 null");
-
-        // ====== 验证数据量 ======
-        assertTrue(result.getOrderCount() > 0, "应解析到至少一条 Order 记录");
-        assertTrue(result.getTradeConfirmCount() > 0, "应解析到至少一条 TradeConfirm 记录");
-
-        System.out.println("========================================");
-        System.out.println("Parse result summary: " + result);
-        System.out.println("========================================");
-
-        // ====== 打印所有 Order 记录 ======
-        List<IbkrOrderRecord> orders = result.getOrders();
-        System.out.println();
-        System.out.println("============ Order records (total: " + orders.size() + ") ============");
-        for (int i = 0; i < orders.size(); i++) {
-            System.out.printf("[Order %d] %s%n", i + 1, orders.get(i));
-        }
-
-        // ====== 打印所有 TradeConfirm 记录 ======
-        List<IbkrTradeConfirm> tradeConfirms = result.getTradeConfirms();
-        System.out.println();
-        System.out.println("============ TradeConfirm records (total: " + tradeConfirms.size() + ") ============");
-        for (int i = 0; i < tradeConfirms.size(); i++) {
-            System.out.printf("[TradeConfirm %d] %s%n", i + 1, tradeConfirms.get(i));
-        }
-
-        System.out.println();
-        System.out.println("========================================");
-        System.out.printf("Total: %d Orders, %d TradeConfirms%n", orders.size(), tradeConfirms.size());
-        System.out.println("========================================");
-    }
-
-    @Test
-    @DisplayName("验证 Order 记录字段解析正确性")
-    void verifyOrderFieldsParsedCorrectly() {
-        InputStream inputStream = getClass().getResourceAsStream("/ibkr-flex-trade-confirms.xml");
-        assertNotNull(inputStream);
-
-        FlexQueryParseResult result = parser.parse(inputStream);
-        assertFalse(result.getOrders().isEmpty(), "应至少有一条 Order");
-
-        // 验证第一条 Order 的关键字段
-        IbkrOrderRecord firstOrder = result.getOrders().get(0);
-
-        assertNotNull(firstOrder.getAccountId(), "accountId 不应为 null");
-        assertNotNull(firstOrder.getSymbol(), "symbol 不应为 null");
-        assertNotNull(firstOrder.getBuySell(), "buySell 不应为 null");
-        assertNotNull(firstOrder.getCurrency(), "currency 不应为 null");
-        assertNotNull(firstOrder.getAssetCategory(), "assetCategory 不应为 null");
-
-        // 验证第一条是 AAPL 买入
-        assertEquals("AAPL", firstOrder.getSymbol());
-        assertEquals("BUY", firstOrder.getBuySell());
-        assertEquals("USD", firstOrder.getCurrency());
-        assertEquals("STK", firstOrder.getAssetCategory());
-        assertEquals("4797726468", firstOrder.getOrderID());
-        assertEquals("100", firstOrder.getQuantity());
-        assertEquals("247.41", firstOrder.getPrice());
-
-        // 验证业务方法
-        assertTrue(firstOrder.isBuy());
-        assertTrue(firstOrder.isStock());
-        assertFalse(firstOrder.isOption());
-        assertNotNull(firstOrder.getPriceBigDecimal());
-        assertNotNull(firstOrder.getAbsQuantity());
-        assertNotNull(firstOrder.getAbsCommission());
-    }
-
-    @Test
-    @DisplayName("验证 TradeConfirm 记录字段解析正确性")
-    void verifyTradeConfirmFieldsParsedCorrectly() {
-        InputStream inputStream = getClass().getResourceAsStream("/ibkr-flex-trade-confirms.xml");
-        assertNotNull(inputStream);
-
-        FlexQueryParseResult result = parser.parse(inputStream);
-        assertFalse(result.getTradeConfirms().isEmpty(), "应至少有一条 TradeConfirm");
-
-        // 验证第一条 TradeConfirm 的关键字段
-        IbkrTradeConfirm firstTc = result.getTradeConfirms().get(0);
-
-        assertNotNull(firstTc.getAccountId(), "accountId 不应为 null");
-        assertNotNull(firstTc.getSymbol(), "symbol 不应为 null");
-        assertNotNull(firstTc.getTradeID(), "tradeID 不应为 null");
-        assertNotNull(firstTc.getTransactionType(), "transactionType 不应为 null");
-
-        // 验证第一条 TradeConfirm 是 AAPL 的 ExchTrade
-        assertEquals("AAPL", firstTc.getSymbol());
-        assertEquals("ExchTrade", firstTc.getTransactionType());
-        assertEquals("8856974303", firstTc.getTradeID());
-        assertEquals("4797726468", firstTc.getOrderID());
-        assertEquals("BUY", firstTc.getBuySell());
-        assertEquals("100", firstTc.getQuantity());
-        assertEquals("247.41", firstTc.getPrice());
-        assertEquals("O", firstTc.getCode());
-
-        // 验证业务方法
-        assertTrue(firstTc.isBuy());
-        assertTrue(firstTc.isExchangeTrade());
-        assertFalse(firstTc.isBookTrade());
-        assertTrue(firstTc.isOpening());
-        assertFalse(firstTc.isClosing());
-        assertNotNull(firstTc.getTradeDateAsLocalDate());
-        assertNotNull(firstTc.getDateTimeAsLocalDateTime());
-    }
-
-    @Test
-    @DisplayName("验证 TradeConfirm 中 BookTrade（ACATS 转入）解析正确")
-    void verifyBookTradeTradeConfirm() {
-        InputStream inputStream = getClass().getResourceAsStream("/ibkr-flex-trade-confirms.xml");
-        assertNotNull(inputStream);
-
-        FlexQueryParseResult result = parser.parse(inputStream);
-
-        // 找到第一条 BookTrade 类型的 TradeConfirm
-        IbkrTradeConfirm bookTrade = result.getTradeConfirms().stream()
-                .filter(IbkrTradeConfirm::isBookTrade)
-                .findFirst()
-                .orElse(null);
-
-        assertNotNull(bookTrade, "应存在 BookTrade 类型的 TradeConfirm");
+        IbkrTradeConfirm bookTrade = result.getTradeConfirms().get(1);
         assertEquals("BookTrade", bookTrade.getTransactionType());
         assertTrue(bookTrade.isBookTrade());
         assertFalse(bookTrade.isExchangeTrade());
-
-        System.out.println("BookTrade example: " + bookTrade);
     }
 
     @Test
-    @DisplayName("验证解析空 TradeConfirms 节点不会报错")
     void parseEmptyTradeConfirms() {
         String xml = """
                 <FlexQueryResponse queryName="TEST" type="TCF">
-                    <FlexStatements count="1">
-                        <FlexStatement accountId="TEST123" fromDate="20260101" toDate="20260331" whenGenerated="20260405;124357">
-                            <TradeConfirms>
-                            </TradeConfirms>
-                        </FlexStatement>
-                    </FlexStatements>
+                  <FlexStatements count="1">
+                    <FlexStatement accountId="SYNTH-ACCOUNT">
+                      <TradeConfirms/>
+                    </FlexStatement>
+                  </FlexStatements>
                 </FlexQueryResponse>
                 """;
-
         FlexQueryParseResult result = parser.parse(xml);
-
-        assertNotNull(result);
         assertEquals("TEST", result.getQueryName());
-        assertEquals("TEST123", result.getAccountId());
+        assertEquals("SYNTH-ACCOUNT", result.getAccountId());
         assertEquals(0, result.getOrderCount());
         assertEquals(0, result.getTradeConfirmCount());
     }
 
     @Test
-    @DisplayName("拒绝缺少 TradeConfirms 节点的 XML")
     void parseXmlWithoutTradeConfirms() {
         String xml = """
                 <FlexQueryResponse queryName="TEST" type="TCF">
-                    <FlexStatements count="1">
-                        <FlexStatement accountId="TEST123" fromDate="20260101" toDate="20260331" whenGenerated="20260405;124357">
-                        </FlexStatement>
-                    </FlexStatements>
+                  <FlexStatements count="1">
+                    <FlexStatement accountId="SYNTH-ACCOUNT"/>
+                  </FlexStatements>
                 </FlexQueryResponse>
                 """;
-
         CategorizedSyncException failure = assertThrows(CategorizedSyncException.class, () -> parser.parse(xml));
         assertEquals(FailureCategory.UNRECOGNIZED, failure.getCategory());
         assertTrue(failure.getMessage().contains("TradeConfirms"));
-    }
-
-    @Test
-    @DisplayName("解析无效 XML 应抛出 FlexQueryParseException")
-    void parseInvalidXmlShouldThrow() {
-        String invalidXml = "<invalid>not a valid flex query xml";
-
-        assertThrows(FlexQueryParser.FlexQueryParseException.class, () -> {
-            parser.parse(invalidXml);
-        });
     }
 }

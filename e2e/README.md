@@ -29,14 +29,13 @@ The launcher chooses a free local port and creates its own cluster; it accepts n
 Run from the current checkout in the configured development environment, with existing tools and cached dependencies. Set `TMPDIR=/tmp` and `MAVEN_OPTS=-Djava.io.tmpdir=/tmp`. No application profile is loaded and no existing cluster is used.
 
 ```sh
-mvn -o -f backend/pom.xml '-Dtest=*Test,!FlexQueryParserTest' test
-mvn -o -f backend/pom.xml '-Dtest=FlexQueryParserTest#parseEmptyTradeConfirms+parseXmlWithoutTradeConfirms+parseInvalidXmlShouldThrow' test
+mvn -o -f backend/pom.xml test
 python3 -B e2e/verify-ordered-market-events.py
 npm --prefix frontend test
 npm --prefix frontend run build
 ```
 
-The four existing parser methods using a personal ignored XML fixture are excluded explicitly; replacing that dependency remains an active TODO. No tests are marked skipped or weakened. Keep the method selector separate from the broad class selection so nested tests are included. Check actual class, nested-class and parameterized-case names in Surefire reports rather than relying on totals alone. After backend source changes, recompile before the integration check; the launcher refuses stale class files.
+All parser tests now use synthetic data; the default backend command needs no exclusions or method selectors. Maven excludes the ignored personal XML from test resources. Check actual class, nested-class and parameterized-case names in Surefire reports rather than relying on totals alone; old report files can remain after test removal, so use the suites listed by the current run. See the [test suite review](../docs/audits/2026-11-17-test-suite-review.md) for the cleanup evidence. After backend source changes, recompile before the integration check; the launcher refuses stale class files.
 
 `OrderedMarketEventCheck.java` uses actual transaction proxies, repositories and services against Flyway V1–V29 in a new `/tmp/vortex-ordered-events-*` cluster. It checks the server data directory, installs nothing, and always stops and removes its cluster. Failure to stop preserves the directory. Covered scenarios:
 

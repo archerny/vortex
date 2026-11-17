@@ -51,7 +51,7 @@ class OrderedMarketEventRegressionTest {
     void shouldRejectAnEarlierTradeAfterItsSplitWasProcessed() {
         StockSplitEvent event = split(1L, DATE);
         event.setProcessed(true);
-        lenient().when(splits.findByIsDeletedFalseOrderByEventDateDesc()).thenReturn(List.of(event));
+        when(splits.findByIsDeletedFalseOrderByEventDateDesc()).thenReturn(List.of(event));
         when(brokers.existsById(1L)).thenReturn(true);
         TradeRecord trade = new TradeRecord();
         trade.setTradeDate(DATE.minusDays(1)); trade.setBrokerId(1L);
@@ -68,15 +68,22 @@ class OrderedMarketEventRegressionTest {
         StockSplitEvent first = split(1L, DATE);
         StockSplitEvent later = split(2L, DATE.plusDays(10));
         when(splits.findById(1L)).thenReturn(java.util.Optional.of(first));
-        lenient().when(splits.findBySymbolInAndEventDateGreaterThanEqualAndIsDeletedFalseOrderByEventDateAsc(any(), any()))
-                .thenReturn(List.of(first, later));
+        when(splits.findByIsDeletedFalseOrderByEventDateDesc()).thenReturn(List.of(later, first));
         PositionSnapshot position = new PositionSnapshot();
         position.setSymbol("SYNTH-A"); position.setUnderlyingSymbol("SYNTH-A");
         position.setBrokerId(1L); position.setQuantity(100);
         position.setAssetType(AssetType.STOCK); position.setCurrency(Currency.USD);
         when(positions.calculatePositions(any(), isNull())).thenReturn(List.of(position));
         processor.processStockSplitEvent(first);
-        verify(trades, times(1)).saveAll(any());
+        @SuppressWarnings({"unchecked", "rawtypes"})
+        org.mockito.ArgumentCaptor<Iterable<TradeRecord>> output = org.mockito.ArgumentCaptor.forClass((Class) Iterable.class);
+        verify(trades, times(1)).saveAll(output.capture());
+        var generated = new java.util.ArrayList<TradeRecord>();
+        output.getValue().forEach(generated::add);
+        assertEquals(1, generated.size());
+        assertEquals(1L, generated.get(0).getTriggerRefId());
+        assertEquals(100, generated.get(0).getQuantity());
+        assertEquals(DATE, generated.get(0).getTradeDate());
         assertTrue(first.getProcessed());
         assertFalse(later.getProcessed());
     }

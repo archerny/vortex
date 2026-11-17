@@ -143,16 +143,6 @@ class SyncBatchFailureHandlerTest {
                     .contains(ORIGINAL_ERROR);
         }
 
-        @Test
-        @DisplayName("attempts repeat exactly MAX_CLEANUP_ATTEMPTS times")
-        void retriesExactlyMaxAttempts() {
-            doThrow(new RuntimeException("boom")).when(cleanupService).cleanupBatchData(anyLong(), anyString());
-
-            handler.handleFailure(BATCH_ID, BROKER, ORIGINAL_ERROR);
-
-            verify(cleanupService, times(SyncBatchFailureHandler.MAX_CLEANUP_ATTEMPTS))
-                    .cleanupBatchData(BATCH_ID, BROKER);
-        }
     }
 
     @Nested

@@ -32,14 +32,13 @@ import static org.mockito.Mockito.*;
 /**
  * Unit tests for {@link IbkrImportWorker}.
  *
- * Tests the per-record transactional import logic that was extracted
- * from IbkrImportService to fix the Spring AOP self-invocation issue.
+ * Verifies worker behavior in memory; transaction boundaries are checked under e2e/.
  *
  * Covers:
  * - importSingleOrder: field mapping, deduplication, error handling
  * - BookTrade detection and trigger determination
- * - Fee calculation
- * - backfillSingleStkRecord: matching and disambiguation
+ * - backfillSingleStkRecord: single/no-candidate matching
+ * Fee calculation and precision cases live in {@link TradeFeePrecisionTest}.
  */
 @ExtendWith(MockitoExtension.class)
 class IbkrImportWorkerTest {
@@ -474,52 +473,6 @@ class IbkrImportWorkerTest {
             ArgumentCaptor<TradeRecord> captor = ArgumentCaptor.forClass(TradeRecord.class);
             verify(tradeRecordRepository).save(captor.capture());
             assertEquals(TriggerRefType.OPTION_EXERCISE, captor.getValue().getTriggerRefType());
-        }
-    }
-
-    // ========================================================
-    // Fee calculation
-    // ========================================================
-    @Nested
-    @DisplayName("Fee calculation")
-    class FeeCalculationTest {
-
-        @Test
-        @DisplayName("should calculate fee as abs(commission) + abs(tradeCharge)")
-        void shouldCalculateFeeCorrectly() {
-            IbkrStagedOrder staged = buildStkOrder("ORD_FEE");
-            staged.setCommission("-3.50");
-            staged.setTradeCharge("-0.70");
-            when(tradeRecordRepository.existsByExternalBrokerAndExternalId("ibkr", "ORD_FEE")).thenReturn(false);
-
-            TradeRecord savedRecord = new TradeRecord();
-            savedRecord.setId(700L);
-            when(tradeRecordRepository.save(any(TradeRecord.class))).thenReturn(savedRecord);
-
-            importWorker.importSingleOrder(1L, 1L, staged);
-
-            ArgumentCaptor<TradeRecord> captor = ArgumentCaptor.forClass(TradeRecord.class);
-            verify(tradeRecordRepository).save(captor.capture());
-            assertEquals(new BigDecimal("4.20"), captor.getValue().getFee());
-        }
-
-        @Test
-        @DisplayName("should handle null commission and tradeCharge")
-        void shouldHandleNullFeeFields() {
-            IbkrStagedOrder staged = buildStkOrder("ORD_NO_FEE");
-            staged.setCommission(null);
-            staged.setTradeCharge(null);
-            when(tradeRecordRepository.existsByExternalBrokerAndExternalId("ibkr", "ORD_NO_FEE")).thenReturn(false);
-
-            TradeRecord savedRecord = new TradeRecord();
-            savedRecord.setId(701L);
-            when(tradeRecordRepository.save(any(TradeRecord.class))).thenReturn(savedRecord);
-
-            importWorker.importSingleOrder(1L, 1L, staged);
-
-            ArgumentCaptor<TradeRecord> captor = ArgumentCaptor.forClass(TradeRecord.class);
-            verify(tradeRecordRepository).save(captor.capture());
-            assertEquals(BigDecimal.ZERO, captor.getValue().getFee());
         }
     }
 

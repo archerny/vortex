@@ -14,7 +14,7 @@ TradeConfirms 只接受直接的属性式 Order、TradeConfirm、SymbolSummary�
 
 结构错误按 UNRECOGNIZED 返回固定的 `Unsupported IBKR TCF report structure: …` 原因，不输出账户或来源值。所有窗口解析完成后才进入暂存；任何窗口不支持都会使当前批次失败并沿既有清理流程处理，原成功批次保留。日期分窗仍可返回多个文件，每份分别校验；账户校验限每份报表，不新增跨窗口／独立请求的账户绑定，不证明成交集合完整或券商数据覆盖全部历史。 [0034 方案](../../../design/0034-2026-11-17-ibkr-single-account-tcf-validation.md) · [结构回归](../../../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrReportStructureTest.java) · [故障处理](../../../docs/broker-sync/recovery.md#ibkr-报表结构不受支持)
 
-2026-11-17 在 `ubuntu-dev` 验证上述结构规则及相关同步测试共 300 项通过，旧解析器的 3 项纯合成方法另行运行通过，Maven 均退出 0；完整组有既有 Surefire 退出握手提示，3 项单独运行正常结束。新增结构 63 项及批次 8 项使用合成 XML 与 Mockito 仓储／网络，覆盖拒绝、合法空报表、重复、重试、后续窗口失败及旧批次不变；没有真实数据库事务或券商返回验证，4 个个人夹具方法仍未运行。完整命令、历史复现和限制见 [完成归档](../../../docs/TODO-ARCHIVE.md)。
+结构回归的 63 项及批次结构场景的 8 项使用合成 XML 与 Mockito 仓储／网络，覆盖拒绝、合法空报表、重复、重试、后续窗口失败及旧批次不变。按 [0039](../../../design/0039-2026-11-17-test-suite-maintenance.md) 整理后，字段映射也使用合成报表，覆盖字符串和流两个入口、Order／ExchTrade／BookTrade、原始费用精度及日期；不再依赖个人 XML。2026-11-17 在 `ubuntu-dev` 运行默认后端全量命令，496 项全部通过，无失败、错误或跳过。没有因此重新验证真实数据库事务或券商返回；完整命令、案例对应及限制见 [测试核对](../../../docs/audits/2026-11-17-test-suite-review.md)，先前分组验证保留在 [完成归档](../../../docs/TODO-ARCHIVE.md)。
 
 ## 导入映射
 
@@ -57,7 +57,7 @@ TradeConfirms 只接受直接的属性式 Order、TradeConfirm、SymbolSummary�
 
 请求 URL 的 DEBUG 日志统一由 `executeHttpGet` 输出，其中 Token 参数通过 `maskToken` 隐藏。非法请求配置使用固定错误消息，避免原始 URI 异常携带 Token。客户端回归测试使用模拟 HTTP 响应和合成 Token，覆盖 SendRequest、GetStatement 两阶段，并核对非法 URL 的异常链。 [日志回归测试](../../../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrFlexClientTest.java) · [日志修复方案](../../../design/0024-2026-11-12-ibkr-token-log-redaction.md)
 
-[适配器测试](../../../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrSyncAdapterTest.java)和 [导入 Worker 测试](../../../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrImportWorkerTest.java)覆盖分窗、失败残留、映射与 BookTrade 边界。[数量回归测试](../../../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrQuantityValidationTest.java)覆盖整数、小数、非法值、溢出，以及真实解析／暂存／导入／异步执行／清理组件配合模拟仓储的调用链。2026-11-16 在 `ubuntu-dev` 运行数量与相关同步测试共 104 项，全部断言通过，Maven 退出 0；未连接真实数据库或账户，不代表已验证数据库事务。解析器测试中部分用例依赖被 Git 忽略的本地 XML，本轮未运行这些个人夹具用例。完整命令及运行限制随数量问题的验收记录保留。
+[适配器测试](../../../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrSyncAdapterTest.java)和 [导入 Worker 测试](../../../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrImportWorkerTest.java)覆盖分窗、失败残留、映射与 BookTrade 边界。[数量回归测试](../../../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrQuantityValidationTest.java)覆盖整数、小数、非法值、溢出，以及真实解析／暂存／导入／异步执行／清理组件配合模拟仓储的调用链。2026-11-16 的数量与相关同步测试 104 项验证及当时未执行个人夹具的限制，保留在数量问题的验收记录中。当前解析测试已按 0039 替换为合成数据，默认全量运行不再需要排除这些方法；内存测试仍不代表已验证数据库事务或真实账户。
 
 历史方案见 [Flex Web Service](../../../design/0009-2026-04-14-ibkr-flex-web-service.md)、[BookTrade](../../../design/0012-2026-04-18-ibkr-booktrade-mapping.md)、[IBKR 暂存](../../../design/0013-2026-04-21-ibkr-staging-schema.md)和 [原始数据查看](../../../design/0015-2026-04-21-sync-staged-data-viewer.md)。
 
