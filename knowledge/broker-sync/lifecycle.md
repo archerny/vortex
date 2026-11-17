@@ -33,6 +33,8 @@
 
 启动恢复扫描 `PENDING` 和 `PROCESSING`，并调用同一失败处理器。`CLEANUP_FAILED` 继续占用活动索引，由人工确认残留后处理。当前流程无 Resume 接口。历史 `PARTIAL` 和 `INTERRUPTED` 仍有前端展示标签，当前应用不生成这两种状态。见 [V28](../../backend/src/main/resources/db/migration/V28__simplify_sync_batch_state_model.sql)、[失败处理器](../../backend/src/main/java/com/vortex/sync/core/SyncBatchFailureHandler.java)和 [启动恢复](../../backend/src/main/java/com/vortex/sync/core/SyncBatchRecoveryRunner.java)。
 
+IBKR 股票侧期权事件回填也是同步成功的必要步骤：同券商全部条件核对后，无匹配、多匹配或已占用均使整个批次失败，查询及保存异常向上传播；本次新导入期权交割记录的乘数不受支持也失败。历史正式记录直接信任，不回查旧来源或历史状态。失败原因保留到批次，沿用 FAILED／CLEANUP_FAILED 流程，不另设“未关联但完成”状态。 [关联规则](brokers/ibkr.md#导入映射) · [0042](../../design/0042-2026-11-18-trust-existing-option-event-records.md)
+
 ## 与市场事件的协调
 
 批次创建与事件操作在同一账本短写互斥中检查最新状态；PENDING／PROCESSING／CLEANUP_FAILED 期间拒绝事件处理、修改和撤销。正式导入与 IBKR 关联回填也取得该事务互斥，新历史交易受关联证券锁限制，完全一致的重复仍可跳过。历史冲突沿用整批失败，不自动重算。 [市场事件](../market-events.md#并发同步与旧状态)

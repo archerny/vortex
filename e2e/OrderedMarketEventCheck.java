@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.concurrent.*;
 import java.util.function.Supplier;
 
-/** Real repositories and transaction proxies; no application profiles, broker clients or real data. */
+/** Real repositories and transaction proxies; no application profiles, live broker access or real data. */
 public class OrderedMarketEventCheck {
     static final String USER = "vortex_ordered_check";
     static final LocalDate DAY = LocalDate.of(2026, 3, 10);
@@ -49,7 +49,8 @@ public class OrderedMarketEventCheck {
     @Import({LedgerWriteLock.class, MarketEventHistoryService.class, TradeRecordService.class,
             PositionService.class, MarketEventProcessingService.class, StockSplitEventService.class,
             SymbolChangeEventService.class, DividendInKindEventService.class, BrokerSyncBatchService.class,
-            IbkrImportWorker.class, TigerImportWorker.class, IbkrCleanupStrategy.class, SyncBatchCleanupService.class})
+            IbkrImportWorker.class, IbkrImportService.class, IbkrStagingWorker.class, IbkrStagingService.class,
+            TigerImportWorker.class, IbkrCleanupStrategy.class, SyncBatchCleanupService.class, SyncBatchFailureHandler.class})
     static class Config {
         @Bean DataSource dataSource() { return new DriverManagerDataSource(url, USER, ""); }
         @Bean LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource source) {
@@ -82,7 +83,7 @@ public class OrderedMarketEventCheck {
             tradeRepo = app.getBean(TradeRecordRepository.class); splitRepo = app.getBean(StockSplitEventRepository.class);
             tx = new TransactionTemplate(app.getBean(PlatformTransactionManager.class));
             broker = app.getBean(BrokerRepository.class).save(new Broker("SYNTH-EVENT", "SYNTH")).getId();
-            lifecycle(); chainAndDividend(); zeroAndLegacy(); multipleBrokers(); transactions(); concurrency(); syncBoundary(); preflight();
+            lifecycle(); chainAndDividend(); zeroAndLegacy(); multipleBrokers(); transactions(); concurrency(); syncBoundary(); exactOptionLinkage(); preflight();
             System.out.println("PASS all ordered-event integration scenarios (real Spring/JPA, isolated PostgreSQL)");
         }
     }
@@ -307,6 +308,118 @@ public class OrderedMarketEventCheck {
         check(quantity("SYNTH-FAILED") == 0, "Unlocked failed cleanup retry");
         System.out.println("PASS sync creation/event race, active states, real locked import rollback, cleanup and completed-batch protection");
         System.out.println("PASS old FAILED footprint cleanup respects event history and remains retryable after undo");
+    }
+
+    static void exactOptionLinkage() throws Exception {
+        var brokers = context.getBean(BrokerRepository.class);
+        Broker ibkr = new Broker("SYNTH-IBKR", "SYNTH"); ibkr.setBrokerCode("ibkr"); ibkr = brokers.save(ibkr);
+        var batches = context.getBean(BrokerSyncBatchService.class);
+        String missing = linkXml("SYNTH-MISSING", "SYNTH-LINK", true, 0);
+        BrokerSyncBatch first = runLinkSync(missing);
+        assertLinkFailure(first, "exact_matches=0");
+        assertLinkFailure(runLinkSync(missing), "exact_matches=0");
+        String repaired = linkXml("SYNTH-MISSING", "SYNTH-LINK", true, 1);
+        BrokerSyncBatch fixed = runLinkSync(repaired);
+        check(fixed.getStatus().equals("COMPLETED"), "Repaired link retry failed");
+        TradeRecord linked = tradeRepo.findByExternalBrokerAndExternalId("ibkr", "SYNTH-MISSING-STK").orElseThrow();
+        TradeRecord option = tradeRepo.findByExternalBrokerAndExternalId("ibkr", "SYNTH-MISSING-OPT0").orElseThrow();
+        check(linked.getTriggerRefId().equals(option.getId()), "Successful pair points at wrong option");
+        check(runLinkSync(repaired).getStatus().equals("COMPLETED"), "Identical repeat failed");
+        check(tradeRepo.findById(linked.getId()).orElseThrow().getTriggerRefId().equals(option.getId()), "Repeat changed old link");
+        assertLinkFailure(runLinkSync(linkXml("SYNTH-AMBIG", "SYNTH-AMBIG", true, 2)), "exact_matches=2");
+
+        BrokerSyncBatch history = runLinkSync(linkXml("SYNTH-HIST", "SYNTH-HIST", false, 1));
+        check(history.getStatus().equals("COMPLETED"), "Historical option import");
+        TradeRecord historical = tradeRepo.findByExternalBrokerAndExternalId("ibkr", "SYNTH-HIST-OPT0").orElseThrow();
+        long otherBroker = brokers.save(new Broker("SYNTH-FOREIGN", "SYNTH")).getId();
+        TradeRecord foreign = optionFixture("SYNTH-HIST", otherBroker); tradeRepo.save(foreign);
+        TradeRecord otherCurrency = optionFixture("SYNTH-HIST", ibkr.getId());
+        otherCurrency.setCurrency(Currency.HKD); tradeRepo.save(otherCurrency);
+        // Existing formal records are trusted even when the historic staging source is unavailable.
+        tx.executeWithoutResult(status -> context.getBean(IbkrStagedOrderRepository.class).deleteByBatchId(history.getId()));
+        BrokerSyncBatch stockBatch = runLinkSync(linkXml("SYNTH-HIST-STOCK", "SYNTH-HIST", true, 0));
+        check(stockBatch.getStatus().equals("COMPLETED"), "Completed historical counterpart was not matched");
+        var actualCandidates = tradeRepo.findOptSideBookTradesForMatching(TradeTrigger.OPTION,
+                TriggerRefType.OPTION_EXERCISE, List.of(AssetType.OPTION_CALL, AssetType.OPTION_PUT),
+                "SYNTH-HIST", DAY, ibkr.getId(), Currency.USD);
+        check(actualCandidates.size() == 1 && actualCandidates.get(0).getId().equals(historical.getId()),
+                "Actual JPQL admitted foreign broker/currency");
+        TradeRecord stock = tradeRepo.findByExternalBrokerAndExternalId("ibkr", "SYNTH-HIST-STOCK-STK").orElseThrow();
+        check(stock.getTriggerRefId().equals(historical.getId()), "Cross-completed-batch linkage");
+        assertLinkFailure(runLinkSync(linkXml("SYNTH-REUSE", "SYNTH-HIST", true, 0)), "already linked");
+        check(tradeRepo.findById(stock.getId()).orElseThrow().getTriggerRefId().equals(historical.getId()), "Failed reuse changed old link");
+
+        // Exercise a real UPDATE failure after the in-memory reference has changed.
+        try (var connection = DriverManager.getConnection(url, USER, ""); var statement = connection.createStatement()) {
+            statement.execute("CREATE FUNCTION reject_synth_link() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN "
+                    + "IF NEW.symbol = 'SYNTH-ROLLBACK' AND NEW.trigger_ref_id <> 0 THEN "
+                    + "RAISE EXCEPTION 'synthetic link write rejected'; END IF; RETURN NEW; END $$");
+            statement.execute("CREATE TRIGGER reject_synth_link BEFORE UPDATE OF trigger_ref_id ON trade_records "
+                    + "FOR EACH ROW EXECUTE FUNCTION reject_synth_link()");
+        }
+        String rollback = linkXml("SYNTH-ROLLBACK", "SYNTH-ROLLBACK", true, 1);
+        assertLinkFailure(runLinkSync(rollback), "synthetic link write rejected");
+        try (var connection = DriverManager.getConnection(url, USER, ""); var statement = connection.createStatement()) {
+            statement.execute("DROP TRIGGER reject_synth_link ON trade_records"); statement.execute("DROP FUNCTION reject_synth_link()");
+        }
+        check(runLinkSync(rollback).getStatus().equals("COMPLETED"), "Rolled-back link retry did not recover");
+        System.out.println("PASS exact IBKR links: actual JPQL broker/currency scope, trusted existing counterpart without staging source, unique/zero/ambiguous matches, "
+                + "one-to-one use, duplicate/retry, real update rollback and entire-batch cleanup with old batches unchanged");
+    }
+
+    static BrokerSyncBatch runLinkSync(String xml) {
+        IbkrFlexQueryProperties properties = new IbkrFlexQueryProperties();
+        properties.setFlexToken("SYNTHETIC-NOT-A-CREDENTIAL"); properties.setTradeConfirmQueryId("SYNTHETIC");
+        IbkrFlexClient fakeClient = new IbkrFlexClient(properties) {
+            @Override public String fetchReport(String from, String to) { return xml; }
+        };
+        var batches = context.getBean(BrokerSyncBatchService.class);
+        var adapter = new IbkrSyncAdapter(properties, fakeClient, new FlexQueryParser(),
+                context.getBean(IbkrStagingService.class), context.getBean(IbkrImportService.class),
+                batches, context.getBean(IbkrStagedOrderRepository.class));
+        var executor = new BrokerSyncAsyncExecutor(new BrokerSyncService(List.of(adapter), context.getBean(BrokerRepository.class)),
+                batches, context.getBean(SyncBatchFailureHandler.class));
+        BrokerSyncBatch batch = batches.createBatch("ibkr", DAY, DAY);
+        SyncRequest request = new SyncRequest(); request.setBrokerCode("ibkr");
+        request.setStartTime(DAY.toString()); request.setEndTime(DAY.toString());
+        executor.execute(batch.getId(), request);
+        return context.getBean(BrokerSyncBatchRepository.class).findById(batch.getId()).orElseThrow();
+    }
+
+    static void assertLinkFailure(BrokerSyncBatch batch, String reason) {
+        check(batch.getStatus().equals("FAILED") && batch.getErrorMessage().contains(reason)
+                && !batch.getErrorMessage().contains("SYNTHETIC-NOT-A-CREDENTIAL"), "Wrong linkage failure: " + batch.getStatus());
+        check(tradeRepo.findBySyncBatchIdAndIsDeletedFalse(batch.getId()).isEmpty(), "Failed sync left formal rows");
+        check(context.getBean(IbkrStagedOrderRepository.class).findByBatchIdAndStatus(batch.getId(), "IMPORTED").isEmpty(),
+                "Failed sync left staged orders");
+        check(context.getBean(IbkrStagedTradeConfirmRepository.class).findByBatchId(batch.getId()).isEmpty(),
+                "Failed sync left confirmations");
+    }
+
+    static TradeRecord optionFixture(String underlying, long brokerId) {
+        TradeRecord record = trade(underlying + "-20260417-C10", DAY);
+        record.setUnderlyingSymbol(underlying); record.setBrokerId(brokerId);
+        record.setAssetType(AssetType.OPTION_CALL); record.setTradeType(TradeType.SELL); record.setQuantity(1);
+        record.setPrice(BigDecimal.ZERO); record.setAmount(BigDecimal.ZERO);
+        record.setTradeTrigger(TradeTrigger.OPTION); record.setTriggerRefType(TriggerRefType.OPTION_EXERCISE);
+        return record;
+    }
+
+    static String linkXml(String prefix, String symbol, boolean stock, int options) {
+        StringBuilder rows = new StringBuilder();
+        if (stock) rows.append(linkXmlRow(prefix + "-STK", symbol, false, "20260417"));
+        for (int i = 0; i < options; i++) rows.append(linkXmlRow(prefix + "-OPT" + i, symbol, true, i == 0 ? "20260417" : "20260515"));
+        return "<FlexQueryResponse type='TCF'><FlexStatements count='1'><FlexStatement accountId='SYNTHETIC'>"
+                + "<TradeConfirms>" + rows + "</TradeConfirms></FlexStatement></FlexStatements></FlexQueryResponse>";
+    }
+
+    static String linkXmlRow(String id, String symbol, boolean option, String expiry) {
+        return "<Order orderID='" + id + "' symbol='" + symbol + "' description='" + symbol + " SYNTHETIC' "
+                + "assetCategory='" + (option ? "OPT" : "STK") + "' currency='USD' buySell='" + (option ? "SELL" : "BUY")
+                + "' quantity='" + (option ? "1" : "100") + "' price='" + (option ? "0" : "10")
+                + "' amount='" + (option ? "0" : "1000") + "' commission='0' tradeDate='20260310' "
+                + "expiry='" + expiry + "' putCall='C' strike='10' multiplier='100'/>"
+                + "<TradeConfirm tradeID='" + id + "-T' orderID='" + id + "' code='Ex'/>";
     }
 
     static StockSplitEvent split(String symbol, LocalDate date) {

@@ -176,6 +176,9 @@ public interface TradeRecordRepository extends BaseRepository<TradeRecord, Long>
     /** Load the existing broker trade to verify duplicate business content. */
     Optional<TradeRecord> findByExternalBrokerAndExternalId(String externalBroker, String externalId);
 
+    boolean existsByTradeTriggerAndTriggerRefIdAndAssetTypeInAndIsDeletedFalse(
+            TradeTrigger trigger, Long triggerRefId, List<AssetType> assetTypes);
+
     /**
      * Find STK-side BookTrade records that need trigger_ref_id back-fill.
      * These are records where:
@@ -208,11 +211,14 @@ public interface TradeRecordRepository extends BaseRepository<TradeRecord, Long>
             "AND t.assetType IN (:assetTypes) " +
             "AND t.underlyingSymbol = :underlyingSymbol " +
             "AND t.tradeDate = :tradeDate " +
+            "AND t.brokerId = :brokerId AND t.currency = :currency " +
             "AND t.isDeleted = false")
     List<TradeRecord> findOptSideBookTradesForMatching(
             @Param("trigger") TradeTrigger trigger,
             @Param("refType") TriggerRefType refType,
             @Param("assetTypes") List<AssetType> assetTypes,
             @Param("underlyingSymbol") String underlyingSymbol,
-            @Param("tradeDate") LocalDate tradeDate);
+            @Param("tradeDate") LocalDate tradeDate,
+            @Param("brokerId") Long brokerId,
+            @Param("currency") Currency currency);
 }

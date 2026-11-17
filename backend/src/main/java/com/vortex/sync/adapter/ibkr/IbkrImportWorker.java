@@ -25,6 +25,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * Worker bean for IBKR import operations that require independent transactions.
@@ -50,6 +51,8 @@ public class IbkrImportWorker {
 
     private final MarketEventHistoryService history;
     private static final DateTimeFormatter IBKR_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd");
+
+    private static final Pattern OPTION_SYMBOL = Pattern.compile("^(.+)-(\\d{8})-([CP])(.+)$");
 
     /** IBKR code tokens that indicate option exercise events */
     private static final Set<String> EXERCISE_CODES = Set.of("Ex", "MEx", "AEx");
@@ -107,6 +110,12 @@ public class IbkrImportWorker {
 
             // Map to TradeRecord
             TradeRecord tradeRecord = mapToTradeRecord(batchId, brokerId, staged);
+            if ((tradeRecord.getAssetType() == AssetType.OPTION_CALL || tradeRecord.getAssetType() == AssetType.OPTION_PUT)
+                    && tradeRecord.getTradeTrigger() == TradeTrigger.OPTION
+                    && (tradeRecord.getTriggerRefType() == TriggerRefType.OPTION_EXERCISE
+                        || tradeRecord.getTriggerRefType() == TriggerRefType.OPTION_ASSIGNED)) {
+                requireStandardOptionEventMultiplier(staged);
+            }
             history.assertHistoryWritable(tradeRecord);
             TradeRecord saved = tradeRecordRepository.save(tradeRecord);
 
@@ -160,58 +169,64 @@ public class IbkrImportWorker {
      * Back-fill trigger_ref_id for a single STK-side BookTrade record.
      * Runs in its own transaction (REQUIRES_NEW).
      *
-     * @param stkRecord the STK-side trade record needing back-fill
+     * @param supplied the STK-side trade record needing back-fill
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void backfillSingleStkRecord(TradeRecord stkRecord) {
+    public void backfillSingleStkRecord(TradeRecord supplied) {
         history.lock();
-        stkRecord = tradeRecordRepository.findById(stkRecord.getId())
-                .filter(record -> !Boolean.TRUE.equals(record.getIsDeleted()))
-                .orElseThrow(() -> new IllegalStateException("Stock-side record disappeared before back-fill"));
+        TradeRecord stkRecord = tradeRecordRepository.findById(supplied.getId())
+                .filter(record -> Boolean.FALSE.equals(record.getIsDeleted()))
+                .orElseThrow(() -> linkageFailure(supplied,
+                        "Stock-side record is not eligible: missing or deleted"));
         history.assertHistoryWritable(stkRecord);
+        if (stkRecord.getTriggerRefId() != null && stkRecord.getTriggerRefId() != 0L) return;
         if (stkRecord.getTradeTrigger() != TradeTrigger.OPTION || stkRecord.getTriggerRefId() == null
-                || stkRecord.getTriggerRefId() != 0L) return;
-        try {
-            List<TradeRecord> optCandidates = tradeRecordRepository.findOptSideBookTradesForMatching(
-                    TradeTrigger.OPTION,
-                    stkRecord.getTriggerRefType(),
-                    List.of(AssetType.OPTION_CALL, AssetType.OPTION_PUT),
-                    stkRecord.getUnderlyingSymbol(),
-                    stkRecord.getTradeDate());
+                || stkRecord.getAssetType() != AssetType.STOCK
+                || (stkRecord.getTriggerRefType() != TriggerRefType.OPTION_EXERCISE
+                    && stkRecord.getTriggerRefType() != TriggerRefType.OPTION_ASSIGNED)
+                || stkRecord.getBrokerId() == null || stkRecord.getCurrency() == null
+                || stkRecord.getTradeDate() == null || isBlank(stkRecord.getUnderlyingSymbol())
+                || !stkRecord.getUnderlyingSymbol().equals(stkRecord.getSymbol())
+                || stkRecord.getTradeType() == null || stkRecord.getPrice() == null
+                || stkRecord.getPrice().signum() <= 0 || stkRecord.getQuantity() == null
+                || stkRecord.getQuantity() <= 0 || stkRecord.getSyncBatchId() == null) {
+            throw linkageFailure(stkRecord, "Stock-side record is not eligible for exact option-event linkage");
+        }
+        List<TradeRecord> matches = tradeRecordRepository.findOptSideBookTradesForMatching(
+                        TradeTrigger.OPTION, stkRecord.getTriggerRefType(),
+                        List.of(AssetType.OPTION_CALL, AssetType.OPTION_PUT),
+                        stkRecord.getUnderlyingSymbol(), stkRecord.getTradeDate(),
+                        stkRecord.getBrokerId(), stkRecord.getCurrency())
+                .stream().filter(option -> isExactOptionMatch(stkRecord, option)).toList();
+        if (matches.size() != 1) {
+            throw linkageFailure(stkRecord, "Expected exactly one option-event counterpart; exact_matches=" + matches.size());
+        }
+        TradeRecord matched = matches.get(0);
+        boolean alreadyUsed = tradeRecordRepository.existsByTradeTriggerAndTriggerRefIdAndAssetTypeInAndIsDeletedFalse(
+                TradeTrigger.OPTION, matched.getId(), List.of(AssetType.STOCK, AssetType.ETF));
+        if (alreadyUsed) {
+            throw linkageFailure(stkRecord, "Option-event counterpart is already linked to another stock record");
+        }
+        stkRecord.setTriggerRefId(matched.getId());
+        tradeRecordRepository.save(stkRecord);
+        logger.debug("[IbkrImport] Back-filled STK record id={} → OPT id={}", stkRecord.getId(), matched.getId());
+    }
 
-            if (optCandidates.isEmpty()) {
-                logger.warn("[IbkrImport] No OPT-side match found for STK record id={}, " +
-                        "symbol={}, date={}", stkRecord.getId(), stkRecord.getSymbol(), stkRecord.getTradeDate());
+    private CategorizedSyncException linkageFailure(TradeRecord stock, String reason) {
+        return new CategorizedSyncException(FailureCategory.UNRECOGNIZED, null,
+                reason + "; stock_record_id=" + stock.getId() + "; manual investigation required");
+    }
+
+    private void requireStandardOptionEventMultiplier(IbkrStagedOrder staged) {
+        try {
+            if (!isBlank(staged.getMultiplier()) && new BigDecimal(staged.getMultiplier()).compareTo(new BigDecimal("100")) == 0) {
                 return;
             }
-
-            TradeRecord matched;
-            if (optCandidates.size() == 1) {
-                matched = optCandidates.get(0);
-            } else {
-                // Disambiguate by strike price
-                matched = disambiguateByStrike(stkRecord, optCandidates);
-                if (matched == null) {
-                    // Further disambiguate by quantity
-                    matched = disambiguateByQuantity(stkRecord, optCandidates);
-                }
-                if (matched == null) {
-                    // Last resort: take the first one and warn
-                    matched = optCandidates.get(0);
-                    logger.warn("[IbkrImport] Multiple OPT-side matches for STK record id={}, " +
-                            "using first match (OPT id={})", stkRecord.getId(), matched.getId());
-                }
-            }
-
-            stkRecord.setTriggerRefId(matched.getId());
-            tradeRecordRepository.save(stkRecord);
-            logger.debug("[IbkrImport] Back-filled STK record id={} → OPT id={}",
-                    stkRecord.getId(), matched.getId());
-
-        } catch (Exception e) {
-            logger.warn("[IbkrImport] Failed to back-fill STK record id={}: {}",
-                    stkRecord.getId(), e.getMessage(), e);
+        } catch (NumberFormatException ignored) {
+            // An invalid multiplier is unsupported data, not an implicit default.
         }
+        throw new CategorizedSyncException(FailureCategory.UNRECOGNIZED, null,
+                "Unsupported IBKR option-event multiplier; expected 100; manual investigation required");
     }
 
     // ============ Field Mapping — TradeRecord ============
@@ -334,44 +349,34 @@ public class IbkrImportWorker {
                 staged.getOrderId(), code, EXERCISE_CODES));
     }
 
-    // ============ Disambiguation helpers ============
+    // ============ Exact option-event matching ============
 
-    private TradeRecord disambiguateByStrike(TradeRecord stkRecord, List<TradeRecord> optCandidates) {
-        BigDecimal stkPrice = stkRecord.getPrice();
-        if (stkPrice == null) return null;
+    private boolean isExactOptionMatch(TradeRecord stock, TradeRecord option) {
+        if (option.getId() == null || !Boolean.FALSE.equals(option.getIsDeleted())
+                || !stock.getBrokerId().equals(option.getBrokerId()) || stock.getCurrency() != option.getCurrency()
+                || !stock.getTradeDate().equals(option.getTradeDate())
+                || !stock.getUnderlyingSymbol().equals(option.getUnderlyingSymbol())
+                || option.getTradeTrigger() != TradeTrigger.OPTION
+                || option.getTriggerRefType() != stock.getTriggerRefType()
+                || !Long.valueOf(0L).equals(option.getTriggerRefId())
+                || (option.getAssetType() != AssetType.OPTION_CALL && option.getAssetType() != AssetType.OPTION_PUT)
+                || option.getQuantity() == null || option.getQuantity() <= 0
+                || stock.getQuantity().longValue() != option.getQuantity().longValue() * 100L) return false;
 
-        return optCandidates.stream()
-                .filter(opt -> {
-                    BigDecimal optStrike = extractStrikeFromSymbol(opt.getSymbol());
-                    return optStrike != null && stkPrice.compareTo(optStrike) == 0;
-                })
-                .findFirst()
-                .orElse(null);
-    }
-
-    private TradeRecord disambiguateByQuantity(TradeRecord stkRecord, List<TradeRecord> optCandidates) {
-        if (stkRecord.getQuantity() == null) return null;
-        int stkQty = stkRecord.getQuantity();
-
-        return optCandidates.stream()
-                .filter(opt -> {
-                    if (opt.getQuantity() == null) return false;
-                    int expectedStkQty = opt.getQuantity() * 100;
-                    return stkQty == expectedStkQty;
-                })
-                .findFirst()
-                .orElse(null);
-    }
-
-    private BigDecimal extractStrikeFromSymbol(String symbol) {
-        if (symbol == null) return null;
+        boolean exercise = stock.getTriggerRefType() == TriggerRefType.OPTION_EXERCISE;
+        boolean call = option.getAssetType() == AssetType.OPTION_CALL;
+        if (option.getTradeType() != (exercise ? TradeType.SELL : TradeType.BUY)
+                || stock.getTradeType() != (exercise == call ? TradeType.BUY : TradeType.SELL)
+                || option.getSymbol() == null) return false;
+        var symbol = OPTION_SYMBOL.matcher(option.getSymbol());
+        if (!symbol.matches() || !stock.getUnderlyingSymbol().equals(symbol.group(1))
+                || !symbol.group(3).equals(call ? "C" : "P")) return false;
         try {
-            int lastDash = symbol.lastIndexOf('-');
-            if (lastDash < 0 || lastDash >= symbol.length() - 2) return null;
-            String strikeStr = symbol.substring(lastDash + 2);
-            return new BigDecimal(strikeStr);
-        } catch (Exception e) {
-            return null;
+            LocalDate.parse(symbol.group(2), DateTimeFormatter.BASIC_ISO_DATE);
+            BigDecimal strike = new BigDecimal(symbol.group(4));
+            return strike.signum() > 0 && stock.getPrice().compareTo(strike) == 0;
+        } catch (java.time.DateTimeException | NumberFormatException invalidSymbol) {
+            return false;
         }
     }
 

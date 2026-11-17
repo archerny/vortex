@@ -147,6 +147,20 @@ class IbkrImportServiceTest {
         }
 
         @Test
+        void shouldPropagateLinkageFailureAndStopFurtherBackfills() {
+            when(brokerRepository.findByBrokerCode("ibkr")).thenReturn(Optional.of(buildBroker()));
+            TradeRecord stock = new TradeRecord(), later = new TradeRecord();
+            when(tradeRecordRepository.findStkSideBookTradesNeedingBackfill(
+                    eq(1L), eq(TradeTrigger.OPTION), anyList(), eq(AssetType.STOCK)))
+                    .thenReturn(List.of(stock, later));
+            RuntimeException failure = new com.vortex.sync.core.CategorizedSyncException(
+                    com.vortex.sync.core.FailureCategory.UNRECOGNIZED, null, "Synthetic linkage failure");
+            doThrow(failure).when(importWorker).backfillSingleStkRecord(stock);
+            assertSame(failure, assertThrows(RuntimeException.class, () -> importService.importAll(1L)));
+            verify(importWorker, never()).backfillSingleStkRecord(later);
+        }
+
+        @Test
         @DisplayName("should call markFailed via proxy when worker throws ImportOneFailedException")
         void shouldInvokeMarkFailedOnImportFailure() {
             when(brokerRepository.findByBrokerCode("ibkr")).thenReturn(Optional.of(buildBroker()));

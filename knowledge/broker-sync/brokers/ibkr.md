@@ -25,7 +25,11 @@ TradeConfirms 只接受直接的属性式 Order、TradeConfirm、SymbolSummary�
 - 正式交易以订单为粒度。`STK` 映射到股票，`OPT` 按 `putCall` 的 `C` 或 `P` 映射到期权。期权 symbol 使用 `description` 的首个词作为标的，再拼到期日、方向和去掉尾零的行权价。
 - `tradeDate` 使用 `yyyyMMdd`。`BUY`、`SELL` 分别映射为买卖方向。`CNH` 与 `CNY` 都映射为 `CNY`，`USD` 和 `HKD` 保持原值。金额取原始 `amount` 的绝对值，费用为佣金和附加费的绝对值之和。数量先取 BigDecimal 绝对值，只接受非零且不超过 2147483647 的数值整数，再用 `intValueExact()` 无损转换；拒绝小数、零、缺失、非法与超范围数量，不截断或舍入。
 - `order_time` 和 `order_type` 同时为空时，订单进入 BookTrade 分支，交易触发来源为 `OPTION`。其他订单使用 `MANUAL/NONE`。BookTrade 按 `order_id` 读取第一条成交确认的 `code`，按分号拆分后精确匹配。`Ex`、`MEx`、`AEx` 的行权判定优先于 `Ep` 的到期判定，后者优先于 `A`、`GEA` 的指派判定。确认记录缺失、code 为空或无法识别时，该订单失败并最终触发整批清理。
-- 期权事件初始 `trigger_ref_id` 为 0。导入后，对本批股票侧行权或指派记录回填关联的期权交易 ID。期权候选按事件类型、标的和交易日查询，可能来自其他批次。多候选时优先匹配行权价，其次匹配数量，仍无法区分时取首条。找不到候选则保留 0 并记录警告。
+- 期权事件初始 `trigger_ref_id` 为 0。导入后只回填本批未删除、未关联的股票侧行权／指派记录，指向同次事件的期权侧簿记记录，不是原始开仓记录。候选必须同券商、币种、交易日、底层证券及事件类型，且是未删除、关联 ID 为 0 的 CALL／PUT。按用户确认的历史准确前提，直接信任正式记录，已有和本批记录按同一组业务条件匹配，不查询历史批次状态、原始暂存来源或设置人工记录例外。
+- 行权的期权侧为 SELL，指派为 BUY；股票侧分别是行权 CALL→BUY／PUT→SELL、指派 CALL→SELL／PUT→BUY。期权代码须解析出有效日历到期日，代码中的底层证券及 C/P 须与记录一致；正式记录没有独立的到期日字段可交叉核对。股票单价与行权价精确相等，股数等于合约数乘100，使用long防溢出，无舍入或容差。不同到期日仍有多个完整匹配时不猜测，不按事件日推断到期日。
+- 所有条件同时核对后必须恰好有一个匹配。0 或多个匹配均以 UNRECOGNIZED 失败，提示 `exact_matches` 与人工排查；不再逐步取首条或保留0继续成功。唯一候选若已被另一条有效股票／ETF期权事件引用，也拒绝；不先删除已占用候选来消除歧义。股票侧在持锁重读后重新核对资格，已有关联不改写。
+- 项目按100乘数处理。仅本次新导入、尚无正式记录的行权／指派期权侧检查当前暂存订单 multiplier 为精确数值100，缺失、非法或非100失败；STK、普通成交、到期记录不受此新增门槛影响。关联不回查历史来源。正式重复兜底不追加乘数门槛，暂存阶段既有同ID来源内容一致性仍须满足，不能把来源内容冲突当作合法重复。不自动支持合并／拆分簿记或非标准交割合约。
+- 回填异常向 Adapter 传播并使本次同步失败，异步执行器沿既有机制清理本批暂存和正式交易，成功清理后 FAILED；清理失败仍为 CLEANUP_FAILED。原成功批次及期权候选不改动，批次保留内部股票行ID、失败条件和人工排查提示；保存／查询异常同样不会被吞掉。 [0040 规则](../../../design/0040-2026-11-18-ibkr-exact-option-event-linkage.md) · [0042 信任历史并简化](../../../design/0042-2026-11-18-trust-existing-option-event-records.md) · [恢复说明](../../../docs/broker-sync/recovery.md#ibkr-期权事件关联失败)
 
 映射和回填见 [导入 Worker](../../../backend/src/main/java/com/vortex/sync/adapter/ibkr/IbkrImportWorker.java)、[导入服务](../../../backend/src/main/java/com/vortex/sync/adapter/ibkr/IbkrImportService.java)及 [交易仓储查询](../../../backend/src/main/java/com/vortex/repository/TradeRecordRepository.java)。
 
@@ -54,6 +58,8 @@ TradeConfirms 只接受直接的属性式 Order、TradeConfirm、SymbolSummary�
 数量不支持的订单不会保存正式交易。ImportService 在独立事务中记录失败，Adapter 沿用失败计数触发整批清理；本批其他已导入订单也会被清理，其他批次不受影响。Adapter 在清理前按批次读取首条 FAILED 记录，将其已有错误附在批次摘要的 `first failure:` 后，清理后仍能查看原因；没有可用说明时保留计数摘要。同样的数据重新同步仍会拒绝。重复订单先按上文校验内容，本次不修正历史账本。数量限制设计与未来升级边界见 [0027](../../../design/0027-2026-11-16-ibkr-reject-fractional-quantities.md)。
 
 ## 验证边界
+
+2026-11-18按0042信任历史并简化后，后端全量539项通过；再补两个输入范围参数边界，受影响专项70项通过。组合清单覆盖当前全部541案例，无失败、错误或跳过。临时PostgreSQL实际验证同券商查询、无需旧暂存来源的可信既有记录关联、零／多匹配失败、占用、回滚、整批清理与重试，临时服务停止并删除。未连接真实IBKR或现有账本。范围、命令、组合清单及限制见 [关联验收](../../../docs/audits/2026-11-18-ibkr-option-link-validation.md)。
 
 请求 URL 的 DEBUG 日志统一由 `executeHttpGet` 输出，其中 Token 参数通过 `maskToken` 隐藏。非法请求配置使用固定错误消息，避免原始 URI 异常携带 Token。客户端回归测试使用模拟 HTTP 响应和合成 Token，覆盖 SendRequest、GetStatement 两阶段，并核对非法 URL 的异常链。 [日志回归测试](../../../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrFlexClientTest.java) · [日志修复方案](../../../design/0024-2026-11-12-ibkr-token-log-redaction.md)
 
