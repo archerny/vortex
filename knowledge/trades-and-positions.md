@@ -18,6 +18,10 @@
 
 交易详情页从未软删除的交易列表中按期权合约 `symbol` 精确匹配，并根据 `triggerRefId` 找出由该合约触发的股票和 ETF 记录。从股票或 ETF 详情进入时，页面先按关联 ID 请求触发源，再用同样的规则整理结果。若请求失败，仅尝试在已有列表中查找该 ID。页面按记录 ID 去重，当前记录在结果中时会高亮。该规则目前用于期权关联。 [详情页实现](../frontend/src/pages/trade/TradeRecordDetail.jsx)
 
+## 历史写入边界
+
+已处理、未撤销的市场事件锁定其关联证券在事件日之前的交易，覆盖所有券商；无关证券仍可补录，事件日普通交易可在事件处理后录入。交易新增检查新记录，修改先检查原记录再检查目标证券和日期，软删除检查原记录。费用、策略等其他编辑同样受约束。MARKET_EVENT 记录不接受普通 CRUD 修改、删除、单独创建或改写来源，须通过撤销所属事件维护。冲突返回 HTTP 409 和原因，详情页隐藏系统交易的编辑／删除入口。 [边界服务](../backend/src/main/java/com/vortex/service/MarketEventHistoryService.java) · [完整事件规则](market-events.md#顺序处理与关联证券历史锁) · [0035](../design/0035-2026-11-17-ordered-market-events-and-history-locks.md)
+
 ## 持仓快照与数据核对
 
 `GET /api/positions?date=YYYY-MM-DD` 按截止日期查询持仓，可另传 `brokerId`。服务读取截止日期当天及之前未软删除的交易，按 `(symbol, brokerId)` 聚合，`BUY` 加数量，`SELL` 减数量，过滤净数量为 0 的结果。负数量会保留，前端标记为可能异常。已生成的市场事件交易同样计入持仓。持仓页提示文字仍称暂未考虑市场事件，服务端的聚合规则以代码为准。 [持仓 API](../backend/src/main/java/com/vortex/controller/PositionController.java) · [持仓服务](../backend/src/main/java/com/vortex/service/PositionService.java) · [持仓页面](../frontend/src/pages/analysis/PositionSnapshotTab.jsx)

@@ -2,7 +2,7 @@
 
 ## 录入与处理状态
 
-市场事件包含拆股、证券代码变更和实物分红。前端三个标签页提供列表和新增。后端还支持按 ID、证券代码或日期查询，以及按 ID 修改和软删除。事件日期使用 `LocalDate`，数据库存储为 `DATE`。事件被处理后记录 `processed` 和 `processedAt`。无符合条件的持仓或应生成的数量为零时，事件仍可标记为已处理。 [市场事件 API](../backend/src/main/java/com/vortex/controller/MarketEventController.java) · [市场事件实体](../backend/src/main/java/com/vortex/entity/BaseMarketEvent.java) · [市场事件页面](../frontend/src/pages/market-events/MarketEvents.jsx) · [V13 处理状态](../backend/src/main/resources/db/migration/V13__add_market_event_processing_fields.sql)
+市场事件包含拆股、证券代码变更和实物分红。前端三个标签页提供列表、新增并处理、受限撤销。后端还支持按 ID、证券代码或日期查询；仅未处理事件允许修改，已处理事件须先撤销再重建。事件日期使用 `LocalDate`，数据库存储为 `DATE`。事件被处理后记录 `processed` 和 `processedAt`。无符合条件的持仓或应生成的数量为零时，事件仍可标记为已处理。 [市场事件 API](../backend/src/main/java/com/vortex/controller/MarketEventController.java) · [市场事件实体](../backend/src/main/java/com/vortex/entity/BaseMarketEvent.java) · [市场事件页面](../frontend/src/pages/market-events/MarketEvents.jsx) · [V13 处理状态](../backend/src/main/resources/db/migration/V13__add_market_event_processing_fields.sql)
 
 录入或修改时，服务端会查找相关证券最近一条未软删除的交易，缺少币种时据此补齐。拆股和实物分红查原证券，代码变更查旧证券代码。没有交易记录时拒绝保存。实物分红另须提供分红证券的 `dividendCurrency`，它可与原证券币种不同。 [拆股服务](../backend/src/main/java/com/vortex/service/StockSplitEventService.java) · [代码变更服务](../backend/src/main/java/com/vortex/service/SymbolChangeEventService.java) · [实物分红服务](../backend/src/main/java/com/vortex/service/DividendInKindEventService.java)
 
@@ -20,11 +20,31 @@
 
 [市场事件回归测试](../backend/src/test/java/com/vortex/service/MarketEventProcessingServiceTest.java) 使用真实事件处理与持仓计算、Mockito 仓储及合成交易，从证券代码变更入口验证清仓、重新建仓和生成交易。2026-11-16 在 `ubuntu-dev` 中，新增 8 项及相关持仓、交易服务测试共 33 项通过，Maven 退出 0；仅为纯内存回归，未验证真实数据库事务，也未读取或重算用户历史账本。卖超、负持仓、同日成交排序及更广的计价精度规则保持原有边界，本次只修复清仓尾差。
 
-## 历史重算的范围
+## 顺序处理与关联证券历史锁
 
-新增、修改或软删除事件会触发重算。新增从事件日期开始，修改从新旧日期中较早的一天开始并合并新旧标的。软删除时，服务先清理被删除事件关联的系统交易，再从该事件日期重算其余相关事件。事件变更和派生交易处理在同一事务中完成。 [事件处理与事务](../backend/src/main/java/com/vortex/service/MarketEventProcessingService.java) · [系统交易删除查询](../backend/src/main/java/com/vortex/repository/TradeRecordRepository.java)
+事件 D 只生成自身的交易，不再自动级联重算。处理前要求关联证券不存在 D 当天或之后的有效普通交易，也不存在同日或更晚的已处理关联事件。同日无关事件允许；同日有关事件拒绝，不推断日内先后。公开处理入口持锁后按类型和 ID 重读，已处理则幂等返回，已撤销或不存在则拒绝。 [单事件处理](../backend/src/main/java/com/vortex/service/MarketEventProcessingService.java)
 
-重算先按传入的标的集合与起始日期查询未软删除的事件，按日期升序排列。同日优先级依次为代码变更、拆股、实物分红。服务按事件类型和 ID 物理删除旧的系统交易，重置处理状态，再逐个生成记录并标记已处理。查询以这次传入的标的集合为限，不沿后续代码变更或分红递归扩展。由于生成记录时仍取前一日的持仓，同日排序不会让同日拆股结果计入分红基数。交易记录服务中的普通增、改、软删不会自动启动这条重算流程。 [重算实现](../backend/src/main/java/com/vortex/service/MarketEventProcessingService.java) · [交易写入](../backend/src/main/java/com/vortex/service/TradeRecordService.java)
+| 事件 | 关联证券，覆盖所有券商 |
+| --- | --- |
+| 拆股 | 原证券 |
+| 代码变更 | 旧代码和新代码 |
+| 实物分红 | 原证券和分红证券 |
+
+处理成功后，关联证券在 D 之前的正式交易不可新增、修改或删除；D 当天的普通交易可随后录入。无关证券仍可补录，按实际 symbol 匹配，不将 underlyingSymbol 相同的期权合约视为同一证券。修改交易同时检查旧、新范围，不能通过移动日期、证券或券商绕过；其他字段编辑也无隐式例外。MARKET_EVENT 行只能随所属事件维护，普通 CRUD 不可单独创建、修改、删除或改写来源。前端详情也不提供其编辑／删除按钮。 [统一边界](../backend/src/main/java/com/vortex/service/MarketEventHistoryService.java) · [交易入口](../backend/src/main/java/com/vortex/service/TradeRecordService.java)
+
+历史锁直接从已处理且未撤销的三类事件推导，没有独立锁定日期表。零持仓、零输出的已处理事件同样生效；多个约束叠加。撤销只允许关联范围的尾部事件：没有同日或更晚的已处理关联事件，也没有 D 当天或之后的有效普通交易。撤销在同一事务删除本事件的 MARKET_EVENT 派生行、软删除事件并清除处理状态，其他事件及其约束保留。用户先回退后续相关数据，再撤销、修正历史并按日期重新创建；不会自动级联撤销。
+
+## 并发、同步与旧状态
+
+账本短写事务共用 PostgreSQL 事务级 advisory mutex，等待后再查询边界；这只协调并发写入，历史限制仍按关联证券判断。锁与写入使用同一事务，随提交或回滚释放，实际隔离级别须为 READ COMMITTED。手工 CRUD、三类事件、正式导入、IBKR 关联回填、批次创建和清理均接入；外层不得持锁调用另一个需要该锁的 REQUIRES_NEW Worker。 [写入互斥](../backend/src/main/java/com/vortex/service/LedgerWriteLock.java)
+
+存在 PENDING／PROCESSING／CLEANUP_FAILED 批次时，事件新增处理、修改和撤销均拒绝。IBKR 同内容重复仍跳过，新交易命中历史锁则整批失败并清理；Tiger 使用相同边界，原时间格式缺陷仍单独待办。清理先核对批次归属、状态和本批有效交易的历史限制，再执行任何删除；COMPLETED 不允许清理，旧 FAILED 残留若被事件锁定也拒绝删除。 [同步生命周期](broker-sync/lifecycle.md) · [恢复说明](../docs/broker-sync/recovery.md)
+
+交易／事件 HTTP 写入冲突返回 409，保留 status/message，并提供 code、blockingEventId、blockingEventType、eventDate、symbols；页面显示原因及可用的阻挡事件信息。同步保留既有 UNRECOGNIZED 分类。 [响应契约](../backend/src/main/java/com/vortex/controller/MarketEventConflictAdvice.java) · [操作与错误码](../docs/market-events.md)
+
+不在启动时重算、删除或补造历史结果；processed=true 是保守锁定依据，不证明旧结果正确。未处理事件已有派生行时拒绝修改、处理与撤销；创建请求不能指定 ID、审计字段、已处理／删除状态或显式空状态。存量检查与异常处置见 [操作指南](../docs/market-events.md#存量切换)。实际用户账本未在本次检查或修复。
+
+规则来源：[0035](../design/0035-2026-11-17-ordered-market-events-and-history-locks.md)、[0036](../design/0036-2026-11-17-market-event-write-coordination.md)、[0037](../design/0037-2026-11-17-ordered-event-state-validation.md)、[0038](../design/0038-2026-11-17-sync-cleanup-history-guard.md)。单测及独立临时数据库的真实事务、并发、失败回滚验收见 [验证指南](../e2e/README.md#ordered-market-event-check)。
 
 ## 数据演进与历史决策
 

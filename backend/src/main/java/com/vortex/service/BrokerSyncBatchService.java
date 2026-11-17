@@ -38,9 +38,11 @@ public class BrokerSyncBatchService {
             Set.of("PENDING", "PROCESSING", "CLEANUP_FAILED");
 
     private final BrokerSyncBatchRepository batchRepository;
+    private final LedgerWriteLock writeLock;
 
-    public BrokerSyncBatchService(BrokerSyncBatchRepository batchRepository) {
+    public BrokerSyncBatchService(BrokerSyncBatchRepository batchRepository, LedgerWriteLock writeLock) {
         this.batchRepository = batchRepository;
+        this.writeLock = writeLock;
     }
 
     /**
@@ -97,6 +99,7 @@ public class BrokerSyncBatchService {
      */
     @Transactional
     public BrokerSyncBatch createBatch(String brokerCode, LocalDate syncDateFrom, LocalDate syncDateTo) {
+        writeLock.acquire();
         // Fast-path: surface the conflicting batch's ID/status if any.
         batchRepository.findFirstByStatusInOrderByIdDesc(ACTIVE_STATUSES)
                 .ifPresent(active -> {

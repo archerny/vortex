@@ -27,6 +27,7 @@ import static org.mockito.Mockito.*;
  */
 @ExtendWith(MockitoExtension.class)
 class TradeRecordServiceTest {
+    @org.mockito.Mock private com.vortex.service.MarketEventHistoryService eventHistory;
 
     @Mock
     private TradeRecordRepository tradeRecordRepository;

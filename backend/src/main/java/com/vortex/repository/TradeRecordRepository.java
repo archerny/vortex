@@ -19,6 +19,16 @@ import java.util.Optional;
  */
 public interface TradeRecordRepository extends BaseRepository<TradeRecord, Long> {
 
+    boolean existsBySymbolInAndTradeDateGreaterThanEqualAndTradeTriggerNotAndIsDeletedFalse(
+            java.util.Collection<String> symbols, LocalDate date, TradeTrigger excludedTrigger);
+
+    boolean existsByTradeTriggerAndTriggerRefTypeAndTriggerRefId(TradeTrigger trigger, TriggerRefType type, Long eventId);
+
+    @org.springframework.data.jpa.repository.Modifying
+    @Query("DELETE FROM TradeRecord t WHERE t.tradeTrigger = :trigger AND t.triggerRefType = :type AND t.triggerRefId = :eventId")
+    void deleteEventTrades(@Param("trigger") TradeTrigger trigger, @Param("type") TriggerRefType type,
+                           @Param("eventId") Long eventId);
+
     /**
      * 查询所有未删除的交易记录（按ID倒序）
      */
@@ -146,6 +156,8 @@ public interface TradeRecordRepository extends BaseRepository<TradeRecord, Long>
     @org.springframework.data.jpa.repository.Modifying
     @Query("DELETE FROM TradeRecord t WHERE t.syncBatchId = :syncBatchId")
     int deleteBySyncBatchId(@Param("syncBatchId") Long syncBatchId);
+
+    List<TradeRecord> findBySyncBatchIdAndIsDeletedFalse(Long syncBatchId);
 
     /**
      * 根据证券代码查询最近一条未删除的交易记录

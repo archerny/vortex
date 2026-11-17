@@ -33,4 +33,10 @@
 
 启动恢复扫描 `PENDING` 和 `PROCESSING`，并调用同一失败处理器。`CLEANUP_FAILED` 继续占用活动索引，由人工确认残留后处理。当前流程无 Resume 接口。历史 `PARTIAL` 和 `INTERRUPTED` 仍有前端展示标签，当前应用不生成这两种状态。见 [V28](../../backend/src/main/resources/db/migration/V28__simplify_sync_batch_state_model.sql)、[失败处理器](../../backend/src/main/java/com/vortex/sync/core/SyncBatchFailureHandler.java)和 [启动恢复](../../backend/src/main/java/com/vortex/sync/core/SyncBatchRecoveryRunner.java)。
 
+## 与市场事件的协调
+
+批次创建与事件操作在同一账本短写互斥中检查最新状态；PENDING／PROCESSING／CLEANUP_FAILED 期间拒绝事件处理、修改和撤销。正式导入与 IBKR 关联回填也取得该事务互斥，新历史交易受关联证券锁限制，完全一致的重复仍可跳过。历史冲突沿用整批失败，不自动重算。 [市场事件](../market-events.md#并发同步与旧状态)
+
+清理在任何删除前确认批次存在、券商相符、状态为 PENDING／PROCESSING／FAILED／CLEANUP_FAILED，并检查本批有效正式交易没有命中事件历史锁。COMPLETED 拒绝清理；旧 FAILED 残留若已参与后续事件，也拒绝删除，避免清理绕过历史锁。普通失败流程仍先清理再置 FAILED，清理失败保留 CLEANUP_FAILED。 [0038](../../design/0038-2026-11-17-sync-cleanup-history-guard.md) · [恢复说明](../../docs/broker-sync/recovery.md)
+
 相关测试源码覆盖 [异步执行](../../backend/src/test/java/com/vortex/sync/core/BrokerSyncAsyncExecutorTest.java)、[重试和中断](../../backend/src/test/java/com/vortex/sync/core/SyncBatchFailureHandlerTest.java)、[启动恢复](../../backend/src/test/java/com/vortex/sync/core/SyncBatchRecoveryRunnerTest.java)和 [HTTP 409](../../backend/src/test/java/com/vortex/controller/BrokerSyncControllerTest.java)。历史决策见 [导入一致性 v2](../../design/0018-2026-04-22-broker-import-consistency-v2.md)。

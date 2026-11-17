@@ -19,29 +19,16 @@ import java.util.stream.Collectors;
 
 /**
  * 市场事件处理服务
- * 核心功能：当用户录入/修改/删除市场事件时，自动生成或重算系统交易记录。
+ * 核心功能：顺序处理单个市场事件，生成其系统交易记录。
  *
- * 设计详见 market-event-processing-design.md
+ * 设计详见 design/0035、0036、0037。
  *
- * 核心流程：
- * 1. 确定受影响的 symbols
- * 2. 找出这些 symbols 在事件日期当天及之后的所有市场事件，按时间排序
- * 3. 删除这些事件关联的所有系统交易记录
- * 4. 按排序后的顺序逐个重新处理每个事件（生成系统交易记录）
- * 5. 整个流程包裹在数据库事务中
+ * 历史依赖通过 MarketEventHistoryService 保护，不再执行级联重算。
  */
 @Service
 public class MarketEventProcessingService {
 
     private static final Logger log = LoggerFactory.getLogger(MarketEventProcessingService.class);
-
-    /**
-     * 同一天内的事件处理优先级（数字越小优先级越高）
-     * 代码变更 > 拆股 > 实物分红
-     */
-    private static final int PRIORITY_SYMBOL_CHANGE = 1;
-    private static final int PRIORITY_STOCK_SPLIT = 2;
-    private static final int PRIORITY_DIVIDEND_IN_KIND = 3;
 
     @Autowired
     private PositionService positionService;
@@ -58,171 +45,48 @@ public class MarketEventProcessingService {
     @Autowired
     private DividendInKindEventRepository dividendInKindEventRepository;
 
-    // ============================================================
-    // 公共入口方法：由各事件 Service 的 create/update/delete 调用
-    // ============================================================
+    @Autowired
+    private MarketEventHistoryService history;
 
-    /**
-     * 处理拆股事件（新增或修改后触发）
-     * 包含级联重算机制
-     */
     @Transactional
     public void processStockSplitEvent(StockSplitEvent event) {
-        log.info("Processing stock split event: id={}, symbol={}, eventDate={}", event.getId(), event.getSymbol(), event.getEventDate());
-        Set<String> affectedSymbols = new HashSet<>();
-        affectedSymbols.add(event.getSymbol());
-        cascadeRecalculate(affectedSymbols, event.getEventDate());
+        process(event, TriggerRefType.STOCK_SPLIT);
     }
 
-    /**
-     * 处理代码变更事件（新增或修改后触发）
-     * 包含级联重算机制
-     */
     @Transactional
     public void processSymbolChangeEvent(SymbolChangeEvent event) {
-        log.info("Processing symbol change event: id={}, oldSymbol={}, newSymbol={}, eventDate={}",
-                event.getId(), event.getOldSymbol(), event.getNewSymbol(), event.getEventDate());
-        Set<String> affectedSymbols = new HashSet<>();
-        affectedSymbols.add(event.getOldSymbol());
-        affectedSymbols.add(event.getNewSymbol());
-        cascadeRecalculate(affectedSymbols, event.getEventDate());
+        process(event, TriggerRefType.SYMBOL_CHANGE);
     }
 
-    /**
-     * 处理实物分红事件（新增或修改后触发）
-     * 包含级联重算机制
-     */
     @Transactional
     public void processDividendInKindEvent(DividendInKindEvent event) {
-        log.info("Processing dividend-in-kind event: id={}, symbol={}, dividendSymbol={}, eventDate={}",
-                event.getId(), event.getSymbol(), event.getDividendSymbol(), event.getEventDate());
-        Set<String> affectedSymbols = new HashSet<>();
-        affectedSymbols.add(event.getSymbol());
-        affectedSymbols.add(event.getDividendSymbol());
-        cascadeRecalculate(affectedSymbols, event.getEventDate());
+        process(event, TriggerRefType.DIVIDEND_IN_KIND);
     }
 
-    /**
-     * 处理市场事件删除后的级联重算
-     * 删除事件后，仍需对受影响 symbols 的后续事件进行重算
-     *
-     * @param affectedSymbols 受影响的 symbol 集合
-     * @param eventDate       被删除事件的日期
-     */
-    @Transactional
-    public void processEventDeletion(Set<String> affectedSymbols, LocalDate eventDate) {
-        log.info("Processing cascade recalculation after event deletion: symbols={}, eventDate={}", affectedSymbols, eventDate);
-        cascadeRecalculate(affectedSymbols, eventDate);
-    }
-
-    // ============================================================
-    // 核心：级联重算机制
-    // ============================================================
-
-    /**
-     * 级联重算：找出受影响的所有后续事件，删除旧交易记录，按时间顺序重新生成
-     *
-     * @param affectedSymbols 受影响的 symbol 集合
-     * @param sinceDate       从该日期（含）开始的事件需要重算
-     */
-    private void cascadeRecalculate(Set<String> affectedSymbols, LocalDate sinceDate) {
-        // 1. 收集所有受影响的事件（按时间+优先级排序）
-        List<EventWrapper> allEvents = collectAffectedEvents(affectedSymbols, sinceDate);
-        log.info("Cascade recalculation: found {} affected events", allEvents.size());
-
-        if (allEvents.isEmpty()) {
-            return;
-        }
-
-        // 2. 按事件类型分组，收集需要清理的 triggerRefIds
-        Map<TriggerRefType, List<Long>> idsToDelete = new HashMap<>();
-        for (EventWrapper wrapper : allEvents) {
-            idsToDelete.computeIfAbsent(wrapper.triggerRefType, k -> new ArrayList<>())
-                    .add(wrapper.eventId);
-        }
-
-        // 3. 批量删除旧的系统交易记录
-        for (Map.Entry<TriggerRefType, List<Long>> entry : idsToDelete.entrySet()) {
-            tradeRecordRepository.deleteByTriggerRefTypeAndTriggerRefIdIn(entry.getKey(), entry.getValue());
-            log.info("Deleted system trade records for triggerRefType={}, eventIds={}", entry.getKey(), entry.getValue());
-        }
-
-        // 4. 将所有事件的 processed 状态重置为 false
-        resetProcessedStatus(allEvents);
-
-        // 5. 按排序顺序逐个处理每个事件
-        for (EventWrapper wrapper : allEvents) {
-            List<TradeRecord> generatedRecords = processOneEvent(wrapper);
-            if (!generatedRecords.isEmpty()) {
-                tradeRecordRepository.saveAll(generatedRecords);
-                log.info("Event {} (id={}) generated {} system trade records",
-                        wrapper.triggerRefType, wrapper.eventId, generatedRecords.size());
-            } else {
-                log.info("Event {} (id={}) processed, no position impact, no trade records generated",
-                        wrapper.triggerRefType, wrapper.eventId);
-            }
-            // 标记为已处理
-            markAsProcessed(wrapper);
-        }
-    }
-
-    // ============================================================
-    // 收集受影响的事件并排序
-    // ============================================================
-
-    /**
-     * 收集所有受影响的市场事件，按 eventDate 升序 + 同一天内固定优先级排序
-     * 同一天内顺序：代码变更 > 拆股 > 实物分红
-     */
-    private List<EventWrapper> collectAffectedEvents(Set<String> symbols, LocalDate sinceDate) {
-        List<EventWrapper> allEvents = new ArrayList<>();
-
-        // 查询拆股事件
-        List<StockSplitEvent> splitEvents = stockSplitEventRepository
-                .findBySymbolInAndEventDateGreaterThanEqualAndIsDeletedFalseOrderByEventDateAsc(symbols, sinceDate);
-        for (StockSplitEvent e : splitEvents) {
-            allEvents.add(new EventWrapper(e.getEventDate(), PRIORITY_STOCK_SPLIT,
-                    TriggerRefType.STOCK_SPLIT, e.getId(), e));
-        }
-
-        // 查询代码变更事件
-        List<SymbolChangeEvent> changeEvents = symbolChangeEventRepository.findAffectedEvents(symbols, sinceDate);
-        for (SymbolChangeEvent e : changeEvents) {
-            allEvents.add(new EventWrapper(e.getEventDate(), PRIORITY_SYMBOL_CHANGE,
-                    TriggerRefType.SYMBOL_CHANGE, e.getId(), e));
-        }
-
-        // 查询实物分红事件
-        List<DividendInKindEvent> dividendEvents = dividendInKindEventRepository.findAffectedEvents(symbols, sinceDate);
-        for (DividendInKindEvent e : dividendEvents) {
-            allEvents.add(new EventWrapper(e.getEventDate(), PRIORITY_DIVIDEND_IN_KIND,
-                    TriggerRefType.DIVIDEND_IN_KIND, e.getId(), e));
-        }
-
-        // 排序：先按日期升序，同一天按优先级升序
-        allEvents.sort(Comparator.comparing(EventWrapper::getEventDate)
-                .thenComparingInt(EventWrapper::getPriority));
-
-        return allEvents;
-    }
-
-    // ============================================================
-    // 单个事件处理：根据事件类型分发
-    // ============================================================
-
-    /**
-     * 处理单个市场事件，返回生成的系统交易记录列表
-     */
-    private List<TradeRecord> processOneEvent(EventWrapper wrapper) {
-        return switch (wrapper.triggerRefType) {
-            case STOCK_SPLIT -> processStockSplit((StockSplitEvent) wrapper.event);
-            case SYMBOL_CHANGE -> processSymbolChange((SymbolChangeEvent) wrapper.event);
-            case DIVIDEND_IN_KIND -> processDividendInKind((DividendInKindEvent) wrapper.event);
-            default -> {
-                log.warn("Unknown event type: {}", wrapper.triggerRefType);
-                yield Collections.emptyList();
-            }
+    private void process(BaseMarketEvent event, TriggerRefType type) {
+        history.lock();
+        if (event.getId() == null) throw new IllegalArgumentException("Save market event before processing");
+        event = switch (type) {
+            case STOCK_SPLIT -> stockSplitEventRepository.findById(event.getId()).orElse(null);
+            case SYMBOL_CHANGE -> symbolChangeEventRepository.findById(event.getId()).orElse(null);
+            case DIVIDEND_IN_KIND -> dividendInKindEventRepository.findById(event.getId()).orElse(null);
+            default -> throw new IllegalArgumentException("Unsupported market event type");
         };
+        if (event == null || !Boolean.FALSE.equals(event.getIsDeleted()) || event.getProcessed() == null) {
+            throw new IllegalArgumentException("Market event is missing, revoked or has invalid processing state");
+        }
+        if (Boolean.TRUE.equals(event.getProcessed())) return;
+        history.assertCanProcess(event, type);
+        List<TradeRecord> records = switch (type) {
+            case STOCK_SPLIT -> processStockSplit((StockSplitEvent) event);
+            case SYMBOL_CHANGE -> processSymbolChange((SymbolChangeEvent) event);
+            case DIVIDEND_IN_KIND -> processDividendInKind((DividendInKindEvent) event);
+            default -> throw new IllegalArgumentException("Unsupported market event type");
+        };
+        if (!records.isEmpty()) tradeRecordRepository.saveAll(records);
+        event.setProcessed(true);
+        event.setProcessedAt(LocalDateTime.now());
+        saveEvent(event, type);
     }
 
     // ============================================================
@@ -490,95 +354,12 @@ public class MarketEventProcessingService {
         return costPool.divide(BigDecimal.valueOf(holdingQty), 4, RoundingMode.HALF_UP);
     }
 
-    /**
-     * 重置事件列表中所有事件的 processed 状态为 false
-     */
-    private void resetProcessedStatus(List<EventWrapper> events) {
-        for (EventWrapper wrapper : events) {
-            wrapper.event.setProcessed(false);
-            wrapper.event.setProcessedAt(null);
-        }
-        // 批量保存（按类型分组保存）
-        saveEventsByType(events);
-    }
-
-    /**
-     * 标记单个事件为已处理
-     */
-    private void markAsProcessed(EventWrapper wrapper) {
-        wrapper.event.setProcessed(true);
-        wrapper.event.setProcessedAt(LocalDateTime.now());
-        saveOneEvent(wrapper);
-    }
-
-    /**
-     * 按类型分组批量保存事件列表
-     */
-    private void saveEventsByType(List<EventWrapper> events) {
-        List<StockSplitEvent> splitEvents = new ArrayList<>();
-        List<SymbolChangeEvent> changeEvents = new ArrayList<>();
-        List<DividendInKindEvent> dividendEvents = new ArrayList<>();
-
-        for (EventWrapper wrapper : events) {
-            switch (wrapper.triggerRefType) {
-                case STOCK_SPLIT -> splitEvents.add((StockSplitEvent) wrapper.event);
-                case SYMBOL_CHANGE -> changeEvents.add((SymbolChangeEvent) wrapper.event);
-                case DIVIDEND_IN_KIND -> dividendEvents.add((DividendInKindEvent) wrapper.event);
-                default -> { }
-            }
-        }
-
-        if (!splitEvents.isEmpty()) {
-            stockSplitEventRepository.saveAll(splitEvents);
-        }
-        if (!changeEvents.isEmpty()) {
-            symbolChangeEventRepository.saveAll(changeEvents);
-        }
-        if (!dividendEvents.isEmpty()) {
-            dividendInKindEventRepository.saveAll(dividendEvents);
-        }
-    }
-
-    /**
-     * 保存单个事件
-     */
-    private void saveOneEvent(EventWrapper wrapper) {
-        switch (wrapper.triggerRefType) {
-            case STOCK_SPLIT -> stockSplitEventRepository.save((StockSplitEvent) wrapper.event);
-            case SYMBOL_CHANGE -> symbolChangeEventRepository.save((SymbolChangeEvent) wrapper.event);
-            case DIVIDEND_IN_KIND -> dividendInKindEventRepository.save((DividendInKindEvent) wrapper.event);
-            default -> { }
-        }
-    }
-
-    // ============================================================
-    // 内部类：事件包装器，用于统一排序
-    // ============================================================
-
-    /**
-     * 事件包装器，将不同类型的市场事件统一封装，便于排序和处理
-     */
-    private static class EventWrapper {
-        private final LocalDate eventDate;
-        private final int priority;
-        private final TriggerRefType triggerRefType;
-        private final Long eventId;
-        private final BaseMarketEvent event;
-
-        EventWrapper(LocalDate eventDate, int priority, TriggerRefType triggerRefType, Long eventId, BaseMarketEvent event) {
-            this.eventDate = eventDate;
-            this.priority = priority;
-            this.triggerRefType = triggerRefType;
-            this.eventId = eventId;
-            this.event = event;
-        }
-
-        LocalDate getEventDate() {
-            return eventDate;
-        }
-
-        int getPriority() {
-            return priority;
+    private void saveEvent(BaseMarketEvent event, TriggerRefType type) {
+        switch (type) {
+            case STOCK_SPLIT -> stockSplitEventRepository.save((StockSplitEvent) event);
+            case SYMBOL_CHANGE -> symbolChangeEventRepository.save((SymbolChangeEvent) event);
+            case DIVIDEND_IN_KIND -> dividendInKindEventRepository.save((DividendInKindEvent) event);
+            default -> throw new IllegalArgumentException("Unsupported market event type");
         }
     }
 }

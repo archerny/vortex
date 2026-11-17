@@ -32,6 +32,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class TradeFeePrecisionTest {
+    @org.mockito.Mock private com.vortex.service.MarketEventHistoryService eventHistory;
     @Mock private IbkrStagedOrderRepository orders;
     @Mock private IbkrStagedTradeConfirmRepository confirms;
     @Mock private TradeRecordRepository trades;
@@ -68,7 +69,7 @@ class TradeFeePrecisionTest {
             return record;
         });
 
-        new IbkrImportWorker(orders, confirms, trades).importSingleOrder(1L, 1L, order);
+        new IbkrImportWorker(orders, confirms, trades, eventHistory).importSingleOrder(1L, 1L, order);
 
         var captor = org.mockito.ArgumentCaptor.forClass(TradeRecord.class);
         verify(trades).save(captor.capture());

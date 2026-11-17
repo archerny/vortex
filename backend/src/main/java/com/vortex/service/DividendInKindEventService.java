@@ -11,9 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -35,6 +32,9 @@ public class DividendInKindEventService {
 
     @Autowired
     private MarketEventProcessingService marketEventProcessingService;
+
+    @Autowired
+    private MarketEventHistoryService history;
 
     /**
      * 查询所有未删除的实物分红事件
@@ -83,6 +83,8 @@ public class DividendInKindEventService {
      */
     @Transactional
     public DividendInKindEvent create(DividendInKindEvent event) {
+        history.lock();
+        history.assertNewEvent(event, TriggerRefType.DIVIDEND_IN_KIND);
         validateDividendCurrency(event);
         autoFillFromExistingTradeRecord(event);
         DividendInKindEvent saved = dividendInKindEventRepository.save(event);
@@ -93,65 +95,47 @@ public class DividendInKindEventService {
     }
 
     /**
-     * 更新实物分红事件，并重新生成系统交易记录
+     * 更新实物分红事件（仅未处理事件），随后生成本事件的系统交易
      */
     @Transactional
-    public DividendInKindEvent update(Long id, DividendInKindEvent eventData) {
+    public DividendInKindEvent update(Long id, DividendInKindEvent data) {
+        history.lock();
         DividendInKindEvent existing = dividendInKindEventRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Dividend-in-kind event not found, ID: " + id));
-
-        // 记录旧值，用于确定受影响范围
-        String oldSymbol = existing.getSymbol();
-        String oldDividendSymbol = existing.getDividendSymbol();
-        java.time.LocalDate oldDate = existing.getEventDate();
-
-        existing.setSymbol(eventData.getSymbol());
-        existing.setCurrency(eventData.getCurrency());
-        existing.setEventDate(eventData.getEventDate());
-        existing.setDividendSymbol(eventData.getDividendSymbol());
-        validateDividendCurrency(eventData);
-        existing.setDividendCurrency(eventData.getDividendCurrency());
-        existing.setRatioFrom(eventData.getRatioFrom());
-        existing.setRatioTo(eventData.getRatioTo());
-        existing.setFairValuePerShare(eventData.getFairValuePerShare());
-        existing.setDescription(eventData.getDescription());
-
+                .filter(event -> !Boolean.TRUE.equals(event.getIsDeleted()))
+                .orElseThrow(() -> new IllegalArgumentException("Market event not found, ID: " + id));
+        history.assertEditable(existing, TriggerRefType.DIVIDEND_IN_KIND);
+        validateDividendCurrency(data);
+        existing.setSymbol(data.getSymbol());
+        existing.setCurrency(data.getCurrency());
+        existing.setEventDate(data.getEventDate());
+        existing.setDividendSymbol(data.getDividendSymbol());
+        existing.setDividendCurrency(data.getDividendCurrency());
+        existing.setRatioFrom(data.getRatioFrom());
+        existing.setRatioTo(data.getRatioTo());
+        existing.setFairValuePerShare(data.getFairValuePerShare());
+        existing.setDescription(data.getDescription());
         autoFillFromExistingTradeRecord(existing);
         DividendInKindEvent saved = dividendInKindEventRepository.save(existing);
-
-        // 级联重算：受影响 symbols 包含新旧所有 symbols
-        Set<String> affectedSymbols = new HashSet<>();
-        affectedSymbols.add(oldSymbol);
-        affectedSymbols.add(oldDividendSymbol);
-        affectedSymbols.add(saved.getSymbol());
-        affectedSymbols.add(saved.getDividendSymbol());
-        java.time.LocalDate sinceDate = oldDate.isBefore(saved.getEventDate()) ? oldDate : saved.getEventDate();
-        marketEventProcessingService.processEventDeletion(affectedSymbols, sinceDate);
-
+        marketEventProcessingService.processDividendInKindEvent(saved);
         return saved;
     }
 
     /**
-     * 软删除实物分红事件，并级联重算后续事件
+     * 软删除实物分红事件，只清理本事件的派生交易
      */
     @Transactional
     public void delete(Long id) {
+        history.lock();
         DividendInKindEvent existing = dividendInKindEventRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Dividend-in-kind event not found, ID: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Market event not found, ID: " + id));
+        if (Boolean.TRUE.equals(existing.getIsDeleted())) return;
+        history.assertCanUndo(existing, TriggerRefType.DIVIDEND_IN_KIND);
+        tradeRecordRepository.deleteEventTrades(com.vortex.entity.enums.TradeTrigger.MARKET_EVENT,
+                TriggerRefType.DIVIDEND_IN_KIND, existing.getId());
         existing.setIsDeleted(true);
         existing.setProcessed(false);
         existing.setProcessedAt(null);
         dividendInKindEventRepository.save(existing);
-
-        // 先清理被删除事件自身关联的系统交易记录
-        tradeRecordRepository.deleteByTriggerRefTypeAndTriggerRefIdIn(
-                TriggerRefType.DIVIDEND_IN_KIND, List.of(existing.getId()));
-
-        // 删除后级联重算
-        Set<String> affectedSymbols = new HashSet<>();
-        affectedSymbols.add(existing.getSymbol());
-        affectedSymbols.add(existing.getDividendSymbol());
-        marketEventProcessingService.processEventDeletion(affectedSymbols, existing.getEventDate());
     }
 
     /**

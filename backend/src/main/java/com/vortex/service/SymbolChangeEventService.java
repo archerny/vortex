@@ -11,9 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -35,6 +32,9 @@ public class SymbolChangeEventService {
 
     @Autowired
     private MarketEventProcessingService marketEventProcessingService;
+
+    @Autowired
+    private MarketEventHistoryService history;
 
     /**
      * 查询所有未删除的代码变更事件
@@ -93,6 +93,8 @@ public class SymbolChangeEventService {
      */
     @Transactional
     public SymbolChangeEvent create(SymbolChangeEvent event) {
+        history.lock();
+        history.assertNewEvent(event, TriggerRefType.SYMBOL_CHANGE);
         // 自动填充：symbol = oldSymbol（事件是对旧代码发生的）
         event.setSymbol(event.getOldSymbol());
 
@@ -107,62 +109,42 @@ public class SymbolChangeEventService {
     }
 
     /**
-     * 更新代码变更事件，并重新生成系统交易记录
+     * 更新代码变更事件（仅未处理事件），随后生成本事件的系统交易
      */
     @Transactional
-    public SymbolChangeEvent update(Long id, SymbolChangeEvent eventData) {
+    public SymbolChangeEvent update(Long id, SymbolChangeEvent data) {
+        history.lock();
         SymbolChangeEvent existing = symbolChangeEventRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Symbol change event not found, ID: " + id));
-
-        // 记录旧值，用于确定受影响范围
-        String oldOldSymbol = existing.getOldSymbol();
-        String oldNewSymbol = existing.getNewSymbol();
-        java.time.LocalDate oldDate = existing.getEventDate();
-
-        existing.setSymbol(eventData.getOldSymbol()); // symbol = oldSymbol
-        existing.setEventDate(eventData.getEventDate());
-        existing.setOldSymbol(eventData.getOldSymbol());
-        existing.setNewSymbol(eventData.getNewSymbol());
-        existing.setDescription(eventData.getDescription());
-
-        // 重新自动填充 currency（旧代码可能已变更）
+                .filter(event -> !Boolean.TRUE.equals(event.getIsDeleted()))
+                .orElseThrow(() -> new IllegalArgumentException("Market event not found, ID: " + id));
+        history.assertEditable(existing, TriggerRefType.SYMBOL_CHANGE);
+        existing.setSymbol(data.getOldSymbol());
+        existing.setEventDate(data.getEventDate());
+        existing.setOldSymbol(data.getOldSymbol());
+        existing.setNewSymbol(data.getNewSymbol());
+        existing.setDescription(data.getDescription());
         autoFillFromExistingTradeRecord(existing);
-
         SymbolChangeEvent saved = symbolChangeEventRepository.save(existing);
-
-        // 级联重算：受影响 symbols 包含新旧所有 symbols
-        Set<String> affectedSymbols = new HashSet<>();
-        affectedSymbols.add(oldOldSymbol);
-        affectedSymbols.add(oldNewSymbol);
-        affectedSymbols.add(saved.getOldSymbol());
-        affectedSymbols.add(saved.getNewSymbol());
-        java.time.LocalDate sinceDate = oldDate.isBefore(saved.getEventDate()) ? oldDate : saved.getEventDate();
-        marketEventProcessingService.processEventDeletion(affectedSymbols, sinceDate);
-
+        marketEventProcessingService.processSymbolChangeEvent(saved);
         return saved;
     }
 
     /**
-     * 软删除代码变更事件，并级联重算后续事件
+     * 软删除代码变更事件，只清理本事件的派生交易
      */
     @Transactional
     public void delete(Long id) {
+        history.lock();
         SymbolChangeEvent existing = symbolChangeEventRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Symbol change event not found, ID: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Market event not found, ID: " + id));
+        if (Boolean.TRUE.equals(existing.getIsDeleted())) return;
+        history.assertCanUndo(existing, TriggerRefType.SYMBOL_CHANGE);
+        tradeRecordRepository.deleteEventTrades(com.vortex.entity.enums.TradeTrigger.MARKET_EVENT,
+                TriggerRefType.SYMBOL_CHANGE, existing.getId());
         existing.setIsDeleted(true);
         existing.setProcessed(false);
         existing.setProcessedAt(null);
         symbolChangeEventRepository.save(existing);
-
-        // 先清理被删除事件自身关联的系统交易记录
-        tradeRecordRepository.deleteByTriggerRefTypeAndTriggerRefIdIn(
-                TriggerRefType.SYMBOL_CHANGE, List.of(existing.getId()));
-
-        // 删除后级联重算
-        Set<String> affectedSymbols = new HashSet<>();
-        affectedSymbols.add(existing.getOldSymbol());
-        affectedSymbols.add(existing.getNewSymbol());
-        marketEventProcessingService.processEventDeletion(affectedSymbols, existing.getEventDate());
     }
 
     /**

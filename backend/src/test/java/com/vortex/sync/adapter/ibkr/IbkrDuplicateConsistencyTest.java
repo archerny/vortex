@@ -42,6 +42,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class IbkrDuplicateConsistencyTest {
+    @org.mockito.Mock private com.vortex.service.MarketEventHistoryService eventHistory;
     @Mock private IbkrStagedOrderRepository orders;
     @Mock private IbkrStagedTradeConfirmRepository confirms;
     @Mock private TradeRecordRepository trades;
@@ -296,7 +297,7 @@ class IbkrDuplicateConsistencyTest {
     @MethodSource("tradeChanges")
     void shouldRejectDifferentExistingFormalTrade(String field, Consumer<TradeRecord> mutation) {
         IbkrStagedOrder staged = storedOrder(order());
-        IbkrImportWorker worker = new IbkrImportWorker(orders, confirms, trades);
+        IbkrImportWorker worker = new IbkrImportWorker(orders, confirms, trades, eventHistory);
         TradeRecord existing = worker.mapToTradeRecord(1L, 1L, staged);
         existing.setId(55L);
         mutation.accept(existing);
@@ -325,7 +326,7 @@ class IbkrDuplicateConsistencyTest {
         IbkrStagedTradeConfirm event = new IbkrStagedTradeConfirm();
         event.setCode("Ex;P");
         when(confirms.findByOrderId(staged.getOrderId())).thenReturn(List.of(event));
-        IbkrImportWorker worker = new IbkrImportWorker(orders, confirms, trades);
+        IbkrImportWorker worker = new IbkrImportWorker(orders, confirms, trades, eventHistory);
         TradeRecord existing = worker.mapToTradeRecord(1L, 1L, staged);
         existing.setId(55L);
         existing.setTriggerRefId(999L);
@@ -350,7 +351,7 @@ class IbkrDuplicateConsistencyTest {
         IbkrStagedOrder staged = storedOrder(order());
         when(trades.existsByExternalBrokerAndExternalId("ibkr", staged.getOrderId())).thenReturn(true);
         var error = assertThrows(ImportOneFailedException.class,
-                () -> new IbkrImportWorker(orders, confirms, trades).importSingleOrder(2L, 1L, staged));
+                () -> new IbkrImportWorker(orders, confirms, trades, eventHistory).importSingleOrder(2L, 1L, staged));
         assertEquals(FailureCategory.INTERNAL,
                 assertInstanceOf(CategorizedSyncException.class, error.getCause()).getCategory());
         verify(trades, never()).save(any());
@@ -362,7 +363,7 @@ class IbkrDuplicateConsistencyTest {
         staged.setId(11L);
         staged.setOrderId("\u2003SYNTH-ORDER\u2003");
         var error = assertThrows(ImportOneFailedException.class,
-                () -> new IbkrImportWorker(orders, confirms, trades).importSingleOrder(2L, 1L, staged));
+                () -> new IbkrImportWorker(orders, confirms, trades, eventHistory).importSingleOrder(2L, 1L, staged));
         assertTrue(error.getCause().getMessage().contains("surrounding whitespace"));
         verifyNoInteractions(trades, orders);
     }

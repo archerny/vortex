@@ -39,6 +39,7 @@ import static org.mockito.Mockito.when;
  */
 @ExtendWith(MockitoExtension.class)
 class TigerImportWorkerTest {
+    @org.mockito.Mock private com.vortex.service.MarketEventHistoryService eventHistory;
 
     @Mock
     private TigerStagedOrderRepository stagedOrderRepository;
@@ -50,7 +51,7 @@ class TigerImportWorkerTest {
 
     @BeforeEach
     void setUp() {
-        worker = new TigerImportWorker(stagedOrderRepository, tradeRecordRepository);
+        worker = new TigerImportWorker(stagedOrderRepository, tradeRecordRepository, eventHistory);
     }
 
     // ============ Helpers ============
@@ -133,6 +134,7 @@ class TigerImportWorkerTest {
             assertNotNull(staged.getErrorMessage());
             verify(stagedOrderRepository).save(staged);
             verify(tradeRecordRepository, never()).save(any(TradeRecord.class));
+            verify(eventHistory, never()).assertHistoryWritable(any());
         }
 
         @Test
@@ -195,6 +197,19 @@ class TigerImportWorkerTest {
     @Nested
     @DisplayName("importOne() — unexpected exception path")
     class ExceptionPath {
+
+        @Test void historyRejectionPreservesCauseAndWritesNeitherFormalNorStagedRow() {
+            TigerStagedOrder staged = validStockOrder();
+            var conflict = new com.vortex.service.MarketEventConflictException("HISTORY_LOCKED", "synthetic history locked",
+                    1L, com.vortex.entity.enums.TriggerRefType.STOCK_SPLIT, java.time.LocalDate.of(2026, 3, 10), java.util.Set.of("AAPL"));
+            org.mockito.Mockito.doThrow(conflict).when(eventHistory).assertHistoryWritable(any(TradeRecord.class));
+            ImportOneFailedException error = assertThrows(ImportOneFailedException.class, () -> worker.importOne(1L, 42L, staged));
+            assertSame(conflict, error.getCause());
+            assertEquals(com.vortex.sync.core.FailureCategory.UNRECOGNIZED, conflict.getCategory());
+            verify(tradeRecordRepository, never()).save(any());
+            verify(stagedOrderRepository, never()).save(any());
+            assertEquals("PENDING", staged.getStatus());
+        }
 
         @Test
         @DisplayName("should throw ImportOneFailedException when save() throws")

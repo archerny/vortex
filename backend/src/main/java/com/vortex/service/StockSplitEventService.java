@@ -11,9 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -35,6 +32,9 @@ public class StockSplitEventService {
 
     @Autowired
     private MarketEventProcessingService marketEventProcessingService;
+
+    @Autowired
+    private MarketEventHistoryService history;
 
     /**
      * 查询所有未删除的拆股事件
@@ -78,6 +78,8 @@ public class StockSplitEventService {
      */
     @Transactional
     public StockSplitEvent create(StockSplitEvent event) {
+        history.lock();
+        history.assertNewEvent(event, TriggerRefType.STOCK_SPLIT);
         // 从 symbol 的已有交易记录中自动填充 currency
         autoFillFromExistingTradeRecord(event);
 
@@ -88,59 +90,42 @@ public class StockSplitEventService {
     }
 
     /**
-     * 更新拆股事件，并重新生成系统交易记录
-     * 需要考虑修改前后 symbol/eventDate 变化导致的受影响范围
+     * 更新拆股事件（仅未处理事件），随后生成本事件的系统交易
      */
     @Transactional
-    public StockSplitEvent update(Long id, StockSplitEvent eventData) {
+    public StockSplitEvent update(Long id, StockSplitEvent data) {
+        history.lock();
         StockSplitEvent existing = stockSplitEventRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Stock split event not found, ID: " + id));
-
-        // 记录旧值，用于确定受影响范围
-        String oldSymbol = existing.getSymbol();
-        java.time.LocalDate oldDate = existing.getEventDate();
-
-        existing.setSymbol(eventData.getSymbol());
-        existing.setEventDate(eventData.getEventDate());
-        existing.setRatioFrom(eventData.getRatioFrom());
-        existing.setRatioTo(eventData.getRatioTo());
-        existing.setDescription(eventData.getDescription());
-
-        // 重新自动填充 currency（symbol 可能已变更）
+                .filter(event -> !Boolean.TRUE.equals(event.getIsDeleted()))
+                .orElseThrow(() -> new IllegalArgumentException("Market event not found, ID: " + id));
+        history.assertEditable(existing, TriggerRefType.STOCK_SPLIT);
+        existing.setSymbol(data.getSymbol());
+        existing.setEventDate(data.getEventDate());
+        existing.setRatioFrom(data.getRatioFrom());
+        existing.setRatioTo(data.getRatioTo());
+        existing.setDescription(data.getDescription());
         autoFillFromExistingTradeRecord(existing);
-
         StockSplitEvent saved = stockSplitEventRepository.save(existing);
-
-        // 级联重算：受影响 symbols 包含新旧 symbol，起始日期取新旧中较早的
-        Set<String> affectedSymbols = new HashSet<>();
-        affectedSymbols.add(oldSymbol);
-        affectedSymbols.add(saved.getSymbol());
-        java.time.LocalDate sinceDate = oldDate.isBefore(saved.getEventDate()) ? oldDate : saved.getEventDate();
-        marketEventProcessingService.processEventDeletion(affectedSymbols, sinceDate);
-
+        marketEventProcessingService.processStockSplitEvent(saved);
         return saved;
     }
 
     /**
-     * 软删除拆股事件，并级联重算后续事件
+     * 软删除拆股事件，只清理本事件的派生交易
      */
     @Transactional
     public void delete(Long id) {
+        history.lock();
         StockSplitEvent existing = stockSplitEventRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Stock split event not found, ID: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Market event not found, ID: " + id));
+        if (Boolean.TRUE.equals(existing.getIsDeleted())) return;
+        history.assertCanUndo(existing, TriggerRefType.STOCK_SPLIT);
+        tradeRecordRepository.deleteEventTrades(com.vortex.entity.enums.TradeTrigger.MARKET_EVENT,
+                TriggerRefType.STOCK_SPLIT, existing.getId());
         existing.setIsDeleted(true);
         existing.setProcessed(false);
         existing.setProcessedAt(null);
         stockSplitEventRepository.save(existing);
-
-        // 先清理被删除事件自身关联的系统交易记录
-        tradeRecordRepository.deleteByTriggerRefTypeAndTriggerRefIdIn(
-                TriggerRefType.STOCK_SPLIT, List.of(existing.getId()));
-
-        // 删除后级联重算
-        Set<String> affectedSymbols = new HashSet<>();
-        affectedSymbols.add(existing.getSymbol());
-        marketEventProcessingService.processEventDeletion(affectedSymbols, existing.getEventDate());
     }
 
     /**

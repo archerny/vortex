@@ -16,6 +16,7 @@ import {
 } from '../../constants/tradeConstants';
 import getTradeColumns from './TradeColumns';
 import { feeForInput, feeText } from '../../utils/tradeFee';
+import { marketEventErrorMessage } from '../../utils/marketEventError';
 
 /* 统一 Descriptions 表格列宽的样式 */
 const descriptionsTableStyle = `
@@ -269,7 +270,7 @@ const TradeRecordDetail = ({ recordId, onBack }) => {
         console.error('Form validation failed:', error);
       } else {
         console.error('Failed to update trade record:', error);
-        const errorMsg = error.response?.data?.message || '更新失败，请稍后重试';
+        const errorMsg = marketEventErrorMessage(error, '更新失败，请稍后重试');
         message.error(errorMsg);
       }
     } finally {
@@ -289,7 +290,7 @@ const TradeRecordDetail = ({ recordId, onBack }) => {
       }
     } catch (error) {
       console.error('Failed to delete trade record:', error);
-      const errorMsg = error.response?.data?.message || '删除失败，请稍后重试';
+      const errorMsg = marketEventErrorMessage(error, '删除失败，请稍后重试');
       message.error(errorMsg);
     }
   };
@@ -303,7 +304,7 @@ const TradeRecordDetail = ({ recordId, onBack }) => {
       <Tag color={tradeTypeColorMap[record.tradeType] || 'default'}>
         {tradeTypeMap[record.tradeType] || record.tradeType}
       </Tag>
-      {tradeEditable && (
+      {tradeEditable && record.tradeTrigger !== 'MARKET_EVENT' && (
         <>
           <Button
             type="primary"
@@ -597,7 +598,7 @@ const TradeRecordDetail = ({ recordId, onBack }) => {
             <Col span={8}>
               <Form.Item label="触发来源" name="tradeTrigger">
                 <Select>
-                  {Object.entries(tradeTriggerMap).map(([value, label]) => (
+                  {Object.entries(tradeTriggerMap).filter(([value]) => value !== 'MARKET_EVENT').map(([value, label]) => (
                     <Select.Option key={value} value={value}>{label}</Select.Option>
                   ))}
                 </Select>

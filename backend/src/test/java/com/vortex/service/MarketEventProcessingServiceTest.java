@@ -36,6 +36,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class MarketEventProcessingServiceTest {
+    @org.mockito.Mock private com.vortex.service.MarketEventHistoryService eventHistory;
 
     private static final LocalDate EVENT_DATE = LocalDate.of(2026, 4, 1);
     private static final LocalDate AS_OF = EVENT_DATE.minusDays(1);
@@ -94,7 +95,7 @@ class MarketEventProcessingServiceTest {
         event.setNewSymbol(NEW);
         event.setEventDate(EVENT_DATE);
         event.setCurrency(Currency.USD);
-        when(changes.findAffectedEvents(anyCollection(), eq(EVENT_DATE))).thenReturn(List.of(event));
+        when(changes.findById(42L)).thenReturn(java.util.Optional.of(event));
         when(trades.findByTradeDateLessThanEqualAndIsDeletedFalseOrderByTradeDateAsc(AS_OF))
                 .thenReturn(history);
         if (hasPosition) {

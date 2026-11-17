@@ -41,6 +41,9 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class IbkrQuantityValidationTest {
+    @org.mockito.Mock private com.vortex.service.LedgerWriteLock eventWriteLock;
+    @Mock private com.vortex.repository.BrokerSyncBatchRepository cleanupBatches;
+    @org.mockito.Mock private com.vortex.service.MarketEventHistoryService eventHistory;
 
     @Mock private IbkrStagedOrderRepository orders;
     @Mock private IbkrStagedTradeConfirmRepository confirms;
@@ -49,7 +52,12 @@ class IbkrQuantityValidationTest {
 
     @BeforeEach
     void setUp() {
-        worker = new IbkrImportWorker(orders, confirms, trades);
+        worker = new IbkrImportWorker(orders, confirms, trades, eventHistory);
+        lenient().when(cleanupBatches.findById(anyLong())).thenAnswer(invocation -> {
+            var batch = new com.vortex.entity.BrokerSyncBatch();
+            batch.setId(invocation.getArgument(0)); batch.setBrokerCode("ibkr"); batch.setStatus("PROCESSING");
+            return Optional.of(batch);
+        });
     }
 
     private IbkrStagedOrder order(String quantity) {
@@ -261,7 +269,7 @@ class IbkrQuantityValidationTest {
         IbkrSyncAdapter adapter = new IbkrSyncAdapter(properties, client, new FlexQueryParser(),
                 new IbkrStagingService(new IbkrStagingWorker(orders, confirms)), importer, batches, orders);
         SyncBatchCleanupService cleanup = new SyncBatchCleanupService(
-                List.of(new IbkrCleanupStrategy(orders, confirms)), List.of(adapter), trades);
+                List.of(new IbkrCleanupStrategy(orders, confirms)), List.of(adapter), trades, eventWriteLock, cleanupBatches, eventHistory);
         BrokerSyncAsyncExecutor executor = new BrokerSyncAsyncExecutor(
                 new BrokerSyncService(List.of(adapter), brokers), batches, new SyncBatchFailureHandler(cleanup, batches));
 

@@ -43,6 +43,7 @@ import static org.mockito.Mockito.*;
  */
 @ExtendWith(MockitoExtension.class)
 class IbkrImportWorkerTest {
+    @org.mockito.Mock private com.vortex.service.MarketEventHistoryService eventHistory;
 
     @Mock
     private IbkrStagedOrderRepository stagedOrderRepository;
@@ -58,7 +59,7 @@ class IbkrImportWorkerTest {
     @BeforeEach
     void setUp() {
         importWorker = new IbkrImportWorker(
-                stagedOrderRepository, stagedTradeConfirmRepository, tradeRecordRepository);
+                stagedOrderRepository, stagedTradeConfirmRepository, tradeRecordRepository, eventHistory);
     }
 
     // ============ Test data builders ============
@@ -550,6 +551,8 @@ class IbkrImportWorkerTest {
                     eq(LocalDate.of(2026, 1, 15))))
                     .thenReturn(List.of(optMatch));
 
+            stkRecord.setTradeTrigger(com.vortex.entity.enums.TradeTrigger.OPTION);
+            when(tradeRecordRepository.findById(stkRecord.getId())).thenReturn(java.util.Optional.of(stkRecord));
             importWorker.backfillSingleStkRecord(stkRecord);
 
             assertEquals(20L, stkRecord.getTriggerRefId());
@@ -570,6 +573,8 @@ class IbkrImportWorkerTest {
                     any(), any(), any(), any(), any()))
                     .thenReturn(Collections.emptyList());
 
+            stkRecord.setTradeTrigger(com.vortex.entity.enums.TradeTrigger.OPTION);
+            when(tradeRecordRepository.findById(stkRecord.getId())).thenReturn(java.util.Optional.of(stkRecord));
             importWorker.backfillSingleStkRecord(stkRecord);
 
             verify(tradeRecordRepository, never()).save(any());

@@ -1,6 +1,9 @@
 package com.vortex.sync.core;
 
 import com.vortex.repository.TradeRecordRepository;
+import com.vortex.repository.BrokerSyncBatchRepository;
+import com.vortex.service.LedgerWriteLock;
+import com.vortex.service.MarketEventHistoryService;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,10 +64,14 @@ public class SyncBatchCleanupService {
     private final Map<String, BrokerCleanupStrategy> strategiesByBroker;
     private final Set<String> registeredAdapterBrokerCodes;
     private final TradeRecordRepository tradeRecordRepository;
+    private final LedgerWriteLock writeLock;
+    private final BrokerSyncBatchRepository batchRepository;
+    private final MarketEventHistoryService history;
 
     public SyncBatchCleanupService(List<BrokerCleanupStrategy> strategies,
                                    List<BrokerSyncAdapter> adapters,
-                                   TradeRecordRepository tradeRecordRepository) {
+                                   TradeRecordRepository tradeRecordRepository, LedgerWriteLock writeLock,
+                                   BrokerSyncBatchRepository batchRepository, MarketEventHistoryService history) {
         // Guard against two strategies claiming the same broker code.
         this.strategiesByBroker = strategies.stream()
                 .collect(Collectors.toUnmodifiableMap(
@@ -81,6 +88,9 @@ public class SyncBatchCleanupService {
                 .map(BrokerSyncAdapter::getBrokerCode)
                 .collect(Collectors.toUnmodifiableSet());
         this.tradeRecordRepository = tradeRecordRepository;
+        this.writeLock = writeLock;
+        this.batchRepository = batchRepository;
+        this.history = history;
     }
 
     /**
@@ -131,6 +141,15 @@ public class SyncBatchCleanupService {
                     + ". Registered: " + Collections.unmodifiableSet(new HashSet<>(strategiesByBroker.keySet())));
         }
 
+        writeLock.acquire();
+        var batch = batchRepository.findById(batchId)
+                .orElseThrow(() -> new IllegalArgumentException("Sync batch not found for cleanup"));
+        if (!brokerCode.equals(batch.getBrokerCode()) || !Set.of("PENDING", "PROCESSING", "FAILED", "CLEANUP_FAILED").contains(batch.getStatus())) {
+            throw new IllegalStateException("Only the owning failed or active sync batch may be cleaned");
+        }
+        for (var trade : tradeRecordRepository.findBySyncBatchIdAndIsDeletedFalse(batchId)) {
+            history.assertHistoryWritable(trade);
+        }
         strategy.deleteStagedRows(batchId);
         int tradeRecordsDeleted = tradeRecordRepository.deleteBySyncBatchId(batchId);
 

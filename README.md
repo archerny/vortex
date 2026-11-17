@@ -204,6 +204,7 @@ See [Local Config Guide](docs/local-config-guide.md) for details.
 | [TODO](docs/TODO.md) | Open defects, code references and acceptance criteria |
 | [TODO Archive](docs/TODO-ARCHIVE.md) | Completed, cancelled and merged items with decisions and verification records |
 | [Broker Sync Guide](docs/broker-sync/README.md) | Broker setup, synchronization and recovery |
+| [Market Event Guide](docs/market-events.md) | Ordered event entry, per-security history locks, undo and cutover checks |
 
 ## Roadmap
 

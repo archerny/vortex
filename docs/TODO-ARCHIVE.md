@@ -6,6 +6,36 @@
 
 ## 已完成
 
+- [x] **P1 市场事件改为顺序处理并锁定关联证券历史**
+
+  普通交易新增、修改或软删除后，后续市场事件的派生交易仍保留旧结果。事件重算也只查询初始标的集合，未继续追踪代码变更或分红引出的新标的。例如已有 100 股、后续两倍拆股，再补录拆股前的 100 股买入，当前可能得到 300 股。另一个场景是 A 变更为 B 后 B 再拆股，补录 A 的早期拆股只重算到 A→B，B 的拆股结果仍旧。 [普通交易写入](../backend/src/main/java/com/vortex/service/TradeRecordService.java) · [事件重算](../backend/src/main/java/com/vortex/service/MarketEventProcessingService.java) · [代码变更事件查询](../backend/src/main/java/com/vortex/repository/SymbolChangeEventRepository.java)
+
+  验收需覆盖补录、修改和软删除历史交易，以及 A→B→后续拆股或分红的依赖链。第一种合成场景的最终持仓应为 400 股。修改标的、券商或日期时，新旧受影响范围均须与从原始记录完整重算的结果一致，重复重算应得到相同结果，处理失败时须保持事务一致性。
+
+  2026-11-17 范围调整：原条目“补齐历史交易改动和跨标的事件的重算范围”的问题与验收记录保留如上。用户决定保留事件一键生成交易，用顺序处理及历史锁定替代自动级联重算，不采用全量重放后续事件或完全手工录入调整交易。用户明确只锁定事件关联证券，允许无关证券补录；第一版拒绝同日关联事件；关联证券已有事件当天或之后的普通交易时，拒绝撤销，要求先手动回退后续相关数据。方案见 [0035](../design/0035-2026-11-17-ordered-market-events-and-history-locks.md)。
+
+  新验收以拒绝使已处理事件失效的操作、保持原账本不变为准：上述补录应拒绝且仍为 200 股；满足条件并显式撤销、补录、按顺序重新处理后才得到 400 股。覆盖事件新旧代码／分红证券、多券商、零输出事件、手工交易与 IBKR／Tiger 正式导入、重复校验、整批失败清理、同日及撤销限制，并验证真实隔离数据库中的事务与并发。当前只确认设计，业务代码仍使用原级联逻辑，历史数据未改动；实现、完整回归、独立复核及 knowledge 同步前继续未勾选。
+
+  2026-11-17 完成：按 [0035](../design/0035-2026-11-17-ordered-market-events-and-history-locks.md)、[0036](../design/0036-2026-11-17-market-event-write-coordination.md)、[0037](../design/0037-2026-11-17-ordered-event-state-validation.md) 和 [0038](../design/0038-2026-11-17-sync-cleanup-history-guard.md)，保留事件一键生成，移除自动级联重算。只处理当前事件；锁定其关联证券在事件日之前的正式交易，覆盖全部券商，零输出事件也生效，多个约束叠加。普通交易增改删检查旧、新范围，MARKET_EVENT 行不可经普通 CRUD 维护；事件只能按顺序处理，同日关联拒绝，已处理字段不可直接编辑。撤销只允许关联尾部、无事件当天或之后普通交易的事件，事务内只删本事件派生行并软删除本事件。无关证券可补录。
+
+  所有相关短写事务通过同一 PostgreSQL 事务级 advisory mutex 协调，在 READ COMMITTED 下等待后重新检查。同步活动批次阻止事件操作；IBKR／Tiger 新历史写入、IBKR 关联回填和批次清理保护同一历史。合法重复仍跳过，新冲突使整批失败并清理，旧成功批次不变。清理核对批次归属／允许状态，并在任何删除前检查有效正式残留；COMPLETED 拒绝清理，旧 FAILED 残留已被事件使用时保守拒绝。未处理事件已有派生行、旧管理状态为空均拒绝处理、修改、撤销，不自动修复；公开处理入口持锁重读而不信任旧对象。创建不接受客户端指定的 ID、审计或异常处理状态。
+
+  页面补充三类事件撤销、录入顺序提示、冲突原因与阻挡事件元数据；失败保留弹窗，成功刷新。当前知识、事件操作、同步生命周期／持久化及恢复说明已在同一变更同步。 [当前规则](../knowledge/market-events.md) · [操作指南](market-events.md) · [验证入口](../e2e/README.md#ordered-market-event-check)
+
+  验证环境：ubuntu-dev，Ubuntu 26.04.1、Temurin 25.0.5、Maven 3.10.0、Node 26.13.0、npm 11.20.0、Python 3.14.4、PostgreSQL 18.6，工作树 /home/bytedance.guest/workspace/private/vortex。沿用现有工具和缓存；TMPDIR=/tmp、MAVEN_OPTS=-Djava.io.tmpdir=/tmp。构建及日志在工作树，临时数据库及编译文件位于本次 /tmp/vortex-ordered-events-*，完成后停止并清理。没有安装工具、修改依赖、新增迁移或连接真实券商、个人 XML、vortex／vortex_dev。
+
+  - 旧实现先运行 OrderedMarketEventRegressionTest，当时新增2项均失败，退出1、0错误，复现早期交易未拒绝及请求一个事件却级联重放；日志 backend/target/ordered-events-red.log。
+  - 完整运行 `mvn -o -f backend/pom.xml '-Dtest=*Test,!FlexQueryParserTest' test`，退出0，498项全过；日志 backend/target/ordered-events-backend.log。原有Surefire退出确认等待30秒提示仍在，Maven BUILD SUCCESS，未修改超时或掩盖退出提示。
+  - 单独运行 `mvn -o -f backend/pom.xml '-Dtest=FlexQueryParserTest#parseEmptyTradeConfirms+parseXmlWithoutTradeConfirms+parseInvalidXmlShouldThrow' test`，退出0，3项全过；日志 backend/target/ordered-events-parser.log。4个依赖被忽略个人XML的既有方法明确未运行，替换个人夹具仍为活动TODO，没有新增跳过标记。
+  - 最后补齐显式空状态和旧NULL状态保护后，运行 `mvn -o -f backend/pom.xml -Dtest=MarketEventHistoryServiceTest,OrderedMarketEventRegressionTest,MarketEventProcessingServiceTest,MarketEventConflictAdviceTest test`，退出0，33项全过（17／7／8／1），正常退出；日志 backend/target/ordered-events-final-focused.log。复用未受后续变更影响的完整组结果，最后仅整理注释标点和空行。按31个测试类、嵌套类和参数化案例名称逐条核对，合并504个唯一案例，不重复累计33项；清单 backend/target/ordered-events-test-manifest.json 与报告逐条对应，无遗漏、失败、错误或跳过。
+  - `python3 e2e/verify-ordered-market-events.py` 最终退出0，总PASS，临时集群停止并删除；日志 backend/target/ordered-events-integration.log。真实Spring事务/JPA覆盖100→200拒绝补录、撤销修正后400、旧新范围与系统交易只读、两券商、代码链和分红目标后续拆股、同日限制、零输出与叠加约束；验证外层及撤销回滚、真实派生行数值约束失败整体回滚、重试和隔离级别拒绝；并发事件只成功一次，交易先行／事件先行及批次创建先行均等待提交后重查；实际IBKR受锁导入回滚、清理、COMPLETED保护、旧FAILED残留保护及解除依赖后重试。只读诊断在合成旧NULL、残留派生行与同日重叠记录上验证。中间验收器曾因合成订单缺少普通成交字段、异常包装类型、数值边界夹具和提示文本断言不符而失败，修正验收器后完整重跑，不改生产数量／金额／费用规则。单测不作为数据库事务证据。
+  - `npm --prefix frontend test` 退出0，54项通过；`npm --prefix frontend run build` 退出0。日志 frontend/ordered-events-tests.log、frontend/ordered-events-build.log；保留既有图表大分块构建提示。实际浏览器使用独立合成API逐一验证三类撤销409时保留原因、成功后刷新列表；截图 target/ordered-events-ui-conflict.png。未使用真实后端或账本进行页面写入。
+
+  边界：没有自动验证或修复用户实际历史。processed=true不证明旧结果正确，部署前需按操作指南在隔离副本只读核对存量，异常维护另行授权。若旧FAILED残留清理转为CLEANUP_FAILED且又依赖市场事件，普通页面撤销与清理会互相阻挡；当前保守停止，须停写、确认Worker退出、备份核对并单独评审维护，未提供自动解锁或通用修复命令。原数量取整、成本／费用精度、卖空和同日交易排序规则不变；Tiger时间格式和IBKR匹配歧义继续独立TODO。
+
+  实现、全部差异、验收场景与实际运行证据经未参与实现的Agent独立复核通过；发现的旧处理对象、未处理残留、旧NULL状态及FAILED残留清理绕过已修复并回归。没有剩余可行动发现，原问题和范围变更历史完整保留于此。
+
+
 - [x] **P1 校验 IBKR 报表结构及导出层级**
 
   解析器只读第一份 FlexStatement 和第一组 TradeConfirms；缺少节点时返回空结果，不校验报告类型。合成两份 statement 只解析一份；不含所需节点的 AF 报表、含成交但无订单层的 TCF 报表均可由适配器报告成功 0。上述结果在 `ubuntu-dev` 通过真实解析器与模拟仓储复现；本次真实文件的结构完整，未触发。 [解析入口](../backend/src/main/java/com/vortex/sync/adapter/ibkr/FlexQueryParser.java#L107) · [审阅 R4](audits/2026-11-16-ibkr-sync-review.md#r4--p1不支持的报表结构会被静默截断或当成零条成功)

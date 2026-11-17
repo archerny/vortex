@@ -34,6 +34,7 @@ import static org.mockito.Mockito.*;
  */
 @ExtendWith(MockitoExtension.class)
 class BrokerSyncBatchServiceTest {
+    @org.mockito.Mock private com.vortex.service.LedgerWriteLock eventWriteLock;
 
     @Mock
     private BrokerSyncBatchRepository batchRepository;

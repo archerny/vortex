@@ -38,6 +38,9 @@ import static org.mockito.Mockito.*;
 /** Real component call chain with in-memory repository behavior; no database transactions. */
 @ExtendWith(MockitoExtension.class)
 class IbkrDuplicateBatchTest {
+    @org.mockito.Mock private com.vortex.service.LedgerWriteLock eventWriteLock;
+    @Mock private com.vortex.repository.BrokerSyncBatchRepository cleanupBatches;
+    @org.mockito.Mock private com.vortex.service.MarketEventHistoryService eventHistory;
     @Mock private IbkrStagedOrderRepository orders;
     @Mock private IbkrStagedTradeConfirmRepository confirms;
     @Mock private TradeRecordRepository trades;
@@ -78,6 +81,22 @@ class IbkrDuplicateBatchTest {
         verify(batches, never()).markAsFailed(anyLong(), anyString());
         verify(trades, times(1)).save(any());
         assertEquals(before, h.snapshot());
+    }
+
+    @Test void lockedNewHistoryFailsWholeBatchAndRetryPreservesSuccessfulDuplicates() throws Exception {
+        Harness h = new Harness(); h.run(99L);
+        String before = h.snapshot();
+        h.report = report("10", "-1.25", true);
+        doThrow(new com.vortex.service.MarketEventConflictException("HISTORY_LOCKED", "synthetic history locked",
+                1L, com.vortex.entity.enums.TriggerRefType.STOCK_SPLIT, java.time.LocalDate.of(2026, 2, 1), java.util.Set.of("SYNTH")))
+                .when(eventHistory).assertHistoryWritable(any(TradeRecord.class));
+        for (long batch : new long[]{100L, 101L}) {
+            h.run(batch);
+            verify(batches).markAsFailed(eq(batch), contains("history locked"));
+            assertEquals(before, h.snapshot());
+            verify(trades).deleteBySyncBatchId(batch);
+        }
+        verify(trades, times(1)).save(any());
     }
 
     @Test
@@ -281,12 +300,17 @@ class IbkrDuplicateBatchTest {
             IbkrFlexQueryProperties properties = new IbkrFlexQueryProperties();
             properties.setFlexToken("synthetic-token");
             properties.setTradeConfirmQueryId("synthetic-query");
-            IbkrImportWorker importer = new IbkrImportWorker(orders, confirms, trades);
+            IbkrImportWorker importer = new IbkrImportWorker(orders, confirms, trades, eventHistory);
             IbkrSyncAdapter adapter = new IbkrSyncAdapter(properties, client, new FlexQueryParser(),
                     new IbkrStagingService(new IbkrStagingWorker(orders, confirms)),
                     new IbkrImportService(orders, trades, brokers, importer), batches, orders);
             SyncBatchCleanupService cleanup = new SyncBatchCleanupService(
-                    List.of(new IbkrCleanupStrategy(orders, confirms)), List.of(adapter), trades);
+                    List.of(new IbkrCleanupStrategy(orders, confirms)), List.of(adapter), trades, eventWriteLock, cleanupBatches, eventHistory);
+            lenient().when(cleanupBatches.findById(anyLong())).thenAnswer(invocation -> {
+                var batch = new com.vortex.entity.BrokerSyncBatch();
+                batch.setId(invocation.getArgument(0)); batch.setBrokerCode("ibkr"); batch.setStatus("PROCESSING");
+                return Optional.of(batch);
+            });
             executor = new BrokerSyncAsyncExecutor(new BrokerSyncService(List.of(adapter), brokers),
                     batches, new SyncBatchFailureHandler(cleanup, batches));
         }

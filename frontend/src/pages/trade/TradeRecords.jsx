@@ -7,6 +7,7 @@ import { fetchAllTradeRecords, createTradeRecord, fetchTradeStatistics } from '.
 import { fetchActiveBrokers } from '../../services/brokerApi';
 import { fetchAllStrategies } from '../../services/strategyApi';
 import { assetTypeMap, tradeTypeMap } from '../../constants/tradeConstants';
+import { marketEventErrorMessage } from '../../utils/marketEventError';
 
 // 新增表单中仅展示 BUY / SELL，不再展示旧枚举值
 const newTradeTypeOptions = {
@@ -187,7 +188,7 @@ const TradeRecords = () => {
         console.error('Form validation failed:', error);
       } else {
         console.error('Failed to create trade record:', error);
-        const errorMsg = error.response?.data?.message || '新增交易记录失败，请稍后重试';
+        const errorMsg = marketEventErrorMessage(error, '新增交易记录失败，请稍后重试');
         message.error(errorMsg);
       }
     } finally {

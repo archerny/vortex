@@ -11,6 +11,7 @@ import com.vortex.entity.enums.TriggerRefType;
 import com.vortex.repository.IbkrStagedOrderRepository;
 import com.vortex.repository.IbkrStagedTradeConfirmRepository;
 import com.vortex.repository.TradeRecordRepository;
+import com.vortex.service.MarketEventHistoryService;
 import com.vortex.sync.core.CategorizedSyncException;
 import com.vortex.sync.core.FailureCategory;
 import org.slf4j.Logger;
@@ -46,6 +47,8 @@ public class IbkrImportWorker {
     private static final Logger logger = LoggerFactory.getLogger(IbkrImportWorker.class);
 
     private static final String BROKER_CODE = "ibkr";
+
+    private final MarketEventHistoryService history;
     private static final DateTimeFormatter IBKR_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd");
 
     /** IBKR code tokens that indicate option exercise events */
@@ -57,10 +60,11 @@ public class IbkrImportWorker {
 
     public IbkrImportWorker(IbkrStagedOrderRepository stagedOrderRepository,
                             IbkrStagedTradeConfirmRepository stagedTradeConfirmRepository,
-                            TradeRecordRepository tradeRecordRepository) {
+                           TradeRecordRepository tradeRecordRepository, MarketEventHistoryService history) {
         this.stagedOrderRepository = stagedOrderRepository;
         this.stagedTradeConfirmRepository = stagedTradeConfirmRepository;
         this.tradeRecordRepository = tradeRecordRepository;
+        this.history = history;
     }
 
     /**
@@ -84,6 +88,7 @@ public class IbkrImportWorker {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void importSingleOrder(Long batchId, Long brokerId, IbkrStagedOrder staged) {
         try {
+            history.lock();
             IbkrRecordContent.requireId("orderID", staged.getOrderId());
             // Deduplication check
             if (tradeRecordRepository.existsByExternalBrokerAndExternalId(BROKER_CODE, staged.getOrderId())) {
@@ -102,6 +107,7 @@ public class IbkrImportWorker {
 
             // Map to TradeRecord
             TradeRecord tradeRecord = mapToTradeRecord(batchId, brokerId, staged);
+            history.assertHistoryWritable(tradeRecord);
             TradeRecord saved = tradeRecordRepository.save(tradeRecord);
 
             // Update staged order status
@@ -158,6 +164,13 @@ public class IbkrImportWorker {
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void backfillSingleStkRecord(TradeRecord stkRecord) {
+        history.lock();
+        stkRecord = tradeRecordRepository.findById(stkRecord.getId())
+                .filter(record -> !Boolean.TRUE.equals(record.getIsDeleted()))
+                .orElseThrow(() -> new IllegalStateException("Stock-side record disappeared before back-fill"));
+        history.assertHistoryWritable(stkRecord);
+        if (stkRecord.getTradeTrigger() != TradeTrigger.OPTION || stkRecord.getTriggerRefId() == null
+                || stkRecord.getTriggerRefId() != 0L) return;
         try {
             List<TradeRecord> optCandidates = tradeRecordRepository.findOptSideBookTradesForMatching(
                     TradeTrigger.OPTION,

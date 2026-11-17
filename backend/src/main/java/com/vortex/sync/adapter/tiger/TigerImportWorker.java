@@ -4,6 +4,7 @@ import com.vortex.entity.TigerStagedOrder;
 import com.vortex.entity.TradeRecord;
 import com.vortex.repository.TigerStagedOrderRepository;
 import com.vortex.repository.TradeRecordRepository;
+import com.vortex.service.MarketEventHistoryService;
 import com.vortex.sync.core.CategorizedSyncException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,12 +35,14 @@ public class TigerImportWorker {
     private final TigerStagedOrderRepository stagedOrderRepository;
     private final TradeRecordRepository tradeRecordRepository;
     private final TigerTradeRecordMapper mapper;
+    private final MarketEventHistoryService history;
 
     public TigerImportWorker(TigerStagedOrderRepository stagedOrderRepository,
-                             TradeRecordRepository tradeRecordRepository) {
+                             TradeRecordRepository tradeRecordRepository, MarketEventHistoryService history) {
         this.stagedOrderRepository = stagedOrderRepository;
         this.tradeRecordRepository = tradeRecordRepository;
         this.mapper = new TigerTradeRecordMapper();
+        this.history = history;
     }
 
     /**
@@ -68,6 +71,7 @@ public class TigerImportWorker {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void importOne(Long batchId, Long brokerId, TigerStagedOrder staged) {
         try {
+            history.lock();
             boolean alreadyImported = tradeRecordRepository
                     .existsByExternalBrokerAndExternalId(BROKER_CODE, staged.getTigerId());
 
@@ -99,6 +103,7 @@ public class TigerImportWorker {
             }
 
             TradeRecord tradeRecord = mapper.toTradeRecord(staged, brokerId, batchId);
+            history.assertHistoryWritable(tradeRecord);
             TradeRecord saved = tradeRecordRepository.save(tradeRecord);
 
             staged.setStatus("IMPORTED");

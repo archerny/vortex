@@ -29,6 +29,9 @@ public class TradeRecordService {
     private TradeRecordRepository tradeRecordRepository;
 
     @Autowired
+    private MarketEventHistoryService history;
+
+    @Autowired
     private BrokerRepository brokerRepository;
 
     @Autowired
@@ -129,6 +132,8 @@ public class TradeRecordService {
      */
     @Transactional
     public TradeRecord create(TradeRecord record) {
+        if (record.getId() != null) throw new IllegalArgumentException("New trade id is managed by the server");
+        history.lock();
         // 校验券商是否存在
         if (!brokerRepository.existsById(record.getBrokerId())) {
             throw new IllegalArgumentException("Broker not found, ID: " + record.getBrokerId());
@@ -167,6 +172,7 @@ public class TradeRecordService {
         validateTriggerConsistency(record);
         // 自动计算金额：期权（OPTION_CALL / OPTION_PUT）一个合约对应100股正股，金额需要乘以100
         recalculateAmount(record);
+        history.assertUserTradeWritable(record);
         return tradeRecordRepository.save(record);
     }
 
@@ -175,9 +181,12 @@ public class TradeRecordService {
      */
     @Transactional
     public TradeRecord update(Long id, TradeRecord recordData) {
+        history.lock();
         TradeRecord existing = tradeRecordRepository.findById(id)
                 .filter(r -> !r.getIsDeleted())
                 .orElseThrow(() -> new IllegalArgumentException("Trade record not found, ID: " + id));
+
+        history.assertUserTradeWritable(existing);
 
         // 校验券商是否存在
         if (!brokerRepository.existsById(recordData.getBrokerId())) {
@@ -190,6 +199,7 @@ public class TradeRecordService {
             }
         }
 
+        history.assertUserTradeWritable(recordData);
         existing.setTradeDate(recordData.getTradeDate());
         existing.setBrokerId(recordData.getBrokerId());
         existing.setAssetType(recordData.getAssetType());
@@ -287,8 +297,11 @@ public class TradeRecordService {
      */
     @Transactional
     public void softDelete(Long id) {
+        history.lock();
         TradeRecord record = tradeRecordRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Trade record not found, ID: " + id));
+        if (Boolean.TRUE.equals(record.getIsDeleted())) return;
+        history.assertUserTradeWritable(record);
         record.setIsDeleted(true);
         tradeRecordRepository.save(record);
     }

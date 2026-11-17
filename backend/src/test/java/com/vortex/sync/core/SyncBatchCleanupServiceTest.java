@@ -29,11 +29,68 @@ import static org.mockito.Mockito.*;
  *   <li>Duplicate strategy beans for the same broker code are rejected at construction</li>
  * </ul>
  */
+@org.junit.jupiter.api.extension.ExtendWith(org.mockito.junit.jupiter.MockitoExtension.class)
 class SyncBatchCleanupServiceTest {
+    @org.mockito.Mock private com.vortex.service.LedgerWriteLock eventWriteLock;
+    @org.mockito.Mock private com.vortex.repository.BrokerSyncBatchRepository cleanupBatches;
+    @org.mockito.Mock private com.vortex.service.MarketEventHistoryService eventHistory;
+
+    @org.junit.jupiter.api.BeforeEach
+    void activeBatch() {
+        lenient().when(cleanupBatches.findById(anyLong())).thenAnswer(invocation -> {
+            var batch = new com.vortex.entity.BrokerSyncBatch();
+            batch.setId(invocation.getArgument(0));
+            batch.setBrokerCode(batch.getId() == 11L ? "tiger" : "ibkr");
+            batch.setStatus("PROCESSING");
+            return java.util.Optional.of(batch);
+        });
+    }
 
     // ------------------------------------------------------------------------
     // Helper fakes
     // ------------------------------------------------------------------------
+
+    @Test void failedLegacyBatchCannotDeleteHistoryUsedByAnEvent() {
+        var batch = new com.vortex.entity.BrokerSyncBatch();
+        batch.setId(42L); batch.setBrokerCode("ibkr"); batch.setStatus("FAILED");
+        when(cleanupBatches.findById(42L)).thenReturn(java.util.Optional.of(batch));
+        RecordingStrategy strategy = new RecordingStrategy("ibkr");
+        TradeRecordRepository trades = mock(TradeRecordRepository.class);
+        var record = new com.vortex.entity.TradeRecord();
+        when(trades.findBySyncBatchIdAndIsDeletedFalse(42L)).thenReturn(List.of(record));
+        doThrow(new com.vortex.service.MarketEventConflictException("HISTORY_LOCKED", "synthetic locked history", 1L,
+                com.vortex.entity.enums.TriggerRefType.STOCK_SPLIT, java.time.LocalDate.of(2026, 3, 10), java.util.Set.of("SYNTH-A")))
+                .when(eventHistory).assertHistoryWritable(record);
+        SyncBatchCleanupService service = new SyncBatchCleanupService(List.of(strategy), List.of(), trades, eventWriteLock, cleanupBatches, eventHistory);
+        assertThrows(com.vortex.service.MarketEventConflictException.class, () -> service.cleanupBatchData(42L, "ibkr"));
+        assertTrue(strategy.deletedBatches.isEmpty()); verify(trades, never()).deleteBySyncBatchId(anyLong());
+    }
+
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(strings = {"COMPLETED", "UNKNOWN"})
+    void refusesCleanupOfFinishedOrUnknownBatchState(String state) {
+        var batch = new com.vortex.entity.BrokerSyncBatch();
+        batch.setId(42L); batch.setBrokerCode("ibkr"); batch.setStatus(state);
+        when(cleanupBatches.findById(42L)).thenReturn(java.util.Optional.of(batch));
+        RecordingStrategy strategy = new RecordingStrategy("ibkr");
+        TradeRecordRepository trades = mock(TradeRecordRepository.class);
+        SyncBatchCleanupService service = new SyncBatchCleanupService(List.of(strategy), List.of(), trades, eventWriteLock, cleanupBatches, eventHistory);
+        assertThrows(IllegalStateException.class, () -> service.cleanupBatchData(42L, "ibkr"));
+        assertTrue(strategy.deletedBatches.isEmpty()); verifyNoInteractions(trades);
+    }
+
+    @Test void refusesCleanupByDifferentBrokerOrMissingBatch() {
+        var batch = new com.vortex.entity.BrokerSyncBatch();
+        batch.setId(42L); batch.setBrokerCode("tiger"); batch.setStatus("FAILED");
+        when(cleanupBatches.findById(42L)).thenReturn(java.util.Optional.of(batch));
+        when(cleanupBatches.findById(43L)).thenReturn(java.util.Optional.empty());
+        RecordingStrategy strategy = new RecordingStrategy("ibkr");
+        TradeRecordRepository trades = mock(TradeRecordRepository.class);
+        SyncBatchCleanupService service = new SyncBatchCleanupService(List.of(strategy), List.of(), trades, eventWriteLock, cleanupBatches, eventHistory);
+        assertThrows(IllegalStateException.class, () -> service.cleanupBatchData(42L, "ibkr"));
+        assertThrows(IllegalArgumentException.class, () -> service.cleanupBatchData(43L, "ibkr"));
+        assertTrue(strategy.deletedBatches.isEmpty()); verifyNoInteractions(trades);
+    }
 
     /** Captures invocations so we can assert dispatch without Mockito per-bean. */
     private static final class RecordingStrategy implements BrokerCleanupStrategy {
@@ -91,7 +148,7 @@ class SyncBatchCleanupServiceTest {
             SyncBatchCleanupService svc = new SyncBatchCleanupService(
                     List.of(new RecordingStrategy("ibkr"), new RecordingStrategy("tiger")),
                     List.of(new FakeAdapter("ibkr"), new FakeAdapter("tiger")),
-                    mock(TradeRecordRepository.class));
+                    mock(TradeRecordRepository.class), eventWriteLock, cleanupBatches, eventHistory);
 
             // No exception from @PostConstruct helper
             assertDoesNotThrow(svc::verifyAdapterCoverage);
@@ -103,7 +160,7 @@ class SyncBatchCleanupServiceTest {
             SyncBatchCleanupService svc = new SyncBatchCleanupService(
                     List.of(new RecordingStrategy("ibkr")),                         // no tiger!
                     List.of(new FakeAdapter("ibkr"), new FakeAdapter("tiger")),
-                    mock(TradeRecordRepository.class));
+                    mock(TradeRecordRepository.class), eventWriteLock, cleanupBatches, eventHistory);
 
             IllegalStateException ex = assertThrows(IllegalStateException.class,
                     svc::verifyAdapterCoverage);
@@ -117,7 +174,7 @@ class SyncBatchCleanupServiceTest {
             SyncBatchCleanupService svc = new SyncBatchCleanupService(
                     List.of(new RecordingStrategy("ibkr"), new RecordingStrategy("tiger")),
                     List.of(new FakeAdapter("ibkr")),                               // only ibkr adapter
-                    mock(TradeRecordRepository.class));
+                    mock(TradeRecordRepository.class), eventWriteLock, cleanupBatches, eventHistory);
 
             assertDoesNotThrow(svc::verifyAdapterCoverage);
         }
@@ -129,7 +186,7 @@ class SyncBatchCleanupServiceTest {
                     new SyncBatchCleanupService(
                             List.of(new RecordingStrategy("ibkr"), new RecordingStrategy("ibkr")),
                             List.of(new FakeAdapter("ibkr")),
-                            mock(TradeRecordRepository.class)));
+                            mock(TradeRecordRepository.class), eventWriteLock, cleanupBatches, eventHistory));
             assertTrue(ex.getMessage().contains("ibkr"));
         }
     }
@@ -153,7 +210,7 @@ class SyncBatchCleanupServiceTest {
             SyncBatchCleanupService svc = new SyncBatchCleanupService(
                     List.of(ibkr, tiger),
                     List.of(new FakeAdapter("ibkr"), new FakeAdapter("tiger")),
-                    tradeRepo);
+                    tradeRepo, eventWriteLock, cleanupBatches, eventHistory);
 
             svc.cleanupBatchData(42L, "ibkr");
 
@@ -172,7 +229,7 @@ class SyncBatchCleanupServiceTest {
             SyncBatchCleanupService svc = new SyncBatchCleanupService(
                     List.of(ibkr, tiger),
                     List.of(new FakeAdapter("ibkr"), new FakeAdapter("tiger")),
-                    tradeRepo);
+                    tradeRepo, eventWriteLock, cleanupBatches, eventHistory);
 
             svc.cleanupBatchData(11L, "tiger");
 
@@ -190,7 +247,7 @@ class SyncBatchCleanupServiceTest {
             SyncBatchCleanupService svc = new SyncBatchCleanupService(
                     List.of(ibkr),
                     List.of(new FakeAdapter("ibkr")),
-                    tradeRepo);
+                    tradeRepo, eventWriteLock, cleanupBatches, eventHistory);
 
             IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
                     () -> svc.cleanupBatchData(1L, "mystery-broker"));
@@ -213,7 +270,7 @@ class SyncBatchCleanupServiceTest {
             return new SyncBatchCleanupService(
                     List.of(new RecordingStrategy("ibkr")),
                     List.of(new FakeAdapter("ibkr")),
-                    tradeRepo);
+                    tradeRepo, eventWriteLock, cleanupBatches, eventHistory);
         }
 
         @Test
@@ -260,7 +317,7 @@ class SyncBatchCleanupServiceTest {
             SyncBatchCleanupService svc = new SyncBatchCleanupService(
                     List.of(ibkr),
                     List.of(new FakeAdapter("ibkr")),
-                    tradeRepo);
+                    tradeRepo, eventWriteLock, cleanupBatches, eventHistory);
 
             RuntimeException thrown = assertThrows(RuntimeException.class,
                     () -> svc.cleanupBatchData(1L, "ibkr"));
@@ -279,7 +336,7 @@ class SyncBatchCleanupServiceTest {
             SyncBatchCleanupService svc = new SyncBatchCleanupService(
                     List.of(ibkr),
                     List.of(new FakeAdapter("ibkr")),
-                    tradeRepo);
+                    tradeRepo, eventWriteLock, cleanupBatches, eventHistory);
 
             RuntimeException thrown = assertThrows(RuntimeException.class,
                     () -> svc.cleanupBatchData(1L, "ibkr"));
