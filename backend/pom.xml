@@ -26,6 +26,8 @@
         <!-- Override Byte Buddy / Mockito versions for Java 25 compatibility -->
         <byte-buddy.version>1.17.5</byte-buddy.version>
         <mockito.version>5.18.0</mockito.version>
+        <forkCount>2</forkCount>
+        <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
     </properties>
 
     <dependencies>
@@ -100,6 +102,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
+                    <forkCount>${forkCount}</forkCount>
+                    <redirectTestOutputToFile>${maven.test.redirectTestOutputToFile}</redirectTestOutputToFile>
                     <!-- Required for Mockito inline mocking on Java 21+ -->
                     <argLine>
                         -XX:+EnableDynamicAgentLoading

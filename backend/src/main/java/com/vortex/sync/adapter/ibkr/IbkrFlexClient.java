@@ -338,8 +338,9 @@ public class IbkrFlexClient {
 
     /**
      * Sleep for specified duration, handling InterruptedException.
+     * Package-private so contract tests can skip real waiting.
      */
-    private void sleep(long ms, String reason) {
+    void sleep(long ms, String reason) {
         try {
             Thread.sleep(ms);
         } catch (InterruptedException e) {

@@ -42,7 +42,7 @@ mvn -f backend/pom.xml spring-boot:run -Dspring-boot.run.profiles=dev
 npm --prefix frontend run dev
 
 # In-memory unit tests and frontend build
-mvn -f backend/pom.xml test
+mvn -e -f backend/pom.xml test
 npm --prefix frontend test
 npm --prefix frontend run build
 ```

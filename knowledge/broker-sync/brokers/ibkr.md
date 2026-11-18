@@ -61,7 +61,7 @@ TradeConfirms 只接受直接的属性式 Order、TradeConfirm、SymbolSummary�
 
 期权关联的验收使用临时 PostgreSQL，覆盖同券商查询、无需旧暂存来源的可信既有记录关联、零／多匹配失败、占用、回滚、整批清理与重试。实际命令、组合清单及限制见 [关联验收](../../../docs/TODO-ARCHIVE.md#期权关联验收明细)。验证未连接真实 IBKR 或现有账本。
 
-请求 URL 的 DEBUG 日志统一由 `executeHttpGet` 输出，其中 Token 参数通过 `maskToken` 隐藏。非法请求配置使用固定错误消息，避免原始 URI 异常携带 Token。客户端回归测试使用模拟 HTTP 响应和合成 Token，覆盖 SendRequest、GetStatement 两阶段，并核对非法 URL 的异常链。 [日志回归测试](../../../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrFlexClientTest.java) · [日志修复方案](../../../design/0024-2026-11-12-ibkr-token-log-redaction.md)
+请求 URL 的 DEBUG 日志统一由 `executeHttpGet` 输出，其中 Token 参数通过 `maskToken` 隐藏。非法请求配置使用固定错误消息，避免原始 URI 异常携带 Token。客户端回归测试使用模拟 HTTP 响应和合成 Token，从真实 `fetchReport` 入口覆盖 SendRequest、GetStatement 两阶段，并核对非法 URL 的异常链；成功场景通过 Spy 替换包内等待方法，跳过报表生成及限流的真实休眠，不验证客户端返回耗时。生产客户端继续沿用原等待、重试和中断处理。 [日志回归测试](../../../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrFlexClientTest.java) · [日志修复方案](../../../design/0024-2026-11-12-ibkr-token-log-redaction.md) · [测试优化方案](../../../design/0044-2026-11-18-test-execution-optimization.md)
 
 [适配器测试](../../../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrSyncAdapterTest.java)和 [导入 Worker 测试](../../../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrImportWorkerTest.java)覆盖分窗、失败残留、映射与 BookTrade 边界。[数量回归测试](../../../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrQuantityValidationTest.java)覆盖整数、小数、非法值、溢出，以及真实解析／暂存／导入／异步执行／清理组件配合模拟仓储的调用链。原数量验证记录见 [归档](../../../docs/TODO-ARCHIVE.md)，内存测试不代表真实账户验证。
 
