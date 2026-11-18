@@ -19,8 +19,8 @@ import java.util.Set;
  * Pure (Spring-free) mapper from {@link TigerStagedOrder} to {@link TradeRecord}.
  *
  * <p>Encapsulates the Tiger-specific pre-filter rules (see
- * {@code docs/broker-sync/brokers/tiger/staging-schema.md §5.1}) and the
- * field-level conversion logic (§5.2 / §5.3 / §5.4).
+ * {@code knowledge/broker-sync/brokers/tiger.md}) and the
+ * field-level conversion logic described in that document.
  *
  * <p>This class is deliberately stateless and free of Spring dependencies so it
  * can be covered by lightweight unit tests. Persistence wiring lives in the
@@ -39,7 +39,7 @@ public class TigerTradeRecordMapper {
     // ============ Pre-filter ============
 
     /**
-     * Applies the seven pre-filter rules from {@code staging-schema.md §5.1}.
+     * Applies the seven Tiger pre-filter rules documented in {@code knowledge/broker-sync/brokers/tiger.md}.
      *
      * @param staged           the staged order (non-null)
      * @param alreadyImported  result of
@@ -357,7 +357,7 @@ public class TigerTradeRecordMapper {
      * <p>When {@link Kind#FAILED}, a {@link FailureCategory} is attached so
      * the import worker can format the staged row's {@code error_message}
      * with the standard {@code [CATEGORY] ext_id=... reason: ...} prefix
-     * (see {@code docs/broker-sync/framework/unrecognized-data-logging.md}).
+     * (see {@code knowledge/broker-sync/adapter-contracts.md}).
      * All current failure rules are {@link FailureCategory#UNRECOGNIZED} —
      * upstream data the adapter cannot map into the domain model.</p>
      */

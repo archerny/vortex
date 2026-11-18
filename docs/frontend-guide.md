@@ -1,290 +1,66 @@
-# Vortex Frontend
+# Vortex 前端开发指南
 
-The frontend provides views for trading records, cash flows, positions, market events, and broker synchronization. [Frontend architecture](../knowledge/frontend-architecture.md)
+前端使用 React 18、Ant Design 5、Vite 5、Axios 和 Day.js。页面入口、hash 导航、上下文及当前功能边界见 [前端架构](../knowledge/frontend-architecture.md)。
 
-## Technology Stack
+## 环境与依赖
 
-- **React 18** - Frontend framework
-- **Ant Design 5** - UI component library
-- **Vite** - Build tool
-- **Axios** - HTTP client
-- **Day.js** - Date manipulation library
+先按 [环境隔离约定](../AGENTS.md#1-环境隔离) 确认执行环境与当前工作树。使用已有 Node 和 npm；Vite 5 的 Node 范围是 18.x 或 20 及以上。
 
-## Getting Started
+```bash
+node -v
+npm -v
+npm --prefix frontend ci
+```
 
-### Prerequisites
+所有命令从工作树根目录执行。安装以 `package-lock.json` 为准；修改依赖时同步清单和锁文件，核对无关升级，并在干净依赖目录完成安装、测试和构建验收。已有依赖且未变化时无需重复安装。
 
-Select the execution environment and check its tools as described in [AGENTS.md](../AGENTS.md#1-环境隔离).
-
-- **Node.js 18.x or 20 and newer**, as required by the locked Vite version
-  ```bash
-  # Check Node.js version
-  node -v
-  ```
-
-- **npm**, which the repository scripts use with `package-lock.json`
-  ```bash
-  # Check npm version
-  npm -v
-  ```
-
-### Installation
-
-With project dependencies already installed, use the commands below from the worktree root. To set up dependencies for the first time, check that `frontend/package.json` and `frontend/package-lock.json` agree before running `npm --prefix frontend ci`.
-
-The lockfile includes Vitest and the chart demo dependencies. Use `npm --prefix frontend ci` to reproduce the locked installation.
-
-### Running in Development Mode
+## 启动与接口
 
 ```bash
 npm --prefix frontend run dev
 ```
 
-The application will start at `http://localhost:3000`
+默认地址为 `http://localhost:3000`。[vite.config.js](../frontend/vite.config.js) 把 `/api` 代理到 `http://localhost:8080`，布局通过 `/api/health` 检查后端。业务请求复用 [services/](../frontend/src/services/) 的 Axios 封装。
 
-### Chart Selection Demo
-
-Open **盈亏分析 → 技术选型 Demo**, or visit `http://localhost:3000/#/profit-chart-demo`. Replace the port when running Vite with a custom port.
-
-The page uses fixed synthetic data and two fictional symbols. Its four tabs demonstrate:
-
-- Lightweight Charts: candlesticks, moving averages, volume panes and trade markers.
-- Apache ECharts: normalized NAV/drawdown, strategy expiry payoff, synthetic Delta/Gamma, volatility smiles and an IV heatmap.
-- Plotly.js: interactive 3D volatility and illustrative payoff surfaces. WebGL is required for this tab.
-- Ant Design Table: an option chain with expiry/strike filters, sorting, optional Greeks, virtual scrolling and contract details.
-
-Try changing the symbol and chart parameters, toggling legends or averages, rotating the 3D surface, and selecting option-chain rows. These controls operate on frontend samples; they do not fetch ledger or broker data. Prices and sensitivities are illustrative, not a production pricing model. The existing layout health check remains active.
-
-The page and its chart panels load dynamically. The Plotly 3D distribution is intentionally isolated in its own panel chunk; production builds can report a large-chunk warning. See [frontend architecture](../knowledge/frontend-architecture.md#图表技术选型演示) and [design 0026](../design/0026-2026-11-15-frontend-chart-selection-demo.md).
-
-### Building for Production
-
-```bash
-npm --prefix frontend run build
-```
-
-Vite writes static assets to `frontend/dist/`. The deployment script copies and archives them in `deploy/output/`.
-
-Serve the static files alongside a same-origin `/api` endpoint or reverse proxy. The deployment script's `-a` option sets `VITE_API_BASE_URL`, which current frontend requests do not read.
-
-### Preview Production Build
-
-```bash
-npm --prefix frontend run preview
-```
-
-## Debugging Guide
-
-### Development Tools
-
-#### 1. Browser DevTools
-
-**Chrome/Edge DevTools:**
-- Press `F12` or `Ctrl+Shift+I` (Windows/Linux) / `Cmd+Option+I` (Mac)
-- **Console Tab**: View logs, errors, and warnings
-- **Network Tab**: Monitor API requests and responses
-- **React DevTools**: Install the React Developer Tools extension for component inspection
-
-**Useful Console Commands:**
-```javascript
-// Check if backend is accessible
-fetch('/api/health').then(r => r.json()).then(console.log)
-```
-
-#### 2. Vite Hot Module Replacement (HMR)
-
-Vite provides instant feedback during development:
-- Changes to `.jsx` files trigger automatic component updates
-- CSS changes apply immediately without page reload
-- Check terminal for compilation errors
-
-#### 3. Network Debugging
-
-**API Proxy Configuration** (in `vite.config.js`):
-```javascript
-proxy: {
-  '/api': {
-    target: 'http://localhost:8080',
-    changeOrigin: true
-  }
-}
-```
-
-Check the health endpoint through the frontend proxy.
+需要联调时，先按 [后端指南](backend-guide.md) 启动使用隔离开发库的后端，然后从前端代理核对：
 
 ```bash
 curl http://localhost:3000/api/health
 ```
 
-#### 4. Common Debugging Scenarios
+端口被占用时可为当前会话指定 `--port 3001`；Vite 也可能自动选择后续端口，以终端输出为准。后端端口变化时需同步修改开发代理。
 
-**Backend Connection Issues:**
-1. Verify backend is running: `curl http://localhost:8080/api/health`
-2. Check proxy configuration in `vite.config.js`
-3. Review browser Network tab for failed requests
-
-**Component Not Updating:**
-1. Check browser console for errors
-2. Verify component state management
-3. Use React DevTools to inspect component props and state
-
-**Build errors**
-
-Check that the installed dependencies match the manifest. If Vite's dependency cache is stale, restart the development server with `npm --prefix frontend run dev -- --force`.
-
-### IDE Configuration
-
-**VS Code Recommended Extensions:**
-- ESLint
-- Prettier
-- ES7+ React/Redux/React-Native snippets
-- Auto Rename Tag
-
-**VS Code Debug Configuration** (`.vscode/launch.json`):
-```json
-{
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "type": "chrome",
-      "request": "launch",
-      "name": "Launch Chrome",
-      "url": "http://localhost:3000",
-      "webRoot": "${workspaceFolder}/frontend/src"
-    }
-  ]
-}
-```
-
-## Project Structure
-
-The app starts at `frontend/src/main.jsx`. Layout, navigation, pages, request wrappers, and the current feature boundaries are documented in [Frontend architecture](../knowledge/frontend-architecture.md). See [Adding a page](frontend-structure.md#添加页面) for the navigation wiring.
-
-## API Endpoints
-
-The layout checks backend availability with `GET /api/health`. Domain APIs are wrapped in [frontend/src/services/](../frontend/src/services/). The Vite development proxy forwards requests under `/api` to the backend.
-
-## Development Guidelines
-
-1. Ensure backend service is running at `http://localhost:8080`
-2. Frontend dev server automatically proxies `/api` requests to backend
-3. Use Ant Design components for UI development
-4. Follow React Hooks best practices
-5. Keep components small and focused
-6. Use meaningful variable and function names
-
-## Troubleshooting
-
-### Port Already in Use
-
-If port 3000 is occupied, pass a port for the current session.
+## 测试与构建
 
 ```bash
-npm --prefix frontend run dev -- --port 3001
-```
-
-### Dependency Installation Issues
-
-Check the npm registry, network access, and lockfile in the selected environment. Changes to user-wide npm configuration or caches require approval under the repository's environment rules.
-
-### Hot Reload Not Working
-
-1. Check if file is saved properly
-2. Restart dev server: `Ctrl+C` then `npm run dev`
-3. Clear browser cache and reload
-
-## 单元测试
-
-> 📋 完整的单元测试规范请参阅 [单元测试规范](unit-test-spec.md)。核心原则：**单元测试不得操作数据库中的数据**。
-
-### 测试框架
-
-- **Vitest** - 基于 Vite 的测试框架，开箱即用，无需额外编译配置
-
-### 配置
-
-测试配置已集成在 `vite.config.js` 中：
-
-```javascript
-export default defineConfig({
-  // ...
-  test: {
-    globals: true,
-    environment: 'node',
-  },
-})
-```
-
-### 运行测试
-
-```bash
-# 在工作树根目录运行所有测试
 npm --prefix frontend test
-
-# 已安装项目依赖时，使用项目内的 Vitest 进入监听模式
-cd frontend
-./node_modules/.bin/vitest
+npm --prefix frontend run build
+npm --prefix frontend run preview
 ```
 
-### 测试思路
+`test` 执行 `vitest run`，Node 环境下覆盖菜单／常量、合成图表数据、费用 API、真实组件的静态展示与排序、市场事件错误格式。网络调用使用模拟实现。监听模式可使用 `npm --prefix frontend test -- --watch`，不需下载全局工具。测试规范见 [单测规范](unit-test-spec.md)。
 
-前端采用**常量/配置层优先**的测试策略，专注于数据映射的完整性和一致性验证。这些常量是整个前端 UI 展示的基础，一旦映射缺失或错误会导致页面显示异常。
+构建产物为 `frontend/dist/`；preview 仅用于本地检查静态构建，不自动提供后端业务接口。生产需配置同源 `/api` 或反向代理。部署脚本的 `-a` 仅设置 `VITE_API_BASE_URL`，当前 API 请求未读取该变量，不能用它切换生产后端地址。 [部署指南](../deploy/README.md)
 
-测试文件统一放置在对应模块的 `__tests__` 目录下。
+`package.json` 另声明了 `lint`，但仓库当前未提供 ESLint 配置文件；不要把该脚本当作已经可用并通过的验收项。
 
-### 测试清单
+## 添加页面
 
-#### 1. tradeConstants.test.js（交易常量映射）
+1. 在 `frontend/src/pages/` 的对应功能目录创建页面组件。
+2. 在 [menuConfig.js](../frontend/src/constants/menuConfig.js) 中添加菜单和路径映射；属于子菜单时同步更新父菜单映射。
+3. 在 [AppLayout.jsx](../frontend/src/components/AppLayout.jsx) 中导入页面，并在 `renderContent()` 中添加分支。
+4. 需要请求后端时，复用 [services/](../frontend/src/services/) 中对应领域的 API 封装。
 
-文件路径：`src/constants/__tests__/tradeConstants.test.js`
+## 页面边界与交互验收
 
-| 测试模块 | 测试场景 |
-|---|---|
-| 证券类型映射 | `assetTypeMap` 包含全部 4 种类型（STOCK/ETF/OPTION_CALL/OPTION_PUT）、正反向映射一致性、颜色映射覆盖所有类型 |
-| 交易类型映射 | `tradeTypeMap` 只有 BUY/SELL、正反向映射一致性、颜色映射覆盖、金额颜色映射覆盖 |
-| 币种配置 | `currencyOptions` 包含 3 种币种（CNY/HKD/USD）、每项有 label+value、颜色映射覆盖 |
-| 交易触发来源映射 | `tradeTriggerMap` 包含 3 种触发类型（MANUAL/OPTION/MARKET_EVENT）、颜色映射覆盖 |
-| 触发关联类型映射 | `triggerRefTypeMap` 包含全部 7 种关联类型、颜色映射覆盖、期权子类型和市场事件子类型分组验证 |
+交易费用使用后端的 `feeExact` 和分币种精确统计字符串，展示及输入不固定小数位；表单使用 `InputNumber.stringMode`，避免保存时经过 JavaScript 浮点数。金额隐藏和编辑开关是浏览器设置，其中编辑开关只控制普通交易详情的按钮。 [交易契约](../knowledge/trades-and-positions.md)
 
-**测试设计要点：**
-- 验证**双向映射一致性**：`assetTypeMap` 与 `assetTypeReverseMap` 互为反转，确保前端表单提交和展示能正确互换
-- 验证**颜色映射完整性**：每个枚举值都有对应的颜色配置，防止 Tag 组件渲染时出现无颜色的情况
-- 验证**关联类型分组**：期权子类型（EXPIRE/EXERCISE/ASSIGNED）和市场事件子类型（STOCK_SPLIT/SYMBOL_CHANGE/DIVIDEND_IN_KIND）各成一组，与后端校验逻辑对应
+市场事件的新增、冲突提示、撤销失败保留弹窗及成功刷新，应按 [操作指南](market-events.md) 点验。仅有内存单测和构建结果不能证明浏览器交互正确。使用合成 API 的本地验收工具见 [e2e 指南](../e2e/README.md#ordered-market-event-check)。
 
-#### 2. menuConfig.test.js（菜单配置）
+仪表盘和个股／账户／策略盈亏仍是占位页。技术选型 Demo 位于 `#/profit-chart-demo`，四个标签页展示 Lightweight Charts、ECharts、Plotly 和 Ant Design 期权链。数据固定为合成样本，不调用账本或行情接口；布局的健康检查仍会运行。Plotly 曲面需要 WebGL，页面与面板按需加载，构建可能有大分块提示。 [演示内容与限制](../knowledge/frontend-architecture.md#图表技术选型演示)
 
-文件路径：`src/constants/__tests__/menuConfig.test.js`
+## 调试
 
-| 测试模块 | 测试场景 |
-|---|---|
-| 路由映射 | `menuKeyToPath` 包含测试列举的页面路由、`pathToMenuKey` 双向映射一致性、条目数量一致 |
-| 父菜单映射 | 子菜单 key 都存在于 `menuKeyToPath` 中、账户管理/交易管理/盈亏分析子菜单正确映射到父组 |
-| 菜单项结构 | `menuItems` 非空数组、顶级项有 key/icon/label、含子菜单项的 children 非空且结构正确、包含仪表盘/交易管理/盈亏分析/账户管理/系统设置五大模块 |
+浏览器 Console 用于查看渲染异常，Network 用于核对 `/api` 请求、响应和 409 错误原因。连通性问题先核对后端健康入口、Vite 代理和实际端口；profile 与数据库见 [配置指南](local-config-guide.md)。
 
-**测试设计要点：**
-- 验证**路由映射不丢失**：防止新增页面后忘记添加映射，导致路由跳转或菜单高亮失效
-- 验证**父子菜单关系**：确保侧边栏展开/收起状态和面包屑导航的正确性
-- 验证**菜单结构完整性**：确保 Ant Design Menu 组件能正确渲染所有菜单项
-
-## Integration with Backend
-
-### Full Stack Development Workflow
-
-Start both processes from the worktree root in the selected execution environment. The backend uses the configured isolated database. [Backend guide](backend-guide.md) · [Database setup](database-setup.md)
-
-**Terminal 1 — Backend**
-
-```bash
-mvn -f backend/pom.xml spring-boot:run -Dspring-boot.run.profiles=dev
-```
-
-**Terminal 2 — Frontend**
-
-```bash
-npm --prefix frontend run dev
-```
-
-**Verify Integration:**
-1. Backend: `http://localhost:8080/api/health`
-2. Frontend: `http://localhost:3000`
-3. Frontend API call: `http://localhost:3000/api/health` (proxied to backend)
+HMR 或依赖缓存异常时，先保存文件并重启开发进程；需要重建 Vite 缓存可运行 `npm --prefix frontend run dev -- --force`。发布页面使用 hash 导航，交易详情由 `#/trade-detail/<id>` 单独解析，添加路由须同步菜单和布局分支。

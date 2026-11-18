@@ -6,7 +6,7 @@ package com.vortex.entity.enums;
  *
  * 仅有 BUY / SELL 两个值，描述「做了什么动作」。
  * 「为什么发生」由 trade_trigger + trigger_ref_type 表达。
- * 详见 trade-type-refactor-discussion.md
+ * 现行规则见 knowledge/trades-and-positions.md
  */
 public enum TradeType {
     /** 买入 */

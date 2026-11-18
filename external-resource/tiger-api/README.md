@@ -1,5 +1,7 @@
 # Tiger OpenAPI 文档 - 下载与维护指南
 
+Vortex 使用 Java SDK 查询已成交订单，暂存／导入仍有时间格式缺陷，见 [Tiger 知识](../../knowledge/broker-sync/brokers/tiger.md)。本页的采集记录和资料适用范围见 [总索引](../README.md)。
+
 ## 概述
 
 本目录存放从 [老虎开放平台新文档站](https://docs.itigerup.com/docs) 下载的离线 Markdown 文档，供项目内部引用。

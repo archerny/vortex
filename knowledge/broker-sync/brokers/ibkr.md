@@ -14,7 +14,7 @@ TradeConfirms 只接受直接的属性式 Order、TradeConfirm、SymbolSummary�
 
 结构错误按 UNRECOGNIZED 返回固定的 `Unsupported IBKR TCF report structure: …` 原因，不输出账户或来源值。所有窗口解析完成后才进入暂存；任何窗口不支持都会使当前批次失败并沿既有清理流程处理，原成功批次保留。日期分窗仍可返回多个文件，每份分别校验；账户校验限每份报表，不新增跨窗口／独立请求的账户绑定，不证明成交集合完整或券商数据覆盖全部历史。 [0034 方案](../../../design/0034-2026-11-17-ibkr-single-account-tcf-validation.md) · [结构回归](../../../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrReportStructureTest.java) · [故障处理](../../../docs/broker-sync/recovery.md#ibkr-报表结构不受支持)
 
-结构回归的 63 项及批次结构场景的 8 项使用合成 XML 与 Mockito 仓储／网络，覆盖拒绝、合法空报表、重复、重试、后续窗口失败及旧批次不变。按 [0039](../../../design/0039-2026-11-17-test-suite-maintenance.md) 整理后，字段映射也使用合成报表，覆盖字符串和流两个入口、Order／ExchTrade／BookTrade、原始费用精度及日期；不再依赖个人 XML。2026-11-17 在 `ubuntu-dev` 运行默认后端全量命令，496 项全部通过，无失败、错误或跳过。没有因此重新验证真实数据库事务或券商返回；完整命令、案例对应及限制见 [测试核对](../../../docs/audits/2026-11-17-test-suite-review.md)，先前分组验证保留在 [完成归档](../../../docs/TODO-ARCHIVE.md)。
+结构及批次回归使用合成 XML 与 Mockito 仓储／网络，覆盖拒绝、合法空报表、重复、重试、后续窗口失败及旧批次不变。按 [0039](../../../design/0039-2026-11-17-test-suite-maintenance.md) 整理后，字段映射也使用合成报表，覆盖字符串和流两个入口、Order／ExchTrade／BookTrade、原始费用精度及日期；不再依赖个人 XML。默认全量测试无需排除解析方法，原清理运行记录见 [测试清理依据](../../../docs/TODO-ARCHIVE.md#测试清理依据)，早期分组验证见 [归档](../../../docs/TODO-ARCHIVE.md)；它们不代表真实券商报表或账本对账。
 
 ## 导入映射
 
@@ -49,7 +49,7 @@ TradeConfirms 只接受直接的属性式 Order、TradeConfirm、SymbolSummary�
 
 暂存来源一致时不重新比较用户后来编辑的正式交易。缺少来源暂存而命中正式记录时，兜底仅比较正式表的业务投影，不能核对未保存的账户、费用组成或原始符号；既有单价／金额固定小数位或旧费用舍入也可能导致拒绝，不作自动修复。新 tradeID 仍作为新明细处理，不额外证明成交集合完整性或订单终态；不自动合并后续成交、不覆盖或重算历史账本。 [比较实现](../../../backend/src/main/java/com/vortex/sync/adapter/ibkr/IbkrRecordContent.java) · [0032](../../../design/0032-2026-11-17-ibkr-duplicate-content-consistency.md) · [冲突排查](../../../docs/broker-sync/recovery.md#ibkr-重复记录内容冲突)
 
-[重复内容回归](../../../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrDuplicateConsistencyTest.java) 和 [批次调用链回归](../../../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrDuplicateBatchTest.java) 使用合成数据与 Mockito 仓储／网络。2026-11-17 在 `ubuntu-dev`，新增 115 项及相关测试共 229 项全部通过、Maven 退出 0；相关整组运行有既有 Surefire 退出握手等待提示，新增 115 项单独运行正常结束。覆盖全部已持久化来源字段、规范化、异常 ID、正式投影、重复及冲突、整批清理、重试和原成功批次逐字段不变。未连接真实数据库、券商或个人 XML，不能把内存调用链验证表述为真实事务或并发唯一约束验证。完整命令、结果和验证边界见 [完成记录](../../../docs/TODO-ARCHIVE.md)。
+[重复内容回归](../../../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrDuplicateConsistencyTest.java) 和 [批次调用链回归](../../../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrDuplicateBatchTest.java) 使用合成数据与 Mockito 仓储／网络，覆盖持久化来源字段、规范化、异常 ID、正式投影、重复及冲突、整批清理、重试和原成功批次逐字段不变。内存调用链不证明真实事务或并发唯一约束，原命令、结果及限制见 [完成记录](../../../docs/TODO-ARCHIVE.md)。
 
 ## 数量限制与失败说明
 
@@ -59,12 +59,14 @@ TradeConfirms 只接受直接的属性式 Order、TradeConfirm、SymbolSummary�
 
 ## 验证边界
 
-2026-11-18按0042信任历史并简化后，后端全量539项通过；再补两个输入范围参数边界，受影响专项70项通过。组合清单覆盖当前全部541案例，无失败、错误或跳过。临时PostgreSQL实际验证同券商查询、无需旧暂存来源的可信既有记录关联、零／多匹配失败、占用、回滚、整批清理与重试，临时服务停止并删除。未连接真实IBKR或现有账本。范围、命令、组合清单及限制见 [关联验收](../../../docs/audits/2026-11-18-ibkr-option-link-validation.md)。
+期权关联的验收使用临时 PostgreSQL，覆盖同券商查询、无需旧暂存来源的可信既有记录关联、零／多匹配失败、占用、回滚、整批清理与重试。实际命令、组合清单及限制见 [关联验收](../../../docs/TODO-ARCHIVE.md#期权关联验收明细)。验证未连接真实 IBKR 或现有账本。
 
 请求 URL 的 DEBUG 日志统一由 `executeHttpGet` 输出，其中 Token 参数通过 `maskToken` 隐藏。非法请求配置使用固定错误消息，避免原始 URI 异常携带 Token。客户端回归测试使用模拟 HTTP 响应和合成 Token，覆盖 SendRequest、GetStatement 两阶段，并核对非法 URL 的异常链。 [日志回归测试](../../../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrFlexClientTest.java) · [日志修复方案](../../../design/0024-2026-11-12-ibkr-token-log-redaction.md)
 
-[适配器测试](../../../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrSyncAdapterTest.java)和 [导入 Worker 测试](../../../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrImportWorkerTest.java)覆盖分窗、失败残留、映射与 BookTrade 边界。[数量回归测试](../../../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrQuantityValidationTest.java)覆盖整数、小数、非法值、溢出，以及真实解析／暂存／导入／异步执行／清理组件配合模拟仓储的调用链。2026-11-16 的数量与相关同步测试 104 项验证及当时未执行个人夹具的限制，保留在数量问题的验收记录中。当前解析测试已按 0039 替换为合成数据，默认全量运行不再需要排除这些方法；内存测试仍不代表已验证数据库事务或真实账户。
+[适配器测试](../../../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrSyncAdapterTest.java)和 [导入 Worker 测试](../../../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrImportWorkerTest.java)覆盖分窗、失败残留、映射与 BookTrade 边界。[数量回归测试](../../../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrQuantityValidationTest.java)覆盖整数、小数、非法值、溢出，以及真实解析／暂存／导入／异步执行／清理组件配合模拟仓储的调用链。原数量验证记录见 [归档](../../../docs/TODO-ARCHIVE.md)，内存测试不代表真实账户验证。
+
+[费用精度回归](../../../backend/src/test/java/com/vortex/sync/adapter/ibkr/TradeFeePrecisionTest.java)覆盖原始费用的计算、API 数字／字符串和统计。V29 的独立迁移验收另由 [费用运行器](../../../e2e/README.md#fee-precision-migration-check) 使用临时 PostgreSQL 验证实际落库和汇总，原运行结果见归档；没有实际 XML 导入或历史账本对账。
+
+客户端部分 Flex 错误码说明、重试及 AUTH／NETWORK 分类仍未修复，账户 ID 日志按用户决定允许；二者不能与 Token 脱敏或结构校验的已完成验证混为一谈。 [活动 TODO](../../../docs/TODO.md) · [研发约定](../../../AGENTS.md#验证与数据安全)
 
 历史方案见 [Flex Web Service](../../../design/0009-2026-04-14-ibkr-flex-web-service.md)、[BookTrade](../../../design/0012-2026-04-18-ibkr-booktrade-mapping.md)、[IBKR 暂存](../../../design/0013-2026-04-21-ibkr-staging-schema.md)和 [原始数据查看](../../../design/0015-2026-04-21-sync-staged-data-viewer.md)。
-
-2026-11-17 在 `ubuntu-dev` 运行 [费用精度回归](../../../backend/src/test/java/com/vortex/sync/adapter/ibkr/TradeFeePrecisionTest.java) 及相关 IBKR 导入、Tiger 映射、交易和市场事件服务单测，展示修订后共 86 项全部通过，费用用例 10 项。单测全部使用内存模拟仓储；0029 已通过 [独立迁移脚本](../../../e2e/README.md#fee-precision-migration-check) 在 PostgreSQL 18.6 临时集群验证实际落库和汇总，复现旧 V28 的两位舍入并确认 V29 无此损失。0030 未修改迁移或 ORM，沿用该隔离验证；临时服务已停止且清理。未执行真实券商同步、个人 XML 导入或历史账本对账。

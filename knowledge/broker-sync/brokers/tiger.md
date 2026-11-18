@@ -16,7 +16,7 @@
 
 ## 时间格式限制
 
-当前源码存在两阶段时间格式不一致。`TigerStagingWorker` 将 SDK 的毫秒时间戳以 `Asia/Shanghai` 转成 `yyyy-MM-dd'T'HH:mm:ss` 后写入 `trade_time`，`TigerTradeRecordMapper` 却将同一字段按 epoch 毫秒整数解析。按该代码路径，新暂存订单在导入时会因时间格式失败并触发批次清理。本次文档迁移通过静态核对发现此问题，未修复业务代码或连接真实账户验证。
+当前源码存在两阶段时间格式不一致。`TigerStagingWorker` 将 SDK 的毫秒时间戳以 `Asia/Shanghai` 转成 `yyyy-MM-dd'T'HH:mm:ss` 后写入 `trade_time`，`TigerTradeRecordMapper` 却将同一字段按 epoch 毫秒整数解析。按该代码路径，通过预过滤的新暂存订单在导入时会因时间格式失败并触发批次清理。该缺陷仍待修复；证据为源码静态核对，未进行真实账户运行验证。 [活动待办](../../../docs/TODO.md)
 
 [暂存服务测试](../../../backend/src/test/java/com/vortex/sync/adapter/tiger/TigerStagingServiceTest.java)模拟暂存 Worker，[映射测试](../../../backend/src/test/java/com/vortex/sync/adapter/tiger/TigerTradeRecordMapperTest.java)直接使用构造的毫秒字符串。这两组测试没有覆盖暂存到导入的时间格式衔接。对应实现见 [暂存 Worker](../../../backend/src/main/java/com/vortex/sync/adapter/tiger/TigerStagingWorker.java)和 [交易映射器](../../../backend/src/main/java/com/vortex/sync/adapter/tiger/TigerTradeRecordMapper.java)。
 

@@ -33,7 +33,7 @@ import java.util.Map;
  *
  * <p>v2 state model has no resume endpoint: failed or stuck batches are
  * cleaned up automatically (fail-fast) and the next sync is a fresh
- * batch. See {@code docs/broker-sync/framework/import-consistency.md}.</p>
+ * batch. See {@code knowledge/broker-sync/lifecycle.md}.</p>
  */
 @RestController
 @RequestMapping("/api/broker-sync")

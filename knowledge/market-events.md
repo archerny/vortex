@@ -18,7 +18,7 @@
 
 代码变更的平均成本按原证券和券商回放历史交易计算。买入金额增加成本池；当前正持仓恰好全部卖出时，直接结清成本池并将数量减为零，后续建仓不再携带旧的舍入尾差。部分卖出仍按 6 位小数、`HALF_UP` 的均价减记，最终均价仍以 4 位小数、`HALF_UP` 舍入，两笔转移交易的金额仍为该均价乘持仓数量。此处成本池仅为回放中的局部变量，计算用于代码变更交易定价，不是日常持仓查询维护的成本账户。 [平均成本实现](../backend/src/main/java/com/vortex/service/MarketEventProcessingService.java) · [0028 清仓成本池方案](../design/0028-2026-11-16-clear-cost-pool-on-liquidation.md) · [交易与持仓](trades-and-positions.md)
 
-[市场事件回归测试](../backend/src/test/java/com/vortex/service/MarketEventProcessingServiceTest.java) 使用真实事件处理与持仓计算、Mockito 仓储及合成交易，从证券代码变更入口验证清仓、重新建仓和生成交易。2026-11-16 在 `ubuntu-dev` 中，新增 8 项及相关持仓、交易服务测试共 33 项通过，Maven 退出 0；仅为纯内存回归，未验证真实数据库事务，也未读取或重算用户历史账本。卖超、负持仓、同日成交排序及更广的计价精度规则保持原有边界，本次只修复清仓尾差。
+[市场事件回归测试](../backend/src/test/java/com/vortex/service/MarketEventProcessingServiceTest.java) 使用真实事件处理与持仓计算、Mockito 仓储及合成交易，从证券代码变更入口验证清仓、重新建仓和生成交易。原清仓修复的内存运行记录见 [归档](../docs/TODO-ARCHIVE.md)，真实事务的后续验证入口见 [e2e](../e2e/README.md#ordered-market-event-check)。卖超、负持仓、同日成交排序及更广的计价精度规则仍保持原有边界；清仓修复不代表这些口径均已解决。
 
 ## 顺序处理与关联证券历史锁
 
@@ -42,7 +42,7 @@
 
 交易／事件 HTTP 写入冲突返回 409，保留 status/message，并提供 code、blockingEventId、blockingEventType、eventDate、symbols；页面显示原因及可用的阻挡事件信息。同步保留既有 UNRECOGNIZED 分类。 [响应契约](../backend/src/main/java/com/vortex/controller/MarketEventConflictAdvice.java) · [操作与错误码](../docs/market-events.md)
 
-不在启动时重算、删除或补造历史结果；processed=true 是保守锁定依据，不证明旧结果正确。未处理事件已有派生行时拒绝修改、处理与撤销；创建请求不能指定 ID、审计字段、已处理／删除状态或显式空状态。存量检查与异常处置见 [操作指南](../docs/market-events.md#存量切换)。实际用户账本未在本次检查或修复。
+不在启动时重算、删除或补造历史结果；processed=true 是保守锁定依据，不证明旧结果正确。未处理事件已有派生行时拒绝修改、处理与撤销；创建请求不能指定 ID、审计字段、已处理／删除状态或显式空状态。存量检查与异常处置见 [操作指南](../docs/market-events.md#存量切换)。既有验收使用合成数据，没有检查或修复实际用户账本。
 
 规则来源：[0035](../design/0035-2026-11-17-ordered-market-events-and-history-locks.md)、[0036](../design/0036-2026-11-17-market-event-write-coordination.md)、[0037](../design/0037-2026-11-17-ordered-event-state-validation.md)、[0038](../design/0038-2026-11-17-sync-cleanup-history-guard.md)。单测及独立临时数据库的真实事务、并发、失败回滚验收见 [验证指南](../e2e/README.md#ordered-market-event-check)。
 

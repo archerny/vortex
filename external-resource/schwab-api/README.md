@@ -1,5 +1,7 @@
 # Charles Schwab API 文档 - 下载与维护指南
 
+Vortex 尚无 Schwab 适配器；本目录部分内容来自第三方，使用前需核对官方定义。资料适用范围见 [总索引](../README.md)。
+
 ## 概述
 
 本目录存放从 [Charles Schwab Developer Portal](https://developer.schwab.com/) 及相关来源整理的离线 Markdown 文档，供项目内部引用。

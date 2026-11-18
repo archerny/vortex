@@ -54,7 +54,7 @@ public class BrokerSyncBatch extends BaseEntity {
 
     /**
      * 批次主状态：PENDING, PROCESSING, COMPLETED, FAILED, CLEANUP_FAILED
-     * (v2 removed PARTIAL and INTERRUPTED — see docs/broker-sync/framework/import-consistency.md)
+     * (v2 removed PARTIAL and INTERRUPTED — see knowledge/broker-sync/lifecycle.md)
      */
     @Column(name = "status", nullable = false, length = 32)
     private String status;

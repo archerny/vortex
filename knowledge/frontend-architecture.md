@@ -28,9 +28,9 @@
 
 [package.json](../frontend/package.json) 定义开发、构建和测试命令，`package-lock.json` 包含 Vitest 和图表依赖的锁定记录。Vitest 在 Node 环境中运行，[常量测试](../frontend/src/constants/__tests__/) 覆盖菜单映射和交易常量，[演示数据测试](../frontend/src/pages/profit/chart-demo/__tests__/mockData.test.js) 覆盖合成价格、报价、收益边界和曲面维度。运行和排查步骤见 [前端指南](../docs/frontend-guide.md)。
 
-[费用 API 回归](../frontend/src/services/__tests__/tradeFeePrecision.test.js) 通过模拟 Axios 验证高精度费用读取、回填和提交；[展示及排序回归](../frontend/src/utils/__tests__/tradeFee.test.jsx) 使用真实列表列和统计组件，覆盖完整小数、极小费用、零／缺省值、遮罩、精确排序及旧响应兼容。2026-11-17 修订后 51 项前端单测及构建通过；实际浏览器在独立合成接口上确认列表、详情和统计均展示 `1.1234567890123456789`。此前仅修改证券代码再保存的浏览器验收也已确认费用字符串无损。未连接真实后端或用户账本。
+[费用 API 回归](../frontend/src/services/__tests__/tradeFeePrecision.test.js) 通过模拟 Axios 验证高精度费用读取、回填和提交；[展示及排序回归](../frontend/src/utils/__tests__/tradeFee.test.jsx) 在 Node 中使用真实列表列和统计组件的静态渲染，覆盖完整小数、极小费用、零／缺省值、遮罩、精确排序及旧响应兼容。原费用修订的单测、构建与合成接口浏览器验收记录见 [归档](../docs/TODO-ARCHIVE.md)，没有连接真实后端或用户账本；不在架构说明中维护固定测试数量。
 
-市场事件页面通过共享撤销组件确认操作。失败保留弹窗和原因，成功刷新列表；交易与事件写入的冲突提示显示后端提供的阻挡事件、日期和证券，相关接口返回 409。实际三类撤销交互以合成接口点验，未操作真实账本。 [操作指南](../docs/market-events.md) · [冲突格式化测试](../frontend/src/utils/__tests__/marketEventError.test.js)
+市场事件页面通过共享撤销组件确认操作。失败保留弹窗和原因，成功刷新列表；交易与事件写入的冲突提示显示后端提供的阻挡事件、日期和证券，相关接口返回 409。三类撤销交互的既有合成接口点验见 [归档](../docs/TODO-ARCHIVE.md)，未操作真实账本。 [操作指南](../docs/market-events.md) · [冲突格式化测试](../frontend/src/utils/__tests__/marketEventError.test.js)
 
 ## 图表技术选型演示
 

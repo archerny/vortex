@@ -24,10 +24,12 @@ spring.datasource.password=<dev-password>
 
 ## 表结构与默认配置
 
-- Flyway 通过 [`db/migration/`](../backend/src/main/resources/db/migration/) 下的脚本初始化空库并升级已有数据库。新结构变更通过追加迁移完成。
+- Flyway 通过 [`db/migration/`](../backend/src/main/resources/db/migration/) 下的 V1–V29 脚本初始化空库并升级已有数据库。新结构变更通过追加迁移完成；V29 解除费用列的固定小数位，不回填历史费用。 [费用契约](../knowledge/trades-and-positions.md#交易记录)
 - `spring.jpa.hibernate.ddl-auto=validate` 让 Hibernate 检查实体映射与数据库结构。表结构变更由 Flyway 管理。
 - HikariCP 的连接池配置和 Hibernate 的 JDBC 时区设置见 [application.properties](../backend/src/main/resources/application.properties)。需要覆盖时写入所选 profile 的配置。
 - [旧库手动基线脚本](../backend/src/main/resources/db/manual/flyway_baseline_for_existing_db.sql) 只适用于已经人工应用 V1 至 V18、尚无 Flyway 记录的旧库。使用前须逐项核对目标库结构与迁移记录。
+
+PostgreSQL 18.6 的既有合成迁移与事务验收见 [e2e 指南](../e2e/README.md)。Flyway 版本由 Spring Boot 依赖管理决定，不能仅凭数据库最低版本文字推断所有组合已验证。
 
 ## 启动与验证
 

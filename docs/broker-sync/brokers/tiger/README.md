@@ -1,5 +1,7 @@
 # Tiger 接入与使用
 
+**当前限制：**适配器虽已存在，正常暂存保存的成交时间与导入解析格式不一致，新订单可能使整批同步失败并清理。此项仍待修复，不能将发现接口列出 Tiger 当作可成功导入的证明。 [实现与已知缺陷](../../../../knowledge/broker-sync/brokers/tiger.md#时间格式限制) · [待办](../../../TODO.md)
+
 ## 配置
 
 1. 准备 Tiger 开放平台的 Tiger ID、SDK 使用的 PKCS#8 RSA 私钥和资金账户。 [接入参考](../../../../external-resource/tiger-api/docs/basic-java.md)

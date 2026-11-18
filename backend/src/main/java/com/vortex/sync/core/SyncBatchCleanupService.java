@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
  * <p>Used by {@link SyncBatchFailureHandler} as part of the v2 fail-fast
  * model: when a sync batch fails (at any phase, or on startup recovery), we
  * first wipe its footprint and only then mark the batch terminal. See
- * {@code docs/broker-sync/framework/import-consistency.md § 5}.</p>
+ * {@code knowledge/broker-sync/lifecycle.md}.</p>
  *
  * <h3>Cleanup scope</h3>
  * <ul>

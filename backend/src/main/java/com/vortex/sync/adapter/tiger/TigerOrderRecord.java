@@ -127,9 +127,9 @@ public class TigerOrderRecord {
      * 对于普通交易通常为 null 或空字符串；非空时代表订单为期权事件类订单，
      * 例如行权（Exercise）、被指派（Assignment）、到期作废（Expired）等。
      *
-     * 在 Phase 3 本期实现中，{@code attrDesc} 非空的订单一律暂存为 FAILED，
+     * 当前导入阶段拒绝 {@code attrDesc} 非空的订单，标记为 FAILED，
      * 保留原值以便后续收集样本并补齐 attrDesc → TriggerRefType 的映射表。
-     * 参见 {@code docs/broker-sync/brokers/tiger/staging-schema.md § 5.1}。
+     * 参见 {@code knowledge/broker-sync/brokers/tiger.md} 的导入映射。
      */
     private String attrDesc;
 

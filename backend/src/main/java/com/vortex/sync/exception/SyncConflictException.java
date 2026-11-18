@@ -7,7 +7,7 @@ package com.vortex.sync.exception;
  *
  * <p>This exception corresponds to the DB-level guard provided by the partial
  * unique index {@code uk_only_one_active} (see Flyway V28 and
- * {@code docs/broker-sync/framework/import-consistency.md § 4}). Controllers
+ * {@code knowledge/broker-sync/lifecycle.md}). Controllers
  * should translate this into an HTTP {@code 409 Conflict} response; the
  * conflicting {@link #getConflictingBatchId()} and
  * {@link #getConflictingStatus()} are exposed so the frontend can render the

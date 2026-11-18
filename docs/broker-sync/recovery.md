@@ -33,7 +33,7 @@ IBKR 批次的 `first failure:` 后若显示 `Fractional IBKR quantities are not
 
 ## IBKR 期权事件关联失败
 
-出现 `[UNRECOGNIZED]`、`exact_matches=0`／`exact_matches=2` 等匹配数量及 `manual investigation required` 时，本批股票侧行权／指派没有恰好一个能验证的期权侧簿记记录。`stock_record_id` 是本地内部行ID，不是券商订单号。它所关联的是同一次事件的期权平仓记录，不是更早的开仓交易。其他提示还包括候选已被使用或本批股票记录失去资格。 [匹配条件](../../knowledge/broker-sync/brokers/ibkr.md#导入映射)
+出现 `[UNRECOGNIZED]`、`exact_matches=0`／`exact_matches=2` 等匹配数量及 `manual investigation required` 时，本批股票侧行权／指派没有恰好一个能验证的期权侧簿记记录。`stock_record_id` 是本地内部行ID，不是券商订单号。它指向同一次事件的期权侧记录：行权为 SELL，指派为 BUY，不能统一称为 SELL 平仓；也不是更早的开仓交易。其他提示还包括候选已被使用或本批股票记录失去资格。 [匹配条件](../../knowledge/broker-sync/brokers/ibkr.md#导入映射)
 
 应核对本次报表是否包含事件两侧，以及券商、币种、日期、标的、行权／指派、买卖方向、行权价与100倍数量关系是否一致。两个到期日不同的合约仍可能同时符合条件，这时也必须人工排查。已有正式记录按用户确认直接信任，不回查历史批次状态或补齐旧来源，不做历史数据兼容。本次新导入期权交割记录若出现 `Unsupported IBKR option-event multiplier; expected 100`，核对当前报表乘数；非标准交割、一对多／多对一暂不自动支持。
 
@@ -46,6 +46,12 @@ IBKR 批次的 `first failure:` 后若显示 `Fractional IBKR quantities are not
 PENDING／PROCESSING／CLEANUP_FAILED 期间事件处理、修改、撤销均被阻止，避免依赖半批结果。自动清理在任何删除前检查本批有效正式交易的历史约束；旧 FAILED 残留若已被事件使用，也会拒绝删除。此时保留诊断、先核对依赖，不能绕过锁定直接删行或删除成功批次。COMPLETED 批次不允许经清理服务删除。
 
 旧 FAILED 残留若因历史锁导致失败清理，最终可能转为 CLEANUP_FAILED：清理等待事件解除历史锁，事件撤销又被活动批次阻止。这种异常存量不能通过普通页面的“先撤销、再清理”恢复。应停止全部写入、确认 Worker 已退出、备份并核对批次与事件依赖，单独授权和评审维护处置；本版本不提供自动解锁或通用修复命令，不能仅修改状态假装清理完成。正常流程先清理再置 FAILED，不产生这一组合；切换前须查出旧异常。
+
+## 其他已知问题
+
+Tiger 报错 `trade_time is not a valid epoch-millis long` 时，先核对 [已知时间格式缺陷](../../knowledge/broker-sync/brokers/tiger.md#时间格式限制)：暂存保存日期时间文本，映射要求毫秒数字。当前未修复，同一路径直接重试通常仍会失败，不应手工修改暂存时间绕过校验。
+
+IBKR 客户端的部分错误码说明与 AUTH／NETWORK 分类尚未对齐官方语义，见 [TODO](../TODO.md)。遇到 1005、1006、1012 等错误时结合原错误码核对厂商定义，不能只依赖当前客户端文字判断 Token 或限流问题。
 
 ## 只读检查
 

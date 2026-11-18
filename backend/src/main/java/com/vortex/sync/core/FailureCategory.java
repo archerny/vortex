@@ -7,8 +7,8 @@ package com.vortex.sync.core;
  * staged-row level failures so operators can filter/group failures by
  * cause without parsing free-form text.</p>
  *
- * <p>See {@code docs/broker-sync/framework/unrecognized-data-logging.md}
- * and {@code docs/broker-sync/framework/sync-lifecycle.md § 7.1}.</p>
+ * <p>See {@code knowledge/broker-sync/adapter-contracts.md}
+ * and {@code knowledge/broker-sync/lifecycle.md}.</p>
  */
 public enum FailureCategory {
 

@@ -1,219 +1,77 @@
 # Vortex
 
+Vortex is a personal investment ledger and profit-and-loss analysis system. It currently supports trades, position quantities, cash flows, brokers, strategies, market events, and broker synchronization. Production profit-and-loss analysis is not yet implemented.
 
-A personal investment portfolio management system designed for individual investors who trade across multiple brokers and markets. Vortex provides a unified platform to manage trade records, cash flows, position snapshots, and market events — with the goal of accurate profit & loss analysis.
+## Current Capabilities
 
-## Features
+| Module | Implemented Behavior and Limits |
+| --- | --- |
+| Trade records | Query, create, edit, soft-delete, related-trade display, and statistics for stocks, ETFs, calls, and puts. Directions are BUY/SELL; currencies are CNY/HKD/USD. Quantities are integers, prices have 4 decimal places, and trade amounts have 2. Fee storage, aggregation, display, and editing preserve numeric precision. |
+| Position snapshots | Aggregate BUY minus SELL quantities by cutoff date, symbol, and broker, including generated market-event trades. Position cost and profit/loss are not calculated. |
+| Basic management | Query and create cash flows; query, create, and update brokers; query, create, update, and delete strategies. The backend also exposes cash-flow soft deletion, but no cash-flow update endpoint. |
+| Market events | Stock splits, symbol changes, and dividends in kind generate trades for the selected event using prior-day positions. Events are processed in order, lock earlier history for related securities, and can be undone only when the required conditions hold. No automatic cascading recalculation. |
+| IBKR synchronization | Asynchronous fetching, staging, order-level import, content checks for duplicate IDs, and exact, unique option-event linkage. Only single-account TCF reports with the prescribed structure and integer quantities are supported. |
+| Tiger synchronization | SDK fetching, staging, and import code exists, but staged timestamps do not match the import parser's format. Normal new orders can fail the entire batch. This defect remains unresolved. |
+| Sync batches | At most one active batch globally. Failed batches are cleaned up in full; cleanup failure blocks new synchronization. No resume or automatic scheduling. The staged-data viewer covers IBKR only. |
+| Data verification | Six categories of trade anomaly checks report issues without automatically repairing the ledger. |
+| Frontend demos | The dashboard and stock, strategy, and account profit/loss pages are placeholders. The chart-selection demo uses fixed synthetic data for charts and an option chain, without ledger or market-data integration. |
 
-### Core Functionality
-
-- **Trade Record Management** — Full CRUD with soft-delete for stock, ETF, and options (calls & puts) trades across US (USD), HK (HKD), and CN (CNY) markets. Automatic amount calculation with contract multiplier support for options.
-- **Position Snapshots** — Real-time position aggregation by `(symbol, brokerId)`, derived purely from BUY/SELL trade records.
-- **Cash Flow Records** — Track deposits and withdrawals across brokers and currencies.
-- **Broker Management** — Manage multiple brokerage accounts.
-- **Strategy Management** — Organize trades by investment strategies.
-
-### Market Event Processing
-
-- **Stock Splits** — Generates zero-cost BUY records when the split ratio increases the share count.
-- **Symbol Changes** — Generates SELL (old symbol) + BUY (new symbol) records to seamlessly transfer cost basis (e.g., FB → META).
-- **Dividends in Kind** — Generates BUY records for dividend securities with fair-value cost basis.
-- **Historical Recalculation** — Changing an event recalculates events selected by affected symbols and dates in the same transaction. Calculations use prior-day positions. [Market Event Knowledge](knowledge/market-events.md)
-
-### Trade Origin Tracking
-
-Every trade record carries explicit origin metadata:
-- `tradeTrigger` — Why the trade happened: `MANUAL`, `OPTION`, or `MARKET_EVENT`
-- `triggerRefType` — Specific sub-type (e.g., `STOCK_SPLIT`, `OPTION_EXERCISE`, `OPTION_ASSIGNED`)
-- `triggerRefId` — Links to the originating event or trade record
-
-### Broker Data Sync
-
-- **IBKR and Tiger** — Both adapters have asynchronous fetch, staging and import code. The staged-data viewer currently exposes IBKR data. [Broker Sync Knowledge](knowledge/broker-sync/README.md)
-- **Batch management** — The UI shows batch status and errors. The framework cleans up failed batches and blocks new submissions while a batch requires manual recovery. [Broker Sync Guide](docs/broker-sync/README.md)
-
-### Data Verification
-
-Six built-in verification rules for trade data anomaly detection:
-- Option symbol format validation
-- HK stock symbol format validation
-- Passive option operation fee/price checks
-- US stock symbol format validation
-- Symbol-to-asset-type consistency
-- Trigger type and ref type consistency
-
-### Frontend
-
-- Dashboard and profit-analysis page placeholders
-- Trade record list with detail pages, statistics panel, and related trades display
-- Cash flow management
-- Market event management (Stock Split / Symbol Change / Dividend in Kind tabs)
-- Trade anomaly analysis and position snapshot views
-- Sync management page
-- Amount visibility toggle (show/hide sensitive data)
+Detailed rules are documented in [Trades and Positions](knowledge/trades-and-positions.md), [Market Events](knowledge/market-events.md), [Broker Synchronization](knowledge/broker-sync/README.md), and [Frontend Architecture](knowledge/frontend-architecture.md). Known unresolved issues are tracked in [TODO](docs/TODO.md).
 
 ## Tech Stack
 
-| Layer | Technology | Version |
-|-------|-----------|---------|
-| **Backend** | Java + Spring Boot | Java 17, Spring Boot 3.2.0 |
-| **Build (Backend)** | Maven | 3.6+ |
-| **ORM** | Spring Data JPA (Hibernate) | — |
-| **Database** | PostgreSQL | 12+ |
-| **Migrations** | Flyway | V1–V28 |
-| **Connection Pool** | HikariCP | — |
-| **Frontend** | React | 18.2 |
-| **UI Library** | Ant Design | 5.12 |
-| **Build (Frontend)** | Vite | 5.0 |
-| **HTTP Client** | Axios | 1.6 |
-| **Charts** | Recharts | 2.12 |
-| **Date Handling** | Day.js | 1.11 |
-| **Backend Testing** | JUnit 5 + Mockito | — |
-| **Frontend Testing** | Vitest | 1.6 |
-| **Broker SDKs** | Tiger Open API SDK, IBKR Flex Web Service | Tiger SDK 2.4.7 |
+- Backend: Java compilation target 17, Spring Boot 3.2.0, Maven, Spring Data JPA/Hibernate, HikariCP, PostgreSQL, and Flyway V1–V29.
+- Frontend: React 18, Ant Design 5, Vite 5, Axios, and Day.js; chart dependencies include Recharts, Lightweight Charts, ECharts, and Plotly.
+- Testing: JUnit 5/Mockito and Vitest. Separate disposable PostgreSQL runners in `e2e/` verify real transactions and migrations.
+- Brokers: Tiger OpenAPI Java SDK 2.4.7 and IBKR Flex Web Service.
 
-## Getting Started
+Backend versions are defined in [pom.xml](backend/pom.xml). Frontend declarations and resolved versions are recorded in [package.json](frontend/package.json) and [package-lock.json](frontend/package-lock.json). Existing synthetic validation on PostgreSQL 18.6 is documented in the [e2e guide](e2e/README.md); it does not establish compatibility with every PostgreSQL version.
 
-### Prerequisites
+## Development and Verification
 
-- **JDK 17+**
-- **Maven 3.6+**
-- **Node.js 18+**
-- **PostgreSQL 12+**
+Select the execution environment and check the existing Java, Maven, Node, and npm tools according to the [development rules](AGENTS.md#1-环境隔离). Install frontend dependencies from the lockfile; Vite 5 supports Node 18.x or 20 and newer. Before integration work, configure the `dev` profile to use an isolated development database. The base configuration points to `vortex`; selecting `dev` alone does not switch databases. Application startup connects to the database and may apply Flyway migrations.
 
-### Database Setup
-
-Set up an isolated database for development and configure the `dev` profile before starting the backend. Flyway applies migrations at startup. Verify the datasource first, especially when using the `local` profile for a real ledger. [Database Setup](docs/database-setup.md) · [Local Config Guide](docs/local-config-guide.md)
-
-### Backend
+Run these commands from the current worktree root:
 
 ```bash
+# Initial frontend dependency installation
+npm --prefix frontend ci
+
+# Start the backend and frontend in separate terminals
 mvn -f backend/pom.xml spring-boot:run -Dspring-boot.run.profiles=dev
-```
+npm --prefix frontend run dev
 
-The backend starts at `http://localhost:8080`.
-
-### Frontend
-
-```bash
-cd frontend
-
-npm install
-npm run dev
-```
-
-The frontend starts at `http://localhost:3000` and proxies API requests to the backend.
-
-### Running Tests
-
-```bash
-# Backend unit tests
+# In-memory unit tests and frontend build
 mvn -f backend/pom.xml test
-
-# Frontend unit tests
 npm --prefix frontend test
+npm --prefix frontend run build
 ```
 
-> **Testing philosophy**: All unit tests run in pure memory with no database connections. Backend tests use Mockito for repository isolation; frontend tests focus on constant/config layer validation. See [Unit Test Spec](docs/unit-test-spec.md) for details.
+The backend defaults to `http://localhost:8080`, with status available at `/api/health`. The frontend defaults to `http://localhost:3000`, and its development proxy forwards `/api` to the backend. Unit tests do not connect to databases or brokers; parser tests use synthetic XML and require no personal fixtures. See the [backend guide](docs/backend-guide.md), [frontend guide](docs/frontend-guide.md), [configuration guide](docs/local-config-guide.md), and [unit-test specification](docs/unit-test-spec.md) for details.
 
-## Project Structure
+## Project Structure and Documentation
 
-```
-vortex/
-├── backend/                            # Spring Boot backend
-│   ├── pom.xml                         # Maven config
-│   └── src/
-│       ├── main/java/com/vortex/
-│       │   ├── Application.java        # Main entry point
-│       │   ├── config/                 # Configuration (Async, Database)
-│       │   ├── controller/             # REST controllers
-│       │   ├── dto/                    # Data transfer objects
-│       │   ├── entity/                 # JPA entities
-│       │   │   └── enums/              # Enums (AssetType, TradeType, Currency, ...)
-│       │   ├── repository/             # Data access layer
-│       │   ├── service/                # Business logic
-│       │   └── sync/                   # Broker sync module
-│       │       ├── core/               # Sync core (adapter interface, async executor)
-│       │       └── adapter/            # Broker adapters (Tiger, IBKR)
-│       └── main/resources/
-│           ├── application.properties  # Base config (no secrets)
-│           └── db/migration/           # Flyway migrations
-├── frontend/                           # React + Vite frontend
-│   ├── package.json
-│   └── src/
-│       ├── components/                 # Layout components
-│       ├── contexts/                   # React contexts
-│       ├── constants/                  # Constants and config
-│       ├── services/                   # API service layer
-│       └── pages/                      # Page components
-│           ├── trade/                  # Trade records (list, detail, stats)
-│           ├── market-events/          # Market events (3 tabs)
-│           ├── analysis/               # Anomaly detection + position snapshot
-│           ├── profit/                 # P&L analysis (placeholder)
-│           └── sync/                   # Sync management
-├── deploy/                             # Build scripts
-│   ├── build-backend.sh                # Backend build → JAR + start script
-│   └── build-frontend.sh              # Frontend build → static files
-├── docs/                               # Setup, usage and recovery guides
-├── knowledge/                          # Current capabilities and architecture
-├── design/                             # Historical decisions and proposals
-├── e2e/                                # E2E test scripts
-│   └── reset-dev-db.sh                 # Dev database reset utility
-└── external-resource/                  # Broker API reference docs
-    ├── tiger-api/
-    ├── ibkr-api/
-    ├── futu-api/
-    ├── schwab-api/
-    └── longbridge-api/
-```
+| Directory or Entry Point | Purpose |
+| --- | --- |
+| [`backend/`](backend/) | Controllers, services, repositories, entities and DTOs, broker adapters, migrations, and backend unit tests |
+| [`frontend/`](frontend/) | React entry point, layout and contexts, hash navigation, pages, API wrappers, and frontend unit tests |
+| [Current Knowledge](knowledge/README.md) | Implemented capabilities, business contracts, architecture, and source references |
+| [Operations and Development Guides](docs/README.md) | Environment setup, development, deployment, market-event operations, sync recovery, and verification |
+| [Design Index](design/README.md) | Historical decisions and pending proposals; designs alone do not establish current capabilities |
+| [TODO](docs/TODO.md) / [Archive](docs/TODO-ARCHIVE.md) | Open work and dated resolution and validation evidence |
+| [Independent Validation](e2e/README.md) | Synthetic data, temporary databases, read-only diagnostics, and UI tools using mock APIs |
+| [Build and Deployment](deploy/README.md) | Build scripts, output directories, and current parameter limitations |
+| [External References](external-resource/README.md) | Offline broker documentation; available references do not imply API integration |
 
-## Production Build
+## Distribution Builds
 
 ```bash
-# Backend (outputs JAR + start script + archive)
-./deploy/build-backend.sh           # with tests
-./deploy/build-backend.sh -s        # skip tests
-
-# Frontend (outputs static files + archive)
+./deploy/build-backend.sh
 ./deploy/build-frontend.sh
 ```
 
-Build artifacts are written to `deploy/output/`. For distribution, use a worktree without local credentials in backend resources and inject configuration at runtime. Serve the frontend with `/api` routed to the backend. [Backend Guide](docs/backend-guide.md) · [Frontend Guide](docs/frontend-guide.md)
+Artifacts are written to `deploy/output/`. The backend JAR includes local profile files present in the resource directory at build time. Before distribution, ensure that no credential files are included and inject configuration at runtime. The generated `start.sh` defaults to `local`; explicitly pass `dev` for an isolated development environment. Frontend requests use relative `/api` paths, so the hosting service must provide same-origin routing or a reverse proxy. See the [deployment guide](deploy/README.md) for the actual effects of script parameters.
 
-## Configuration
-
-Sensitive configuration (database passwords, broker API keys) is managed via Spring Boot profiles:
-
-- `application.properties` — Base config with placeholders (committed to repo)
-- `application-local.properties` — Local overrides with real secrets (gitignored)
-
-See [Local Config Guide](docs/local-config-guide.md) for details.
-
-## Documentation
-
-| Document | Description |
-|----------|-------------|
-| [Backend Guide](docs/backend-guide.md) | Backend tech stack, startup instructions, project structure |
-| [Frontend Guide](docs/frontend-guide.md) | Frontend tech stack, startup instructions, debugging guide |
-| [Frontend Structure](docs/frontend-structure.md) | Guide for adding frontend pages |
-| [Database Setup](docs/database-setup.md) | PostgreSQL installation and configuration |
-| [Local Config Guide](docs/local-config-guide.md) | Spring Boot profile mechanism and secret management |
-| [Unit Test Spec](docs/unit-test-spec.md) | Testing standards and conventions |
-| [Current Knowledge](knowledge/README.md) | Implemented behavior, architecture and code references |
-| [Design History](design/README.md) | Numbered design records and pending proposals |
-| [TODO](docs/TODO.md) | Open defects, code references and acceptance criteria |
-| [TODO Archive](docs/TODO-ARCHIVE.md) | Completed, cancelled and merged items with decisions and verification records |
-| [Broker Sync Guide](docs/broker-sync/README.md) | Broker setup, synchronization and recovery |
-| [Market Event Guide](docs/market-events.md) | Ordered event entry, per-security history locks, undo and cutover checks |
-
-## Roadmap
-
-- [ ] Profit & loss analysis module (per-stock, per-strategy, per-account)
-- [ ] Chart-based analysis (profit trends, asset distribution)
-- [ ] Additional broker adapters (Futu, Longbridge)
-- [ ] Automatic sync scheduling with conflict resolution
-- [ ] Data export functionality
-
-## License
+Production profit/loss analysis, live market data, additional broker adapters, automatic sync scheduling, and data export are not currently implemented. Futu and Longbridge remain design drafts; Schwab has reference documentation but no project adapter.
 
 Private project. All rights reserved.

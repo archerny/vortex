@@ -23,7 +23,7 @@ import java.util.List;
  * staging were never written to {@code tiger_staged_orders}, so the downstream
  * {@code countByBatchIdAndStatus(FAILED)} check in the adapter never noticed
  * them, and the batch finalized as COMPLETED with a missing record. Removed
- * in v2.4.2 — see {@code docs/broker-sync/framework/import-consistency.md}.</p>
+ * in v2.4.2 — see {@code knowledge/broker-sync/adapter-contracts.md}.</p>
  *
  * <p>Each call into {@link TigerStagingWorker#stageOrder} still runs in its
  * own {@code REQUIRES_NEW} transaction, so successful inserts are committed

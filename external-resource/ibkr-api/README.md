@@ -1,5 +1,7 @@
 # IBKR (Interactive Brokers) API 文档 - 下载与维护指南
 
+Vortex 当前只接入 Trade Confirmation Flex Web Service，实际支持范围见 [IBKR 知识](../../knowledge/broker-sync/brokers/ibkr.md)。本页的采集记录和资料适用范围见 [总索引](../README.md)。
+
 ## 概述
 
 本目录存放从 [IBKR API 官方文档](https://www.interactivebrokers.com/campus/ibkr-api-page/ibkr-api-home/) 下载的离线 Markdown 文档，供项目内部引用。

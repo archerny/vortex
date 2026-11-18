@@ -1,5 +1,7 @@
 # Futu API 文档 - 下载与维护指南
 
+Vortex 尚无富途适配器，只有 [设计草案](../../design/0020-2026-04-23-futu-sync.md)。本页的采集记录和资料适用范围见 [总索引](../README.md)。
+
 ## 概述
 
 本目录存放从 [Futu OpenAPI 官方文档](https://openapi.futunn.com/futu-api-doc/) 下载的离线 Markdown 文档，供项目内部引用。

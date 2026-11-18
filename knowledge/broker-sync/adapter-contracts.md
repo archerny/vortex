@@ -15,6 +15,8 @@
 
 这套契约的历史依据见 [导入一致性 v2](../../design/0018-2026-04-22-broker-import-consistency-v2.md)及 [导入数据丢失链修复](../../design/0019-2026-04-23-broker-import-data-loss-fix.md)。清理及恢复见 [生命周期](lifecycle.md#状态与恢复)。
 
+“整批失败清理”是补偿语义：各 Worker 的短事务独立提交，拉取到完成并不处于同一个数据库事务。批次处理中可能已有正式行；若清理或最终状态写入失败，应以实际残留和诊断为准，不宣称整批从未写入或绝不残留。
+
 ## 分类与诊断
 
 券商各自映射原始资产类别。内部 `AssetType` 包含 `STOCK`、`ETF`、`OPTION_CALL`、`OPTION_PUT`。当前 IBKR 和 Tiger 的常规同步映射覆盖股票和期权，ETF 没有单独的映射分支。

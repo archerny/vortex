@@ -1,5 +1,7 @@
 # Longbridge API 文档 - 下载与维护指南
 
+Vortex 尚无长桥适配器，只有 [设计草案](../../design/0021-2026-04-24-longbridge-sync.md)。本页的采集记录和资料适用范围见 [总索引](../README.md)。
+
 ## 概述
 
 本目录存放从 [Longbridge OpenAPI 官方文档](https://open.longbridge.com/zh-CN/docs) 下载的离线 Markdown 文档，供项目内部引用。

@@ -19,6 +19,8 @@
 
 基础配置的默认库名为 `vortex`，开发测试库约定为 `vortex_dev`，默认数据库用户名为 `dermesos`。创建 `dev` 配置时，将连接 URL 覆盖为实际开发库地址。用户名可按实际角色覆盖。外部 profile、环境变量和命令行中的连接配置也须与目标库一致。 [库名方案](../design/0023-2026-11-11-database-names.md) · [用户名方案](../design/0025-2026-11-15-database-username.md)
 
+仓库没有受版本控制的 `dev`／`local` 覆盖文件。只指定 profile 名称不会自动切换库名；未提供覆盖时仍使用基础文件的 `vortex`。`dev` 用途也不会自动关闭券商请求，自动验证应使用模拟客户端或独立合成运行器。
+
 可在 `backend/src/main/resources/` 创建所选 profile 的文件，填写该环境的数据库连接配置。下例使用开发库占位符。真实凭据通过本地文件或运行环境的秘密存储提供。 [数据库配置指南](database-setup.md)
 
 ```properties

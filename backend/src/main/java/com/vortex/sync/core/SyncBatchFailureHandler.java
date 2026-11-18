@@ -26,7 +26,7 @@ import org.springframework.stereotype.Service;
  * transient DB issues (brief pool exhaustion, short-lived lock conflicts,
  * serialization failures) can clear before we escalate.</p>
  *
- * <p>See {@code docs/broker-sync/framework/import-consistency.md § 5.4}.</p>
+ * <p>See {@code knowledge/broker-sync/lifecycle.md}.</p>
  */
 @Service
 public class SyncBatchFailureHandler {

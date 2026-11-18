@@ -212,7 +212,7 @@ public class TigerSyncAdapter implements BrokerSyncAdapter {
      * <p>Mirrors {@code IbkrSyncAdapter.isNetworkFailure} so both adapters
      * honour the same {@code java.net.*} / {@code java.io.*} / SSL /
      * TLS-class fallback promised by
-     * {@code docs/broker-sync/framework/unrecognized-data-logging.md §5.2}.
+     * {@code knowledge/broker-sync/adapter-contracts.md}.
      */
     private static boolean isNetworkFailure(Throwable e) {
         if (e == null) {
