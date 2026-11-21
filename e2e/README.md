@@ -13,12 +13,28 @@
 | `market-event-ui-server.mjs` | Serve the real frontend with synthetic event APIs on port 4317 for manual UI acceptance; does not access a backend or database. |
 | `FeePrecisionCheck.java` | Java helper for the fee launcher; verifies migrations, ORM and repository sums with synthetic data. |
 | `OrderedMarketEventCheck.java` | Java helper for ordered-event and IBKR linkage integration checks; run through its Python launcher. |
+| `verify-ibkr-settings.py` | Own a disposable PostgreSQL cluster, validate V30 migration and the full application configuration API; `--serve` holds a synthetic UI on port 4318. |
+| `IbkrSettingsCheck.java` | Settings launcher helper: historical upgrade, real transaction rollback/locking, credential encryption/key permissions and application restarts. |
+| `ibkr-settings-ui-server.mjs` | Vite proxy to the explicit synthetic application port, used by the settings launcher; never proxies to the default backend. |
 
 ## 开发库重置
 
 `reset-dev-db.sh` 会删除并重建 `public` schema，随后重启应用才由 Flyway 重建表。它不创建隔离实例，也不证明目标库可以丢弃。脚本从 `VORTEX_DEV_DB_HOST`、`VORTEX_DEV_DB_PORT`、`VORTEX_DEV_DB_NAME`、`VORTEX_DEV_DB_USER`、`VORTEX_DEV_DB_PASSWORD` 读取连接，要求全部非空，并在执行前交互输入 `yes`。没有 `--help` 或命令行参数解析。按 [环境及数据安全约定](../AGENTS.md#验证与数据安全) 核对目标并取得本次清空授权；不能把“dev”文件名当作连接目标确认。
 
-后文两个 Python 运行器则自行创建临时集群，不接受现有数据库连接；需要所选环境已有工具和缓存，不能因缺工具而擅自安装。费用运行器会执行 Maven 编译／单测，事件运行器要求源码已编译且拒绝过期 class 文件，避免两项检查同时写同一 `backend/target/`。
+这些临时验证运行器自行创建临时集群，不接受现有数据库连接；需要所选环境已有工具和缓存，不能因缺工具而擅自安装。费用运行器会执行 Maven 编译／单测，事件及配置运行器要求源码已编译且拒绝过期 class 文件，避免两项检查同时写同一 `backend/target/`。
+
+## IBKR settings check
+
+```bash
+TMPDIR=/tmp MAVEN_OPTS=-Djava.io.tmpdir=/tmp mvn -e -o -f backend/pom.xml test
+python3 -B e2e/verify-ibkr-settings.py
+# Optional manual UI verification; press Enter to stop and remove the temporary cluster:
+python3 -B e2e/verify-ibkr-settings.py --serve
+```
+
+Requires existing Java/javac, Python, Node, psql and PostgreSQL server binaries, plus cached Maven dependencies and the frontend's existing dependencies. It reads a successful current settings-test classpath and refuses stale main classes. The Java checker verifies the owned server data directory, migrates a fresh database and a V29 database with synthetic history, and starts the actual Spring Boot application using an isolated configuration location. It never loads local/dev credentials or connects to an existing ledger. Flex requests go only to a loopback fake server.
+
+Checks include rollback of account binding and credentials, committed pair visibility, competing saves, saved/cleared state across actual application restarts, key permissions/symlinks, ciphertext-only storage and metadata-only responses, retained Token, active-batch refusal of configuration/account mutations, missing-key refusal without regeneration, recovery and an empty TCF batch. `--serve` then exposes the real frontend and synthetic backend at `http://127.0.0.1:4318/#/sync-management`; check account creation, save, refresh, IBKR selection and clear. These manual interactions are separate from automatic API checks. Temporary keys, databases and processes are removed on exit. No account is opened with a real broker.
 
 ## Fee precision migration check
 
@@ -45,7 +61,7 @@ npm --prefix frontend run build
 
 All parser tests now use synthetic data; the default backend command needs no exclusions or method selectors. Maven excludes the ignored personal XML from test resources. Check actual class, nested-class and parameterized-case names in Surefire reports rather than relying on totals alone; old report files can remain after test removal, so use the suites listed by the current run. See the [test cleanup evidence](../docs/TODO-ARCHIVE.md#测试清理依据) for the case comparison. After backend source changes, recompile before the integration check; the launcher refuses stale class files.
 
-`OrderedMarketEventCheck.java` uses actual transaction proxies, repositories and services against Flyway V1–V29 in a new `/tmp/vortex-ordered-events-*` cluster. It checks the server data directory, installs nothing, and always stops and removes its cluster. Failure to stop preserves the directory. Covered scenarios:
+`OrderedMarketEventCheck.java` uses actual transaction proxies, repositories and services against current Flyway migrations in a new `/tmp/vortex-ordered-events-*` cluster. It checks the server data directory, installs nothing, and always stops and removes its cluster. Failure to stop preserves the directory. Covered scenarios:
 
 - 100 shares → split → 200; earlier changes rejected unchanged; undo, correct and recreate → 400. Old and new update ranges, unrelated history, event-day trades, protected system rows and processed edits.
 - Rename chains, dividend target followed by a split, same-day related rejection, unrelated events, zero-output constraints, reverse undo and two actual brokers.

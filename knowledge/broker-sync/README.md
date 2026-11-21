@@ -14,7 +14,7 @@ IBKR 仅支持规定封套的单账户 TCF、订单粒度和整数数量；Tiger
 
 ## 使用入口
 
-同步管理页提供「同步批次」和「原始数据」两个页签。批次页可手动触发同步、按券商和状态筛选，并刷新结果。原始数据页当前只提供 IBKR 订单和成交确认的只读查看。Tiger 已有暂存表，前端尚无相应查看面板。见 [同步管理页面](../../frontend/src/pages/sync/SyncManagement.jsx)和 [原始数据页](../../frontend/src/pages/sync/staged/StagedDataTab.jsx)。
+同步管理页提供「同步批次」「同步配置」和「原始数据」三个页签。配置页可新建／绑定IBKR记账账户并保存或清空Flex Token与Query ID；凭证以数据库为唯一来源，Token加密且只写不读，保存不请求券商。批次页可手动触发同步、按券商和状态筛选，并刷新结果；缺IBKR配置时给出配置入口，配置失败不影响其他券商选项。原始数据页当前只提供 IBKR 订单和成交确认的只读查看。Tiger 已有暂存表，前端尚无相应查看面板。见 [同步管理页面](../../frontend/src/pages/sync/SyncManagement.jsx)和 [原始数据页](../../frontend/src/pages/sync/staged/StagedDataTab.jsx)。
 
 配置及人工排查见 [券商同步操作指南](../../docs/broker-sync/README.md)和 [失败恢复指南](../../docs/broker-sync/recovery.md)。真实券商环境的联调需要另行授权。
 

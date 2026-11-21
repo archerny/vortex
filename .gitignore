@@ -13,6 +13,7 @@ Thumbs.db
 # Local development environment
 /.dev-environment.local.md
 /.venv/
+.local/
 .firecrawl/
 
 # Java and Maven build output

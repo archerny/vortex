@@ -2,6 +2,8 @@ package com.vortex.controller;
 
 import com.vortex.entity.Broker;
 import com.vortex.service.BrokerService;
+import com.vortex.sync.exception.SyncConflictException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -116,6 +118,16 @@ public class BrokerController {
     }
 
     // ============ 响应构建工具方法 ============
+
+    @ExceptionHandler(SyncConflictException.class)
+    public ResponseEntity<Map<String, Object>> activeSync(SyncConflictException error) {
+        return buildErrorResponse(HttpStatus.CONFLICT, error.getMessage());
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<Map<String, Object>> conflictingAccount() {
+        return buildErrorResponse(HttpStatus.CONFLICT, "账户名称或券商代码重复，或账户仍有关联数据");
+    }
 
     private ResponseEntity<Map<String, Object>> buildSuccessResponse(String message, Object data) {
         return buildSuccessResponse(HttpStatus.OK, message, data);

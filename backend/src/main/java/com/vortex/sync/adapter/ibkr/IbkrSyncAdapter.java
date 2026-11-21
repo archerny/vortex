@@ -94,8 +94,7 @@ public class IbkrSyncAdapter implements BrokerSyncAdapter {
         // 1. Check configuration
         if (!properties.isConfigured()) {
             logger.error("[IbkrSync] batch={} [AUTH] IBKR Flex Query credentials not configured. " +
-                    "Please set broker.ibkr.flex-token and broker.ibkr.trade-confirm-query-id " +
-                    "in application-local.properties", batchId);
+                    "Please save Flex Token and Query ID on the Sync Management configuration tab", batchId);
             return SyncResult.failure(getBrokerCode(),
                     CategorizedSyncException.format(FailureCategory.AUTH, null,
                             "IBKR Flex Query credentials not configured"),

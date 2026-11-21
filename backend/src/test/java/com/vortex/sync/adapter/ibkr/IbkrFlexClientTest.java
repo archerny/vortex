@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -72,7 +73,8 @@ class IbkrFlexClientTest {
     @Test
     void shouldMaskTokenInBothRequestPhasesWithoutChangingRequests() throws Exception {
         IbkrFlexQueryProperties properties = new IbkrFlexQueryProperties();
-        properties.setFlexToken(TOKEN);
+        String specialToken = TOKEN + "&/#";
+        properties.setFlexToken(specialToken);
         properties.setTradeConfirmQueryId("example-query");
         IbkrFlexClient client = spy(new IbkrFlexClient(properties));
         // This contract checks redaction; broker generation and rate-limit waits are simulated.
@@ -103,18 +105,41 @@ class IbkrFlexClientTest {
         assertEquals("/AccountManagement/FlexWebService/GetStatement",
                 requests.getAllValues().get(1).uri().getPath());
         for (HttpRequest request : requests.getAllValues()) {
-            assertTrue(request.uri().getRawQuery().contains("t=" + TOKEN));
+            assertTrue(request.uri().getRawQuery().contains("t=" + TOKEN + "%26%2F%23"));
+            assertEquals(null, request.uri().getFragment());
         }
 
         String output = logAppender.list.stream()
                 .map(ILoggingEvent::getFormattedMessage)
                 .collect(Collectors.joining("\n"));
         assertFalse(output.contains(TOKEN), "Flex Token must not appear in client logs");
+        assertFalse(output.contains("%26%2F%23"));
         assertTrue(output.contains("SendRequest sending request to:"));
         assertTrue(output.contains("GetStatement sending request to:"));
         assertEquals(2, logAppender.list.stream()
                 .filter(event -> event.getFormattedMessage().contains("t=***"))
                 .count());
+    }
+
+    @Test
+    void untrustedBrokerErrorsAndTransportCausesCannotEchoCredentials() throws Exception {
+        var properties = new IbkrFlexQueryProperties();
+        properties.setFlexToken(TOKEN); properties.setTradeConfirmQueryId("123");
+        var client = spy(new IbkrFlexClient(properties));
+        doNothing().when(client).sleep(anyLong(), anyString());
+        ReflectionTestUtils.setField(client, "httpClient", httpClient);
+        when(submissionResponse.statusCode()).thenReturn(200);
+        when(submissionResponse.body()).thenReturn("<FlexStatementResponse><Status>Fail</Status><ErrorCode>1015</ErrorCode><ErrorMessage>" + TOKEN + "</ErrorMessage></FlexStatementResponse>");
+        when(httpClient.send(any(HttpRequest.class), org.mockito.ArgumentMatchers.<HttpResponse.BodyHandler<String>>any()))
+                .thenReturn(submissionResponse);
+        var failure = assertThrows(IbkrFlexClient.IbkrFlexClientException.class, () -> client.fetchReport("20260101", "20260102"));
+        assertFalse(failure.getMessage().contains(TOKEN));
+        assertTrue(failure.getMessage().contains("1015"));
+        assertTrue(logAppender.list.stream().noneMatch(event -> event.getFormattedMessage().contains(TOKEN)));
+        when(httpClient.send(any(HttpRequest.class), org.mockito.ArgumentMatchers.<HttpResponse.BodyHandler<String>>any()))
+                .thenThrow(new java.io.IOException("https://example.invalid/?t=" + TOKEN));
+        failure = assertThrows(IbkrFlexClient.IbkrFlexClientException.class, () -> client.fetchReport("20260101", "20260102"));
+        assertNull(failure.getCause()); assertFalse(failure.getMessage().contains(TOKEN));
     }
 
     @Test

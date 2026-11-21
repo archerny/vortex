@@ -15,3 +15,5 @@
   客户端把 1005、1006、1012 分别描述为 Token 无效、限流、查询不存在，与官方的交割数据未就绪、FIFO 盈亏数据未就绪、Token 过期不一致；实际 Token 无效为 1015，1006 还进入限流异常分支。适配器把所有客户端异常统一分类为 NETWORK，可能给出错误排查方向，让可等待数据就绪的情况直接失败。此项为源码与官方文档静态对照，尚未逐码运行响应复现。 [客户端错误处理](../backend/src/main/java/com/vortex/sync/adapter/ibkr/IbkrFlexClient.java#L303) · [官方错误码](https://www.ibkrguides.com/orgportal/performanceandstatements/flex3error.htm) · [初次审阅 R7](TODO-ARCHIVE.md#ibkr-样例与初次审阅)
 
   验收需用模拟 HTTP 响应覆盖生成中、数据未就绪、Token 过期／无效、查询无效、限流和未知错误码，验证说明、认证／网络分类、重试及退出条件，并保证日志与异常链继续脱敏。本条尚未修复；下一步新增 design。
+
+  2026-11-20配置入口变更补充：远程错误文本和HTTP／XML原始异常不再原样记录，以避免回显Token；相关合成客户端安全回归通过。上述错误码映射、分类及重试规则没有调整，本条仍待处理。 [配置方案](../design/0046-2026-11-20-ibkr-settings-database-snapshots.md) · [客户端安全回归](../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrFlexClientTest.java)

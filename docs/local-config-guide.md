@@ -33,6 +33,8 @@ spring.datasource.password=<dev-password>
 
 ## 启动与检查
 
+IBKR Token／Query ID通过**同步管理 → 同步配置**存入当前数据库，不再读取profile中的旧凭据值。主密钥默认位于工作树根目录`.local/ibkr-sync.key`；打包部署可用`broker.ibkr.secret-key-file`配置持久化路径。数据库与密钥须一起备份，权限及恢复见 [IBKR接入指南](broker-sync/brokers/ibkr/README.md#凭证密钥与部署)。Tiger凭据仍按profile配置。
+
 核对目标开发库后，从工作树根目录通过 Maven 启动应用。
 
 ```bash

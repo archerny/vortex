@@ -77,6 +77,10 @@ public class BrokerSyncService {
         }
 
         // Execute sync
+        var broker = brokerRepository.findByBrokerCode(brokerCode).orElse(null);
+        if (broker == null || !Boolean.TRUE.equals(broker.getIsActive())) {
+            return SyncResult.failure(brokerCode, "请先关联并启用该券商的记账账户", 0);
+        }
         logger.info("[BrokerSync] Starting sync with {} adapter...", brokerCode);
         SyncResult result = adapter.sync(request);
         logger.info("[BrokerSync] Sync completed: {}", result);
@@ -97,7 +101,7 @@ public class BrokerSyncService {
 
         for (String brokerCode : adapterMap.keySet()) {
             Optional<Broker> brokerOpt = brokerRepository.findByBrokerCode(brokerCode);
-            if (brokerOpt.isPresent()) {
+            if (brokerOpt.isPresent() && Boolean.TRUE.equals(brokerOpt.get().getIsActive())) {
                 Broker broker = brokerOpt.get();
                 result.add(new BrokerSyncInfo(
                         brokerCode,

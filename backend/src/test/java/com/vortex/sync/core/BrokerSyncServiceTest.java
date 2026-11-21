@@ -45,6 +45,17 @@ class BrokerSyncServiceTest {
         return new BrokerSyncService(List.of(adapters), brokerRepository);
     }
 
+    @Test
+    void missingOrDisabledAccountCannotFetchBrokerData() {
+        var service = createService(ibkrAdapter);
+        assertFalse(service.sync(new SyncRequest("ibkr")).isSuccess());
+        var disabled = new Broker("Synthetic", "US"); disabled.setIsActive(false);
+        when(brokerRepository.findByBrokerCode("ibkr")).thenReturn(Optional.of(disabled));
+        assertFalse(service.sync(new SyncRequest("ibkr")).isSuccess());
+        assertTrue(service.getSupportedBrokerInfos().isEmpty());
+        verify(ibkrAdapter, never()).sync(any());
+    }
+
     @Nested
     @DisplayName("sync() - adapter routing")
     class SyncRoutingTest {
@@ -54,6 +65,7 @@ class BrokerSyncServiceTest {
         void shouldRouteToIbkrAdapter() {
             SyncResult expectedResult = SyncResult.success("ibkr", 100, 1000);
             SyncRequest request = new SyncRequest("ibkr");
+            when(brokerRepository.findByBrokerCode("ibkr")).thenReturn(Optional.of(new Broker("SYNTH", "US")));
             when(ibkrAdapter.sync(request)).thenReturn(expectedResult);
 
             BrokerSyncService service = createService(ibkrAdapter, tigerAdapter);
@@ -70,6 +82,7 @@ class BrokerSyncServiceTest {
         void shouldRouteToTigerAdapter() {
             SyncResult expectedResult = SyncResult.success("tiger", 50, 800);
             SyncRequest request = new SyncRequest("tiger");
+            when(brokerRepository.findByBrokerCode("tiger")).thenReturn(Optional.of(new Broker("SYNTH", "US")));
             when(tigerAdapter.sync(request)).thenReturn(expectedResult);
 
             BrokerSyncService service = createService(ibkrAdapter, tigerAdapter);
@@ -102,6 +115,7 @@ class BrokerSyncServiceTest {
         void shouldPropagateAdapterFailure() {
             SyncResult failResult = SyncResult.failure("ibkr", "API timeout", 3000);
             SyncRequest request = new SyncRequest("ibkr");
+            when(brokerRepository.findByBrokerCode("ibkr")).thenReturn(Optional.of(new Broker("SYNTH", "US")));
             when(ibkrAdapter.sync(request)).thenReturn(failResult);
 
             BrokerSyncService service = createService(ibkrAdapter);

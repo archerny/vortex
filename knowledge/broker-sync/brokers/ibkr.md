@@ -2,7 +2,7 @@
 
 ## 拉取与暂存
 
-`IbkrSyncAdapter` 使用 Trade Confirmation Flex Query。`IbkrFlexClient` 先调用 `SendRequest`，再轮询 `GetStatement` 获取 XML。适配器按日期范围分窗，窗口末日最多取起始日加 365 天，下一窗从上一窗末日的下一天开始。请求日期使用 `yyyyMMdd`。适配器使用 `broker.ibkr.flex-token` 和 `broker.ibkr.trade-confirm-query-id`，配置步骤见 [IBKR 接入指南](../../../docs/broker-sync/brokers/ibkr/README.md)。
+`IbkrSyncAdapter`使用Trade Confirmation Flex Query。`IbkrFlexClient`先调用`SendRequest`，再轮询`GetStatement`获取XML。适配器按日期范围分窗，窗口末日最多取起始日加365天，下一窗从上一窗末日的下一天开始，请求日期使用`yyyyMMdd`。Token／Query ID由同步配置页保存到数据库；客户端一次读取同一行的凭证快照，不缓存旧值或回退启动文件。Token和Query ID进行URL编码，请求URL日志遮盖Token及q参数，查询元数据日志仍可显示Query ID；远程错误只保留受限错误码和固定描述，HTTP／XML异常不携带原始消息或原因链，防止回显Token。既有错误码分类待办仍未修复。配置步骤见 [IBKR接入指南](../../../docs/broker-sync/brokers/ibkr/README.md)和 [0046](../../../design/0046-2026-11-20-ibkr-settings-database-snapshots.md)。
 
 `FlexQueryParser` 校验单账户、单份规定结构的 TCF 报表。`Order` 写入 `ibkr_staged_orders`，`TradeConfirm` 写入 `ibkr_staged_trade_confirms`，`SymbolSummary` 不导入。暂存 Worker 按 `order_id` 和 `trade_id` 分别去重。前端可按批次查看两表，查询接口为 `GET /api/sync/ibkr/orders` 和 `GET /api/sync/ibkr/trade-confirms`。见 [Flex 客户端](../../../backend/src/main/java/com/vortex/sync/adapter/ibkr/IbkrFlexClient.java)、[XML 解析器](../../../backend/src/main/java/com/vortex/sync/adapter/ibkr/FlexQueryParser.java)和 [原始数据控制器](../../../backend/src/main/java/com/vortex/controller/IbkrStagedDataController.java)。
 

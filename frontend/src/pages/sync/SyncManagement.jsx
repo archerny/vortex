@@ -1,24 +1,33 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Tabs, Typography } from 'antd';
 import { CloudSyncOutlined } from '@ant-design/icons';
 import SyncBatchesTab from './batches/SyncBatchesTab';
 import StagedDataTab from './staged/StagedDataTab';
+import IbkrSettingsTab from './settings/IbkrSettingsTab';
 
 const { Title } = Typography;
 
 /**
  * 同步管理页面
  *
- * 顶层容器，分两个 Tab：
- * - 同步批次：展示 broker_sync_batches 历史批次，支持触发新同步和恢复中断批次
+ * 顶层容器，分三个 Tab：
+ * - 同步批次：展示历史批次，支持触发新同步
+ * - 同步配置：绑定IBKR记账账户，保存或清空Flex凭证
  * - 原始数据：查看各券商同步到 staging 表的原始数据（当前仅 IBKR 实现）
  */
 const SyncManagement = () => {
+  const [activeKey, setActiveKey] = useState('batches');
+  const [refreshKey, setRefreshKey] = useState(0);
   const items = [
     {
       key: 'batches',
       label: '同步批次',
-      children: <SyncBatchesTab />,
+      children: <SyncBatchesTab refreshKey={refreshKey} onConfigureIbkr={() => setActiveKey('settings')} />,
+    },
+    {
+      key: 'settings',
+      label: '同步配置',
+      children: <IbkrSettingsTab onSaved={() => setRefreshKey((value) => value + 1)} onDone={() => setActiveKey('batches')} />,
     },
     {
       key: 'staged-data',
@@ -33,7 +42,7 @@ const SyncManagement = () => {
         <CloudSyncOutlined style={{ marginRight: 8 }} />
         同步管理
       </Title>
-      <Tabs defaultActiveKey="batches" items={items} />
+      <Tabs activeKey={activeKey} onChange={setActiveKey} items={items} />
     </div>
   );
 };

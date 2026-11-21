@@ -13,7 +13,7 @@
 | 交易记录 | [`trade/`](../frontend/src/pages/trade/) 提供列表、统计、新增、详情和详情中的编辑、删除。详情在前端根据期权合约和关联 ID 整理相关交易，复用列表列定义。 |
 | 交易数据分析 | [`analysis/`](../frontend/src/pages/analysis/) 查询指定日期的持仓快照，并按需调用交易核对接口。持仓的计算口径见 [交易与持仓](trades-and-positions.md)。 |
 | 市场事件 | [`market-events/`](../frontend/src/pages/market-events/) 通过三个标签页查询、新增并处理、受限撤销代码变更、拆股和实物分红；提示录入顺序及关联历史锁。 |
-| 同步管理 | [`sync/`](../frontend/src/pages/sync/) 展示同步批次，支持创建同步任务和筛选批次。历史批次标签与 v2 筛选条件分别维护。原始数据查看面板仅覆盖 IBKR，订单与成交确认均为只读展示。 [券商同步](broker-sync/README.md) |
+| 同步管理 | [`sync/`](../frontend/src/pages/sync/) 展示和筛选批次；同步配置可新建／绑定IBKR账户，保存或清空数据库凭证，Token不回显且不存浏览器；新建同步按配置状态启用IBKR并提供配置入口，配置异常不影响其他券商。历史批次标签与v2筛选条件分别维护。原始数据查看仅覆盖IBKR订单与成交确认，均为只读。 [券商同步](broker-sync/README.md) |
 | 出入金、券商和策略 | [CashFlow](../frontend/src/pages/CashFlow.jsx) 查询和新增出入金记录。[BrokerManagement](../frontend/src/pages/BrokerManagement.jsx) 查询、新增和更新券商。[StrategyManagement](../frontend/src/pages/StrategyManagement.jsx) 支持策略的查询、新增、编辑和删除。 |
 | 仪表盘和盈亏 | [Dashboard](../frontend/src/pages/Dashboard.jsx) 显示零值统计和空列表。[个股](../frontend/src/pages/profit/StockProfitAnalysis.jsx)、[策略](../frontend/src/pages/profit/StrategyProfitAnalysis.jsx)和[账户](../frontend/src/pages/profit/AccountProfitAnalysis.jsx)盈亏页面显示占位提示。 |
 | 技术选型 Demo | 盈亏分析下的 [`chart-demo/`](../frontend/src/pages/profit/chart-demo/) 使用固定合成数据展示金融图、分析图、三维曲面和期权链表格；不接入账本、行情或券商业务接口。 |

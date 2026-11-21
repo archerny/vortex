@@ -77,14 +77,15 @@ public class IbkrFlexClient {
      * @throws IbkrFlexClientException on any failure
      */
     public String fetchReport(String fromDate, String toDate) {
-        String token = properties.getFlexToken();
-        String queryId = properties.getTradeConfirmQueryId();
+        var credentials = properties.credentials();
+        String token = credentials.token();
+        String queryId = credentials.queryId();
 
         logger.info("[IbkrFlexClient] Fetching report: queryId={}, dateRange={} ~ {}", queryId, fromDate, toDate);
 
         // Step 1: SendRequest
         String referenceCode = sendRequest(token, queryId, fromDate, toDate);
-        logger.info("[IbkrFlexClient] SendRequest succeeded, referenceCode={}", referenceCode);
+        logger.info("[IbkrFlexClient] SendRequest succeeded");
 
         // Step 2: Wait then poll GetStatement
         sleep(INITIAL_WAIT_MS, "initial wait before GetStatement");
@@ -93,6 +94,10 @@ public class IbkrFlexClient {
         logger.info("[IbkrFlexClient] GetStatement succeeded, report length={} chars", report.length());
 
         return report;
+    }
+
+    private static String encode(String value) {
+        return java.net.URLEncoder.encode(value, java.nio.charset.StandardCharsets.UTF_8);
     }
 
     // ============ Step 1: SendRequest ============
@@ -112,7 +117,7 @@ public class IbkrFlexClient {
      */
     private String sendRequest(String token, String queryId, String fromDate, String toDate) {
         String url = String.format("%s/SendRequest?t=%s&q=%s&fd=%s&td=%s&v=3",
-                properties.getBaseUrl(), token, queryId, fromDate, toDate);
+                properties.getBaseUrl(), encode(token), encode(queryId), fromDate, toDate);
 
         String responseBody = executeHttpGet(url, "SendRequest");
         Document doc = parseXmlResponse(responseBody, "SendRequest");
@@ -143,7 +148,7 @@ public class IbkrFlexClient {
      */
     private String pollGetStatement(String token, String referenceCode) {
         String url = String.format("%s/GetStatement?t=%s&q=%s&v=3",
-                properties.getBaseUrl(), token, referenceCode);
+                properties.getBaseUrl(), encode(token), encode(referenceCode));
 
         for (int attempt = 1; attempt <= MAX_RETRIES; attempt++) {
             logger.debug("[IbkrFlexClient] GetStatement attempt {}/{}", attempt, MAX_RETRIES);
@@ -215,12 +220,13 @@ public class IbkrFlexClient {
             throw e;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new IbkrFlexClientException(operation + " interrupted", e);
+            throw new IbkrFlexClientException(operation + " interrupted");
         } catch (IllegalArgumentException e) {
             // URI validation errors may contain the complete URL, including the token.
             throw new IbkrFlexClientException(operation + " failed: invalid HTTP request configuration");
         } catch (Exception e) {
-            throw new IbkrFlexClientException(operation + " failed: " + e.getMessage(), e);
+            // HTTP exceptions may embed the URI, including credentials, in messages or causes.
+            throw new IbkrFlexClientException(operation + " failed: HTTP transport error");
         }
     }
 
@@ -256,10 +262,13 @@ public class IbkrFlexClient {
             factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
 
             DocumentBuilder builder = factory.newDocumentBuilder();
+            builder.setErrorHandler(new org.xml.sax.helpers.DefaultHandler() {
+                @Override public void error(org.xml.sax.SAXParseException error) throws org.xml.sax.SAXException { throw error; }
+                @Override public void fatalError(org.xml.sax.SAXParseException error) throws org.xml.sax.SAXException { throw error; }
+            });
             return builder.parse(new InputSource(new StringReader(xml)));
         } catch (Exception e) {
-            throw new IbkrFlexClientException(
-                    String.format("%s failed to parse XML response: %s", operation, e.getMessage()), e);
+            throw new IbkrFlexClientException(operation + " failed to parse XML response");
         }
     }
 
@@ -301,20 +310,21 @@ public class IbkrFlexClient {
      * Handle non-retryable error codes by throwing descriptive exceptions.
      */
     private void handleErrorCode(String errorCode, String errorMessage, String operation) {
+        // Remote error text is untrusted and may echo a Token or complete request URL.
+        errorCode = errorCode != null && errorCode.matches("[0-9]{4}") ? errorCode : "unknown";
         String description = describeErrorCode(errorCode);
-        String msg = String.format("[IbkrFlexClient] %s error: code=%s (%s), message=%s",
-                operation, errorCode, description, errorMessage);
+        String msg = String.format("[IbkrFlexClient] %s error: code=%s (%s)", operation, errorCode, description);
         logger.error(msg);
 
         // For rate limit errors, wait and let the caller retry if appropriate
         if ("1006".equals(errorCode) || "1018".equals(errorCode)) {
             throw new IbkrFlexClientException(
                     String.format("%s rate limited (code=%s): %s - please retry later",
-                            operation, errorCode, errorMessage));
+                            operation, errorCode, description));
         }
 
         throw new IbkrFlexClientException(
-                String.format("%s failed (code=%s): %s", operation, errorCode, errorMessage));
+                String.format("%s failed (code=%s): %s", operation, errorCode, description));
     }
 
     /**
@@ -353,7 +363,7 @@ public class IbkrFlexClient {
      * Mask the token in URL for safe logging.
      */
     private String maskToken(String url) {
-        return url.replaceAll("t=[^&]+", "t=***");
+        return url.replaceAll("([tq])=[^&]+", "$1=***");
     }
 
     // ============ Custom Exception ============

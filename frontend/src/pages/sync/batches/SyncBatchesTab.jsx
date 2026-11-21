@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Table, Tag, Select, Space, Typography, Tooltip, Card, Button, message, Modal, DatePicker, Form } from 'antd';
+import { Alert, Table, Tag, Select, Space, Typography, Tooltip, Card, Button, message, Modal, DatePicker, Form } from 'antd';
 import { ReloadOutlined, PlusOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import { fetchSyncBatches, triggerSync, fetchSupportedBrokers } from '../../../services/brokerSyncApi';
 import { fetchAllBrokers } from '../../../services/brokerApi';
+import { fetchIbkrSettings } from '../../../services/ibkrSettingsApi';
 
 dayjs.extend(duration);
 
@@ -19,7 +20,7 @@ const { Text } = Typography;
  * 券商下拉选项来源：/api/brokers（券商管理录入的券商），遵循
  * "券商管理是券商选项的单一数据源" 原则。
  */
-const SyncBatchesTab = () => {
+const SyncBatchesTab = ({ refreshKey = 0, onConfigureIbkr }) => {
   const [batches, setBatches] = useState([]);
   const [loading, setLoading] = useState(false);
   const [filters, setFilters] = useState({ brokerCode: undefined, status: undefined });
@@ -31,6 +32,8 @@ const SyncBatchesTab = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [syncBrokerOptions, setSyncBrokerOptions] = useState([]);
+  const [brokersLoading, setBrokersLoading] = useState(false);
+  const [ibkrReady, setIbkrReady] = useState(false);
   const [form] = Form.useForm();
 
   const loadBatches = useCallback(async () => {
@@ -70,22 +73,29 @@ const SyncBatchesTab = () => {
       }
     };
     loadFilterBrokers();
-  }, []);
+  }, [refreshKey]);
 
   // Load supported brokers (for triggering new sync) when modal opens
   const openModal = async () => {
     setModalOpen(true);
+    setBrokersLoading(true);
     try {
-      const result = await fetchSupportedBrokers();
-      const brokers = (result.data || []).map((info) => ({
-        label: info.brokerName || info.brokerCode.toUpperCase(),
+      const [accounts, settings] = await Promise.allSettled([fetchSupportedBrokers(), fetchIbkrSettings()]);
+      if (accounts.status === 'rejected') throw accounts.reason;
+      const ready = settings.status === 'fulfilled' && !!settings.value.data?.ready;
+      if (settings.status === 'rejected') message.error('无法读取IBKR配置，其他券商仍可同步；请检查同步配置');
+      setIbkrReady(ready);
+      const brokers = (accounts.value.data || []).map((info) => ({
+        label: info.brokerCode === 'ibkr' ? `IBKR · ${info.brokerName}` : info.brokerName || info.brokerCode.toUpperCase(),
         value: info.brokerCode,
+        disabled: info.brokerCode === 'ibkr' && !ready,
       }));
+      if (!brokers.some((broker) => broker.value === 'ibkr')) brokers.push({ label: 'IBKR（请先完成同步配置）', value: 'ibkr', disabled: true });
       setSyncBrokerOptions(brokers);
     } catch (error) {
-      console.error('Failed to load supported brokers:', error);
+      setSyncBrokerOptions([]); setIbkrReady(false);
       message.error('加载券商列表失败');
-    }
+    } finally { setBrokersLoading(false); }
   };
 
   // Submit sync trigger
@@ -324,6 +334,7 @@ const SyncBatchesTab = () => {
     <div>
       <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'flex-end' }}>
         <Space>
+          <Button onClick={onConfigureIbkr}>同步配置</Button>
           <Button type="primary" icon={<PlusOutlined />} onClick={openModal}>
             新建同步
           </Button>
@@ -394,6 +405,7 @@ const SyncBatchesTab = () => {
         cancelText="取消"
         destroyOnClose
       >
+        {!ibkrReady && <Alert type="info" showIcon message="IBKR尚未就绪，请先关联记账账户并配置Flex凭证" action={<Button size="small" onClick={() => { setModalOpen(false); onConfigureIbkr?.(); }}>前往同步配置</Button>} />}
         <Form form={form} layout="vertical" style={{ marginTop: 16 }}>
           <Form.Item
             name="brokerCode"
@@ -403,7 +415,8 @@ const SyncBatchesTab = () => {
             <Select
               placeholder="请选择券商"
               options={syncBrokerOptions}
-              loading={syncBrokerOptions.length === 0}
+              loading={brokersLoading}
+              notFoundContent="暂无可同步账户，请先完成同步配置"
             />
           </Form.Item>
           <Form.Item

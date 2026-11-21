@@ -51,7 +51,7 @@ java -jar backend/target/vortex-backend-1.0.0.jar --spring.profiles.active=dev
 | [`entity/`](../backend/src/main/java/com/vortex/entity/)／[`dto/`](../backend/src/main/java/com/vortex/dto/) | 持久化对象、枚举与接口数据 |
 | [`sync/core/`](../backend/src/main/java/com/vortex/sync/core/) | 适配器路由、异步执行、失败处理与批次清理 |
 | [`sync/adapter/`](../backend/src/main/java/com/vortex/sync/adapter/) | IBKR／Tiger 拉取、暂存、映射和单条 Worker |
-| [`db/migration/`](../backend/src/main/resources/db/migration/) | 当前 V1–V29，结构变更追加迁移 |
+| [`db/migration/`](../backend/src/main/resources/db/migration/) | 当前 V1–V30，结构变更追加迁移 |
 
 Controller／Service／Repository 分层、同步整批失败清理、精度和历史数据要求见 [研发约定](../AGENTS.md)。市场事件写入与同步有共同协调约束，修改前阅读 [市场事件](../knowledge/market-events.md) 和 [同步生命周期](../knowledge/broker-sync/lifecycle.md)。
 

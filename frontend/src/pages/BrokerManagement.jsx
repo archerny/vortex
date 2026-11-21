@@ -178,7 +178,7 @@ const BrokerManagement = () => {
         try {
           if (editingBroker) {
             // 编辑模式 - 调用后端更新 API
-            const result = await updateBroker(editingBroker.id, values);
+              const result = await updateBroker(editingBroker.id, { ...values, brokerCode: values.brokerCode || null });
             if (result.status === 'SUCCESS') {
               message.success(`券商「${values.brokerName}」更新成功！`);
               loadBrokers();

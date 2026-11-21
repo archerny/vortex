@@ -5,13 +5,18 @@
 | 接口 | 当前行为 |
 | --- | --- |
 | `POST /api/broker-sync/trigger` | 校验 `brokerCode`，创建 `PENDING` 批次并提交异步任务。返回 HTTP 200 和批次信息 |
-| `GET /api/broker-sync/brokers` | 返回已注册且在 `brokers` 表中有对应记录的适配器 |
+| `GET /api/broker-sync/brokers` | 返回已注册且在 `brokers` 表中有对应启用账户的适配器，不检查凭据 |
+| `GET /api/broker-sync/ibkr/settings` | 返回账户、Query ID、Token是否配置及就绪状态；不返回Token或密文 |
+| `PUT /api/broker-sync/ibkr/settings` | 事务内绑定账户及保存凭证；首次须Token，后续省略／留空则保留 |
+| `DELETE /api/broker-sync/ibkr/settings` | 持久化清空凭证，保留账户和账本 |
 | `GET /api/broker-sync/batches` | 按可选的 `brokerCode`、`status` 查询批次，按 `startedAt` 倒序 |
 | `GET /api/broker-sync/batches/{id}` | 按 ID 查询单个批次，找不到时返回 HTTP 404 |
 
 新建同步表单要求选择日期范围，并提交 `yyyy-MM-dd` 格式的 `startTime` 和 `endTime`。API 允许省略日期。省略时，批次表中缺失的日期各自记录为当天，适配器仍根据原请求计算抓取范围，默认结束为当天、起始为结束前 90 天。前端提交成功后刷新一次批次列表，后续由用户手动刷新。见 [控制器](../../backend/src/main/java/com/vortex/controller/BrokerSyncController.java)、[批次服务](../../backend/src/main/java/com/vortex/service/BrokerSyncBatchService.java)和 [批次页](../../frontend/src/pages/sync/batches/SyncBatchesTab.jsx)。
 
 ## 异步执行
+
+保存／清空IBKR配置和账户绑定变更、停用、删除与批次创建共用`LedgerWriteLock`；存在PENDING／PROCESSING／CLEANUP_FAILED时拒绝并返回409。每次Flex请求从数据库读取同一组已提交凭证，不需重启，不允许批次中途切换；运行时解密失败明确失败，不回退旧配置。路由在券商请求前拒绝缺失或停用账户。 [0046](../../design/0046-2026-11-20-ibkr-settings-database-snapshots.md)
 
 `BrokerSyncAsyncExecutor` 在 `syncTaskExecutor` 线程池执行。它将批次置为 `PROCESSING`、阶段置为 `FETCHING`，将批次 ID 写入 `SyncRequest`，再由 `BrokerSyncService` 根据 `brokerCode` 路由。适配器在开始暂存和导入前分别切换到 `STAGING` 和 `IMPORTING`。适配器返回成功时，执行器写入结果计数。适配器返回失败或执行中抛出异常时，执行器调用统一失败处理器。
 

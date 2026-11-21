@@ -2,7 +2,7 @@
 
 ## 注册和路由
 
-`BrokerSyncAdapter#getBrokerCode()` 返回稳定的技术标识。Spring 收集适配器组件，`BrokerSyncService` 以该标识构建路由。数据库 `brokers.broker_code` 用于关联实际的券商记录。发现接口只返回可关联到记录的适配器，发现结果本身不检查 API 凭据。导入阶段从该记录取得 `broker_id`。见 [适配器接口](../../backend/src/main/java/com/vortex/sync/core/BrokerSyncAdapter.java)和 [路由服务](../../backend/src/main/java/com/vortex/sync/core/BrokerSyncService.java)。
+`BrokerSyncAdapter#getBrokerCode()` 返回稳定的技术标识。Spring收集适配器组件，`BrokerSyncService`以该标识构建路由。数据库`brokers.broker_code`关联实际记账账户，发现接口只返回已绑定且启用的账户，发现结果本身不检查API凭据；路由在请求券商前再次拒绝缺失或停用账户。IBKR配置页另取数据库凭据的就绪状态。账户新建／更新保存非空唯一代码，活动批次阻止绑定变更、停用及删除。导入阶段从该记录取得`broker_id`。见 [账户服务](../../backend/src/main/java/com/vortex/service/BrokerService.java)、[路由服务](../../backend/src/main/java/com/vortex/sync/core/BrokerSyncService.java)和 [0046](../../design/0046-2026-11-20-ibkr-settings-database-snapshots.md)。
 
 每个适配器都须提供同一技术标识的 `BrokerCleanupStrategy`。启动时清理服务检查策略是否覆盖已注册的适配器，并拒绝同一标识的重复清理策略。新增暂存表时应持有 `batch_id` 并纳入该券商策略，正式交易由框架统一按 `sync_batch_id` 清理。见 [清理策略接口](../../backend/src/main/java/com/vortex/sync/core/BrokerCleanupStrategy.java)和 [清理服务](../../backend/src/main/java/com/vortex/sync/core/SyncBatchCleanupService.java)。
 

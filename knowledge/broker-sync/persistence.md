@@ -3,6 +3,7 @@
 | 表 | 当前职责 | 数据库依据 |
 | --- | --- | --- |
 | `brokers` | 保存券商基础信息。`broker_code` 是可空的技术标识，非空值唯一 | [V23](../../backend/src/main/resources/db/migration/V23__add_broker_code_and_rename_batch_broker_name.sql) |
+| `ibkr_sync_settings` | 单例IBKR Token密文、Query ID和更新时间；清空时保留空配置行，不参与批次清理 | [V30](../../backend/src/main/resources/db/migration/V30__create_ibkr_sync_settings.sql) |
 | `broker_sync_batches` | 保存券商、查询日期范围、状态、阶段、计数及错误信息 | [V19](../../backend/src/main/resources/db/migration/V19__create_broker_sync_batches.sql)、[V24](../../backend/src/main/resources/db/migration/V24__add_phase_and_expand_batch_status.sql)、[V28](../../backend/src/main/resources/db/migration/V28__simplify_sync_batch_state_model.sql) |
 | `ibkr_staged_orders` | IBKR 订单级暂存，按 `order_id` 去重 | [V20](../../backend/src/main/resources/db/migration/V20__create_ibkr_staged_orders.sql) |
 | `ibkr_staged_trade_confirms` | IBKR 成交明细，按 `trade_id` 去重。BookTrade 导入按 `order_id` 查询其 `code` | [V21](../../backend/src/main/resources/db/migration/V21__create_ibkr_staged_trade_confirms.sql) |
@@ -10,6 +11,8 @@
 | `trade_records` | 保存导入后的正式交易。用 `external_broker`、`external_id` 识别券商订单，用 `sync_batch_id` 关联批次 | [V22](../../backend/src/main/resources/db/migration/V22__add_external_fields_to_trade_records.sql) |
 
 ## 暂存与导入
+
+IBKR配置与账户绑定在同一事务内保存，取得与批次创建相同的短写锁；运行时每次读取同一行的凭证快照，不用提交后缓存回调。Token以AES-256-GCM加密，密钥在数据库及Git之外；接口只返回是否已配置，不返回明文或密文。无配置／清空／解密失败都不回退旧profile凭证。该表不是同步暂存表，不含`batch_id`，失败批次不得清除用户配置。密钥权限、备份与恢复见 [接入指南](../../docs/broker-sync/brokers/ibkr/README.md#凭证密钥与部署)及 [0046](../../design/0046-2026-11-20-ibkr-settings-database-snapshots.md)。
 
 - 三张暂存表以 `batch_id` 引用批次表，保留解析后的结构化字段。当前表结构无 `raw_payload` 列。IBKR 成交确认以 `order_id` 与订单关联，无订单表外键，也无导入状态字段。
 - 新订单暂存为 `PENDING`。IBKR 暂存遇到已存在的订单或成交业务键时比较来源内容，只有一致才跳过，差异导致本批失败；原记录仍属于原批次。Tiger 暂存维持原有按键跳过规则。导入阶段只读取当前批次的 `PENDING` 订单，按券商和原始订单 ID 检查正式表重复项；IBKR 在命中时还比较正式业务投影，一致才 SKIPPED，不同则 FAILED。结果写入 `IMPORTED`、`SKIPPED` 或 `FAILED`。`imported_trade_id` 记录成功导入的交易 ID，当前 SQL 未为该字段定义外键。 [0032 比较范围与边界](../../design/0032-2026-11-17-ibkr-duplicate-content-consistency.md)
