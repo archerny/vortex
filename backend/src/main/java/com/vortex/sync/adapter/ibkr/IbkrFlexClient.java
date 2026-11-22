@@ -77,7 +77,14 @@ public class IbkrFlexClient {
      * @throws IbkrFlexClientException on any failure
      */
     public String fetchReport(String fromDate, String toDate) {
-        var credentials = properties.credentials();
+        return fetchReport(null, fromDate, toDate);
+    }
+
+    public String fetchReport(Long brokerAccountId, String fromDate, String toDate) {
+        var credentials = properties.credentials(brokerAccountId);
+        if (credentials.token() == null || credentials.queryId() == null) {
+            throw new IbkrFlexClientException("Selected account credentials are not configured");
+        }
         String token = credentials.token();
         String queryId = credentials.queryId();
 

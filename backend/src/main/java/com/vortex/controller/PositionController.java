@@ -34,9 +34,10 @@ public class PositionController {
     @GetMapping
     public ResponseEntity<Map<String, Object>> getPositions(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-            @RequestParam(required = false) Long brokerId) {
+            @RequestParam(required = false) Long brokerId,
+            @RequestParam(required = false) Long brokerAccountId) {
         try {
-            List<PositionSnapshot> positions = positionService.calculatePositions(date, brokerId);
+            List<PositionSnapshot> positions = positionService.calculatePositions(date, brokerId, brokerAccountId);
             return buildSuccessResponse("查询成功", positions);
         } catch (Exception e) {
             return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "持仓计算失败: " + e.getMessage());

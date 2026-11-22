@@ -30,8 +30,8 @@ public class CashFlowRecordController {
      * GET /api/cash-flow-records
      */
     @GetMapping
-    public ResponseEntity<Map<String, Object>> getAllRecords() {
-        List<CashFlowRecord> records = cashFlowRecordService.findAll();
+    public ResponseEntity<Map<String, Object>> getAllRecords(@RequestParam(required = false) Long brokerAccountId) {
+        List<CashFlowRecord> records = brokerAccountId == null ? cashFlowRecordService.findAll() : cashFlowRecordService.findByBrokerAccountId(brokerAccountId);
         return buildSuccessResponse("查询成功", records);
     }
 
@@ -117,6 +117,11 @@ public class CashFlowRecordController {
         } catch (IllegalArgumentException e) {
             return buildErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage());
         }
+    }
+
+    @ExceptionHandler(org.springframework.dao.DataIntegrityViolationException.class)
+    public ResponseEntity<Map<String, Object>> conflictingAccount() {
+        return buildErrorResponse(HttpStatus.CONFLICT, "账户与券商关联冲突，或该账户已有相同外部记录");
     }
 
     // ============ 响应构建工具方法 ============

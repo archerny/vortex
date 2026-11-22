@@ -22,6 +22,21 @@ public class BrokerSyncBatch extends BaseEntity {
     @Column(name = "broker_code", nullable = false, length = 50)
     private String brokerCode;
 
+    @Column(name = "broker_account_id")
+    private Long brokerAccountId;
+    @Column(name = "account_id", length = 100)
+    private String accountId;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "broker_account_id", insertable = false, updatable = false)
+    @com.fasterxml.jackson.annotation.JsonProperty(access = com.fasterxml.jackson.annotation.JsonProperty.Access.READ_ONLY)
+    private BrokerAccount brokerAccount;
+
+    public Long getBrokerAccountId() { return brokerAccountId; }
+    public void setBrokerAccountId(Long value) { brokerAccountId = value; }
+    public String getAccountId() { return accountId; }
+    public void setAccountId(String value) { accountId = value; }
+    public BrokerAccount getBrokerAccount() { return brokerAccount; }
+
     /**
      * 同步数据的起始日期
      */

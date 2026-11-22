@@ -29,29 +29,9 @@ public class Broker extends BaseEntity {
     @Column(name = "country", nullable = false, length = 50)
     private String country;
 
-    /**
-     * 券商账户描述
-     */
-    @Column(name = "description", length = 200)
-    private String description;
-
-    /**
-     * 关联邮箱
-     */
-    @Column(name = "email", length = 100)
-    private String email;
-
-    /**
-     * 关联电话
-     */
-    @Column(name = "phone", length = 30)
-    private String phone;
-
-    /**
-     * 是否启用
-     */
-    @Column(name = "is_active")
-    private Boolean isActive = true;
+    /** 券商简介，与实际账户的备注独立。 */
+    @Column(name = "introduction", length = 500)
+    private String introduction;
 
     // ============ Constructors ============
 
@@ -89,36 +69,12 @@ public class Broker extends BaseEntity {
         this.country = country;
     }
 
-    public String getDescription() {
-        return description;
+    public String getIntroduction() {
+        return introduction;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public Boolean getIsActive() {
-        return isActive;
-    }
-
-    public void setIsActive(Boolean isActive) {
-        this.isActive = isActive;
+    public void setIntroduction(String introduction) {
+        this.introduction = introduction;
     }
 
     @Override
@@ -128,10 +84,7 @@ public class Broker extends BaseEntity {
                 ", brokerName='" + brokerName + '\'' +
                 ", brokerCode='" + brokerCode + '\'' +
                 ", country='" + country + '\'' +
-                ", description='" + description + '\'' +
-                ", email='" + email + '\'' +
-                ", phone='" + phone + '\'' +
-                ", isActive=" + isActive +
+                ", introduction='" + introduction + '\'' +
                 '}';
     }
 }

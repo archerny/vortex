@@ -2,9 +2,11 @@
 
 ## 拉取与暂存
 
-`TigerSyncAdapter` 通过 POM 中声明的 Tiger OpenAPI Java SDK 查询 `FILLED_ORDERS`。窗口末日最多取起始日加 90 天，下一窗从上一窗末日的下一天开始。适配器使用 `broker.tiger.tiger-id`、`broker.tiger.private-key` 和 `broker.tiger.account`，配置步骤见 [Tiger 接入指南](../../../docs/broker-sync/brokers/tiger/README.md)。
+`TigerSyncAdapter` 通过 POM 中声明的 Tiger OpenAPI Java SDK 查询 `FILLED_ORDERS`。窗口末日最多取起始日加 90 天，下一窗从上一窗末日的下一天开始。托管账户选择 Tiger 券商并填写真实资金账号；同步配置的账户行将 Tiger ID 和 PKCS#8 私钥明文保存到 `broker_sync_connections`，资金账号来自所选账户资料。生产运行仅从数据库读取，不回退profile；每批捕获同一组凭证，用于新建SDK客户端和所有日期窗口。配置步骤见 [Tiger接入指南](../../../docs/broker-sync/brokers/tiger/README.md)和 [0047](../../../design/0047-2026-11-21-broker-accounts-and-sync-connections.md)。
 
-订单暂存到 `tiger_staged_orders`。`tiger_id` 来自 SDK 的 `TradeOrder.getId()`，用于暂存去重，导入后也作为 `trade_records.external_id`。V27 尝试给已有 Tiger 券商行填入技术标识 `tiger`。前端同步批次页可触发 Tiger，同步原始数据页目前只提供 IBKR 面板。见 [Tiger 适配器](../../../backend/src/main/java/com/vortex/sync/adapter/tiger/TigerSyncAdapter.java)和 [V27](../../../backend/src/main/resources/db/migration/V27__seed_tiger_broker_code.sql)。
+订单暂存到 `tiger_staged_orders`。`tiger_id` 来自 SDK 的 `TradeOrder.getId()`，与来源资金账号组成暂存去重键，导入后与本地账户主键及券商共同去重，也作为 `trade_records.external_id`。V27 尝试给已有 Tiger 券商行填入技术标识 `tiger`。前端同步批次页可触发 Tiger，同步原始数据页目前只提供 IBKR 面板。见 [Tiger 适配器](../../../backend/src/main/java/com/vortex/sync/adapter/tiger/TigerSyncAdapter.java)和 [V27](../../../backend/src/main/resources/db/migration/V27__seed_tiger_broker_code.sql)。
+
+拉取订单的资金账号必须与本批真实账户 ID 快照一致，否则在暂存前失败。不同账户可导入相同外部 ID；导入从持久化批次读取本地账户，不能按当前券商代码重新选择归属。局部合成验收覆盖错账户拒绝、分账户凭证和去重；真实 ORM 导入使用 epoch 时间夹具，特意不经过下述有缺陷的正常暂存时间转换，不能据此认定该缺陷已修复。
 
 ## 导入映射
 

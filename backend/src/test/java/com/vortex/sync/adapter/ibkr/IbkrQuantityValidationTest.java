@@ -61,7 +61,7 @@ class IbkrQuantityValidationTest {
     }
 
     private IbkrStagedOrder order(String quantity) {
-        IbkrStagedOrder order = new IbkrStagedOrder();
+        IbkrStagedOrder order = new IbkrStagedOrder(); order.setAccountId("SYNTH-ACCOUNT");
         order.setId(1L);
         order.setBatchId(100L);
         order.setOrderId("synthetic-order");
@@ -92,7 +92,7 @@ class IbkrQuantityValidationTest {
             return record;
         });
 
-        worker.importSingleOrder(100L, 1L, order);
+        worker.importSingleOrder(100L, 1L, 1L, order);
 
         ArgumentCaptor<TradeRecord> saved = ArgumentCaptor.forClass(TradeRecord.class);
         verify(trades).save(saved.capture());
@@ -109,7 +109,7 @@ class IbkrQuantityValidationTest {
         IbkrStagedOrder order = order(raw);
 
         ImportOneFailedException error = assertThrows(ImportOneFailedException.class,
-                () -> worker.importSingleOrder(100L, 1L, order));
+                () -> worker.importSingleOrder(100L, 1L, 1L, order));
 
         CategorizedSyncException cause = assertInstanceOf(CategorizedSyncException.class, error.getCause());
         assertEquals(FailureCategory.UNRECOGNIZED, cause.getCategory());
@@ -127,7 +127,7 @@ class IbkrQuantityValidationTest {
     @NullAndEmptySource
     void shouldRejectInvalidZeroMissingAndOverflowingQuantities(String raw) {
         ImportOneFailedException error = assertThrows(ImportOneFailedException.class,
-                () -> worker.importSingleOrder(100L, 1L, order(raw)));
+                () -> worker.importSingleOrder(100L, 1L, 1L, order(raw)));
 
         CategorizedSyncException cause = assertInstanceOf(CategorizedSyncException.class, error.getCause());
         assertEquals(FailureCategory.UNRECOGNIZED, cause.getCategory());
@@ -144,7 +144,7 @@ class IbkrQuantityValidationTest {
         order.setDescription("SYNTH 16JAN26 10 C");
 
         ImportOneFailedException error = assertThrows(ImportOneFailedException.class,
-                () -> worker.importSingleOrder(100L, 1L, order));
+                () -> worker.importSingleOrder(100L, 1L, 1L, order));
 
         assertTrue(error.getCause().getMessage().contains("Fractional IBKR quantities are not supported"));
         verify(trades, never()).save(any());
@@ -158,7 +158,7 @@ class IbkrQuantityValidationTest {
         properties.setFlexToken("synthetic-token");
         properties.setTradeConfirmQueryId("synthetic-query");
         IbkrFlexClient client = mock(IbkrFlexClient.class);
-        when(client.fetchReport(anyString(), anyString())).thenReturn("""
+        when(client.fetchReport(org.mockito.ArgumentMatchers.eq(1L), anyString(), anyString())).thenReturn("""
                 <FlexQueryResponse type="TCF"><FlexStatements count="1">
                   <FlexStatement accountId="synthetic-account"><TradeConfirms/></FlexStatement>
                 </FlexStatements></FlexQueryResponse>
@@ -173,7 +173,7 @@ class IbkrQuantityValidationTest {
         IbkrSyncAdapter adapter = new IbkrSyncAdapter(properties, client, new FlexQueryParser(),
                 mock(IbkrStagingService.class), mock(IbkrImportService.class),
                 mock(BrokerSyncBatchService.class), orders);
-        SyncRequest request = new SyncRequest("ibkr", "2026-01-01", "2026-01-05");
+        SyncRequest request = com.vortex.fixtures.AccountFixtures.request("synthetic-account", "ibkr", "2026-01-01", "2026-01-05");
         request.setBatchId(100L);
 
         var result = adapter.sync(request);
@@ -192,13 +192,13 @@ class IbkrQuantityValidationTest {
         Map<Long, IbkrStagedTradeConfirm> stagedConfirms = new LinkedHashMap<>();
         Map<Long, TradeRecord> persisted = new LinkedHashMap<>();
         AtomicLong ids = new AtomicLong(200);
-        TradeRecord previous = new TradeRecord();
+        TradeRecord previous = new TradeRecord(); previous.setBrokerAccountId(1L);
         previous.setId(10L);
         previous.setSyncBatchId(99L);
         persisted.put(10L, previous);
 
-        when(orders.findByOrderId(anyString())).thenAnswer(i -> staged.values().stream()
-                .filter(o -> o.getOrderId().equals(i.getArgument(0))).findFirst());
+        when(orders.findByAccountIdAndOrderId(org.mockito.ArgumentMatchers.nullable(String.class), anyString())).thenAnswer(i -> staged.values().stream()
+                .filter(o -> o.getOrderId().equals(i.getArgument(1))).findFirst());
         when(orders.save(any())).thenAnswer(i -> {
             IbkrStagedOrder value = i.getArgument(0);
             if (value.getId() == null) value.setId(ids.incrementAndGet());
@@ -248,7 +248,7 @@ class IbkrQuantityValidationTest {
         broker.setId(1L);
         when(brokers.findByBrokerCode("ibkr")).thenReturn(Optional.of(broker));
         IbkrFlexClient client = mock(IbkrFlexClient.class);
-        when(client.fetchReport(anyString(), anyString())).thenReturn("""
+        when(client.fetchReport(org.mockito.ArgumentMatchers.eq(1L), anyString(), anyString())).thenReturn("""
                 <FlexQueryResponse type="TCF"><FlexStatements count="1"><FlexStatement accountId="synthetic-account">
                   <TradeConfirms>
                     <Order orderID="synthetic-good" assetCategory="STK" symbol="SYNTH" currency="USD"
@@ -265,16 +265,16 @@ class IbkrQuantityValidationTest {
         properties.setFlexToken("synthetic-token");
         properties.setTradeConfirmQueryId("synthetic-query");
         BrokerSyncBatchService batches = mock(BrokerSyncBatchService.class);
-        IbkrImportService importer = new IbkrImportService(orders, trades, brokers, worker);
+        IbkrImportService importer = new IbkrImportService(orders, trades, com.vortex.fixtures.AccountFixtures.accounts(), worker, com.vortex.fixtures.AccountFixtures.batches());
         IbkrSyncAdapter adapter = new IbkrSyncAdapter(properties, client, new FlexQueryParser(),
                 new IbkrStagingService(new IbkrStagingWorker(orders, confirms)), importer, batches, orders);
         SyncBatchCleanupService cleanup = new SyncBatchCleanupService(
                 List.of(new IbkrCleanupStrategy(orders, confirms)), List.of(adapter), trades, eventWriteLock, cleanupBatches, eventHistory);
         BrokerSyncAsyncExecutor executor = new BrokerSyncAsyncExecutor(
-                new BrokerSyncService(List.of(adapter), brokers), batches, new SyncBatchFailureHandler(cleanup, batches));
+                new BrokerSyncService(List.of(adapter), brokers, com.vortex.fixtures.AccountFixtures.service("synthetic-account")), batches, new SyncBatchFailureHandler(cleanup, batches));
 
         for (long batch : new long[] {100L, 101L}) {
-            executor.execute(batch, new SyncRequest("ibkr", "2026-01-01", "2026-01-05"));
+            executor.execute(batch, com.vortex.fixtures.AccountFixtures.request("synthetic-account", "ibkr", "2026-01-01", "2026-01-05"));
 
             verify(batches).markAsFailed(eq(batch), contains(reason));
             verify(orders).deleteByBatchId(batch);

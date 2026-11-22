@@ -46,8 +46,8 @@ public class TradeRecordController {
      * GET /api/trade-records
      */
     @GetMapping
-    public ResponseEntity<Map<String, Object>> getAllRecords() {
-        List<TradeRecord> records = tradeRecordService.findAll();
+    public ResponseEntity<Map<String, Object>> getAllRecords(@RequestParam(required = false) Long brokerAccountId) {
+        List<TradeRecord> records = brokerAccountId == null ? tradeRecordService.findAll() : tradeRecordService.findByBrokerAccountId(brokerAccountId);
         return buildSuccessResponse("查询成功", records);
     }
 
@@ -167,6 +167,11 @@ public class TradeRecordController {
         String message = result.isPassed() ? "核对通过，所有交易记录数据正常" :
                 "核对完成，发现 " + result.getErrorCount() + " 条异常记录";
         return buildSuccessResponse(message, result);
+    }
+
+    @ExceptionHandler(org.springframework.dao.DataIntegrityViolationException.class)
+    public ResponseEntity<Map<String, Object>> conflictingAccount() {
+        return buildErrorResponse(HttpStatus.CONFLICT, "账户与券商关联冲突，或该账户已有相同外部记录");
     }
 
     // ============ 响应构建工具方法 ============

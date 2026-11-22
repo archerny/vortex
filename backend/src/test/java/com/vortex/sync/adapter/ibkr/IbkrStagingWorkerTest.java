@@ -45,7 +45,7 @@ class IbkrStagingWorkerTest {
     }
 
     private IbkrOrderRecord buildOrder(String orderId) {
-        IbkrOrderRecord order = new IbkrOrderRecord();
+        IbkrOrderRecord order = new IbkrOrderRecord(); order.setAccountId("SYNTH-ACCOUNT");
         order.setOrderID(orderId);
         order.setAccountId("U12345");
         order.setCurrency("USD");
@@ -62,7 +62,7 @@ class IbkrStagingWorkerTest {
     }
 
     private IbkrTradeConfirm buildConfirm(String tradeId) {
-        IbkrTradeConfirm confirm = new IbkrTradeConfirm();
+        IbkrTradeConfirm confirm = new IbkrTradeConfirm(); confirm.setAccountId("SYNTH-ACCOUNT");
         confirm.setTradeID(tradeId);
         confirm.setOrderID("ORD001");
         confirm.setAccountId("U12345");
@@ -117,7 +117,7 @@ class IbkrStagingWorkerTest {
             stagingWorker.stageOrder(1L, order);
             ArgumentCaptor<IbkrStagedOrder> captor = ArgumentCaptor.forClass(IbkrStagedOrder.class);
             verify(stagedOrderRepository).save(captor.capture());
-            when(stagedOrderRepository.findByOrderId("ORD_EXISTS")).thenReturn(Optional.of(captor.getValue()));
+            when(stagedOrderRepository.findByAccountIdAndOrderId(org.mockito.ArgumentMatchers.nullable(String.class), org.mockito.ArgumentMatchers.eq("ORD_EXISTS"))).thenReturn(Optional.of(captor.getValue()));
             clearInvocations(stagedOrderRepository);
 
             boolean result = stagingWorker.stageOrder(2L, order);
@@ -151,7 +151,7 @@ class IbkrStagingWorkerTest {
             stagingWorker.stageTradeConfirm(1L, confirm);
             ArgumentCaptor<IbkrStagedTradeConfirm> captor = ArgumentCaptor.forClass(IbkrStagedTradeConfirm.class);
             verify(stagedTradeConfirmRepository).save(captor.capture());
-            when(stagedTradeConfirmRepository.findByTradeId("TC_EXISTS")).thenReturn(Optional.of(captor.getValue()));
+            when(stagedTradeConfirmRepository.findByAccountIdAndTradeId(org.mockito.ArgumentMatchers.nullable(String.class), org.mockito.ArgumentMatchers.eq("TC_EXISTS"))).thenReturn(Optional.of(captor.getValue()));
             clearInvocations(stagedTradeConfirmRepository);
 
             boolean result = stagingWorker.stageTradeConfirm(2L, confirm);

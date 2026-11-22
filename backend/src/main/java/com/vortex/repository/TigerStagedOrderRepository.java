@@ -21,6 +21,8 @@ import java.util.Optional;
  */
 @Repository
 public interface TigerStagedOrderRepository extends JpaRepository<TigerStagedOrder, Long> {
+    boolean existsByAccountAndTigerId(String account, String tigerId);
+
 
     /**
      * Find all staged orders by batch ID.

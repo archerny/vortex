@@ -46,7 +46,7 @@ public class OrderedMarketEventCheck {
     @Configuration
     @EnableTransactionManagement
     @EnableJpaRepositories(basePackages = "com.vortex.repository")
-    @Import({LedgerWriteLock.class, MarketEventHistoryService.class, TradeRecordService.class,
+    @Import({BrokerAccountService.class, LedgerWriteLock.class, MarketEventHistoryService.class, TradeRecordService.class,
             PositionService.class, MarketEventProcessingService.class, StockSplitEventService.class,
             SymbolChangeEventService.class, DividendInKindEventService.class, BrokerSyncBatchService.class,
             IbkrImportWorker.class, IbkrImportService.class, IbkrStagingWorker.class, IbkrStagingService.class,
@@ -82,11 +82,19 @@ public class OrderedMarketEventCheck {
             changes = app.getBean(SymbolChangeEventService.class); dividends = app.getBean(DividendInKindEventService.class);
             tradeRepo = app.getBean(TradeRecordRepository.class); splitRepo = app.getBean(StockSplitEventRepository.class);
             tx = new TransactionTemplate(app.getBean(PlatformTransactionManager.class));
-            broker = app.getBean(BrokerRepository.class).save(new Broker("SYNTH-EVENT", "SYNTH")).getId();
+            broker = managedBroker(new Broker("SYNTH-EVENT", "SYNTH")).getId();
             lifecycle(); chainAndDividend(); zeroAndLegacy(); multipleBrokers(); transactions(); concurrency(); syncBoundary(); exactOptionLinkage(); preflight();
             System.out.println("PASS all ordered-event integration scenarios (real Spring/JPA, isolated PostgreSQL)");
         }
     }
+
+    static Broker managedBroker(Broker broker) {
+        Broker saved = context.getBean(BrokerRepository.class).save(broker);
+        BrokerAccount account = new BrokerAccount(); account.setBrokerId(saved.getId()); account.setAccountId("SYNTHETIC"); account.setAccountName("Synthetic account");
+        context.getBean(BrokerAccountService.class).create(account);
+        return saved;
+    }
+    static long accountKey(long owner) { return context.getBean(BrokerAccountService.class).resolve(null, owner).getId(); }
 
     static void lifecycle() {
         TradeRecord original = trades.create(trade("SYNTH-LIFE", DAY.minusDays(1)));
@@ -200,14 +208,14 @@ public class OrderedMarketEventCheck {
     }
 
     static void multipleBrokers() {
-        long second = context.getBean(BrokerRepository.class).save(new Broker("SYNTH-SECOND", "SYNTH")).getId();
+        long second = managedBroker(new Broker("SYNTH-SECOND", "SYNTH")).getId();
         trades.create(trade("SYNTH-MULTI", DAY.minusDays(1)));
-        TradeRecord other = trade("SYNTH-MULTI", DAY.minusDays(1)); other.setBrokerId(second); trades.create(other);
+        TradeRecord other = trade("SYNTH-MULTI", DAY.minusDays(1)); other.setBrokerId(second); other.setBrokerAccountId(accountKey(second)); trades.create(other);
         StockSplitEvent event = splits.create(split("SYNTH-MULTI", DAY));
         check(quantity("SYNTH-MULTI") == 400, "Event did not include both brokers");
-        TradeRecord blocked = trade("SYNTH-MULTI", DAY.minusDays(2)); blocked.setBrokerId(second);
+        TradeRecord blocked = trade("SYNTH-MULTI", DAY.minusDays(2)); blocked.setBrokerId(second); blocked.setBrokerAccountId(accountKey(second));
         conflict("HISTORY_LOCKED", () -> trades.create(blocked));
-        TradeRecord following = trade("SYNTH-MULTI", DAY); following.setBrokerId(second); following = trades.create(following);
+        TradeRecord following = trade("SYNTH-MULTI", DAY); following.setBrokerId(second); following.setBrokerAccountId(accountKey(second)); following = trades.create(following);
         conflict("FOLLOWING_TRADES_EXIST", () -> splits.delete(event.getId()));
         trades.softDelete(following.getId()); splits.delete(event.getId());
         check(quantity("SYNTH-MULTI") == 200, "Cross-broker undo");
@@ -265,6 +273,7 @@ public class OrderedMarketEventCheck {
         StockSplitEvent lock = splits.create(split("SYNTH-SYNC", DAY));
         BrokerSyncBatch importing = batches.createBatch("ibkr", DAY.minusDays(2), DAY);
         IbkrStagedOrder order = new IbkrStagedOrder();
+        order.setAccountId("SYNTHETIC");
         order.setBatchId(importing.getId()); order.setOrderId("SYNTH-LOCKED-ORDER");
         order.setSymbol("SYNTH-SYNC"); order.setAssetCategory("STK"); order.setTradeDate("20260309");
         order.setCurrency("USD"); order.setBuySell("BUY"); order.setQuantity("10");
@@ -273,7 +282,7 @@ public class OrderedMarketEventCheck {
         order = context.getBean(IbkrStagedOrderRepository.class).save(order);
         final IbkrStagedOrder staged = order;
         try {
-            context.getBean(IbkrImportWorker.class).importSingleOrder(importing.getId(), broker, staged);
+            context.getBean(IbkrImportWorker.class).importSingleOrder(importing.getId(), broker, accountKey(broker), staged);
             throw new AssertionError("Locked import allowed");
         } catch (RuntimeException expected) {
             check(expected.getClass().getSimpleName().equals("ImportOneFailedException"), "Wrong import wrapper");
@@ -294,6 +303,7 @@ public class OrderedMarketEventCheck {
         TradeRecord leftover = trade("SYNTH-FAILED", DAY.minusDays(1)); leftover.setSyncBatchId(legacyFailed.getId());
         leftover = trades.create(leftover);
         IbkrStagedOrder leftoverStage = new IbkrStagedOrder();
+        leftoverStage.setAccountId("SYNTHETIC");
         leftoverStage.setBatchId(legacyFailed.getId()); leftoverStage.setOrderId("SYNTH-FAILED-ORDER");
         leftoverStage = context.getBean(IbkrStagedOrderRepository.class).save(leftoverStage);
         batches.markAsFailed(legacyFailed.getId(), "synthetic legacy footprint");
@@ -312,7 +322,7 @@ public class OrderedMarketEventCheck {
 
     static void exactOptionLinkage() throws Exception {
         var brokers = context.getBean(BrokerRepository.class);
-        Broker ibkr = new Broker("SYNTH-IBKR", "SYNTH"); ibkr.setBrokerCode("ibkr"); ibkr = brokers.save(ibkr);
+        Broker ibkr = new Broker("SYNTH-IBKR", "SYNTH"); ibkr.setBrokerCode("ibkr"); ibkr = managedBroker(ibkr);
         var batches = context.getBean(BrokerSyncBatchService.class);
         String missing = linkXml("SYNTH-MISSING", "SYNTH-LINK", true, 0);
         BrokerSyncBatch first = runLinkSync(missing);
@@ -331,7 +341,7 @@ public class OrderedMarketEventCheck {
         BrokerSyncBatch history = runLinkSync(linkXml("SYNTH-HIST", "SYNTH-HIST", false, 1));
         check(history.getStatus().equals("COMPLETED"), "Historical option import");
         TradeRecord historical = tradeRepo.findByExternalBrokerAndExternalId("ibkr", "SYNTH-HIST-OPT0").orElseThrow();
-        long otherBroker = brokers.save(new Broker("SYNTH-FOREIGN", "SYNTH")).getId();
+        long otherBroker = managedBroker(new Broker("SYNTH-FOREIGN", "SYNTH")).getId();
         TradeRecord foreign = optionFixture("SYNTH-HIST", otherBroker); tradeRepo.save(foreign);
         TradeRecord otherCurrency = optionFixture("SYNTH-HIST", ibkr.getId());
         otherCurrency.setCurrency(Currency.HKD); tradeRepo.save(otherCurrency);
@@ -339,9 +349,7 @@ public class OrderedMarketEventCheck {
         tx.executeWithoutResult(status -> context.getBean(IbkrStagedOrderRepository.class).deleteByBatchId(history.getId()));
         BrokerSyncBatch stockBatch = runLinkSync(linkXml("SYNTH-HIST-STOCK", "SYNTH-HIST", true, 0));
         check(stockBatch.getStatus().equals("COMPLETED"), "Completed historical counterpart was not matched");
-        var actualCandidates = tradeRepo.findOptSideBookTradesForMatching(TradeTrigger.OPTION,
-                TriggerRefType.OPTION_EXERCISE, List.of(AssetType.OPTION_CALL, AssetType.OPTION_PUT),
-                "SYNTH-HIST", DAY, ibkr.getId(), Currency.USD);
+        var actualCandidates = tradeRepo.findOptSideBookTradesForMatching(accountKey(ibkr.getId()), TradeTrigger.OPTION, TriggerRefType.OPTION_EXERCISE, List.of(AssetType.OPTION_CALL, AssetType.OPTION_PUT), "SYNTH-HIST", DAY, ibkr.getId(), Currency.USD);
         check(actualCandidates.size() == 1 && actualCandidates.get(0).getId().equals(historical.getId()),
                 "Actual JPQL admitted foreign broker/currency");
         TradeRecord stock = tradeRepo.findByExternalBrokerAndExternalId("ibkr", "SYNTH-HIST-STOCK-STK").orElseThrow();
@@ -371,15 +379,15 @@ public class OrderedMarketEventCheck {
         IbkrFlexQueryProperties properties = new IbkrFlexQueryProperties();
         properties.setFlexToken("SYNTHETIC-NOT-A-CREDENTIAL"); properties.setTradeConfirmQueryId("SYNTHETIC");
         IbkrFlexClient fakeClient = new IbkrFlexClient(properties) {
-            @Override public String fetchReport(String from, String to) { return xml; }
+            @Override public String fetchReport(Long accountKey, String from, String to) { return xml; }
         };
         var batches = context.getBean(BrokerSyncBatchService.class);
         var adapter = new IbkrSyncAdapter(properties, fakeClient, new FlexQueryParser(),
                 context.getBean(IbkrStagingService.class), context.getBean(IbkrImportService.class),
                 batches, context.getBean(IbkrStagedOrderRepository.class));
-        var executor = new BrokerSyncAsyncExecutor(new BrokerSyncService(List.of(adapter), context.getBean(BrokerRepository.class)),
+        var executor = new BrokerSyncAsyncExecutor(new BrokerSyncService(List.of(adapter), context.getBean(BrokerRepository.class), context.getBean(BrokerAccountService.class)),
                 batches, context.getBean(SyncBatchFailureHandler.class));
-        BrokerSyncBatch batch = batches.createBatch("ibkr", DAY, DAY);
+        BrokerSyncBatch batch = batches.createBatch("ibkr", DAY, DAY, accountKey(context.getBean(BrokerRepository.class).findByBrokerCode("ibkr").orElseThrow().getId()), "SYNTHETIC");
         SyncRequest request = new SyncRequest(); request.setBrokerCode("ibkr");
         request.setStartTime(DAY.toString()); request.setEndTime(DAY.toString());
         executor.execute(batch.getId(), request);
@@ -398,7 +406,7 @@ public class OrderedMarketEventCheck {
 
     static TradeRecord optionFixture(String underlying, long brokerId) {
         TradeRecord record = trade(underlying + "-20260417-C10", DAY);
-        record.setUnderlyingSymbol(underlying); record.setBrokerId(brokerId);
+        record.setUnderlyingSymbol(underlying); record.setBrokerId(brokerId); record.setBrokerAccountId(accountKey(brokerId));
         record.setAssetType(AssetType.OPTION_CALL); record.setTradeType(TradeType.SELL); record.setQuantity(1);
         record.setPrice(BigDecimal.ZERO); record.setAmount(BigDecimal.ZERO);
         record.setTradeTrigger(TradeTrigger.OPTION); record.setTriggerRefType(TriggerRefType.OPTION_EXERCISE);
@@ -463,7 +471,7 @@ public class OrderedMarketEventCheck {
     }
     static TradeRecord trade(String symbol, LocalDate date) {
         TradeRecord record = new TradeRecord(); record.setSymbol(symbol); record.setUnderlyingSymbol(symbol);
-        record.setTradeDate(date); record.setBrokerId(broker); record.setAssetType(AssetType.STOCK);
+        record.setTradeDate(date); record.setBrokerId(broker); record.setBrokerAccountId(accountKey(broker)); record.setAssetType(AssetType.STOCK);
         record.setCurrency(Currency.USD); record.setTradeType(TradeType.BUY); record.setQuantity(100);
         record.setPrice(BigDecimal.TEN); record.setFee(BigDecimal.ZERO); return record;
     }

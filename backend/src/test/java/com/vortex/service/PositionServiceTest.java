@@ -43,7 +43,7 @@ class PositionServiceTest {
 
     private TradeRecord buildRecord(Long id, String symbol, TradeType tradeType,
                                      int quantity, Long brokerId) {
-        TradeRecord record = new TradeRecord();
+        TradeRecord record = new TradeRecord(); record.setBrokerAccountId(1L);
         record.setId(id);
         record.setSymbol(symbol);
         record.setUnderlyingSymbol(symbol);
@@ -180,5 +180,20 @@ class PositionServiceTest {
 
         assertEquals(1, result.size());
         assertEquals(100, result.get(0).getQuantity());
+    }
+
+    @Test void sameBrokerAccountsDoNotOffsetAndCanBeFilteredIndependently() {
+        LocalDate date = LocalDate.of(2026, 1, 1);
+        var first = buildRecord(1L, "SYNTH", TradeType.BUY, 100, 1L);
+        var second = buildRecord(2L, "SYNTH", TradeType.SELL, 100, 1L);
+        second.setBrokerAccountId(2L);
+        when(tradeRecordRepository.findByTradeDateLessThanEqualAndIsDeletedFalseOrderByTradeDateAsc(date)).thenReturn(List.of(first, second));
+        var result = positionService.calculatePositions(date, null);
+        assertEquals(2, result.size());
+        assertEquals(List.of(100, -100), result.stream().map(PositionSnapshot::getQuantity).toList());
+        var selected = positionService.calculatePositions(date, null, 2L);
+        assertEquals(1, selected.size());
+        assertEquals(2L, selected.get(0).getBrokerAccountId());
+        assertEquals(-100, selected.get(0).getQuantity());
     }
 }

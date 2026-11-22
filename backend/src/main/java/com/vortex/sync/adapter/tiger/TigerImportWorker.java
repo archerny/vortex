@@ -69,11 +69,11 @@ public class TigerImportWorker {
      * @throws ImportOneFailedException if mapping or persistence throws
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void importOne(Long batchId, Long brokerId, TigerStagedOrder staged) {
+    public void importOne(Long batchId, Long brokerId, Long brokerAccountId, TigerStagedOrder staged) {
         try {
             history.lock();
             boolean alreadyImported = tradeRecordRepository
-                    .existsByExternalBrokerAndExternalId(BROKER_CODE, staged.getTigerId());
+                    .existsByBrokerAccountIdAndExternalBrokerAndExternalId(brokerAccountId, BROKER_CODE, staged.getTigerId());
 
             TigerTradeRecordMapper.FilterResult filterResult = mapper.preFilter(staged, alreadyImported);
 
@@ -103,6 +103,7 @@ public class TigerImportWorker {
             }
 
             TradeRecord tradeRecord = mapper.toTradeRecord(staged, brokerId, batchId);
+            tradeRecord.setBrokerAccountId(brokerAccountId);
             history.assertHistoryWritable(tradeRecord);
             TradeRecord saved = tradeRecordRepository.save(tradeRecord);
 

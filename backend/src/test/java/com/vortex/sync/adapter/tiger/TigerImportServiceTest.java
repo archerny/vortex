@@ -1,8 +1,8 @@
 package com.vortex.sync.adapter.tiger;
 
-import com.vortex.entity.Broker;
+import com.vortex.entity.BrokerAccount;
 import com.vortex.entity.TigerStagedOrder;
-import com.vortex.repository.BrokerRepository;
+import com.vortex.repository.BrokerAccountRepository;
 import com.vortex.repository.TigerStagedOrderRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -48,7 +48,7 @@ class TigerImportServiceTest {
     private TigerStagedOrderRepository stagedOrderRepository;
 
     @Mock
-    private BrokerRepository brokerRepository;
+    private BrokerAccountRepository accountRepository;
 
     @Mock
     private TigerImportWorker importWorker;
@@ -57,14 +57,12 @@ class TigerImportServiceTest {
 
     @BeforeEach
     void setUp() {
-        importService = new TigerImportService(stagedOrderRepository, brokerRepository, importWorker);
+        importService = new TigerImportService(stagedOrderRepository, accountRepository, importWorker, com.vortex.fixtures.AccountFixtures.batches());
     }
 
-    private Broker buildBroker() {
-        Broker broker = new Broker("Tiger Securities", "US");
-        broker.setId(7L);
-        broker.setBrokerCode("tiger");
-        return broker;
+    private BrokerAccount buildAccount() {
+        var account = new BrokerAccount(); account.setId(1L); account.setBrokerId(7L);
+        account.setAccountId("SYNTH-ACCOUNT"); account.setAccountName("Synthetic account"); return account;
     }
 
     private TigerStagedOrder buildStagedOrder(String tigerId) {
@@ -81,9 +79,9 @@ class TigerImportServiceTest {
     class ImportAll {
 
         @Test
-        @DisplayName("should throw when broker with code 'tiger' is not found")
-        void shouldThrowWhenBrokerNotFound() {
-            when(brokerRepository.findByBrokerCode("tiger")).thenReturn(Optional.empty());
+        @DisplayName("should throw when selected batch account 'tiger' is not found")
+        void shouldThrowWhenAccountNotFound() {
+            when(accountRepository.findById(1L)).thenReturn(Optional.empty());
 
             assertThrows(IllegalStateException.class, () -> importService.importAll(1L));
             verifyNoInteractions(importWorker);
@@ -92,19 +90,19 @@ class TigerImportServiceTest {
         @Test
         @DisplayName("should complete silently and not touch worker when no PENDING rows")
         void shouldHandleNoPendingOrders() {
-            when(brokerRepository.findByBrokerCode("tiger")).thenReturn(Optional.of(buildBroker()));
+            when(accountRepository.findById(1L)).thenReturn(Optional.of(buildAccount()));
             when(stagedOrderRepository.findByBatchIdAndStatus(1L, "PENDING"))
                     .thenReturn(Collections.emptyList());
 
             assertDoesNotThrow(() -> importService.importAll(1L));
 
-            verify(importWorker, never()).importOne(anyLong(), anyLong(), any());
+            verify(importWorker, never()).importOne(anyLong(), anyLong(), org.mockito.ArgumentMatchers.eq(1L), any());
         }
 
         @Test
         @DisplayName("should delegate every PENDING order to the worker with the resolved broker id")
         void shouldDelegateEachOrderToWorker() {
-            when(brokerRepository.findByBrokerCode("tiger")).thenReturn(Optional.of(buildBroker()));
+            when(accountRepository.findById(1L)).thenReturn(Optional.of(buildAccount()));
             TigerStagedOrder o1 = buildStagedOrder("T-1");
             TigerStagedOrder o2 = buildStagedOrder("T-2");
             when(stagedOrderRepository.findByBatchIdAndStatus(1L, "PENDING"))
@@ -112,20 +110,20 @@ class TigerImportServiceTest {
 
             importService.importAll(1L);
 
-            verify(importWorker).importOne(1L, 7L, o1);
-            verify(importWorker).importOne(1L, 7L, o2);
+            verify(importWorker).importOne(1L, 7L, 1L, o1);
+            verify(importWorker).importOne(1L, 7L, 1L, o2);
         }
 
         @Test
         @DisplayName("should call markFailed via proxy when worker throws ImportOneFailedException")
         void shouldInvokeMarkFailedOnImportFailure() {
-            when(brokerRepository.findByBrokerCode("tiger")).thenReturn(Optional.of(buildBroker()));
+            when(accountRepository.findById(1L)).thenReturn(Optional.of(buildAccount()));
             TigerStagedOrder bad = buildStagedOrder("T-FAIL");
             when(stagedOrderRepository.findByBatchIdAndStatus(1L, "PENDING")).thenReturn(List.of(bad));
 
             RuntimeException root = new RuntimeException("parse error");
             doThrow(new ImportOneFailedException(bad, root))
-                    .when(importWorker).importOne(1L, 7L, bad);
+                    .when(importWorker).importOne(1L, 7L, 1L, bad);
 
             assertDoesNotThrow(() -> importService.importAll(1L));
 
@@ -135,12 +133,12 @@ class TigerImportServiceTest {
         @Test
         @DisplayName("should swallow markFailed exception so adapter-level residual check can pick it up")
         void shouldSwallowMarkFailedException() {
-            when(brokerRepository.findByBrokerCode("tiger")).thenReturn(Optional.of(buildBroker()));
+            when(accountRepository.findById(1L)).thenReturn(Optional.of(buildAccount()));
             TigerStagedOrder bad = buildStagedOrder("T-MF-FAIL");
             when(stagedOrderRepository.findByBatchIdAndStatus(1L, "PENDING")).thenReturn(List.of(bad));
 
             doThrow(new ImportOneFailedException(bad, new RuntimeException("boom")))
-                    .when(importWorker).importOne(1L, 7L, bad);
+                    .when(importWorker).importOne(1L, 7L, 1L, bad);
             doThrow(new IllegalStateException("markFailed also failed"))
                     .when(importWorker).markFailed(same(bad), anyString());
 
@@ -152,7 +150,7 @@ class TigerImportServiceTest {
         @Test
         @DisplayName("should keep iterating remaining orders after one import failure")
         void shouldKeepIteratingAfterFailure() {
-            when(brokerRepository.findByBrokerCode("tiger")).thenReturn(Optional.of(buildBroker()));
+            when(accountRepository.findById(1L)).thenReturn(Optional.of(buildAccount()));
             TigerStagedOrder good1 = buildStagedOrder("T-GOOD1");
             TigerStagedOrder bad = buildStagedOrder("T-FAIL");
             TigerStagedOrder good2 = buildStagedOrder("T-GOOD2");
@@ -160,13 +158,13 @@ class TigerImportServiceTest {
                     .thenReturn(List.of(good1, bad, good2));
 
             doThrow(new ImportOneFailedException(bad, new RuntimeException("row2 boom")))
-                    .when(importWorker).importOne(1L, 7L, bad);
+                    .when(importWorker).importOne(1L, 7L, 1L, bad);
 
             importService.importAll(1L);
 
-            verify(importWorker).importOne(1L, 7L, good1);
-            verify(importWorker).importOne(1L, 7L, bad);
-            verify(importWorker).importOne(1L, 7L, good2);
+            verify(importWorker).importOne(1L, 7L, 1L, good1);
+            verify(importWorker).importOne(1L, 7L, 1L, bad);
+            verify(importWorker).importOne(1L, 7L, 1L, good2);
             verify(importWorker).markFailed(same(bad), anyString());
         }
     }

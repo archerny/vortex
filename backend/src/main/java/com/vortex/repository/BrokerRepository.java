@@ -22,11 +22,6 @@ public interface BrokerRepository extends BaseRepository<Broker, Long> {
     Optional<Broker> findByBrokerCode(String brokerCode);
 
     /**
-     * 根据是否启用状态查询
-     */
-    List<Broker> findByIsActive(Boolean isActive);
-
-    /**
      * 根据国家/地区查询
      */
     List<Broker> findByCountry(String country);

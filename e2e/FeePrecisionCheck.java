@@ -1,4 +1,5 @@
 import com.vortex.entity.Broker;
+import com.vortex.entity.BrokerAccount;
 import com.vortex.entity.Strategy;
 import com.vortex.entity.TradeRecord;
 import com.vortex.entity.enums.AssetType;
@@ -86,7 +87,7 @@ public class FeePrecisionCheck {
     private static Flyway flyway(String database, String target, String... initSql) {
         var config = Flyway.configure().dataSource(url(database), USER, "").locations(MIGRATIONS)
                 .initSql(String.join(";", initSql));
-        if (target != null) config.target(target);
+        config.target(target == null ? "29" : target);
         return config.load();
     }
 
@@ -106,6 +107,8 @@ public class FeePrecisionCheck {
     }
 
     private static void verifyOrmAndConstraints(String database) throws Exception {
+        // Keep fee-migration assertions scoped to V29; use the current schema for current entities.
+        Flyway.configure().dataSource(url(database), USER, "").locations(MIGRATIONS).load().migrate();
         long broker;
         try (Connection connection = connect(database)) {
             check("-1".equals(scalar(connection, "SELECT atttypmod FROM pg_attribute "
@@ -113,7 +116,7 @@ public class FeePrecisionCheck {
             broker = broker(connection);
         }
         try (var factory = new Configuration().addAnnotatedClass(TradeRecord.class)
-                .addAnnotatedClass(Broker.class).addAnnotatedClass(Strategy.class)
+                .addAnnotatedClass(Broker.class).addAnnotatedClass(BrokerAccount.class).addAnnotatedClass(Strategy.class)
                 .setProperty("hibernate.connection.url", url(database))
                 .setProperty("hibernate.connection.username", USER)
                 .setProperty("hibernate.hbm2ddl.auto", "validate")
@@ -125,7 +128,7 @@ public class FeePrecisionCheck {
             for (String fee : new String[] {"1.12345678", "0.0000000001234567890123456789", "123456789012.1234567890123456789"}) {
                 TradeRecord record = new TradeRecord();
                 record.setTradeDate(LocalDate.of(2026, 11, 17));
-                record.setBrokerId(broker);
+                record.setBrokerId(broker); record.setBrokerAccountId(broker);
                 record.setAssetType(AssetType.STOCK);
                 record.setSymbol("SYNTH-PRECISE");
                 record.setUnderlyingSymbol("SYNTH");
@@ -152,8 +155,8 @@ public class FeePrecisionCheck {
             expectConstraint(connection, broker, "-0.000000001", "23514");
             expectConstraint(connection, broker, null, "23502");
             connection.createStatement().execute("INSERT INTO trade_records "
-                    + "(trade_date,broker_id,asset_type,symbol,underlying_symbol,trade_type,quantity,price,amount,trade_trigger) "
-                    + "VALUES ('2026-11-17'," + broker + ",'STOCK','SYNTH-DEFAULT','SYNTH','BUY',1,10,10,'MANUAL')");
+                    + "(trade_date,broker_id,broker_account_id,asset_type,symbol,underlying_symbol,trade_type,quantity,price,amount,trade_trigger) "
+                    + "VALUES ('2026-11-17'," + broker + "," + broker + ",'STOCK','SYNTH-DEFAULT','SYNTH','BUY',1,10,10,'MANUAL')");
             check(BigDecimal.ZERO.compareTo(new BigDecimal(scalar(connection,
                     "SELECT fee::text FROM trade_records WHERE symbol = 'SYNTH-DEFAULT'"))) == 0,
                     "Default fee changed");
@@ -173,17 +176,24 @@ public class FeePrecisionCheck {
         try (var result = connection.createStatement().executeQuery("INSERT INTO brokers (broker_name,country) "
                 + "VALUES ('SYNTH-' || nextval('brokers_id_seq'),'SYNTH') RETURNING id")) {
             result.next();
-            return result.getLong(1);
+            long id = result.getLong(1);
+            if (scalar(connection, "SELECT to_regclass('broker_accounts')") != null) {
+                connection.createStatement().execute("INSERT INTO broker_accounts(id,broker_id,account_id,account_name) VALUES ("+id+","+id+",'SYNTH-"+id+"','Synthetic account')");
+            }
+            return id;
         }
     }
 
     private static void insert(Connection connection, long broker, String symbol, String fee) throws Exception {
+        boolean scoped = scalar(connection, "SELECT to_regclass('broker_accounts')") != null;
         try (var statement = connection.prepareStatement("INSERT INTO trade_records "
-                + "(trade_date,broker_id,asset_type,symbol,underlying_symbol,trade_type,quantity,price,amount,fee,currency,trade_trigger) "
-                + "VALUES ('2026-11-17',?,'STOCK',?,'SYNTH','BUY',1,10,10,?,'USD','MANUAL')")) {
-            statement.setLong(1, broker);
-            statement.setString(2, symbol);
-            statement.setBigDecimal(3, fee == null ? null : new BigDecimal(fee));
+                + "(trade_date,broker_id,"+(scoped ? "broker_account_id," : "")+"asset_type,symbol,underlying_symbol,trade_type,quantity,price,amount,fee,currency,trade_trigger) "
+                + "VALUES ('2026-11-17',?,"+(scoped ? "?," : "")+"'STOCK',?,'SYNTH','BUY',1,10,10,?,'USD','MANUAL')")) {
+            int parameter = 1;
+            statement.setLong(parameter++, broker);
+            if (scoped) statement.setLong(parameter++, broker);
+            statement.setString(parameter++, symbol);
+            statement.setBigDecimal(parameter, fee == null ? null : new BigDecimal(fee));
             statement.executeUpdate();
         }
     }

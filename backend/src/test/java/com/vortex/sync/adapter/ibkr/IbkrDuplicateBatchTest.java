@@ -127,11 +127,11 @@ class IbkrDuplicateBatchTest {
     @Test
     void shouldDetectAConflictingOrderAcrossFetchWindows() {
         Harness h = new Harness();
-        when(client.fetchReport(anyString(), anyString())).thenReturn(
+        when(client.fetchReport(org.mockito.ArgumentMatchers.eq(1L), anyString(), anyString())).thenReturn(
                 report("10", "-1.25", false).replace("20260105", "20250105"),
                 report("20", "-1.25", false));
-        h.executor.execute(100L, new SyncRequest("ibkr", "2025-01-01", "2026-01-05"));
-        verify(client, times(2)).fetchReport(anyString(), anyString());
+        h.executor.execute(100L, com.vortex.fixtures.AccountFixtures.request("SYNTH-ACCOUNT", "ibkr", "2025-01-01", "2026-01-05"));
+        verify(client, times(2)).fetchReport(org.mockito.ArgumentMatchers.eq(1L), anyString(), anyString());
         verify(batches).markAsFailed(eq(100L), contains("quantity"));
         assertTrue(h.staged.isEmpty());
         assertTrue(h.persisted.isEmpty());
@@ -220,9 +220,9 @@ class IbkrDuplicateBatchTest {
         Harness h = new Harness();
         h.run(99L);
         String before = h.snapshot();
-        when(client.fetchReport(anyString(), anyString())).thenReturn(
+        when(client.fetchReport(org.mockito.ArgumentMatchers.eq(1L), anyString(), anyString())).thenReturn(
                 report("10", "-1.25", true), document(confirmXml("SYNTH-FILL", "SYNTH-OLD", "10", "0")));
-        h.executor.execute(100L, new SyncRequest("ibkr", "2025-01-01", "2026-01-05"));
+        h.executor.execute(100L, com.vortex.fixtures.AccountFixtures.request("SYNTH-ACCOUNT", "ibkr", "2025-01-01", "2026-01-05"));
         verify(batches).markAsFailed(eq(100L), contains("[UNRECOGNIZED]"));
         verify(batches, never()).updatePhase(100L, "STAGING");
         verify(batches, never()).markAsCompleted(eq(100L), any());
@@ -240,10 +240,10 @@ class IbkrDuplicateBatchTest {
         String report = report("10", "-1.25", false);
 
         Harness() {
-            lenient().when(orders.findByOrderId(anyString())).thenAnswer(i -> staged.values().stream()
-                    .filter(row -> row.getOrderId().equals(i.getArgument(0))).findFirst());
-            lenient().when(confirms.findByTradeId(anyString())).thenAnswer(i -> fills.values().stream()
-                    .filter(row -> row.getTradeId().equals(i.getArgument(0))).findFirst());
+            lenient().when(orders.findByAccountIdAndOrderId(org.mockito.ArgumentMatchers.nullable(String.class), anyString())).thenAnswer(i -> staged.values().stream()
+                    .filter(row -> row.getOrderId().equals(i.getArgument(1))).findFirst());
+            lenient().when(confirms.findByAccountIdAndTradeId(org.mockito.ArgumentMatchers.nullable(String.class), anyString())).thenAnswer(i -> fills.values().stream()
+                    .filter(row -> row.getTradeId().equals(i.getArgument(1))).findFirst());
             lenient().when(orders.save(any())).thenAnswer(i -> {
                 IbkrStagedOrder row = i.getArgument(0);
                 if (row.getId() == null) row.setId(ids.incrementAndGet());
@@ -266,12 +266,12 @@ class IbkrDuplicateBatchTest {
                             && !((java.util.Collection<?>) i.getArgument(1)).contains(row.getStatus())).count());
             lenient().when(orders.findFirstByBatchIdAndStatusOrderByIdAsc(anyLong(), anyString())).thenAnswer(i -> staged.values().stream()
                     .filter(row -> Objects.equals(row.getBatchId(), i.getArgument(0)) && row.getStatus().equals(i.getArgument(1))).findFirst());
-            lenient().when(trades.existsByExternalBrokerAndExternalId(anyString(), anyString())).thenAnswer(i -> persisted.values().stream()
-                    .anyMatch(row -> Objects.equals(row.getExternalBroker(), i.getArgument(0))
-                            && Objects.equals(row.getExternalId(), i.getArgument(1))));
-            lenient().when(trades.findByExternalBrokerAndExternalId(anyString(), anyString())).thenAnswer(i -> persisted.values().stream()
-                    .filter(row -> Objects.equals(row.getExternalBroker(), i.getArgument(0))
-                            && Objects.equals(row.getExternalId(), i.getArgument(1))).findFirst());
+            lenient().when(trades.existsByBrokerAccountIdAndExternalBrokerAndExternalId(org.mockito.ArgumentMatchers.eq(1L), anyString(), anyString())).thenAnswer(i -> persisted.values().stream()
+                    .anyMatch(row -> Objects.equals(row.getExternalBroker(), i.getArgument(1))
+                            && Objects.equals(row.getExternalId(), i.getArgument(2))));
+            lenient().when(trades.findByBrokerAccountIdAndExternalBrokerAndExternalId(org.mockito.ArgumentMatchers.eq(1L), anyString(), anyString())).thenAnswer(i -> persisted.values().stream()
+                    .filter(row -> Objects.equals(row.getExternalBroker(), i.getArgument(1))
+                            && Objects.equals(row.getExternalId(), i.getArgument(2))).findFirst());
             lenient().when(trades.save(any())).thenAnswer(i -> {
                 TradeRecord row = i.getArgument(0);
                 if (row.getId() == null) row.setId(ids.incrementAndGet());
@@ -296,14 +296,14 @@ class IbkrDuplicateBatchTest {
             Broker broker = new Broker("Synthetic broker", "US");
             broker.setId(1L);
             lenient().when(brokers.findByBrokerCode("ibkr")).thenReturn(Optional.of(broker));
-            lenient().when(client.fetchReport(anyString(), anyString())).thenAnswer(i -> report);
+            lenient().when(client.fetchReport(org.mockito.ArgumentMatchers.eq(1L), anyString(), anyString())).thenAnswer(i -> report);
             IbkrFlexQueryProperties properties = new IbkrFlexQueryProperties();
             properties.setFlexToken("synthetic-token");
             properties.setTradeConfirmQueryId("synthetic-query");
             IbkrImportWorker importer = new IbkrImportWorker(orders, confirms, trades, eventHistory);
             IbkrSyncAdapter adapter = new IbkrSyncAdapter(properties, client, new FlexQueryParser(),
                     new IbkrStagingService(new IbkrStagingWorker(orders, confirms)),
-                    new IbkrImportService(orders, trades, brokers, importer), batches, orders);
+                    new IbkrImportService(orders, trades, com.vortex.fixtures.AccountFixtures.accounts(), importer, com.vortex.fixtures.AccountFixtures.batches()), batches, orders);
             SyncBatchCleanupService cleanup = new SyncBatchCleanupService(
                     List.of(new IbkrCleanupStrategy(orders, confirms)), List.of(adapter), trades, eventWriteLock, cleanupBatches, eventHistory);
             lenient().when(cleanupBatches.findById(anyLong())).thenAnswer(invocation -> {
@@ -311,12 +311,12 @@ class IbkrDuplicateBatchTest {
                 batch.setId(invocation.getArgument(0)); batch.setBrokerCode("ibkr"); batch.setStatus("PROCESSING");
                 return Optional.of(batch);
             });
-            executor = new BrokerSyncAsyncExecutor(new BrokerSyncService(List.of(adapter), brokers),
+            executor = new BrokerSyncAsyncExecutor(new BrokerSyncService(List.of(adapter), brokers, com.vortex.fixtures.AccountFixtures.service("SYNTH-ACCOUNT")),
                     batches, new SyncBatchFailureHandler(cleanup, batches));
         }
 
         void run(long batch) {
-            executor.execute(batch, new SyncRequest("ibkr", "2026-01-01", "2026-01-05"));
+            executor.execute(batch, com.vortex.fixtures.AccountFixtures.request("SYNTH-ACCOUNT", "ibkr", "2026-01-01", "2026-01-05"));
         }
 
         String snapshot() throws Exception {

@@ -2,11 +2,136 @@
 
 这里保留已完成、已取消或已合并事项的背景、处理历史和验证证据。当前需要继续处理的事项见 [待办事项](TODO.md)，维护规则见 [项目研发约定](../AGENTS.md#todo-维护与完成)。
 
-最近归档日期：2026-11-20。进展记录保留当时的状态，以条目最后的完成或处置记录为准；取消、合并不代表已修复并通过验收。
+最近归档日期：2026-11-22。进展记录保留当时的状态，以条目最后的完成或处置记录为准；取消、合并不代表已修复并通过验收。
+
+本轮未提交的 0047—0051 设计草稿已合并为 [0047 统一方案](../design/0047-2026-11-21-broker-accounts-and-sync-connections.md)。下文继续按 V31—V35 分别保留阶段行为和验证证据，早期结果不代表后续版本的全部验证已通过。
 
 补充证据：[IBKR 样例与初次审阅](#ibkr-样例与初次审阅) · [测试清理依据](#测试清理依据) · [期权关联验收明细](#期权关联验收明细)。运行方法见 [e2e 指南](../e2e/README.md)，未完成事项继续位于 TODO。
 
 ## 已完成
+
+- [x] **清空开发库测试数据并生成页面演示数据**
+
+  2026-11-22 按用户明确指令“先清空 dev 数据库中的测试数据，然后生成一些数据放到 dev 数据库中”完成。本次为运维及合成数据准备，未修改产品代码或接口，当前能力知识无需调整，也未添加数据库迁移。
+
+  目标经核对为 `ubuntu-dev` 当前工作树的 `127.0.0.1:5432/vortex_dev`、角色 `vortex_dev`、V35、无活动同步批次。先停止已记录的当前后端并保存私有数据库备份，再于一个 Spring 事务内 `TRUNCATE` 全部 15 张业务表并重置序列，保留表结构及 Flyway 历史；不使用跨表集的 CASCADE。数据主要经现有账户、交易、流水及市场事件 Service 创建，同一事务中执行交易核对、分账户持仓和迁移历史不变断言，通过后才提交。同步批次及暂存行为合成展示记录，未发起同步或保存券商凭证。
+
+  最终数据为 3 家券商、6 个账户（同券商双账户、待补全及停用账户）、4 个策略、8 笔出入金、24 笔原始交易及 6 笔市场事件派生交易；三类已处理事件各 1 个，2026-11-22 持仓为 17 条。同步历史有 2 个 COMPLETED、1 个 FAILED，IBKR 订单／成交确认各 2 行、Tiger 暂存 1 行，无活动批次。包含 USD／HKD／CNY、股票／ETF／期权、到期及行权关联、高精度费用、逐账户拆股和分红、代码变更；真实交易核对接口返回 30 笔、0 异常。
+
+  使用已有 Java25.0.5、Python3.14.4、PostgreSQL18.6 及既有编译类路径。一次性脚本、运行日志、提交标记和数量摘要在 Git 忽略的 `backend/target/dev-demo-2026-11-22/`。`rehearse.py` 在自建临时 PostgreSQL 中两次通过后执行 `prepare.py`；正式首次尝试因非特权角色无权查询 `data_directory` 在 Spring 启动前退出，尚未清空，后端已恢复。该检查随后仅用于自有临时集群；正式目标在应用启动前验证库／角色／活动批次，并使用受控环境及最高优先级固定数据源。最终重试退出 0，`commit.marker`、COMMITTED 和 PASS 均存在，临时配置已删除。失败路径可区分已提交后的报告错误，不将所有非零退出误称为回滚。
+
+  `verify-api.py` 退出 0，经真实前端代理核对上述数量、三类事件处理状态、分账户 AAPL 持仓 80／150、17 条持仓和 0 异常、6 个连接条目均未配置／未就绪。宿主现有 Node／Chrome 的 `ui.mjs` 退出 0，读取真实开发页面：账户、交易、持仓、代码变更标签及批次均可展示；24 次 API 请求全部 GET，无浏览器异常，临时浏览器目录已移除。三类事件都经 API 校验，未扩大为三个事件标签均已点验。截图 `accounts.png`、`positions.png` 已检查。
+
+  清空前备份另存 `.local/dev-backups/vortex-dev-before-demo-2026-11-22.dump`，权限 0600 且被 Git 忽略，不受常规构建清理影响。独立 Agent 只读复核脚本、目标／事务／服务恢复、提交与失败记录、摘要及 API／UI 结果后通过；276 项产品输入哈希未变。未读取备份内容，未执行全量测试或真实券商请求。前后端服务已恢复，用户可直接进行页面操作。
+
+- [x] **补齐券商简介并将启停限定到账户**
+
+  2026-11-22 完成，方案 [0047](../design/0047-2026-11-21-broker-accounts-and-sync-connections.md)。按用户三项要求：新增独立券商简介 `brokers.introduction`（500 字符），移除托管账户页“券商管理”按钮，并通过 V35 删除 `brokers.is_active`。券商只维护名称、技术代码、国家／地区和简介；账户备注仍是 `broker_accounts.description`，不反向复制为券商简介。
+
+  券商实体、服务、仓储、页面及同步流程均移除券商状态判断。连接的 active／ready 和同步触发只检查账户自身状态、真实 ID 及凭证；适配器发现只检查对应券商资料存在。旧 `GET /api/brokers/active` 兼容返回全部券商，旧前端导出查询普通列表。V34→V35 保持已有账户状态、资料及账本／连接／批次逐字段不变；V33 当时按旧券商状态初始化待补全账户的历史迁移保持原样。简介新增／更新修剪空白，省略／null 保留、空串清空，超长拒绝。
+
+  在 `ubuntu-dev` 当前工作树使用已有 Java25.0.5／Maven3.10.1、Node22.22.1／npm9.2.0、Python3.14.4、PostgreSQL18.6，沿用缓存，产物在工作树、临时文件在 `/tmp`。无工具安装或依赖变更，本轮只运行针对性验证。
+
+  - `TMPDIR=/tmp MAVEN_OPTS=-Djava.io.tmpdir=/tmp mvn -B -ntp -o -f backend/pom.xml -Dtest=BrokerServiceTest,BrokerSyncConnectionServiceTest,BrokerSyncServiceTest,BrokerSyncControllerTest test` 退出 0，4 个源类 31 个案例，无失败／错误／跳过。逐项核对实际方法及嵌套 suite，清单 `backend/target/broker-reference/test-manifest.json`，日志 `backend-tests.log`；覆盖简介增改／保留／清空／长度及账户启停、发现和路由。
+  - `npm --prefix frontend run build` 退出 0，保留既有 CJS／大分块提示，日志 `backend/target/broker-reference/frontend-build.log`。前端验证以实际页面交互为主，未重复运行无关单测。
+  - `python3 -B e2e/verify-account-profiles.py` 退出 0，4 组 PASS，日志 `backend/target/broker-reference/database-check.log`。旧联系人升级明确固定 V33→V34，另验证 V34→V35 的锁失败回滚重试、原停用券商下的启用账户保留状态，以及账户／资料／交易／流水／连接／批次完整 JSON 快照不变。空库启动至当前结构并完成 JPA 校验；真实 HTTP 验证简介创建、读取、修改、字段省略保留及清空后 GET，券商响应无状态、旧列表兼容、账户连接就绪和停用后拒绝触发、券商发现仍存在、其他账户及账户备注保留。显式 null 简介语义由服务同一分支及单测覆盖，未称作独立 HTTP 场景。没有请求真实券商，临时应用与集群已清理。
+  - 宿主已有 Node26.4.0／Chrome157.0.8103.79 执行 `node backend/target/broker-reference/ui.mjs` 退出 0，全部 API 拦截为合成数据。3 组点验覆盖简介新增／回填／修改及表格显示、券商无状态列／开关、账户页无跨页按钮、账户状态仍可编辑，并保留联系人和待补全账户回归。合成截图 `brokers.png`／`accounts.png` 已检查；日志 `ui.log` 和请求清单 `ui-requests.json` 位于同目录。无未捕获异常，临时 Chrome 目录已清理。
+  - 5 个 Java 验收 helper 编译通过，日志 `backend/target/broker-reference/helper-compile.log`；旧设置脚本改为编辑账户状态，升级前 SQL 仍保留原版本字段。未执行其他较宽数据库入口或全量测试，不将编译通过或旧 V33 全量结果扩大为当前全部回归通过。当前代码／测试／运行器／构建配置哈希保存在 `source-inputs.json`。
+
+  开发库确认 `dev/vortex_dev` 且无活动批次后，保存权限 0600 的升级前私有备份，再重启后端执行 V35 和 JPA 校验；没有清库。前端已重启提供新模块，当前知识、账户／同步／部署及 e2e 文档已同步。独立 Agent 已只读复核本次迁移、完整状态调用链、两页面、用例／验收、当前知识及部署／归档文档，并复算 276 项输入哈希、4 源类／8 suite／31 个命名案例及 PG／UI 记录，结论通过，无剩余可行动问题。未重审无关账本算法或真实券商路径。最终检查 30 份变更 Markdown 的 605 处本地链接／锚点、新文件空白及 `git diff --check` 均通过；私有备份权限 0600 且被 Git 忽略。宿主前端、后端健康和代理券商 API 均 HTTP 200，确认简介字段存在、券商状态字段已移除，实际前端模块为最终版本。最后检查曾因工具用量限制中断，用户要求继续后已完成；未重复运行已通过测试。最终检查记录 `backend/target/broker-reference/delivery-checks.json`。未提交代码。
+
+- [x] **将邮箱、电话与账户备注迁至托管账户**
+
+  2026-11-22 完成，方案 [0047](../design/0047-2026-11-21-broker-accounts-and-sync-connections.md)。V33 拆分后原 `brokers.email`、`phone` 和“券商账户描述”仍在券商层，用户明确要求这些信息归实际账户。V34 新增账户同名三列并迁移资料，删除券商旧列；实体、服务、券商列表／表单与账户列表／表单同步调整。券商仅维护名称、代码、国家和状态，联系方式与备注按账户独立保存，不影响同步凭证和账本口径。
+
+  旧资料优先归入唯一待补全账户，否则只有一个账户时归入它；零账户、多真实账户或多个待补全账户无法确认归属时，新建“待补全账户（原券商资料）”保存。无资料券商不新增账户。旧字符串、已有账户审计字段及账本／批次／连接保持原值。账户更新省略或传 null 保留已有可选字段，传空字符串清空；新写入修剪首尾空白，长度沿用 100／30／200。前端邮箱验证兼容历史首尾空白。
+
+  在 `ubuntu-dev` 当前工作树使用既有 Java25.0.5／Maven3.10.1、Node22.22.1／npm9.2.0、Python3.14.4、PostgreSQL18.6；缓存沿用，产物在工作树，临时集群在 `/tmp`。未安装工具或修改依赖。以下为 V34 的实际针对性验证，此前 566／60 项全量结果属于 V33，本轮未重复执行全量单测或整套回归。
+
+  - `TMPDIR=/tmp MAVEN_OPTS=-Djava.io.tmpdir=/tmp mvn -B -ntp -o -f backend/pom.xml -Dtest=BrokerAccountServiceTest,BrokerServiceTest,BrokerSyncConnectionServiceTest test` 退出 0，3 类 17 例，失败／错误／跳过均为 0。逐方法对应实际清单 `backend/target/account-profiles/test-manifest.json`，日志 `backend-tests.log`；新增覆盖规范化、长度限制、旧请求保留、明确清空、同券商账户独立及验证失败不部分修改实体。
+  - `npm --prefix frontend test -- src/services/brokerAccountApi.test.js` 退出 0，1 文件 2 例，覆盖联系人字段与账户写入请求；最终 `npm --prefix frontend run build` 退出 0，保留既有 CJS／大分块提示。日志分别为 `backend/target/account-profiles/frontend-tests.log` 和 `frontend-build.log`。
+  - `python3 -B e2e/verify-account-profiles.py` 最终退出 0，日志 `backend/target/account-profiles/database-check.log`。临时 PostgreSQL 验证空库 V34、V33 带资料升级的全部回填分支、字段原值及旧账户审计保留、旧列删除、交易／批次／连接不变、强制失败完整回滚及重试。真实 Spring/JPA／HTTP 验证创建／读取、省略和显式 JSON null 保留、空串清空后重新 GET、长度拒绝、同券商两账户独立及券商／嵌套券商响应不再含账户资料。临时应用及集群已清理，无真实券商请求或现有账本访问。
+  - 宿主机已有 Node26.4.0／Chrome157.0.8103.79 执行 `node backend/target/account-profiles/ui.mjs` 退出 0，全部 API 由 CDP 拦截为合成数据。点验券商表格／表单无账户资料，账户资料新增／显示／回填／编辑／清空、历史邮箱空白、失败保留输入、同券商账户隔离，以及待补全账户资料编辑。无未捕获页面异常；截图已检查，临时浏览器配置已移除。日志、合成截图和请求清单位于 `backend/target/account-profiles/ui.log`、`ui.png`、`ui-requests.json`。
+  - 五个数据库 Java helper 均编译通过，日志 `backend/target/account-profiles/helper-compile.log`。多账户 helper 的历史迁移阶段明确固定至 V33，保留原场景；正常应用阶段校验当前结构。本轮没有执行其余较宽数据库运行器，不将编译通过描述为运行通过。当前代码／测试／运行器／构建配置的 275 文件哈希保存在 `backend/target/account-profiles/source-inputs.json`。
+
+  开发环境确认 `dev/vortex_dev`、无活动批次后，先在忽略的产物目录保存权限 0600 的升级前数据库备份，再由新后端执行 V34 及 JPA 校验；没有重置开发库。前端已重启提供最终模块。账户、数据库、后端资源及当前知识已同步；历史方案和原全量记录保留，交易／事件／同步业务规则未改变，对应算法文档无需修改。独立 Agent 只读复核本次 V34、实体／服务／API、页面、用例、运行器及当前知识／部署／归档，复算原始报告和 275 项哈希后通过，无剩余可行动问题；未重审无关账本算法或真实券商路径。29 份变更 Markdown 的 597 处本地链接及锚点、新文件空白和 `git diff --check` 均通过，前端、后端健康及代理券商 API 均 HTTP 200，并确认券商响应无账户资料、实际前端模块含新字段。未提交代码。
+
+- [x] **真实托管账户 ID 与同券商多账户**
+
+  **2026-11-22 全量验证补充：**用户明确要求“全量测一下”后，在同一 `ubuntu-dev` 工作树运行以下检查，全部退出 0。执行环境、工具及写入范围与下文一致，生产代码、测试和依赖未修改；此前局部结果保留为历史记录。日志目录为 `backend/target/full-validation-2026-11-22/`。
+
+  | 命令 | 实际结果 | 日志 |
+  | --- | --- | --- |
+  | `mvn -B -ntp -o -f backend/pom.xml test` | 38 个源类、98 个含嵌套 suite、566 个实际案例；失败／错误／跳过均为 0 | `backend-unit-1.log` |
+  | `npm --prefix frontend test -- --reporter=default --reporter=json --outputFile=../backend/target/full-validation-2026-11-22/frontend-unit.json` | 9 文件、60 个案例全部通过，无跳过 | `frontend-1.log` |
+  | `npm --prefix frontend run build` | 构建成功；保留既有 CJS／大分块提示 | `frontend-2.log` |
+  | `python3 -B e2e/verify-fee-precision.py` | 费用迁移、真实 ORM 精度与汇总、历史数值保留及迁移失败回滚／重试通过 | `database-1.log` |
+  | `python3 -B e2e/verify-ordered-market-events.py` | 全部现有事件顺序／历史锁、事务／并发、同步清理及精确期权关联场景通过 | `database-2.log` |
+  | `python3 -B e2e/verify-ibkr-settings.py` | 旧库升级、明文凭证／事务／重启、真实 HTTP 及活动批次凭证快照场景通过 | `database-3.log` |
+  | `python3 -B e2e/verify-ibkr-settings.py --connections-only` | V33 历史迁移、分账户导入／持仓／事件／凭证及 HTTP 的 8 组场景通过 | `database-4.log` |
+
+  后端全量报告在后续费用运行器重新执行指定测试前已独立保存至 `unit-reports/`。`full-unit-manifest.json` 逐项对应所有源测试类、注解方法、嵌套 suite、参数化展开及前端命名案例，确认无缺失、重复或跳过；`source-inputs.json` 记录 272 个代码、测试、运行器及构建配置文件的哈希。各命令、退出状态和耗时保存在 `*-results.json`，最终汇总为 `summary.json`。独立 Agent 从原始 XML／Vitest JSON 及日志复算清单、数量、数据库场景和清理结果，确认与归档一致且输入哈希未变化，未发现需要修正的问题。四个数据库入口使用各自临时 PostgreSQL 和合成数据，均已停止应用／数据库并移除临时目录；未连接真实券商或现有账本，未清空开发库。上轮合成浏览器点验继续有效，本次没有重复运行或扩大为完整浏览器回归。Tiger 正常暂存时间链和 IBKR 错误码仍按 TODO 处理，测试通过不代表这两项已修复。开发服务检查为前后端 HTTP 200，文档 95 处本地链接及锚点、`git diff --check` 均通过。
+
+  2026-11-22 完成，方案 [0047](../design/0047-2026-11-21-broker-accounts-and-sync-connections.md)。保留券商名称及代码，新增 `broker_accounts`，独立维护本地账户主键、真实账户 ID、名称和启停。页面支持同券商多账户；连接、批次、交易、流水、持仓、期权关联、市场事件成本及取整按账户区分。Tiger 资金账号来自账户资料，连接只保存 Tiger ID／私钥；IBKR 保存 Token／Query ID。明文凭证及允许同步期间编辑的决定沿用，进一步保护继续留在 TODO。
+
+  用户确认旧数据每券商迁至一个真实 ID 为空的“待补全账户”。V33 保留全部历史交易／流水（含删除行、事件行）的原券商、数值、关联和更新时间，不猜测真实账号或重算。原连接迁至该账户；历史批次仅依据正式交易确定唯一原归属，券商代码转移不能改变历史账户，空／多归属批次保持未知。历史暂存空账户保留，新写入／更新须有来源账户。待补全账户可改名或停用，补齐后才可同步，已补齐 ID 不可清空。旧仅传券商的请求必须能唯一确定账户，否则拒绝。
+
+  环境为 `ubuntu-dev` 当前工作树 `/home/suzywang.guest/workspace/vortex`，Java25.0.5、Maven3.10.1、Node22.22.1／npm9.2.0、Python3.14.4、PostgreSQL18.6。产物在工作树、临时集群在 `/tmp`，沿用既有缓存，无安装或依赖变更。仅执行直接相关单测和针对性验收，未执行全量单测或整套回归。
+
+  - 后端以 `mvn -B -ntp -o -f backend/pom.xml -Dtest=<所选类> test` 分组运行账户、连接、批次、交易、持仓、事件及两券商暂存／导入／去重相关类。日志位于 `backend/target/multiple-accounts-{core,pipeline,dedup,owner,final-owner,pending,option-move}-tests.log`，命令与所选类见各日志。逐项核对 18 个所选源类全部注解方法、49 个含嵌套 suite 和参数展开后的 327 个有效案例，当前失败／错误／跳过均为 0，清单 `backend/target/multiple-accounts-manifest.json`。最初 pipeline 组的来源账户空白规范化错误已修正并重跑受影响组；该次原失败不计作通过。327 是复用未受后续改动影响结果的组合，非一次全量命令。
+  - `npm --prefix frontend test -- src/services/brokerAccountApi.test.js src/services/syncConnectionApi.test.js src/services/ibkrSettingsApi.test.js src/constants/__tests__/menuConfig.test.js` 退出 0，4 文件 15 例。日志 `backend/target/multiple-accounts-frontend-tests.log`。最终 `npm --prefix frontend run build` 退出 0，保留既有 CJS／大分块提示，日志 `backend/target/multiple-accounts-frontend-build.log`。
+  - `python3 -B e2e/verify-ibkr-settings.py --connections-only` 最终退出 0，8 组 PASS，日志 `backend/target/multiple-accounts-db-check.log`。临时 PostgreSQL 实际验证空库 V33、V32 历史升级、强制失败回滚／重试、外键、唯一约束及凭证事务回滚。真实 Spring/JPA／IBKR 调用链覆盖同 ID 跨账户、重复／冲突／部分失败、两张 IBKR 暂存表和正式行清理、其他账户保留、全局活动批次限制、拉取期间券商代码转移后的固定归属、期权关联、期权来源移动的反向引用校验与软删除引用放行、持仓、逐账户代码变更及分红取整。Tiger 暂存及 ORM 导入使用明确的 epoch 夹具，未覆盖且未修复正常暂存时间缺陷。
+  - 同一 focused 运行器的 HTTP 验证覆盖账户 CRUD、待补全改名／停用／补齐及禁止再次清空 ID、重复／关联删除拒绝、交易改账户后的响应及查询过滤、流水归属、秘密留空／独立清空和歧义旧请求拒绝。所选第二 IBKR 账户异步触发两次 loopback 假 Flex 请求，核对该账户 Token 及 Query ID／ReferenceCode，合法空报表完成。没有真实券商访问，临时应用和集群已清理。
+  - 宿主机用已有 Node26.4.0／Chrome157.0.8103.79 运行 `node backend/target/multiple-accounts-ui.mjs` 退出 0，全部 API 由 CDP 拦截为合成数据。4 组点验覆盖券商字段、同券商新增第三账户、待补全改名／停用／补齐、两类分账户凭证、失败保留、保存期间禁止关闭、秘密留空与独立清空、提交本地主键及显示真实 ID、关联交易／触发源隔离。无未捕获异常，临时浏览器配置已清理；日志、合成截图及请求清单为 `backend/target/multiple-accounts-ui.log`、`multiple-accounts-ui.png`、`multiple-accounts-ui-requests.json`。页面点验与真实数据库验收分别执行。
+  - 四个数据库 Java helper 均已编译适配当前 API 和 V33 约束；费用迁移阶段保持 V29 断言，ORM 阶段使用当前结构。除 focused 入口外，旧配置、费用及完整事件三个较宽运行器本轮没有执行，旧版本结果不能证明当前全部回归通过。
+
+  开发库核对目标后已升级 V33，`dev/vortex_dev` 后端和前端已重启，未重置开发库。操作、API、部署及备份／回退已更新 [账户指南](accounts.md)、同步及配置文档和当前知识。独立 Agent 只读复核 V33、账户／账本／事件服务、连接与批次、两适配器完整归属调用链、前端、相关测试和 helper、当前知识及部署文档。复核发现的 JPA 更新响应、代码转移后的导入归属、待补全编辑、期权反向引用移动及验收证据边界问题均已修正并补验；未发现剩余可行动问题。排除不相关业务的重审及真实券商对账。交付检查覆盖 28 份变更 Markdown 的 588 处本地链接和锚点、新文件空白及 `git diff --check`；均通过。宿主机访问前端、后端健康及前端 API 代理均 HTTP 200，并确认前端实际提供最终账户模块。未提交代码，未验证真实券商非空响应或现有用户账本；Tiger 时间缺陷及 IBKR 错误码待办继续保留。
+
+- [x] **托管账户统一管理与IBKR／Tiger账户连接**
+
+  本条记录 V32 阶段，当时复用了券商行作为账户，尚无独立真实账户 ID；该模型现已由上方 V33 多账户实现取代。以下保留当时过程和验证结果。
+
+  2026-11-22完成。按 [0047](../design/0047-2026-11-21-broker-accounts-and-sync-connections.md)，账户统一在托管账户管理中录入、选择券商及启停；同步配置列出全部已有账户，按账户配置IBKR的Token／Query ID或Tiger的Tiger ID／PKCS#8私钥／资金账号。同步页不创建账户，连接保存不修改账户资料。Token／私钥首次必填、之后留空保留或填写替换，确认后清空所选连接。批次选项仅允许已启用且配置完整的账户。
+
+  V32新增 `broker_sync_connections`，按账户保存明文JSONB凭证，迁入匹配账户的旧明文IBKR配置并移除单例表；孤立配置使迁移回滚，修正账户关联后可重试。两券商生产凭证只读数据库，Tiger每批捕获同一组值供客户端及全部日期窗口使用。沿用每券商代码唯一的账户模型；旧IBKR接口由统一连接服务提供，保存要求账户已在账户管理选择IBKR。部署顺序、失败恢复及旧profile不回退的说明已同步。未来保护设计继续保留在 [TODO](TODO.md)。
+
+  局部验证在 `ubuntu-dev` 当前工作树执行，Java25.0.5、Maven3.10.1、Node22.22.1／npm9.2.0、Python3.14.4、PostgreSQL18.6；产物在工作树，临时集群在 `/tmp`，沿用既有缓存，无依赖或工具安装。
+
+  - `mvn -B -ntp -o -f backend/pom.xml -Dtest=BrokerSyncConnectionServiceTest,BrokerSyncConnectionControllerTest,IbkrSyncSettingsServiceTest,IbkrSyncSettingsControllerTest,BrokerServiceTest,TigerSyncAdapterTest test` 退出0，6类14例，0失败／错误／跳过。逐项核对实际方法清单，覆盖全部所选用例；日志 `backend/target/account-connections-tests.log`，清单 `backend/target/account-connections-manifest.json`。
+  - `npm --prefix frontend test -- src/services/syncConnectionApi.test.js src/services/ibkrSettingsApi.test.js src/constants/__tests__/menuConfig.test.js` 退出0，3文件13例，验证账户请求范围、秘密字段留空省略、多行私钥、旧接口及菜单。日志 `backend/target/account-connections-frontend-tests.log`。最终页面 `npm --prefix frontend run build` 退出0，保留既有CJS和大分块提示；日志 `backend/target/account-connections-frontend-build.log`。
+  - `python3 -B e2e/verify-ibkr-settings.py --connections-only` 最终退出0，验证空库V32实际Spring启动、V31明文旧配置升级归属、孤立配置回滚／修正重试、两类数据库凭证及真实事务回滚；实际HTTP验证全账户元数据、Tiger私钥留空保留、跨账户保存／清空隔离及Token／私钥不回传或写入日志。假Flex固定为loopback且无请求，临时应用及PostgreSQL集群已清理。日志 `backend/target/account-connections-check.log`。
+  - 宿主机使用已有Node26.4.0和Chrome157.0.8103.79执行 `node backend/target/account-connections-ui.mjs`，以临时隔离浏览器配置和CDP拦截全部 `/api` 请求，仅使用合成账户／凭证。实际页面覆盖账户管理跳转与新建、同步列表、两类字段、首次必填、失败保留输入、留空保留、单账户确认清空及批次选项；挂起保存响应时关闭按钮和取消禁用，Esc／遮罩点击经过动画等待后弹窗仍可见且处于保存中。无未捕获页面异常。日志 `backend/target/account-connections-ui.log`，合成截图 `backend/target/account-connections-ui.png`，请求路径清单 `backend/target/account-connections-ui-requests.json`，临时浏览器配置已清理。该页面验收与真实数据库验证分别执行，不代表真实券商联调。
+
+  独立Agent只读复核连接服务／API、V32、两个适配器调用链、前端、局部用例／运行器及相关当前知识和部署文档；发现的保存期间弹窗关闭竞态已修正，验收也补充秘密不回传、跨账户独立保存及假Flex端点断言，最终无未解决问题。未重审不相关账本业务。
+
+  开发后端确认 `dev/vortex_dev` 且无活动批次后已恢复，Flyway升级V32及JPA校验成功。页面验收发现共享挂载中的Vite仍返回旧模块，已重启当前工作树记录的前端进程并确认实际返回新账户连接页；Mac访问前端、后端健康和前端代理连接接口均HTTP200。遵照用户约定，本轮未执行全量单测或整套回归，旧IBKR较宽验收模式也未重跑。真实券商授权／非空交易导入未验证，Tiger既有时间格式缺陷继续保留在TODO。
+
+- [x] **移除未使用的 IBKR 加密兼容**
+
+  2026-11-21完成。用户进一步确认从未使用旧加密方案、没有历史凭证，按 [0047](../design/0047-2026-11-21-broker-accounts-and-sync-connections.md) 删除早期实现中的旧密文转换回调、密钥读取及对应合成夹具和验收场景。已应用V31 SQL按研发约定保留原样。当前凭证通过页面明文保存和读取，当前部署及恢复说明已同步。下方早期阶段的已执行验证保留为历史记录。
+
+  验证使用同一 `ubuntu-dev` 工作树，Java25.0.5、Maven3.10.1、Python3.14.4、PostgreSQL18.6，产物位于工作树，临时文件位于 `/tmp`。测试前删除已移除回调的旧编译文件，确认后端类路径中该类不存在。
+
+  - `TMPDIR=/tmp MAVEN_OPTS=-Djava.io.tmpdir=/tmp mvn -B -ntp -o -f backend/pom.xml test` 退出0，551例、0失败／错误／跳过；34源类、94suite及551个case与上一轮完整清单逐项一致。日志 `backend/target/plaintext-no-legacy-tests.log`，清单 `backend/target/plaintext-no-legacy-manifest.json`。
+  - `python3 -B e2e/verify-ibkr-settings.py` 退出0，日志 `backend/target/plaintext-no-legacy-e2e.log`。实际验证无凭证V29／V30库升级至V31及账户保留、空库初始化、明文保存／读取／保留／替换／清空、事务回滚、应用重启、活动批次期间修改及假Flex请求使用配置，临时集群和进程已清理。
+  - 独立Agent复核本轮源码、调用链和文档，确认旧密钥／解密依赖和兼容夹具已移除，未发现未解决问题。前端源码和验证条件与上一轮一致，复用56项单测和构建结果。
+
+  开发后端已重新启动，Flyway成功验证全部31条迁移及既有V31校验和，Mac访问前端、后端健康和配置代理均HTTP200。此轮使用合成验收，真实券商及浏览器页面点验沿用前轮说明。
+
+- [x] **按个人本地使用场景简化 IBKR 凭证配置**
+
+  2026-11-21完成。用户要求页面保存凭证到数据库明文并直接读取，将复杂保护交由后续TODO安排。按 [0047](../design/0047-2026-11-21-broker-accounts-and-sync-connections.md)，运行时改为直接保存／读取 `flex_token`，删除加密及密钥组件，配置与账户写入移除活动批次检查和专用短写锁。页面继续使用现有API和Token留空保留／替换／清空流程。
+
+  V31 SQL与迁移专用回调在同一事务中保留V30已有凭证，转换后运行及数据库备份恢复以明文数据库为准。历史密文升级仅在转换时使用旧密钥。未注册回调、缺失或错误旧密钥、SQL失败均经过回滚和重试验证。0045／0046和下方2026-11-20记录保留历史含义，本段保留早期验收事实，最终范围见上方兼容清理记录。未来保护设计在 [TODO](TODO.md) 中继续未勾选。
+
+  验证环境为当前工作树映射的 `ubuntu-dev`，Java25.0.5、Maven3.10.1、Node22.22.1、npm9.2.0、Python3.14.4、PostgreSQL18.6，临时文件使用 `/tmp`，产物写入工作树，使用既有Maven／npm缓存。首次离线检查发现测试插件缓存不足，使用既有依赖源补齐后执行最终检查，依赖清单及锁文件保持一致。
+
+  - `TMPDIR=/tmp MAVEN_OPTS=-Djava.io.tmpdir=/tmp mvn -B -ntp -o -f backend/pom.xml test` 退出0，551例，0失败／错误／跳过。34个测试源类、94个实际suite及全部case核对通过，清单 `backend/target/plaintext-settings-manifest.json`，日志 `backend/target/plaintext-settings-tests.log`。与旧555例相比，删除已撤回的加密组件1例和活动批次拒绝3个参数用例；对应新行为由明文单测及集成验收覆盖。
+  - `npm --prefix frontend test` 退出0，7文件56例通过；`npm --prefix frontend run build` 退出0，保留既有大分块提示。日志分别为 `backend/target/plaintext-settings-frontend-tests.log` 和 `backend/target/plaintext-settings-build.log`。
+  - `python3 -B e2e/verify-ibkr-settings.py` 退出0。自建临时PostgreSQL验证空库至V31、V29／V30历史库实际Spring启动升级、旧凭证保留、迁移失败回滚重试、保存事务回滚、留空保留／替换／清空及实际应用重启；受控假Flex服务验证活动批次期间配置和账户修改成功，当前报表沿用已捕获凭证，下一报表使用新明文。日志 `backend/target/plaintext-settings-e2e.log`，临时集群、应用及合成旧密钥已清理。
+  - 独立Agent只读复核代码、迁移／回调、测试和文档差异，提出的验收竞态及遗漏回调问题已修正并实际验证；最终复核无未解决问题。Markdown链接及锚点、`git diff --check` 通过。
+
+  开发后端已重新加载当前代码，`dev/vortex_dev`成功升级至V31；Mac访问前端、后端健康及前端代理配置接口均为HTTP200。这是开发环境启动检查，实际验收仅使用独立合成环境。真实券商授权及真实交易导入未执行，页面浏览器点验未在本轮重跑。
 
 - [x] **P1 补齐IBKR账户选择和数据库凭证配置入口**
 

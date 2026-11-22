@@ -37,7 +37,7 @@ class IbkrStagingServiceTest {
     }
 
     private IbkrOrderRecord buildOrder(String orderId) {
-        IbkrOrderRecord order = new IbkrOrderRecord();
+        IbkrOrderRecord order = new IbkrOrderRecord(); order.setAccountId("SYNTH-ACCOUNT");
         order.setOrderID(orderId);
         order.setAccountId("U12345");
         order.setCurrency("USD");
@@ -54,7 +54,7 @@ class IbkrStagingServiceTest {
     }
 
     private IbkrTradeConfirm buildConfirm(String tradeId) {
-        IbkrTradeConfirm confirm = new IbkrTradeConfirm();
+        IbkrTradeConfirm confirm = new IbkrTradeConfirm(); confirm.setAccountId("SYNTH-ACCOUNT");
         confirm.setTradeID(tradeId);
         confirm.setOrderID("ORD001");
         confirm.setAccountId("U12345");

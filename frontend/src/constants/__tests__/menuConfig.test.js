@@ -9,7 +9,7 @@ import {
 describe('menuConfig - 路由映射', () => {
   it('menuKeyToPath 应包含所有页面路由', () => {
     const expectedPaths = [
-      'dashboard', 'cashflow', 'broker', 'trades', 'strategy',
+      'dashboard', 'cashflow', 'broker', 'broker-accounts', 'trades', 'strategy',
       'anomaly', 'market-events', 'profit-stock', 'profit-strategy',
       'profit-account', 'profit-chart-demo', 'settings',
     ];
@@ -41,6 +41,7 @@ describe('menuConfig - 父菜单映射', () => {
     // 账户管理组
     expect(menuKeyToParent['2']).toBe('account');
     expect(menuKeyToParent['6']).toBe('account');
+    expect(menuKeyToParent['11']).toBe('account');
 
     // 交易管理组
     expect(menuKeyToParent['3']).toBe('trade');

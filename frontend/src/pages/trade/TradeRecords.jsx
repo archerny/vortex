@@ -4,7 +4,7 @@ import { PlusOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { useAmountVisibility } from '../../contexts/AmountVisibilityContext';
 import { fetchAllTradeRecords, createTradeRecord, fetchTradeStatistics } from '../../services/tradeRecordApi';
-import { fetchActiveBrokers } from '../../services/brokerApi';
+import { fetchBrokerAccounts, accountLabel } from '../../services/brokerAccountApi';
 import { fetchAllStrategies } from '../../services/strategyApi';
 import { assetTypeMap, tradeTypeMap } from '../../constants/tradeConstants';
 import { marketEventErrorMessage } from '../../utils/marketEventError';
@@ -19,7 +19,7 @@ import TradeStatisticsPanel from './TradeStatisticsPanel';
 
 const TradeRecords = () => {
   const [tradeData, setTradeData] = useState([]);
-  const [brokerList, setBrokerList] = useState([]);
+  const [accountList, setAccountList] = useState([]);
   const [strategyList, setStrategyList] = useState([]);
   const [brokerMap, setBrokerMap] = useState({});
   const [strategyMap, setStrategyMap] = useState({});
@@ -28,6 +28,7 @@ const TradeRecords = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState(null);
+  const [selectedAccountId, setSelectedAccountId] = useState(null);
   const [selectedStrategy, setSelectedStrategy] = useState(null);
   const [selectedTradeType, setSelectedTradeType] = useState('BUY');
   const [pageSize, setPageSize] = useState(10);
@@ -69,14 +70,14 @@ const TradeRecords = () => {
   };
 
   // 加载券商列表
-  const loadBrokers = async () => {
+  const loadAccounts = async () => {
     try {
-      const result = await fetchActiveBrokers();
+      const result = await fetchBrokerAccounts();
       if (result.status === 'SUCCESS') {
         const list = result.data || [];
-        setBrokerList(list);
+        setAccountList(list);
         const map = {};
-        list.forEach((b) => { map[b.id] = b.brokerName; });
+        list.forEach((b) => { map[b.brokerId] = b.broker?.brokerName; });
         setBrokerMap(map);
       }
     } catch (error) {
@@ -103,7 +104,7 @@ const TradeRecords = () => {
   // 组件加载时获取数据
   useEffect(() => {
     loadTradeRecords();
-    loadBrokers();
+    loadAccounts();
     loadStrategies();
     loadStatistics();
   }, []);
@@ -158,7 +159,7 @@ const TradeRecords = () => {
       const fee = values.fee;
       const payload = {
         tradeDate: values.date.format('YYYY-MM-DD'),
-        brokerId: values.brokerId,
+        brokerAccountId: values.brokerAccountId,
         assetType: values.assetType,
         symbol: values.symbol,
         underlyingSymbol: values.underlyingSymbol,
@@ -205,6 +206,8 @@ const TradeRecords = () => {
       title="交易记录"
       extra={
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <Select allowClear placeholder="全部账户" style={{ width: 230 }} value={selectedAccountId}
+            onChange={setSelectedAccountId} options={accountList.map(account => ({ value: account.id, label: accountLabel(account) }))} />
           <span>所属策略：</span>
           <Select
             allowClear
@@ -234,6 +237,7 @@ const TradeRecords = () => {
       <Table
         columns={tradeColumns}
         dataSource={tradeData.filter((item) => {
+          if (selectedAccountId && item.brokerAccountId !== selectedAccountId) return false;
           if (selectedStrategy && item.strategyId !== selectedStrategy) return false;
           if (selectedAsset) {
             const underlying = (item.underlyingSymbol || item.symbol || '').toUpperCase();
@@ -289,13 +293,13 @@ const TradeRecords = () => {
             </Col>
             <Col span={12}>
               <Form.Item
-                label="券商"
-                name="brokerId"
-                rules={[{ required: true, message: '请选择券商' }]}
+                label="托管账户"
+                name="brokerAccountId"
+                rules={[{ required: true, message: '请选择托管账户' }]}
               >
-                <Select placeholder="请选择券商">
-                  {brokerList.map((b) => (
-                    <Select.Option key={b.id} value={b.id}>{b.brokerName}</Select.Option>
+                <Select placeholder="请选择托管账户">
+                  {accountList.map((b) => (
+                    <Select.Option key={b.id} value={b.id}>{accountLabel(b)}</Select.Option>
                   ))}
                 </Select>
               </Form.Item>

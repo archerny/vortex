@@ -20,6 +20,8 @@ import java.util.Optional;
  */
 @Repository
 public interface IbkrStagedOrderRepository extends JpaRepository<IbkrStagedOrder, Long> {
+    Optional<IbkrStagedOrder> findByAccountIdAndOrderId(String accountId, String orderId);
+
 
     /**
      * Find all staged orders by batch ID.

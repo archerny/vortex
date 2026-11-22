@@ -59,7 +59,7 @@ class MarketEventProcessingServiceTest {
 
     private void add(List<TradeRecord> history, String symbol, long broker, TradeType type,
                      int quantity, String amount) {
-        TradeRecord record = new TradeRecord();
+        TradeRecord record = new TradeRecord(); record.setBrokerAccountId(1L);
         record.setId((long) history.size() + 1);
         record.setTradeDate(LocalDate.of(2026, 1, 1).plusDays(history.size()));
         record.setBrokerId(broker);

@@ -5,16 +5,11 @@
 ## 配置
 
 1. 准备 Tiger 开放平台的 Tiger ID、SDK 使用的 PKCS#8 RSA 私钥和资金账户。 [接入参考](../../../../external-resource/tiger-api/docs/basic-java.md)
-2. 在使用的 Spring profile 中注入以下属性。示例均为占位符，真实值存放在版本控制之外。 [配置说明](../../../local-config-guide.md)
+2. 在**券商管理**维护 Tiger 券商，在**托管账户**中选择该券商，填写真实资金账号及账户名称并启用；同券商可有多个账户。迁移的待补全账户须先补齐 ID。
+3. 打开**同步管理 → 同步配置**，在该账户行点击**配置连接**，填写 Tiger ID、PKCS#8 私钥后保存。资金账号统一来自托管账户的真实账户 ID，不在连接表单重复录入。私钥可使用多行PEM文本；首次必填，之后输入框留空保留、填写新值替换。清空凭证需确认，仅删除该账户连接。
 
-   ```properties
-   broker.tiger.tiger-id=<tiger-id>
-   broker.tiger.private-key=<private-key>
-   broker.tiger.account=<account>
-   ```
-
-3. 在券商管理中确认有 Broker Code 为 `tiger` 的记录。V27 仅为匹配名称的已有券商设置代码。新建券商时填写代码，当前编辑接口不会更新该字段。 [V27 迁移](../../../../backend/src/main/resources/db/migration/V27__seed_tiger_broker_code.sql)
+凭证以明文保存到数据库 `broker_sync_connections`，运行时直接读取，页面不回传私钥；配置保存不请求Tiger。旧profile属性不再作为运行时来源，也不会自动导入，需在页面填写。每批开始捕获同一组已提交凭证供全部日期窗口使用，无须重启。数据库备份包含私钥，恢复以数据库为准。 [配置说明](../../../local-config-guide.md) · [多账户方案](../../../../design/0047-2026-11-21-broker-accounts-and-sync-connections.md) · [账户及迁移指南](../../../accounts.md)
 
 ## 提交同步
 
-通过 [同步批次入口](../../README.md#提交与查看批次) 选择 Tiger 和需要的日期范围。Tiger 的订单会写入后台暂存表，前端原始数据页目前只提供 IBKR 面板。遇到碎股、未支持的证券类型或期权事件订单时，按 [适配器当前规则](../../../../knowledge/broker-sync/brokers/tiger.md) 和 [故障排查指南](../../recovery.md) 确认批次结果。
+通过 [同步批次入口](../../README.md#提交与查看批次) 选择具体 Tiger 账户和需要的日期范围。Tiger 的订单会写入后台暂存表，前端原始数据页目前只提供 IBKR 面板。遇到碎股、未支持的证券类型或期权事件订单时，按 [适配器当前规则](../../../../knowledge/broker-sync/brokers/tiger.md) 和 [故障排查指南](../../recovery.md) 确认批次结果。

@@ -17,6 +17,9 @@ import java.util.Optional;
  */
 @Repository
 public interface IbkrStagedTradeConfirmRepository extends JpaRepository<IbkrStagedTradeConfirm, Long> {
+    Optional<IbkrStagedTradeConfirm> findByAccountIdAndTradeId(String accountId, String tradeId);
+    List<IbkrStagedTradeConfirm> findByAccountIdAndOrderId(String accountId, String orderId);
+
 
     /**
      * Find all staged trade confirms by batch ID.

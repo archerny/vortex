@@ -7,7 +7,7 @@ import { PageHeaderTitle } from '../../components/PageHeader';
 import { useAmountVisibility } from '../../contexts/AmountVisibilityContext';
 import { useTradeEditable } from '../../contexts/TradeEditableContext';
 import { fetchAllTradeRecords, fetchTradeRecordById, updateTradeRecord, deleteTradeRecord } from '../../services/tradeRecordApi';
-import { fetchActiveBrokers } from '../../services/brokerApi';
+import { fetchBrokerAccounts, accountLabel } from '../../services/brokerAccountApi';
 import { fetchAllStrategies } from '../../services/strategyApi';
 import {
   assetTypeMap, tradeTypeMap, tradeTypeColorMap, assetTypeColorMap,
@@ -45,7 +45,7 @@ const TradeRecordDetail = ({ recordId, onBack }) => {
   const [brokerMap, setBrokerMap] = useState({});
   const [strategyMap, setStrategyMap] = useState({});
   const [relatedRecords, setRelatedRecords] = useState([]);
-  const [brokerList, setBrokerList] = useState([]);
+  const [accountList, setAccountList] = useState([]);
   const [strategyList, setStrategyList] = useState([]);
 
   // 编辑相关状态
@@ -93,8 +93,9 @@ const TradeRecordDetail = ({ recordId, onBack }) => {
    *   - 再根据这些期权记录的 id，找出被它们触发的股票/ETF交易
    */
   const computeRelatedRecords = async (currentRecord, allRecords) => {
-    if (!currentRecord || !allRecords || allRecords.length === 0) return [];
+    if (!currentRecord || currentRecord.brokerAccountId == null || !allRecords || allRecords.length === 0) return [];
 
+    allRecords = allRecords.filter(row => row.brokerAccountId === currentRecord.brokerAccountId);
     const { id, assetType, symbol, tradeTrigger, triggerRefId } = currentRecord;
 
     // 场景1：期权交易 → 找同 symbol 的期权记录 + 被这些期权触发的股票交易
@@ -117,7 +118,7 @@ const TradeRecordDetail = ({ recordId, onBack }) => {
       try {
         // 通过 triggerRefId 向后端获取触发源期权交易记录
         const refResult = await fetchTradeRecordById(triggerRefId);
-        if (refResult.status === 'SUCCESS' && refResult.data) {
+        if (refResult.status === 'SUCCESS' && refResult.data && refResult.data.brokerAccountId === currentRecord.brokerAccountId) {
           const optionSymbol = refResult.data.symbol;
           if (optionSymbol) {
             // 1. 根据期权 symbol 从全量数据中查找所有同 symbol 的期权记录
@@ -147,16 +148,16 @@ const TradeRecordDetail = ({ recordId, onBack }) => {
     try {
       const [recordsResult, brokersResult, strategiesResult] = await Promise.all([
         fetchAllTradeRecords(),
-        fetchActiveBrokers(),
+        fetchBrokerAccounts(),
         fetchAllStrategies(),
       ]);
 
       if (brokersResult.status === 'SUCCESS') {
         const brokersData = brokersResult.data || [];
         const map = {};
-        brokersData.forEach((b) => { map[b.id] = b.brokerName; });
+        brokersData.forEach((b) => { map[b.brokerId] = b.broker?.brokerName; });
         setBrokerMap(map);
-        setBrokerList(brokersData);
+        setAccountList(brokersData);
       }
 
       if (strategiesResult.status === 'SUCCESS') {
@@ -216,7 +217,7 @@ const TradeRecordDetail = ({ recordId, onBack }) => {
   const handleEdit = () => {
     editForm.setFieldsValue({
       tradeDate: record.tradeDate ? dayjs(record.tradeDate) : null,
-      brokerId: record.brokerId,
+      brokerAccountId: record.brokerAccountId,
       assetType: record.assetType,
       symbol: record.symbol,
       underlyingSymbol: record.underlyingSymbol || '',
@@ -241,7 +242,7 @@ const TradeRecordDetail = ({ recordId, onBack }) => {
 
       const payload = {
         tradeDate: values.tradeDate.format('YYYY-MM-DD'),
-        brokerId: values.brokerId,
+        brokerAccountId: values.brokerAccountId,
         assetType: values.assetType,
         symbol: values.symbol,
         underlyingSymbol: values.underlyingSymbol,
@@ -374,9 +375,9 @@ const TradeRecordDetail = ({ recordId, onBack }) => {
       >
         <Descriptions.Item label="记录ID">{record.id}</Descriptions.Item>
         <Descriptions.Item label="交易日期">{record.tradeDate}</Descriptions.Item>
-        <Descriptions.Item label="券商">
-          {brokerMap[record.brokerId] || `ID:${record.brokerId}`}
-        </Descriptions.Item>
+        <Descriptions.Item label="券商名称">{record.broker?.brokerName || brokerMap[record.brokerId] || '-'}</Descriptions.Item>
+        <Descriptions.Item label="账户名称">{record.brokerAccount?.accountName || '-'}</Descriptions.Item>
+        <Descriptions.Item label="账户 ID">{record.brokerAccount?.accountId || '待补全'}</Descriptions.Item>
         <Descriptions.Item label="证券类型">
           <Tag color={assetTypeColorMap[record.assetType] || 'default'}>
             {assetTypeMap[record.assetType] || record.assetType}
@@ -516,10 +517,10 @@ const TradeRecordDetail = ({ recordId, onBack }) => {
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item label="券商" name="brokerId" rules={[{ required: true, message: '请选择券商' }]}>
-                <Select placeholder="请选择券商">
-                  {brokerList.map((b) => (
-                    <Select.Option key={b.id} value={b.id}>{b.brokerName}</Select.Option>
+              <Form.Item label="托管账户" name="brokerAccountId" rules={[{ required: true, message: '请选择托管账户' }]}>
+                <Select placeholder="请选择托管账户">
+                  {accountList.map((b) => (
+                    <Select.Option key={b.id} value={b.id}>{accountLabel(b)}</Select.Option>
                   ))}
                 </Select>
               </Form.Item>

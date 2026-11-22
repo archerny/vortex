@@ -11,7 +11,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.containsString;
 
 class IbkrSyncSettingsControllerTest {
-    @Test void responsesContainMetadataOnlyAndStorageErrorsAreSafe() throws Exception {
+    @Test void responsesContainMetadataOnlyAndInvalidInputIsReported() throws Exception {
         var service = mock(IbkrSyncSettingsService.class);
         var mvc = MockMvcBuilders.standaloneSetup(new IbkrSyncSettingsController(service)).build();
         when(service.save(any())).thenReturn(new IbkrSyncSettingsView(1L, "Synthetic", "123", true, true));
@@ -20,8 +20,9 @@ class IbkrSyncSettingsControllerTest {
                 .andExpect(status().isOk()).andExpect(jsonPath("$.data.ready").value(true))
                 .andExpect(jsonPath("$.data.token").doesNotExist())
                 .andExpect(content().string(not(containsString("synthetic-secret"))));
-        when(service.get()).thenThrow(new IllegalStateException("synthetic-secret ciphertext"));
-        mvc.perform(get("/api/broker-sync/ibkr/settings")).andExpect(status().isInternalServerError())
-                .andExpect(content().string(not(containsString("synthetic-secret"))));
+        when(service.save(any())).thenThrow(new IllegalArgumentException("请选择IBKR记账账户"));
+        mvc.perform(put("/api/broker-sync/ibkr/settings").contentType("application/json").content("{}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("请选择IBKR记账账户"));
     }
 }

@@ -39,6 +39,10 @@ public class PositionService {
      * @return 持仓快照列表（按券商分组，每个 symbol+brokerId 独立一条记录）
      */
     public List<PositionSnapshot> calculatePositions(LocalDate targetDate, Long brokerId) {
+        return calculatePositions(targetDate, brokerId, null);
+    }
+
+    public List<PositionSnapshot> calculatePositions(LocalDate targetDate, Long brokerId, Long brokerAccountId) {
         // 1. 查询截止日期内的所有交易记录
         List<TradeRecord> records;
         if (brokerId != null) {
@@ -46,6 +50,8 @@ public class PositionService {
         } else {
             records = tradeRecordRepository.findByTradeDateLessThanEqualAndIsDeletedFalseOrderByTradeDateAsc(targetDate);
         }
+
+        if (brokerAccountId != null) records = records.stream().filter(record -> brokerAccountId.equals(record.getBrokerAccountId())).toList();
 
         if (records.isEmpty()) {
             return Collections.emptyList();
@@ -58,7 +64,7 @@ public class PositionService {
         Map<String, PositionSnapshot> positionMap = new LinkedHashMap<>();
 
         for (TradeRecord record : records) {
-            String key = record.getSymbol() + "|" + record.getBrokerId();
+            String key = record.getSymbol() + "|" + record.getBrokerId() + "|" + record.getBrokerAccountId();
             PositionSnapshot position = positionMap.computeIfAbsent(key, k -> {
                 PositionSnapshot snapshot = new PositionSnapshot();
                 snapshot.setSymbol(record.getSymbol());
@@ -66,6 +72,11 @@ public class PositionService {
                 snapshot.setAssetType(record.getAssetType());
                 snapshot.setCurrency(record.getCurrency());
                 snapshot.setBrokerId(record.getBrokerId());
+                snapshot.setBrokerAccountId(record.getBrokerAccountId());
+                if (record.getBrokerAccount() != null) {
+                    snapshot.setAccountId(record.getBrokerAccount().getAccountId());
+                    snapshot.setAccountName(record.getBrokerAccount().getAccountName());
+                }
                 snapshot.setBrokerName(brokerNameMap.getOrDefault(record.getBrokerId(), "未知券商"));
                 snapshot.setQuantity(0);
                 return snapshot;

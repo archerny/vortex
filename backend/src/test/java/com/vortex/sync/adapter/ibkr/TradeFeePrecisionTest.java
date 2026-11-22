@@ -32,6 +32,11 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class TradeFeePrecisionTest {
+    @org.junit.jupiter.api.BeforeEach
+    void wireManagedAccountFixture() {
+        org.springframework.test.util.ReflectionTestUtils.setField(service, "brokerAccountService", com.vortex.fixtures.AccountFixtures.service("SYNTH-ACCOUNT"));
+    }
+
     @org.mockito.Mock private com.vortex.service.MarketEventHistoryService eventHistory;
     @Mock private IbkrStagedOrderRepository orders;
     @Mock private IbkrStagedTradeConfirmRepository confirms;
@@ -50,7 +55,7 @@ class TradeFeePrecisionTest {
             "||0"
     }, delimiter = '|')
     void shouldPreserveFeeDigitsThroughIbkrImport(String commission, String charge, String expected) {
-        IbkrStagedOrder order = new IbkrStagedOrder();
+        IbkrStagedOrder order = new IbkrStagedOrder(); order.setAccountId("SYNTH-ACCOUNT");
         order.setOrderId("SYNTH-FEE");
         order.setTradeDate("20261117");
         order.setCurrency("USD");
@@ -69,7 +74,7 @@ class TradeFeePrecisionTest {
             return record;
         });
 
-        new IbkrImportWorker(orders, confirms, trades, eventHistory).importSingleOrder(1L, 1L, order);
+        new IbkrImportWorker(orders, confirms, trades, eventHistory).importSingleOrder(1L, 1L, 1L, order);
 
         var captor = org.mockito.ArgumentCaptor.forClass(TradeRecord.class);
         verify(trades).save(captor.capture());

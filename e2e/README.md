@@ -13,8 +13,11 @@
 | `market-event-ui-server.mjs` | Serve the real frontend with synthetic event APIs on port 4317 for manual UI acceptance; does not access a backend or database. |
 | `FeePrecisionCheck.java` | Java helper for the fee launcher; verifies migrations, ORM and repository sums with synthetic data. |
 | `OrderedMarketEventCheck.java` | Java helper for ordered-event and IBKR linkage integration checks; run through its Python launcher. |
-| `verify-ibkr-settings.py` | Own a disposable PostgreSQL cluster, validate V30 migration and the full application configuration API; `--serve` holds a synthetic UI on port 4318. |
-| `IbkrSettingsCheck.java` | Settings launcher helper: historical upgrade, real transaction rollback/locking, credential encryption/key permissions and application restarts. |
+| `verify-ibkr-settings.py` | Own a disposable PostgreSQL cluster; `--connections-only` runs focused V33 multi-account migration, persistence, import and HTTP checks. Default mode retains IBKR configuration/snapshot checks; `--serve` holds a synthetic UI on port 4318. |
+| `IbkrSettingsCheck.java` | Settings launcher helper: unconfigured database upgrade, real transaction rollback, plaintext reads and application restarts. |
+| `AccountConnectionsCheck.java` | Focused helper: V32→V33 history, same-broker accounts, credential providers, fixed import ownership, account-isolated deduplication/positions/events and failure rollback/cleanup. |
+| `verify-account-profiles.py` | Focused V33→V34 profile and V34→V35 broker reference-data migrations and real HTTP checks, in an owned temporary PostgreSQL cluster. |
+| `AccountProfilesCheck.java` | Profile helper: unambiguous migration or pending-account preservation, rollback/retry, unchanged ledger/audit, account-scoped CRUD and broker field removal. |
 | `ibkr-settings-ui-server.mjs` | Vite proxy to the explicit synthetic application port, used by the settings launcher; never proxies to the default backend. |
 
 ## 开发库重置
@@ -26,15 +29,30 @@
 ## IBKR settings check
 
 ```bash
-TMPDIR=/tmp MAVEN_OPTS=-Djava.io.tmpdir=/tmp mvn -e -o -f backend/pom.xml test
+TMPDIR=/tmp MAVEN_OPTS=-Djava.io.tmpdir=/tmp mvn -B -ntp -o -f backend/pom.xml -Dtest=BrokerSyncConnectionServiceTest,BrokerSyncConnectionControllerTest,IbkrSyncSettingsServiceTest,IbkrSyncSettingsControllerTest,BrokerServiceTest,TigerSyncAdapterTest test
+python3 -B e2e/verify-ibkr-settings.py --connections-only
+# Optional wider IBKR scenarios, subject to the testing scope authorized for the task:
 python3 -B e2e/verify-ibkr-settings.py
 # Optional manual UI verification; press Enter to stop and remove the temporary cluster:
 python3 -B e2e/verify-ibkr-settings.py --serve
 ```
 
-Requires existing Java/javac, Python, Node, psql and PostgreSQL server binaries, plus cached Maven dependencies and the frontend's existing dependencies. It reads a successful current settings-test classpath and refuses stale main classes. The Java checker verifies the owned server data directory, migrates a fresh database and a V29 database with synthetic history, and starts the actual Spring Boot application using an isolated configuration location. It never loads local/dev credentials or connects to an existing ledger. Flex requests go only to a loopback fake server.
+Requires existing Java/javac, Python, Node, psql and PostgreSQL server binaries, plus cached Maven dependencies and the frontend's existing dependencies. It reads a successful current settings-test classpath and refuses stale main classes. Both helpers verify the owned server data directory and start Spring Boot using an isolated configuration location. They never load local/dev credentials or connect to an existing ledger. Flex uses only a loopback fake server.
 
-Checks include rollback of account binding and credentials, committed pair visibility, competing saves, saved/cleared state across actual application restarts, key permissions/symlinks, ciphertext-only storage and metadata-only responses, retained Token, active-batch refusal of configuration/account mutations, missing-key refusal without regeneration, recovery and an empty TCF batch. `--serve` then exposes the real frontend and synthetic backend at `http://127.0.0.1:4318/#/sync-management`; check account creation, save, refresh, IBKR selection and clear. These manual interactions are separate from automatic API checks. Temporary keys, databases and processes are removed on exit. No account is opened with a real broker.
+`--connections-only` verifies fresh V33 initialization and a V32→V33 upgrade containing soft-deleted and event-generated ledger rows, a transferred broker code, unchanged values/timestamps, unknown empty-batch ownership, and migration rollback/retry. Real Spring/JPA checks cover same-broker IBKR/Tiger accounts and independent database credentials, transaction rollback, same external IDs across accounts, duplicate/conflicting/partial imports, whole-batch cleanup, global batch exclusion, and fixed account ownership when broker code changes during fetch. It also checks account-scoped option links, positions, event costs and dividend rounding. Tiger import uses explicit epoch fixtures to isolate account behavior; the normal-stage timestamp defect remains excluded and unresolved.
+
+Focused HTTP checks cover account CRUD, pending-account rename/disable/completion, duplicate or linked deletion rejection, read-only associations, trade/cash account filters and moving a trade between accounts, secret retention/clear isolation, and ambiguous legacy requests. A selected second-account async sync makes two requests only to the loopback fake Flex server, verifying its Token and Query ID/reference pair and a legal empty report. No real broker is contacted. The temporary application and cluster are removed on exit. This mode does not run the wider historical event or default IBKR settings scenarios.
+
+Default-mode checks include account/credential rollback, plaintext-only storage and metadata-only responses, retained/replaced Token, saved/cleared state across application restarts, and configuration/account edits during an active batch. A controlled fake Flex response confirms the current report keeps its captured Token while the next report reads the replacement plaintext. `--serve` then exposes the real frontend and synthetic backend at `http://127.0.0.1:4318/#/sync-management`; enter accounts through account management, then check account-row configuration, save, refresh, batch selection and clear. These manual interactions are separate from automatic API checks. Temporary databases and processes are removed on exit. No account is opened with a real broker.
+
+## Account profile check
+
+```bash
+mvn -B -ntp -o -f backend/pom.xml -Dtest=BrokerAccountServiceTest,BrokerServiceTest,BrokerSyncConnectionServiceTest test
+python3 -B e2e/verify-account-profiles.py
+```
+
+The launcher uses the current `BrokerAccountServiceTest` classpath, refuses stale production classes, verifies its temporary server data directory, and loads an isolated Spring configuration. It never reads local/dev credentials. The profile migration stage is pinned to V34. Synthetic V33 fixtures cover a unique pending account, a sole real account, zero accounts, multiple real or pending accounts, and absent old profile data. V34 preserves raw contact strings, existing account audit fields, ledger ownership and connection data; a forced failure rolls back and retries successfully. Fresh-schema HTTP checks verify optional profile create/read, omitted and explicit-null retention, empty-string clearing with subsequent GET, same-broker account isolation, length limits and removal of profile fields from broker responses. Additional V34→V35 checks remove broker state, add an independent introduction and preserve complete account/profile/ledger snapshots; a table-lock failure rolls back before retry. Current-schema HTTP checks cover introduction create/update/retention/clear, absence of broker state, the legacy all-broker list, account-only sync readiness/validation and objective broker discovery. No broker request is made; the application and temporary cluster are removed on exit. See [the consolidated design](../design/0047-2026-11-21-broker-accounts-and-sync-connections.md) and [verification evidence](../docs/TODO-ARCHIVE.md).
 
 ## Fee precision migration check
 
@@ -46,18 +64,20 @@ python3 -B e2e/verify-fee-precision.py
 
 Requires existing Java, Maven, PostgreSQL server binaries (`initdb`, `pg_ctl` via `pg_config --bindir`) and the project's cached Maven dependencies. Installs no tools. Maven runs offline, writes build output to `backend/target/`, and reuses its existing cache. The script runs the in-memory `TradeFeePrecisionTest` to compile current sources and obtain the resolved classpath, then compiles `FeePrecisionCheck.java` into its temporary directory. Database checks are separate from unit tests.
 
-The launcher chooses a free local port and creates its own cluster; it accepts no database URL or credentials. The checker confirms the server's data directory before creating synthetic databases. Coverage includes V1→V29, V28→V29 with an unchanged two-decimal historical row, the original V28 rounding behavior, high-precision ORM save/read and currency-specific repository sums, existing fee constraints/default, repeat migration, and lock-failure rollback/retry. Temporary files and the server are cleaned up even on a failed assertion; if stopping the server fails, its directory is retained for recovery.
+The launcher chooses a free local port and creates its own cluster; it accepts no database URL or credentials. The checker confirms the server's data directory before creating synthetic databases. Fee-migration assertions are pinned to V29; ORM checks then upgrade to the current schema. Coverage includes V1→V29, V28→V29 with an unchanged two-decimal historical row, the original V28 rounding behavior, high-precision ORM save/read and currency-specific repository sums, existing fee constraints/default, repeat migration, and lock-failure rollback/retry. Temporary files and the server are cleaned up even on a failed assertion; if stopping the server fails, its directory is retained for recovery.
 
 ## Ordered market event check
 
 Run from the current checkout in the configured development environment, with existing tools and cached dependencies. Set `TMPDIR=/tmp` and `MAVEN_OPTS=-Djava.io.tmpdir=/tmp`. No application profile is loaded and no existing cluster is used.
 
+The wider event runner is optional and must fit the task’s explicitly authorized regression scope. Compile current sources with relevant selected tests first, for example:
+
 ```sh
-mvn -o -f backend/pom.xml test
+mvn -o -f backend/pom.xml -Dtest=MarketEventProcessingServiceTest test
 python3 -B e2e/verify-ordered-market-events.py
-npm --prefix frontend test
-npm --prefix frontend run build
 ```
+
+Full unit suites and whole regression runs require explicit user instruction under [AGENTS.md](../AGENTS.md#测试范围与提交提醒). Initial V33 development ran focused checks and compiled all four helpers. On 2026-11-22, after the user explicitly requested full testing, the backend and frontend unit suites, frontend build and all four database modes above passed against the V33 implementation. Named-case manifests, commands, logs and remaining limits are recorded in [the verification archive](../docs/TODO-ARCHIVE.md). Synthetic browser acceptance from the unchanged preceding version was reused; no complete browser-regression suite or live-broker validation is claimed.
 
 All parser tests now use synthetic data; the default backend command needs no exclusions or method selectors. Maven excludes the ignored personal XML from test resources. Check actual class, nested-class and parameterized-case names in Surefire reports rather than relying on totals alone; old report files can remain after test removal, so use the suites listed by the current run. See the [test cleanup evidence](../docs/TODO-ARCHIVE.md#测试清理依据) for the case comparison. After backend source changes, recompile before the integration check; the launcher refuses stale class files.
 

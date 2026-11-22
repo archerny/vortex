@@ -8,7 +8,7 @@
 
 ## 生成系统交易
 
-三类事件均读取事件前一日的持仓，并处理满足条件的正持仓。生成的交易日期为事件当天，费用为 0，`trade_trigger` 为 `MARKET_EVENT`，关联类型和 ID 指向对应事件。持仓计算通过普通的 `BUY` 或 `SELL` 聚合这些交易。 [市场事件处理服务](../backend/src/main/java/com/vortex/service/MarketEventProcessingService.java) · [持仓服务](../backend/src/main/java/com/vortex/service/PositionService.java)
+三类事件均读取事件前一日的持仓，按账户分别处理满足条件的正持仓，系统交易保留该账户主键；同券商下的账户不互相抵消，实物分红也逐账户取整。生成的交易日期为事件当天，费用为 0，`trade_trigger` 为 `MARKET_EVENT`，关联类型和 ID 指向对应事件。持仓计算通过普通的 `BUY` 或 `SELL` 聚合这些交易。 [市场事件处理服务](../backend/src/main/java/com/vortex/service/MarketEventProcessingService.java) · [持仓服务](../backend/src/main/java/com/vortex/service/PositionService.java)
 
 | 事件 | 系统交易与数量规则 |
 | --- | --- |
@@ -16,7 +16,7 @@
 | 代码变更 | 对持有旧代码的非期权持仓生成等量的旧代码 `SELL` 和新代码 `BUY`。两笔交易都以旧证券截至前一日的移动加权平均成本计价。 |
 | 实物分红 | 分红数量为 `floor(持仓数量 × ratioTo / ratioFrom)`。数量为正时生成分红证券的股票 `BUY`，币种取 `dividendCurrency`。价格取 `fairValuePerShare`，缺省时按 0，金额为价格 × 分红数量。 |
 
-代码变更的平均成本按原证券和券商回放历史交易计算。买入金额增加成本池；当前正持仓恰好全部卖出时，直接结清成本池并将数量减为零，后续建仓不再携带旧的舍入尾差。部分卖出仍按 6 位小数、`HALF_UP` 的均价减记，最终均价仍以 4 位小数、`HALF_UP` 舍入，两笔转移交易的金额仍为该均价乘持仓数量。此处成本池仅为回放中的局部变量，计算用于代码变更交易定价，不是日常持仓查询维护的成本账户。 [平均成本实现](../backend/src/main/java/com/vortex/service/MarketEventProcessingService.java) · [0028 清仓成本池方案](../design/0028-2026-11-16-clear-cost-pool-on-liquidation.md) · [交易与持仓](trades-and-positions.md)
+代码变更的平均成本按原证券及同一本地账户回放历史交易计算。买入金额增加成本池；当前正持仓恰好全部卖出时，直接结清成本池并将数量减为零，后续建仓不再携带旧的舍入尾差。部分卖出仍按 6 位小数、`HALF_UP` 的均价减记，最终均价仍以 4 位小数、`HALF_UP` 舍入，两笔转移交易的金额仍为该均价乘持仓数量。此处成本池仅为回放中的局部变量，计算用于代码变更交易定价，不是日常持仓查询维护的成本账户。 [平均成本实现](../backend/src/main/java/com/vortex/service/MarketEventProcessingService.java) · [0028 清仓成本池方案](../design/0028-2026-11-16-clear-cost-pool-on-liquidation.md) · [交易与持仓](trades-and-positions.md)
 
 [市场事件回归测试](../backend/src/test/java/com/vortex/service/MarketEventProcessingServiceTest.java) 使用真实事件处理与持仓计算、Mockito 仓储及合成交易，从证券代码变更入口验证清仓、重新建仓和生成交易。原清仓修复的内存运行记录见 [归档](../docs/TODO-ARCHIVE.md)，真实事务的后续验证入口见 [e2e](../e2e/README.md#ordered-market-event-check)。卖超、负持仓、同日成交排序及更广的计价精度规则仍保持原有边界；清仓修复不代表这些口径均已解决。
 
@@ -45,6 +45,8 @@
 不在启动时重算、删除或补造历史结果；processed=true 是保守锁定依据，不证明旧结果正确。未处理事件已有派生行时拒绝修改、处理与撤销；创建请求不能指定 ID、审计字段、已处理／删除状态或显式空状态。存量检查与异常处置见 [操作指南](../docs/market-events.md#存量切换)。既有验收使用合成数据，没有检查或修复实际用户账本。
 
 规则来源：[0035](../design/0035-2026-11-17-ordered-market-events-and-history-locks.md)、[0036](../design/0036-2026-11-17-market-event-write-coordination.md)、[0037](../design/0037-2026-11-17-ordered-event-state-validation.md)、[0038](../design/0038-2026-11-17-sync-cleanup-history-guard.md)。单测及独立临时数据库的真实事务、并发、失败回滚验收见 [验证指南](../e2e/README.md#ordered-market-event-check)。
+
+账户隔离依据 [0047](../design/0047-2026-11-21-broker-accounts-and-sync-connections.md)。事件历史锁及并发互斥仍覆盖全部券商、全部账户，不因账户分组而缩小保护范围。
 
 ## 数据演进与历史决策
 

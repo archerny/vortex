@@ -7,7 +7,7 @@
 | `dev` | 使用隔离开发库和合成数据进行联调或迁移验证。启动前确认连接目标。 |
 | `local` | 运行使用真实账本的应用。启动时可能触发 Flyway 迁移。 |
 
-单元测试通过模拟对象隔离数据库和券商服务。从工作树根目录执行 `mvn -f backend/pom.xml test` 即可。 [验证与数据安全](../AGENTS.md#验证与数据安全)
+单元测试通过模拟对象隔离数据库和券商服务。从工作树根目录按任务执行指定类，例如 `mvn -f backend/pom.xml -Dtest=BrokerAccountServiceTest test`；全量测试须用户明确指定。 [验证与数据安全](../AGENTS.md#验证与数据安全)
 
 ## 配置文件
 
@@ -33,7 +33,7 @@ spring.datasource.password=<dev-password>
 
 ## 启动与检查
 
-IBKR Token／Query ID通过**同步管理 → 同步配置**存入当前数据库，不再读取profile中的旧凭据值。主密钥默认位于工作树根目录`.local/ibkr-sync.key`；打包部署可用`broker.ibkr.secret-key-file`配置持久化路径。数据库与密钥须一起备份，权限及恢复见 [IBKR接入指南](broker-sync/brokers/ibkr/README.md#凭证密钥与部署)。Tiger凭据仍按profile配置。
+IBKR 和 Tiger 配置先在**券商管理**维护券商，再在**托管账户**选择所属券商并录入真实账户 ID（同券商可多账户），再通过**同步管理 → 同步配置**的账户行保存连接凭证。凭证以明文存入当前数据库，运行时直接读取；Token／私钥不回传页面，留空保留、填写替换。旧profile凭证不回退、不自动导入，备份与恢复以数据库为准。步骤及 V32 至 V35 部署要求见 [IBKR接入指南](broker-sync/brokers/ibkr/README.md#凭证与部署)和 [Tiger接入指南](broker-sync/brokers/tiger/README.md)。
 
 核对目标开发库后，从工作树根目录通过 Maven 启动应用。
 

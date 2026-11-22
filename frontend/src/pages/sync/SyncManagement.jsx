@@ -3,7 +3,7 @@ import { Tabs, Typography } from 'antd';
 import { CloudSyncOutlined } from '@ant-design/icons';
 import SyncBatchesTab from './batches/SyncBatchesTab';
 import StagedDataTab from './staged/StagedDataTab';
-import IbkrSettingsTab from './settings/IbkrSettingsTab';
+import SyncConnectionSettingsTab from './settings/SyncConnectionSettingsTab';
 
 const { Title } = Typography;
 
@@ -12,7 +12,7 @@ const { Title } = Typography;
  *
  * 顶层容器，分三个 Tab：
  * - 同步批次：展示历史批次，支持触发新同步
- * - 同步配置：绑定IBKR记账账户，保存或清空Flex凭证
+ * - 同步配置：为已有托管账户维护券商连接
  * - 原始数据：查看各券商同步到 staging 表的原始数据（当前仅 IBKR 实现）
  */
 const SyncManagement = () => {
@@ -22,12 +22,12 @@ const SyncManagement = () => {
     {
       key: 'batches',
       label: '同步批次',
-      children: <SyncBatchesTab refreshKey={refreshKey} onConfigureIbkr={() => setActiveKey('settings')} />,
+      children: <SyncBatchesTab refreshKey={refreshKey} onConfigure={() => setActiveKey('settings')} />,
     },
     {
       key: 'settings',
       label: '同步配置',
-      children: <IbkrSettingsTab onSaved={() => setRefreshKey((value) => value + 1)} onDone={() => setActiveKey('batches')} />,
+      children: <SyncConnectionSettingsTab onSaved={() => setRefreshKey((value) => value + 1)} onDone={() => setActiveKey('batches')} />,
     },
     {
       key: 'staged-data',

@@ -2,7 +2,6 @@ package com.vortex.controller;
 
 import com.vortex.entity.Broker;
 import com.vortex.service.BrokerService;
-import com.vortex.sync.exception.SyncConflictException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -46,13 +45,12 @@ public class BrokerController {
     }
 
     /**
-     * 查询所有启用的券商
+     * 旧列表兼容入口：券商不再有状态，返回全部券商。
      * GET /api/brokers/active
      */
     @GetMapping("/active")
     public ResponseEntity<Map<String, Object>> getActiveBrokers() {
-        List<Broker> brokers = brokerService.findActiveBrokers();
-        return buildSuccessResponse("查询成功", brokers);
+        return getAllBrokers();
     }
 
     /**
@@ -119,14 +117,9 @@ public class BrokerController {
 
     // ============ 响应构建工具方法 ============
 
-    @ExceptionHandler(SyncConflictException.class)
-    public ResponseEntity<Map<String, Object>> activeSync(SyncConflictException error) {
-        return buildErrorResponse(HttpStatus.CONFLICT, error.getMessage());
-    }
-
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<Map<String, Object>> conflictingAccount() {
-        return buildErrorResponse(HttpStatus.CONFLICT, "账户名称或券商代码重复，或账户仍有关联数据");
+    public ResponseEntity<Map<String, Object>> conflictingBroker() {
+        return buildErrorResponse(HttpStatus.CONFLICT, "券商名称或券商代码重复，或券商仍有关联数据");
     }
 
     private ResponseEntity<Map<String, Object>> buildSuccessResponse(String message, Object data) {

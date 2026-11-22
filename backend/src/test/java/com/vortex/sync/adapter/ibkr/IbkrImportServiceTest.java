@@ -1,12 +1,12 @@
 package com.vortex.sync.adapter.ibkr;
 
-import com.vortex.entity.Broker;
+import com.vortex.entity.BrokerAccount;
 import com.vortex.entity.IbkrStagedOrder;
 import com.vortex.entity.TradeRecord;
 import com.vortex.entity.enums.AssetType;
 import com.vortex.entity.enums.TradeTrigger;
 import com.vortex.entity.enums.TriggerRefType;
-import com.vortex.repository.BrokerRepository;
+import com.vortex.repository.BrokerAccountRepository;
 import com.vortex.repository.IbkrStagedOrderRepository;
 import com.vortex.repository.TradeRecordRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,7 +44,7 @@ class IbkrImportServiceTest {
     private TradeRecordRepository tradeRecordRepository;
 
     @Mock
-    private BrokerRepository brokerRepository;
+    private BrokerAccountRepository accountRepository;
 
     @Mock
     private IbkrImportWorker importWorker;
@@ -53,20 +53,16 @@ class IbkrImportServiceTest {
 
     @BeforeEach
     void setUp() {
-        importService = new IbkrImportService(
-                stagedOrderRepository, tradeRecordRepository,
-                brokerRepository, importWorker);
+        importService = new IbkrImportService(stagedOrderRepository, tradeRecordRepository, accountRepository, importWorker, com.vortex.fixtures.AccountFixtures.batches());
     }
 
-    private Broker buildBroker() {
-        Broker broker = new Broker("盈透证券", "US");
-        broker.setId(1L);
-        broker.setBrokerCode("ibkr");
-        return broker;
+    private BrokerAccount buildAccount() {
+        var account = new BrokerAccount(); account.setId(1L); account.setBrokerId(1L);
+        account.setAccountId("SYNTH-ACCOUNT"); account.setAccountName("Synthetic account"); return account;
     }
 
     private IbkrStagedOrder buildStagedOrder(String orderId) {
-        IbkrStagedOrder staged = new IbkrStagedOrder();
+        IbkrStagedOrder staged = new IbkrStagedOrder(); staged.setAccountId("SYNTH-ACCOUNT");
         staged.setId(100L);
         staged.setBatchId(1L);
         staged.setStatus("PENDING");
@@ -83,8 +79,8 @@ class IbkrImportServiceTest {
 
         @Test
         @DisplayName("should throw when broker not found")
-        void shouldThrowWhenBrokerNotFound() {
-            when(brokerRepository.findByBrokerCode("ibkr")).thenReturn(Optional.empty());
+        void shouldThrowWhenAccountNotFound() {
+            when(accountRepository.findById(1L)).thenReturn(Optional.empty());
 
             assertThrows(IllegalStateException.class, () -> importService.importAll(1L));
             verifyNoInteractions(importWorker);
@@ -93,18 +89,18 @@ class IbkrImportServiceTest {
         @Test
         @DisplayName("should handle no pending orders gracefully")
         void shouldHandleNoPendingOrders() {
-            when(brokerRepository.findByBrokerCode("ibkr")).thenReturn(Optional.of(buildBroker()));
+            when(accountRepository.findById(1L)).thenReturn(Optional.of(buildAccount()));
             when(stagedOrderRepository.findByBatchIdAndStatus(1L, "PENDING")).thenReturn(Collections.emptyList());
 
             assertDoesNotThrow(() -> importService.importAll(1L));
 
-            verify(importWorker, never()).importSingleOrder(anyLong(), anyLong(), any());
+            verify(importWorker, never()).importSingleOrder(anyLong(), anyLong(), org.mockito.ArgumentMatchers.eq(1L), any());
         }
 
         @Test
         @DisplayName("should delegate each pending order to importWorker")
         void shouldDelegateEachOrderToWorker() {
-            when(brokerRepository.findByBrokerCode("ibkr")).thenReturn(Optional.of(buildBroker()));
+            when(accountRepository.findById(1L)).thenReturn(Optional.of(buildAccount()));
             IbkrStagedOrder order1 = buildStagedOrder("ORD001");
             IbkrStagedOrder order2 = buildStagedOrder("ORD002");
             when(stagedOrderRepository.findByBatchIdAndStatus(1L, "PENDING"))
@@ -119,19 +115,19 @@ class IbkrImportServiceTest {
 
             importService.importAll(1L);
 
-            verify(importWorker).importSingleOrder(1L, 1L, order1);
-            verify(importWorker).importSingleOrder(1L, 1L, order2);
+            verify(importWorker).importSingleOrder(1L, 1L, 1L, order1);
+            verify(importWorker).importSingleOrder(1L, 1L, 1L, order2);
         }
 
         @Test
         @DisplayName("should trigger back-fill for STK-side BookTrades after import")
         void shouldTriggerBackfillAfterImport() {
-            when(brokerRepository.findByBrokerCode("ibkr")).thenReturn(Optional.of(buildBroker()));
+            when(accountRepository.findById(1L)).thenReturn(Optional.of(buildAccount()));
             when(stagedOrderRepository.findByBatchIdAndStatus(1L, "PENDING")).thenReturn(Collections.emptyList());
 
-            TradeRecord stkRecord1 = new TradeRecord();
+            TradeRecord stkRecord1 = new TradeRecord(); stkRecord1.setBrokerAccountId(1L);
             stkRecord1.setId(10L);
-            TradeRecord stkRecord2 = new TradeRecord();
+            TradeRecord stkRecord2 = new TradeRecord(); stkRecord2.setBrokerAccountId(1L);
             stkRecord2.setId(20L);
 
             when(tradeRecordRepository.findStkSideBookTradesNeedingBackfill(
@@ -148,7 +144,7 @@ class IbkrImportServiceTest {
 
         @Test
         void shouldPropagateLinkageFailureAndStopFurtherBackfills() {
-            when(brokerRepository.findByBrokerCode("ibkr")).thenReturn(Optional.of(buildBroker()));
+            when(accountRepository.findById(1L)).thenReturn(Optional.of(buildAccount()));
             TradeRecord stock = new TradeRecord(), later = new TradeRecord();
             when(tradeRecordRepository.findStkSideBookTradesNeedingBackfill(
                     eq(1L), eq(TradeTrigger.OPTION), anyList(), eq(AssetType.STOCK)))
@@ -163,14 +159,14 @@ class IbkrImportServiceTest {
         @Test
         @DisplayName("should call markFailed via proxy when worker throws ImportOneFailedException")
         void shouldInvokeMarkFailedOnImportFailure() {
-            when(brokerRepository.findByBrokerCode("ibkr")).thenReturn(Optional.of(buildBroker()));
+            when(accountRepository.findById(1L)).thenReturn(Optional.of(buildAccount()));
             IbkrStagedOrder bad = buildStagedOrder("ORD_FAIL");
             when(stagedOrderRepository.findByBatchIdAndStatus(1L, "PENDING")).thenReturn(List.of(bad));
 
             // Worker throws the wrapped exception (per P0-1 fix)
             RuntimeException root = new RuntimeException("parse error");
             doThrow(new ImportOneFailedException(bad, root))
-                    .when(importWorker).importSingleOrder(1L, 1L, bad);
+                    .when(importWorker).importSingleOrder(1L, 1L, 1L, bad);
 
             // Backfill path: no STK records to process
             when(tradeRecordRepository.findStkSideBookTradesNeedingBackfill(
@@ -189,12 +185,12 @@ class IbkrImportServiceTest {
         @Test
         @DisplayName("should swallow markFailed exception so adapter-level residual check can pick it up")
         void shouldSwallowMarkFailedException() {
-            when(brokerRepository.findByBrokerCode("ibkr")).thenReturn(Optional.of(buildBroker()));
+            when(accountRepository.findById(1L)).thenReturn(Optional.of(buildAccount()));
             IbkrStagedOrder bad = buildStagedOrder("ORD_MF_FAIL");
             when(stagedOrderRepository.findByBatchIdAndStatus(1L, "PENDING")).thenReturn(List.of(bad));
 
             doThrow(new ImportOneFailedException(bad, new RuntimeException("mapping boom")))
-                    .when(importWorker).importSingleOrder(1L, 1L, bad);
+                    .when(importWorker).importSingleOrder(1L, 1L, 1L, bad);
             doThrow(new IllegalStateException("markFailed also failed"))
                     .when(importWorker).markFailed(same(bad), anyString());
 
@@ -213,7 +209,7 @@ class IbkrImportServiceTest {
         @Test
         @DisplayName("should keep iterating remaining orders after one import failure")
         void shouldKeepIteratingAfterFailure() {
-            when(brokerRepository.findByBrokerCode("ibkr")).thenReturn(Optional.of(buildBroker()));
+            when(accountRepository.findById(1L)).thenReturn(Optional.of(buildAccount()));
             IbkrStagedOrder good1 = buildStagedOrder("ORD_GOOD1");
             IbkrStagedOrder bad = buildStagedOrder("ORD_FAIL");
             IbkrStagedOrder good2 = buildStagedOrder("ORD_GOOD2");
@@ -221,7 +217,7 @@ class IbkrImportServiceTest {
                     .thenReturn(List.of(good1, bad, good2));
 
             doThrow(new ImportOneFailedException(bad, new RuntimeException("row2 boom")))
-                    .when(importWorker).importSingleOrder(1L, 1L, bad);
+                    .when(importWorker).importSingleOrder(1L, 1L, 1L, bad);
 
             when(tradeRecordRepository.findStkSideBookTradesNeedingBackfill(
                     eq(1L), eq(TradeTrigger.OPTION),
@@ -232,9 +228,9 @@ class IbkrImportServiceTest {
             importService.importAll(1L);
 
             // All three were attempted.
-            verify(importWorker).importSingleOrder(1L, 1L, good1);
-            verify(importWorker).importSingleOrder(1L, 1L, bad);
-            verify(importWorker).importSingleOrder(1L, 1L, good2);
+            verify(importWorker).importSingleOrder(1L, 1L, 1L, good1);
+            verify(importWorker).importSingleOrder(1L, 1L, 1L, bad);
+            verify(importWorker).importSingleOrder(1L, 1L, 1L, good2);
             verify(importWorker).markFailed(same(bad), anyString());
         }
     }

@@ -21,12 +21,10 @@ export const fetchBrokerById = async (id) => {
 };
 
 /**
- * 查询所有启用的券商
- * GET /api/brokers/active
+ * 兼容旧导出；券商不再有启停状态，返回全部资料。
  */
 export const fetchActiveBrokers = async () => {
-  const response = await axios.get(`${BASE_URL}/active`);
-  return response.data;
+  return fetchAllBrokers();
 };
 
 /**

@@ -2,7 +2,7 @@
 
 ## 选择数据库
 
-后端使用 PostgreSQL。联调和迁移验证前，先确认数据库主机、端口、库名和用户。开发与测试使用隔离的开发库、合成数据和 `dev` profile。`local` profile 面向真实账本，启动应用时可能运行 Flyway 迁移。后端单测通过 Mockito 隔离数据库依赖，可直接运行 `mvn -f backend/pom.xml test`。 [验证与数据安全](../AGENTS.md#验证与数据安全)
+后端使用 PostgreSQL。联调和迁移验证前，先确认数据库主机、端口、库名和用户。开发与测试使用隔离的开发库、合成数据和 `dev` profile。`local` profile 面向真实账本，启动应用时可能运行 Flyway 迁移。后端单测通过 Mockito 隔离数据库依赖；默认按任务选择指定类，例如 `mvn -f backend/pom.xml -Dtest=BrokerAccountServiceTest test`，全量测试须用户明确指定。 [验证与数据安全](../AGENTS.md#验证与数据安全)
 
 ## 准备开发库
 
@@ -24,7 +24,7 @@ spring.datasource.password=<dev-password>
 
 ## 表结构与默认配置
 
-- Flyway 通过 [`db/migration/`](../backend/src/main/resources/db/migration/) 下的 V1–V30 脚本初始化空库并升级已有数据库。新结构变更通过追加迁移完成；V29 解除费用列的固定小数位，不回填历史费用。V30新增IBKR配置密文表，不修改历史交易。 [费用契约](../knowledge/trades-and-positions.md#交易记录)
+- Flyway 通过 [`db/migration/`](../backend/src/main/resources/db/migration/) 下的 V1–V35 脚本初始化空库并升级已有数据库。新结构变更通过追加迁移完成；V29 解除费用列的固定小数位，不回填历史费用。V30新增IBKR配置表，V31改为明文Token，V32 将其迁至按券商行保存 IBKR／Tiger 明文凭证的 `broker_sync_connections` 并移除旧表。用户确认此前未配置过加密凭证；V32 遇到已有 Token 但缺少 IBKR 券商行时回滚，修正关联后重试。V33 新增真实托管账户表，将交易、流水、连接及可确认的历史批次归属迁至各券商的待补全账户，并增加分账户去重与外键；升级不猜测真实账号或重算历史账本。V34 将邮箱、电话和账户备注从券商迁至托管账户并移除旧列，歧义资料保存在待补全账户中，不修改账本。V35 新增券商独立简介并移除券商启停，已有账户状态和账本不变。升级顺序及恢复见 [账户迁移指南](accounts.md#迁移与恢复) 和 [IBKR部署说明](broker-sync/brokers/ibkr/README.md#凭证与部署)。 [费用契约](../knowledge/trades-and-positions.md#交易记录)
 - `spring.jpa.hibernate.ddl-auto=validate` 让 Hibernate 检查实体映射与数据库结构。表结构变更由 Flyway 管理。
 - HikariCP 的连接池配置和 Hibernate 的 JDBC 时区设置见 [application.properties](../backend/src/main/resources/application.properties)。需要覆盖时写入所选 profile 的配置。
 - [旧库手动基线脚本](../backend/src/main/resources/db/manual/flyway_baseline_for_existing_db.sql) 只适用于已经人工应用 V1 至 V18、尚无 Flyway 记录的旧库。使用前须逐项核对目标库结构与迁移记录。

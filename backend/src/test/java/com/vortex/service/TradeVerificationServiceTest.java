@@ -40,7 +40,7 @@ class TradeVerificationServiceTest {
      */
     private TradeRecord buildBaseRecord(Long id, String symbol, String underlyingSymbol,
                                          AssetType assetType, Currency currency) {
-        TradeRecord record = new TradeRecord();
+        TradeRecord record = new TradeRecord(); record.setBrokerAccountId(1L);
         record.setId(id);
         record.setSymbol(symbol);
         record.setUnderlyingSymbol(underlyingSymbol);

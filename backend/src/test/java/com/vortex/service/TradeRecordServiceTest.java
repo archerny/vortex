@@ -41,10 +41,15 @@ class TradeRecordServiceTest {
     @InjectMocks
     private TradeRecordService tradeRecordService;
 
+    @org.junit.jupiter.api.BeforeEach
+    void wireManagedAccountFixture() {
+        org.springframework.test.util.ReflectionTestUtils.setField(tradeRecordService, "brokerAccountService", com.vortex.fixtures.AccountFixtures.service("SYNTH-ACCOUNT"));
+    }
+
     // ============ 辅助方法 ============
 
     private TradeRecord buildValidStockRecord() {
-        TradeRecord record = new TradeRecord();
+        TradeRecord record = new TradeRecord(); record.setBrokerAccountId(1L);
         record.setTradeDate(LocalDate.of(2025, 3, 10));
         record.setBrokerId(1L);
         record.setAssetType(AssetType.STOCK);
@@ -58,8 +63,21 @@ class TradeRecordServiceTest {
         return record;
     }
 
+    @Test void optionReferencesCannotCrossAccountWhenWritingTrades() {
+        var record = buildValidStockRecord();
+        record.setTradeTrigger(TradeTrigger.OPTION); record.setTriggerRefType(TriggerRefType.OPTION_EXERCISE); record.setTriggerRefId(100L);
+        var source = buildValidOptionRecord(); source.setId(100L); source.setBrokerAccountId(2L);
+        when(brokerRepository.existsById(1L)).thenReturn(true);
+        when(tradeRecordRepository.findById(100L)).thenReturn(Optional.of(source));
+        assertThrows(IllegalArgumentException.class, () -> tradeRecordService.create(record));
+        verify(tradeRecordRepository, never()).save(any());
+        source.setBrokerAccountId(1L);
+        when(tradeRecordRepository.save(any())).thenAnswer(call -> call.getArgument(0));
+        assertEquals(1L, tradeRecordService.create(record).getBrokerAccountId());
+    }
+
     private TradeRecord buildValidOptionRecord() {
-        TradeRecord record = new TradeRecord();
+        TradeRecord record = new TradeRecord(); record.setBrokerAccountId(1L);
         record.setTradeDate(LocalDate.of(2025, 3, 10));
         record.setBrokerId(1L);
         record.setAssetType(AssetType.OPTION_CALL);
@@ -326,6 +344,28 @@ class TradeRecordServiceTest {
     @Nested
     @DisplayName("更新交易记录")
     class UpdateTest {
+
+        @Test
+        void movingReferencedOptionCannotLeaveCrossAccountLinks() {
+            var existing = buildValidOptionRecord(); existing.setId(100L);
+            existing.setTradeTrigger(TradeTrigger.MANUAL); existing.setTriggerRefType(TriggerRefType.NONE); existing.setTriggerRefId(0L);
+            var target = new com.vortex.entity.BrokerAccount(); target.setId(2L); target.setBrokerId(1L);
+            var accounts = mock(BrokerAccountService.class);
+            when(accounts.resolve(2L, 1L)).thenReturn(target);
+            org.springframework.test.util.ReflectionTestUtils.setField(tradeRecordService, "brokerAccountService", accounts);
+            when(tradeRecordRepository.findById(100L)).thenReturn(Optional.of(existing));
+            when(tradeRecordRepository.existsByTradeTriggerAndTriggerRefIdAndBrokerAccountIdNotAndIsDeletedFalse(TradeTrigger.OPTION, 100L, 2L)).thenReturn(true);
+            var input = buildValidOptionRecord(); input.setBrokerAccountId(2L);
+            assertThrows(IllegalArgumentException.class, () -> tradeRecordService.update(100L, input));
+            assertEquals(1L, existing.getBrokerAccountId());
+            assertEquals(0L, existing.getTriggerRefId());
+            verify(tradeRecordRepository, never()).save(any());
+
+            when(tradeRecordRepository.existsByTradeTriggerAndTriggerRefIdAndBrokerAccountIdNotAndIsDeletedFalse(TradeTrigger.OPTION, 100L, 2L)).thenReturn(false);
+            when(brokerRepository.existsById(1L)).thenReturn(true);
+            when(tradeRecordRepository.save(any())).thenAnswer(call -> call.getArgument(0));
+            assertEquals(2L, tradeRecordService.update(100L, input).getBrokerAccountId());
+        }
 
         @Test
         @DisplayName("更新存在的记录 - 应成功并重新计算金额")

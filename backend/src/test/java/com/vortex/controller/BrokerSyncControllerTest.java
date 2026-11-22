@@ -66,7 +66,7 @@ class BrokerSyncControllerTest {
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals("ERROR", response.getBody().get("status"));
-        verify(batchService, never()).createBatch(any(), any(), any());
+        verify(batchService, never()).createBatch(any(), any(), any(), any(), any());
     }
 
     @Test
@@ -77,7 +77,7 @@ class BrokerSyncControllerTest {
         ResponseEntity<Map<String, Object>> response = controller.triggerSync(request);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        verify(batchService, never()).createBatch(any(), any(), any());
+        verify(batchService, never()).createBatch(any(), any(), any(), any(), any());
     }
 
     @Test
@@ -88,7 +88,7 @@ class BrokerSyncControllerTest {
         batch.setId(1L);
         batch.setBrokerCode("ibkr");
         batch.setStatus("PENDING");
-        when(batchService.createBatch(eq("ibkr"), any(), any())).thenReturn(batch);
+        when(batchService.createBatch(eq("ibkr"), any(), any(), any(), any())).thenReturn(batch);
 
         ResponseEntity<Map<String, Object>> response = controller.triggerSync(request);
 
@@ -104,9 +104,7 @@ class BrokerSyncControllerTest {
         when(brokerSyncService.isSupported("ibkr")).thenReturn(true);
         BrokerSyncBatch batch = new BrokerSyncBatch();
         batch.setId(2L);
-        when(batchService.createBatch(eq("ibkr"),
-                eq(LocalDate.of(2026, 1, 15)),
-                eq(LocalDate.of(2026, 2, 15)))).thenReturn(batch);
+        when(batchService.createBatch(eq("ibkr"), eq(LocalDate.of(2026, 1, 15)), eq(LocalDate.of(2026, 2, 15)), any(), any())).thenReturn(batch);
 
         ResponseEntity<Map<String, Object>> response = controller.triggerSync(request);
 

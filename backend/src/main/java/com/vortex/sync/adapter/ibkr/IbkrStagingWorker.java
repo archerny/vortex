@@ -45,11 +45,13 @@ public class IbkrStagingWorker {
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public boolean stageOrder(Long batchId, IbkrOrderRecord order) {
+        if (order.getAccountId() != null) order.setAccountId(order.getAccountId().trim());
+        IbkrRecordContent.requireId("accountId", order.getAccountId());
         String orderId = order.getOrderID();
         IbkrRecordContent.requireId("orderID", orderId);
         IbkrStagedOrder staged = mapToStagedOrder(batchId, order);
 
-        var existing = stagedOrderRepository.findByOrderId(orderId);
+        var existing = stagedOrderRepository.findByAccountIdAndOrderId(order.getAccountId(), orderId);
         if (existing.isPresent()) {
             IbkrRecordContent.requireSameOrder(existing.get(), staged);
             logger.debug("[IbkrStaging] Order already staged, skipping: orderId={}", orderId);
@@ -71,12 +73,14 @@ public class IbkrStagingWorker {
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public boolean stageTradeConfirm(Long batchId, IbkrTradeConfirm confirm) {
+        if (confirm.getAccountId() != null) confirm.setAccountId(confirm.getAccountId().trim());
+        IbkrRecordContent.requireId("accountId", confirm.getAccountId());
         String tradeId = confirm.getTradeID();
         IbkrRecordContent.requireId("tradeID", tradeId);
         IbkrRecordContent.requireId("orderID", confirm.getOrderID());
         IbkrStagedTradeConfirm staged = mapToStagedTradeConfirm(batchId, confirm);
 
-        var existing = stagedTradeConfirmRepository.findByTradeId(tradeId);
+        var existing = stagedTradeConfirmRepository.findByAccountIdAndTradeId(confirm.getAccountId(), tradeId);
         if (existing.isPresent()) {
             IbkrRecordContent.requireSameConfirm(existing.get(), staged);
             logger.debug("[IbkrStaging] TradeConfirm already staged, skipping: tradeId={}", tradeId);

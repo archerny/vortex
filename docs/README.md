@@ -10,6 +10,7 @@
 | 开发前端 | [前端指南](frontend-guide.md) · [添加页面](frontend-guide.md#添加页面) |
 | 构建与分发 | [部署脚本指南](../deploy/README.md) |
 | 录入与撤销市场事件 | [市场事件操作](market-events.md) |
+| 券商及托管账户管理 | [账户、真实 ID 与多账户迁移](accounts.md) |
 | 券商接入与失败处理 | [同步指南](broker-sync/README.md) · [恢复指南](broker-sync/recovery.md) |
 | 测试与隔离验收 | [单测规范](unit-test-spec.md) · [e2e 运行器](../e2e/README.md) |
 | 未修复事项与验收证据 | [TODO](TODO.md) · [归档及补充证据](TODO-ARCHIVE.md) |

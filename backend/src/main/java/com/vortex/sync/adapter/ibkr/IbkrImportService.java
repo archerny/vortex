@@ -1,12 +1,12 @@
 package com.vortex.sync.adapter.ibkr;
 
-import com.vortex.entity.Broker;
+import com.vortex.entity.BrokerAccount;
 import com.vortex.entity.IbkrStagedOrder;
 import com.vortex.entity.TradeRecord;
 import com.vortex.entity.enums.AssetType;
 import com.vortex.entity.enums.TradeTrigger;
 import com.vortex.entity.enums.TriggerRefType;
-import com.vortex.repository.BrokerRepository;
+import com.vortex.repository.BrokerAccountRepository;
 import com.vortex.repository.IbkrStagedOrderRepository;
 import com.vortex.repository.TradeRecordRepository;
 import com.vortex.sync.core.CategorizedSyncException;
@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * IBKR import service.
@@ -44,20 +43,20 @@ public class IbkrImportService {
 
     private static final Logger logger = LoggerFactory.getLogger(IbkrImportService.class);
 
-    private static final String BROKER_CODE = "ibkr";
-
     private final IbkrStagedOrderRepository stagedOrderRepository;
     private final TradeRecordRepository tradeRecordRepository;
-    private final BrokerRepository brokerRepository;
+    private final BrokerAccountRepository accountRepository;
     private final IbkrImportWorker importWorker;
+    private final com.vortex.repository.BrokerSyncBatchRepository batches;
 
     public IbkrImportService(IbkrStagedOrderRepository stagedOrderRepository,
                              TradeRecordRepository tradeRecordRepository,
-                             BrokerRepository brokerRepository,
-                             IbkrImportWorker importWorker) {
+                             BrokerAccountRepository accountRepository,
+                             IbkrImportWorker importWorker, com.vortex.repository.BrokerSyncBatchRepository batches) {
+        this.batches = batches;
         this.stagedOrderRepository = stagedOrderRepository;
         this.tradeRecordRepository = tradeRecordRepository;
-        this.brokerRepository = brokerRepository;
+        this.accountRepository = accountRepository;
         this.importWorker = importWorker;
     }
 
@@ -81,15 +80,17 @@ public class IbkrImportService {
      * @param batchId the batch ID
      */
     public void importAll(Long batchId) {
-        // Resolve broker_id once for the entire batch
-        Long brokerId = resolveBrokerId();
+        // Resolve the fixed owner selected by this batch
+        BrokerAccount owner = resolveAccount(batchId);
+        Long brokerId = owner.getBrokerId();
+        Long brokerAccountId = owner.getId();
 
         List<IbkrStagedOrder> pendingOrders = stagedOrderRepository.findByBatchIdAndStatus(batchId, "PENDING");
         logger.info("[IbkrImport] Starting import: batchId={}, pendingOrders={}", batchId, pendingOrders.size());
 
         for (IbkrStagedOrder staged : pendingOrders) {
             try {
-                importWorker.importSingleOrder(batchId, brokerId, staged);
+                importWorker.importSingleOrder(batchId, brokerId, brokerAccountId, staged);
             } catch (ImportOneFailedException e) {
                 markFailedSafely(e.getStaged(), formatStagedError(e.getStaged(), e.getCause()));
             } catch (Exception e) {
@@ -183,10 +184,10 @@ public class IbkrImportService {
 
     // ============ Helpers ============
 
-    private Long resolveBrokerId() {
-        Optional<Broker> brokerOpt = brokerRepository.findByBrokerCode(BROKER_CODE);
-        return brokerOpt.map(Broker::getId)
-                .orElseThrow(() -> new IllegalStateException(
-                        "Broker not found for code: " + BROKER_CODE + ". Ensure brokers table has a record with broker_code='ibkr'"));
+    private BrokerAccount resolveAccount(Long batchId) {
+        Long key = batches.findById(batchId).map(com.vortex.entity.BrokerSyncBatch::getBrokerAccountId)
+                .orElseThrow(() -> new IllegalStateException("Sync batch has no managed account"));
+        return accountRepository.findById(key)
+                .orElseThrow(() -> new IllegalStateException("Managed account not found for sync batch"));
     }
 }

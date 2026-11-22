@@ -32,6 +32,14 @@ public class SyncRequest {
      */
     private String endTime;
 
+    private Long brokerAccountId;
+    @com.fasterxml.jackson.annotation.JsonProperty(access = com.fasterxml.jackson.annotation.JsonProperty.Access.READ_ONLY)
+    private String accountId;
+    public Long getBrokerAccountId() { return brokerAccountId; }
+    public void setBrokerAccountId(Long value) { brokerAccountId = value; }
+    public String getAccountId() { return accountId; }
+    public void setAccountId(String value) { accountId = value; }
+
     // ============ Constructors ============
 
     public SyncRequest() {

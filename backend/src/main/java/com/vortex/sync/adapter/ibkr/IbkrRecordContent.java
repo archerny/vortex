@@ -165,6 +165,7 @@ final class IbkrRecordContent {
         Map<String, String> fields = new LinkedHashMap<>();
         fields.put("tradeDate", Objects.toString(row.getTradeDate(), null));
         fields.put("brokerId", Objects.toString(row.getBrokerId(), null));
+        fields.put("brokerAccountId", Objects.toString(row.getBrokerAccountId(), null));
         fields.put("assetType", Objects.toString(row.getAssetType(), null));
         fields.put("symbol", row.getSymbol());
         fields.put("underlyingSymbol", row.getUnderlyingSymbol());

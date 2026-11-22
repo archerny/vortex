@@ -2,13 +2,13 @@
 
 ## 注册和路由
 
-`BrokerSyncAdapter#getBrokerCode()` 返回稳定的技术标识。Spring收集适配器组件，`BrokerSyncService`以该标识构建路由。数据库`brokers.broker_code`关联实际记账账户，发现接口只返回已绑定且启用的账户，发现结果本身不检查API凭据；路由在请求券商前再次拒绝缺失或停用账户。IBKR配置页另取数据库凭据的就绪状态。账户新建／更新保存非空唯一代码，活动批次阻止绑定变更、停用及删除。导入阶段从该记录取得`broker_id`。见 [账户服务](../../backend/src/main/java/com/vortex/service/BrokerService.java)、[路由服务](../../backend/src/main/java/com/vortex/sync/core/BrokerSyncService.java)和 [0046](../../design/0046-2026-11-20-ibkr-settings-database-snapshots.md)。
+`BrokerSyncAdapter#getBrokerCode()` 返回稳定的技术标识。Spring收集适配器组件，`BrokerSyncService`以该标识构建路由。数据库 `brokers.broker_code` 关联券商主数据，`broker_accounts` 保存该券商下多个实际记账账户。发现接口检查券商资料存在，不检查 API 凭据；页面通过账户连接 API 读取各账户就绪状态。路由验证本地账户主键、所属券商、真实 ID 及账户启停，并将本地账户与真实 ID 写入批次。连接保存只写该账户凭证，导入从持久化批次取得固定本地账户及券商归属。活动批次期间仍可修改资料／凭证；所属券商不可变，关联账本或批次的账户不可删除。见 [账户服务](../../backend/src/main/java/com/vortex/service/BrokerAccountService.java)、[连接服务](../../backend/src/main/java/com/vortex/service/BrokerSyncConnectionService.java)、[路由服务](../../backend/src/main/java/com/vortex/sync/core/BrokerSyncService.java)和 [0047](../../design/0047-2026-11-21-broker-accounts-and-sync-connections.md)。
 
 每个适配器都须提供同一技术标识的 `BrokerCleanupStrategy`。启动时清理服务检查策略是否覆盖已注册的适配器，并拒绝同一标识的重复清理策略。新增暂存表时应持有 `batch_id` 并纳入该券商策略，正式交易由框架统一按 `sync_batch_id` 清理。见 [清理策略接口](../../backend/src/main/java/com/vortex/sync/core/BrokerCleanupStrategy.java)和 [清理服务](../../backend/src/main/java/com/vortex/sync/core/SyncBatchCleanupService.java)。
 
 ## 两阶段写入与失败处理
 
-1. 使用执行器注入的 `batchId`。先拉取调用方指定范围内的数据，进入 `STAGING` 后写入券商暂存表，进入 `IMPORTING` 后处理暂存订单。
+1. 使用执行器注入的 `batchId` 及已验证的本地账户主键、真实账户 ID 快照。按账户读取凭证，拉取结果校验真实账户一致，不能从报表重新选择记账账户。先拉取调用方指定范围内的数据，进入 `STAGING` 后写入券商暂存表，进入 `IMPORTING` 后处理暂存订单。
 2. 适配器委托独立的 Worker Bean，以 `REQUIRES_NEW` 事务写入暂存记录或导入单条订单。发生导入异常时，在导入事务之外重新加载该暂存行，并在新的事务中写入 `FAILED` 和错误信息。正常过滤出的失败可以由尚可提交的单条事务写入。
 3. 导入结束后从数据库统计 `FAILED` 和残留行。现有两种适配器将 `IMPORTED`、`SKIPPED`、`FAILED` 之外的状态视为残留。只要失败或残留计数大于零，适配器报告整批失败，执行器调用统一清理。无数据或所有新暂存行均按已定义的规则跳过时，可以成功结束。
 4. 当前批次清理成功后，可以重新触发同一范围。暂存业务键和正式表外部订单键负责去重。当前没有持久化的增量游标。

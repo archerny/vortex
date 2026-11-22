@@ -97,9 +97,10 @@ public class TigerSyncAdapter implements BrokerSyncAdapter {
         Long batchId = request.getBatchId();
 
         // 1. Check configuration
-        if (!tigerApiProperties.isConfigured()) {
+        TigerApiProperties.Credentials credentials = tigerApiProperties.credentials(request.getBrokerAccountId());
+        if (request.getBrokerAccountId() == null || !credentials.isConfigured() || !java.util.Objects.equals(request.getAccountId(), credentials.account())) {
             logger.error("[TigerSync] batch={} [AUTH] Tiger API credentials not configured. " +
-                    "Please set broker.tiger.* properties in application-local.properties", batchId);
+                    "Please configure the managed account connection on Sync Management", batchId);
             return SyncResult.failure(getBrokerCode(),
                     CategorizedSyncException.format(FailureCategory.AUTH, null,
                             "Tiger API credentials not configured"),
@@ -108,9 +109,9 @@ public class TigerSyncAdapter implements BrokerSyncAdapter {
 
         try {
             // 2. Initialize client
-            TigerHttpClient client = createClient();
+            TigerHttpClient client = createClient(credentials);
             logger.info("[TigerSync] batch={} Tiger API client initialized, account: {}",
-                    batchId, tigerApiProperties.getAccount());
+                    batchId, credentials.account());
 
             // 3. Resolve date range (phase=FETCHING already set by BrokerSyncAsyncExecutor)
             LocalDate endDate = resolveEndDate(request);
@@ -118,8 +119,12 @@ public class TigerSyncAdapter implements BrokerSyncAdapter {
             logger.info("[TigerSync] batch={} Sync date range: {} ~ {}", batchId, startDate, endDate);
 
             // 4. Fetch all filled orders in 90-day windows
-            List<TigerOrderRecord> allRecords = fetchOrdersInWindows(client, batchId, startDate, endDate);
+            List<TigerOrderRecord> allRecords = fetchOrdersInWindows(client, credentials.account(), batchId, startDate, endDate);
             logger.info("[TigerSync] batch={} Total fetched: {} filled orders", batchId, allRecords.size());
+            if (allRecords.stream().anyMatch(record -> !credentials.account().equals(record.getAccount()))) {
+                throw new CategorizedSyncException(FailureCategory.UNRECOGNIZED, null,
+                        "Tiger order account does not match the selected managed account");
+            }
             logRecordsForDebug(allRecords);
 
             // 5. Stage into tiger_staged_orders
@@ -243,11 +248,11 @@ public class TigerSyncAdapter implements BrokerSyncAdapter {
      * Create a TigerHttpClient instance using credentials from TigerApiProperties
      * (no dependency on tiger_openapi_config.properties file).
      */
-    private TigerHttpClient createClient() {
-        ClientConfig clientConfig = ClientConfig.DEFAULT_CONFIG;
-        clientConfig.tigerId = tigerApiProperties.getTigerId();
-        clientConfig.defaultAccount = tigerApiProperties.getAccount();
-        clientConfig.privateKey = tigerApiProperties.getPrivateKey();
+    TigerHttpClient createClient(TigerApiProperties.Credentials credentials) {
+        ClientConfig clientConfig = new ClientConfig();
+        clientConfig.tigerId = credentials.tigerId();
+        clientConfig.defaultAccount = credentials.account();
+        clientConfig.privateKey = credentials.privateKey();
 
         return TigerHttpClient.getInstance().clientConfig(clientConfig);
     }
@@ -278,7 +283,7 @@ public class TigerSyncAdapter implements BrokerSyncAdapter {
      * <p>Tiger API's {@code get_filled_orders} requires start_time and end_time within 90 days.
      * The server returns the full list per window (no client-side pagination).
      */
-    private List<TigerOrderRecord> fetchOrdersInWindows(TigerHttpClient client, Long batchId,
+    private List<TigerOrderRecord> fetchOrdersInWindows(TigerHttpClient client, String account, Long batchId,
                                                         LocalDate startDate, LocalDate endDate) {
         List<TigerOrderRecord> allRecords = new ArrayList<>();
 
@@ -294,7 +299,7 @@ public class TigerSyncAdapter implements BrokerSyncAdapter {
             }
 
             logger.info("[TigerSync] batch={} Fetching window: {} ~ {}", batchId, windowStart, windowEnd);
-            List<TigerOrderRecord> windowRecords = fetchFilledOrders(client, batchId, windowStart, windowEnd);
+            List<TigerOrderRecord> windowRecords = fetchFilledOrders(client, account, batchId, windowStart, windowEnd);
             allRecords.addAll(windowRecords);
             logger.info("[TigerSync] batch={} Window {} ~ {} returned {} records",
                     batchId, windowStart, windowEnd, windowRecords.size());
@@ -317,11 +322,11 @@ public class TigerSyncAdapter implements BrokerSyncAdapter {
      * <p>An empty result (response ok but zero orders) is still returned as an empty
      * list, which is the normal "no activity in this window" case.
      */
-    private List<TigerOrderRecord> fetchFilledOrders(TigerHttpClient client, Long batchId,
+    private List<TigerOrderRecord> fetchFilledOrders(TigerHttpClient client, String account, Long batchId,
                                                      LocalDate startDate, LocalDate endDate) {
         QueryOrderRequest request = new QueryOrderRequest(MethodName.FILLED_ORDERS);
         String bizContent = AccountParamBuilder.instance()
-                .account(tigerApiProperties.getAccount())
+                .account(account)
                 .startDate(startDate.format(DATE_FORMATTER))
                 .endDate(endDate.format(DATE_FORMATTER))
                 .buildJson();

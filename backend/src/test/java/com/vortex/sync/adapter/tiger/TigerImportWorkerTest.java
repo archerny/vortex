@@ -86,14 +86,14 @@ class TigerImportWorkerTest {
         @DisplayName("should save TradeRecord and mark staged order IMPORTED")
         void shouldImportSuccessfully() {
             TigerStagedOrder staged = validStockOrder();
-            when(tradeRecordRepository.existsByExternalBrokerAndExternalId("tiger", "T-123456"))
+            when(tradeRecordRepository.existsByBrokerAccountIdAndExternalBrokerAndExternalId(1L, "tiger", "T-123456"))
                     .thenReturn(false);
 
-            TradeRecord persisted = new TradeRecord();
+            TradeRecord persisted = new TradeRecord(); persisted.setBrokerAccountId(1L);
             persisted.setId(9001L);
             when(tradeRecordRepository.save(any(TradeRecord.class))).thenReturn(persisted);
 
-            worker.importOne(1L, 42L, staged);
+            worker.importOne(1L, 42L, 1L, staged);
 
             // A TradeRecord should have been persisted
             ArgumentCaptor<TradeRecord> trCaptor = ArgumentCaptor.forClass(TradeRecord.class);
@@ -123,10 +123,10 @@ class TigerImportWorkerTest {
         @DisplayName("should skip when already imported in trade_records")
         void shouldSkipAlreadyImported() {
             TigerStagedOrder staged = validStockOrder();
-            when(tradeRecordRepository.existsByExternalBrokerAndExternalId("tiger", "T-123456"))
+            when(tradeRecordRepository.existsByBrokerAccountIdAndExternalBrokerAndExternalId(1L, "tiger", "T-123456"))
                     .thenReturn(true);
 
-            worker.importOne(1L, 42L, staged);
+            worker.importOne(1L, 42L, 1L, staged);
 
             assertEquals("SKIPPED", staged.getStatus());
             assertNotNull(staged.getErrorMessage());
@@ -140,10 +140,10 @@ class TigerImportWorkerTest {
         void shouldSkipZeroFilledQuantity() {
             TigerStagedOrder staged = validStockOrder();
             staged.setFilledQuantity("0");
-            when(tradeRecordRepository.existsByExternalBrokerAndExternalId("tiger", "T-123456"))
+            when(tradeRecordRepository.existsByBrokerAccountIdAndExternalBrokerAndExternalId(1L, "tiger", "T-123456"))
                     .thenReturn(false);
 
-            worker.importOne(1L, 42L, staged);
+            worker.importOne(1L, 42L, 1L, staged);
 
             assertEquals("SKIPPED", staged.getStatus());
             verify(tradeRecordRepository, never()).save(any(TradeRecord.class));
@@ -162,10 +162,10 @@ class TigerImportWorkerTest {
         void shouldFailUnsupportedSecType() {
             TigerStagedOrder staged = validStockOrder();
             staged.setSecType("FUT");
-            when(tradeRecordRepository.existsByExternalBrokerAndExternalId("tiger", "T-123456"))
+            when(tradeRecordRepository.existsByBrokerAccountIdAndExternalBrokerAndExternalId(1L, "tiger", "T-123456"))
                     .thenReturn(false);
 
-            worker.importOne(1L, 42L, staged);
+            worker.importOne(1L, 42L, 1L, staged);
 
             assertEquals("FAILED", staged.getStatus());
             assertNotNull(staged.getErrorMessage());
@@ -178,10 +178,10 @@ class TigerImportWorkerTest {
         void shouldFailOptionEventAttrDesc() {
             TigerStagedOrder staged = validStockOrder();
             staged.setAttrDesc("Exercise");
-            when(tradeRecordRepository.existsByExternalBrokerAndExternalId("tiger", "T-123456"))
+            when(tradeRecordRepository.existsByBrokerAccountIdAndExternalBrokerAndExternalId(1L, "tiger", "T-123456"))
                     .thenReturn(false);
 
-            worker.importOne(1L, 42L, staged);
+            worker.importOne(1L, 42L, 1L, staged);
 
             assertEquals("FAILED", staged.getStatus());
             assertNotNull(staged.getErrorMessage());
@@ -201,7 +201,7 @@ class TigerImportWorkerTest {
             var conflict = new com.vortex.service.MarketEventConflictException("HISTORY_LOCKED", "synthetic history locked",
                     1L, com.vortex.entity.enums.TriggerRefType.STOCK_SPLIT, java.time.LocalDate.of(2026, 3, 10), java.util.Set.of("AAPL"));
             org.mockito.Mockito.doThrow(conflict).when(eventHistory).assertHistoryWritable(any(TradeRecord.class));
-            ImportOneFailedException error = assertThrows(ImportOneFailedException.class, () -> worker.importOne(1L, 42L, staged));
+            ImportOneFailedException error = assertThrows(ImportOneFailedException.class, () -> worker.importOne(1L, 42L, 1L, staged));
             assertSame(conflict, error.getCause());
             assertEquals(com.vortex.sync.core.FailureCategory.UNRECOGNIZED, conflict.getCategory());
             verify(tradeRecordRepository, never()).save(any());
@@ -213,7 +213,7 @@ class TigerImportWorkerTest {
         @DisplayName("should throw ImportOneFailedException when save() throws")
         void shouldThrowWhenSaveThrows() {
             TigerStagedOrder staged = validStockOrder();
-            when(tradeRecordRepository.existsByExternalBrokerAndExternalId("tiger", "T-123456"))
+            when(tradeRecordRepository.existsByBrokerAccountIdAndExternalBrokerAndExternalId(1L, "tiger", "T-123456"))
                     .thenReturn(false);
             when(tradeRecordRepository.save(any(TradeRecord.class)))
                     .thenThrow(new RuntimeException("DB down"));
@@ -223,7 +223,7 @@ class TigerImportWorkerTest {
             // wraps + rethrows so TigerImportService can invoke markFailed()
             // in a fresh tx via the Spring AOP proxy.
             ImportOneFailedException ex = assertThrows(ImportOneFailedException.class,
-                    () -> worker.importOne(1L, 42L, staged));
+                    () -> worker.importOne(1L, 42L, 1L, staged));
             assertSame(staged, ex.getStaged());
             assertEquals("DB down", ex.getCause().getMessage());
 
@@ -238,11 +238,11 @@ class TigerImportWorkerTest {
         void shouldThrowWhenMappingThrows() {
             TigerStagedOrder staged = validStockOrder();
             staged.setAvgFillPrice("not-a-number");
-            when(tradeRecordRepository.existsByExternalBrokerAndExternalId("tiger", "T-123456"))
+            when(tradeRecordRepository.existsByBrokerAccountIdAndExternalBrokerAndExternalId(1L, "tiger", "T-123456"))
                     .thenReturn(false);
 
             ImportOneFailedException ex = assertThrows(ImportOneFailedException.class,
-                    () -> worker.importOne(1L, 42L, staged));
+                    () -> worker.importOne(1L, 42L, 1L, staged));
             assertSame(staged, ex.getStaged());
             assertNotNull(ex.getCause());
 

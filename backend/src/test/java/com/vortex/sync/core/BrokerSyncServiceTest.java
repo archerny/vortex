@@ -42,17 +42,21 @@ class BrokerSyncServiceTest {
     }
 
     private BrokerSyncService createService(BrokerSyncAdapter... adapters) {
-        return new BrokerSyncService(List.of(adapters), brokerRepository);
+        return new BrokerSyncService(List.of(adapters), brokerRepository, com.vortex.fixtures.AccountFixtures.service("SYNTH-ACCOUNT"));
     }
 
     @Test
     void missingOrDisabledAccountCannotFetchBrokerData() {
         var service = createService(ibkrAdapter);
         assertFalse(service.sync(new SyncRequest("ibkr")).isSuccess());
-        var disabled = new Broker("Synthetic", "US"); disabled.setIsActive(false);
-        when(brokerRepository.findByBrokerCode("ibkr")).thenReturn(Optional.of(disabled));
+        var broker = new Broker("Synthetic", "US"); broker.setId(1L);
+        when(brokerRepository.findByBrokerCode("ibkr")).thenReturn(Optional.of(broker));
+        var account = new com.vortex.entity.BrokerAccount(); account.setId(1L); account.setBrokerId(1L); account.setIsActive(false);
+        var accounts = mock(com.vortex.service.BrokerAccountService.class);
+        when(accounts.resolve(null, 1L)).thenReturn(account);
+        service = new BrokerSyncService(List.of(ibkrAdapter), brokerRepository, accounts);
         assertFalse(service.sync(new SyncRequest("ibkr")).isSuccess());
-        assertTrue(service.getSupportedBrokerInfos().isEmpty());
+        assertEquals(1, service.getSupportedBrokerInfos().size());
         verify(ibkrAdapter, never()).sync(any());
     }
 
@@ -169,7 +173,7 @@ class BrokerSyncServiceTest {
         @Test
         @DisplayName("should return empty list when no adapters registered")
         void shouldReturnEmptyListWhenNoAdapters() {
-            BrokerSyncService service = new BrokerSyncService(Collections.emptyList(), brokerRepository);
+            BrokerSyncService service = new BrokerSyncService(Collections.emptyList(), brokerRepository, com.vortex.fixtures.AccountFixtures.service("SYNTH-ACCOUNT"));
             List<BrokerSyncInfo> infos = service.getSupportedBrokerInfos();
 
             assertNotNull(infos);

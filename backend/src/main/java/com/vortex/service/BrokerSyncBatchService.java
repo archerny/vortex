@@ -71,6 +71,12 @@ public class BrokerSyncBatchService {
         }
     }
 
+    public List<BrokerSyncBatch> listBatches(String brokerCode, String status, Long brokerAccountId) {
+        var batches = listBatches(brokerCode, status);
+        return brokerAccountId == null ? batches : batches.stream()
+                .filter(batch -> brokerAccountId.equals(batch.getBrokerAccountId())).toList();
+    }
+
     /**
      * 根据ID查询单个同步批次
      */
@@ -99,6 +105,12 @@ public class BrokerSyncBatchService {
      */
     @Transactional
     public BrokerSyncBatch createBatch(String brokerCode, LocalDate syncDateFrom, LocalDate syncDateTo) {
+        return createBatch(brokerCode, syncDateFrom, syncDateTo, null, null);
+    }
+
+    @Transactional
+    public BrokerSyncBatch createBatch(String brokerCode, LocalDate syncDateFrom, LocalDate syncDateTo,
+                                       Long brokerAccountId, String accountId) {
         writeLock.acquire();
         // Fast-path: surface the conflicting batch's ID/status if any.
         batchRepository.findFirstByStatusInOrderByIdDesc(ACTIVE_STATUSES)
@@ -114,6 +126,8 @@ public class BrokerSyncBatchService {
 
         BrokerSyncBatch batch = new BrokerSyncBatch();
         batch.setBrokerCode(brokerCode);
+        batch.setBrokerAccountId(brokerAccountId);
+        batch.setAccountId(accountId);
         batch.setSyncDateFrom(syncDateFrom != null ? syncDateFrom : LocalDate.now());
         batch.setSyncDateTo(syncDateTo != null ? syncDateTo : LocalDate.now());
         batch.setStatus("PENDING");

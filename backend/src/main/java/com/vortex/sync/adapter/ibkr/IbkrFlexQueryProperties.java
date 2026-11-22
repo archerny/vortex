@@ -21,6 +21,7 @@ public class IbkrFlexQueryProperties {
     /** Trade Confirm 类型 Flex Query 的 ID */
     private String tradeConfirmQueryId;
     private volatile Supplier<Credentials> credentialSource;
+    private volatile java.util.function.LongFunction<Credentials> accountCredentialSource;
 
     public record Credentials(String token, String queryId) {
         @Override public String toString() { return "Credentials[redacted]"; }
@@ -28,7 +29,15 @@ public class IbkrFlexQueryProperties {
 
     public void useDatabaseCredentials(Supplier<Credentials> source) { credentialSource = source; }
 
+    public void useAccountCredentials(java.util.function.LongFunction<Credentials> source) { accountCredentialSource = source; }
+
+    public Credentials credentials(Long brokerAccountId) {
+        if (accountCredentialSource == null) return credentials();
+        return brokerAccountId == null ? new Credentials(null, null) : accountCredentialSource.apply(brokerAccountId);
+    }
+
     public Credentials credentials() {
+        if (accountCredentialSource != null) return credentials((Long) null);
         Supplier<Credentials> source = credentialSource;
         return source == null ? new Credentials(flexToken, tradeConfirmQueryId) : source.get();
     }

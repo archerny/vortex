@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, Table, Tag, Button, message, Modal, Form, Input, Select, DatePicker, InputNumber, Spin } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { fetchAllCashFlowRecords, createCashFlowRecord } from '../services/cashFlowApi';
-import { fetchAllBrokers } from '../services/brokerApi';
+import { fetchBrokerAccounts, accountLabel } from '../services/brokerAccountApi';
 import { useAmountVisibility } from '../contexts/AmountVisibilityContext';
 
 // 记录类型映射
@@ -20,12 +20,12 @@ const currencyColorMap = {
 
 const CashFlow = () => {
   const [cashFlowData, setCashFlowData] = useState([]);
-  const [brokerList, setBrokerList] = useState([]);
+  const [accountList, setAccountList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm();
-  const [selectedBrokerId, setSelectedBrokerId] = useState(null);
+  const [selectedAccountId, setSelectedAccountId] = useState(null);
   const { amountVisible } = useAmountVisibility();
 
   // 加载出入金记录
@@ -51,11 +51,11 @@ const CashFlow = () => {
   };
 
   // 加载券商列表（用于新增表单的券商下拉）
-  const loadBrokers = async () => {
+  const loadAccounts = async () => {
     try {
-      const result = await fetchAllBrokers();
+      const result = await fetchBrokerAccounts();
       if (result.status === 'SUCCESS') {
-        setBrokerList(result.data || []);
+        setAccountList(result.data || []);
       }
     } catch (error) {
       console.error('Failed to fetch broker list:', error);
@@ -65,11 +65,13 @@ const CashFlow = () => {
   // 组件加载时获取数据
   useEffect(() => {
     loadCashFlowRecords();
-    loadBrokers();
+    loadAccounts();
   }, []);
 
   // 出入金记录表格列定义
   const cashFlowColumns = [
+    { title: '账户 ID', dataIndex: ['brokerAccount', 'accountId'], key: 'accountId', render: (value) => value || '待补全' },
+    { title: '账户名称', dataIndex: ['brokerAccount', 'accountName'], key: 'accountName' },
     {
       title: '日期',
       dataIndex: 'recordDate',
@@ -159,7 +161,7 @@ const CashFlow = () => {
           // 构建提交数据，日期格式化为 YYYY-MM-DD
           const submitData = {
             recordDate: values.date.format('YYYY-MM-DD'),
-            brokerId: values.brokerId,
+            brokerAccountId: values.brokerAccountId,
             recordType: values.recordType,
             amount: values.amount,
             currency: values.currency,
@@ -190,8 +192,8 @@ const CashFlow = () => {
   };
 
   // 根据券商筛选过滤数据
-  const filteredCashFlowData = selectedBrokerId
-    ? cashFlowData.filter((item) => item.broker?.id === selectedBrokerId)
+  const filteredCashFlowData = selectedAccountId
+    ? cashFlowData.filter((item) => item.brokerAccountId === selectedAccountId)
     : cashFlowData;
 
   return (
@@ -199,17 +201,17 @@ const CashFlow = () => {
       title="出入金记录"
       extra={
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <span>券商筛选：</span>
+          <span>账户筛选：</span>
           <Select
             allowClear
-            placeholder="全部券商"
+            placeholder="全部账户"
             style={{ width: 200 }}
-            value={selectedBrokerId}
-            onChange={(value) => setSelectedBrokerId(value)}
+            value={selectedAccountId}
+            onChange={(value) => setSelectedAccountId(value)}
           >
-            {brokerList.map((broker) => (
+            {accountList.map((broker) => (
               <Select.Option key={broker.id} value={broker.id}>
-                {broker.brokerName}
+                {accountLabel(broker)}
               </Select.Option>
             ))}
           </Select>
@@ -256,16 +258,16 @@ const CashFlow = () => {
           </Form.Item>
 
           <Form.Item
-            label="券商"
-            name="brokerId"
-            rules={[{ required: true, message: '请选择券商' }]}
+            label="托管账户"
+            name="brokerAccountId"
+            rules={[{ required: true, message: '请选择托管账户' }]}
           >
-            <Select placeholder="请选择券商">
-              {brokerList
+            <Select placeholder="请选择托管账户">
+              {accountList
                 .filter((b) => b.isActive)
                 .map((broker) => (
                   <Select.Option key={broker.id} value={broker.id}>
-                    {broker.brokerName}
+                    {accountLabel(broker)}
                   </Select.Option>
                 ))}
             </Select>

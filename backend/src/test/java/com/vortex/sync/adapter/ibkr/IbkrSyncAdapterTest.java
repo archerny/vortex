@@ -76,15 +76,15 @@ class IbkrSyncAdapterTest {
         @Test
         @DisplayName("should return failure when credentials not configured")
         void shouldFailWhenNotConfigured() {
-            when(properties.isConfigured()).thenReturn(false);
-            SyncRequest request = new SyncRequest("ibkr");
+            when(properties.credentials(any())).thenReturn(new IbkrFlexQueryProperties.Credentials(null, null));
+            SyncRequest request = com.vortex.fixtures.AccountFixtures.request("U12345", "ibkr");
 
             SyncResult result = adapter.sync(request);
 
             assertFalse(result.isSuccess());
             assertEquals("ibkr", result.getBrokerCode());
             assertTrue(result.getMessage().contains("not configured"));
-            verify(flexClient, never()).fetchReport(anyString(), anyString());
+            verify(flexClient, never()).fetchReport(org.mockito.ArgumentMatchers.eq(1L), anyString(), anyString());
         }
     }
 
@@ -95,13 +95,13 @@ class IbkrSyncAdapterTest {
         @Test
         @DisplayName("should fetch single window for short date range")
         void shouldFetchSingleWindow() {
-            when(properties.isConfigured()).thenReturn(true);
+            when(properties.credentials(any())).thenReturn(new IbkrFlexQueryProperties.Credentials("synthetic-token", "123"));
 
-            SyncRequest request = new SyncRequest("ibkr", "2026-01-01", "2026-03-31");
+            SyncRequest request = com.vortex.fixtures.AccountFixtures.request("U12345", "ibkr", "2026-01-01", "2026-03-31");
             request.setBatchId(1L);
 
             String xmlReport = "<FlexQueryResponse/>";
-            when(flexClient.fetchReport("20260101", "20260331")).thenReturn(xmlReport);
+            when(flexClient.fetchReport(1L, "20260101", "20260331")).thenReturn(xmlReport);
 
             FlexQueryParseResult parseResult = buildParseResult(50, 5);
             when(flexQueryParser.parse(xmlReport)).thenReturn(parseResult);
@@ -119,7 +119,7 @@ class IbkrSyncAdapterTest {
             assertEquals("ibkr", result.getBrokerCode());
             assertTrue(result.getDurationMs() >= 0);
 
-            verify(flexClient, times(1)).fetchReport(anyString(), anyString());
+            verify(flexClient, times(1)).fetchReport(org.mockito.ArgumentMatchers.eq(1L), anyString(), anyString());
             verify(batchService).updatePhase(1L, "STAGING");
             verify(batchService).updatePhase(1L, "IMPORTING");
             verify(stagingService).stageAll(eq(1L), anyList(), anyList());
@@ -134,16 +134,16 @@ class IbkrSyncAdapterTest {
         @Test
         @DisplayName("should split into multiple windows for >365 day range")
         void shouldSplitIntoMultipleWindows() {
-            when(properties.isConfigured()).thenReturn(true);
+            when(properties.credentials(any())).thenReturn(new IbkrFlexQueryProperties.Credentials("synthetic-token", "123"));
 
             // 2024-01-01 to 2026-01-01 = 731 days → 2 windows (no overlap):
             //   Window 1: 2024-01-01 ~ 2024-12-31 (365 days)
             //   Window 2: 2025-01-01 ~ 2026-01-01 (366 days, capped to endDate)
-            SyncRequest request = new SyncRequest("ibkr", "2024-01-01", "2026-01-01");
+            SyncRequest request = com.vortex.fixtures.AccountFixtures.request("U12345", "ibkr", "2024-01-01", "2026-01-01");
             request.setBatchId(2L);
 
             // Mock: each window returns some orders
-            when(flexClient.fetchReport(anyString(), anyString())).thenReturn("<xml/>");
+            when(flexClient.fetchReport(org.mockito.ArgumentMatchers.eq(1L), anyString(), anyString())).thenReturn("<xml/>");
 
             FlexQueryParseResult result1 = buildParseResult(100, 10);
             FlexQueryParseResult result2 = buildParseResult(100, 10);
@@ -161,19 +161,19 @@ class IbkrSyncAdapterTest {
             assertEquals(200, result.getTotalRecords());
 
             // Should have made 2 calls (windows don't overlap, each ≤365 days)
-            verify(flexClient, times(2)).fetchReport(anyString(), anyString());
+            verify(flexClient, times(2)).fetchReport(org.mockito.ArgumentMatchers.eq(1L), anyString(), anyString());
         }
 
         @Test
         @DisplayName("should fetch single day when startDate equals endDate")
         void shouldFetchSingleDayWhenStartEqualsEnd() {
-            when(properties.isConfigured()).thenReturn(true);
+            when(properties.credentials(any())).thenReturn(new IbkrFlexQueryProperties.Credentials("synthetic-token", "123"));
 
             // Same day: 2026-03-15 to 2026-03-15
-            SyncRequest request = new SyncRequest("ibkr", "2026-03-15", "2026-03-15");
+            SyncRequest request = com.vortex.fixtures.AccountFixtures.request("U12345", "ibkr", "2026-03-15", "2026-03-15");
             request.setBatchId(6L);
 
-            when(flexClient.fetchReport("20260315", "20260315")).thenReturn("<xml/>");
+            when(flexClient.fetchReport(1L, "20260315", "20260315")).thenReturn("<xml/>");
 
             FlexQueryParseResult parseResult = buildParseResult(3, 1);
             when(flexQueryParser.parse("<xml/>")).thenReturn(parseResult);
@@ -186,22 +186,22 @@ class IbkrSyncAdapterTest {
 
             assertTrue(result.isSuccess());
             assertEquals(3, result.getTotalRecords());
-            verify(flexClient, times(1)).fetchReport("20260315", "20260315");
+            verify(flexClient, times(1)).fetchReport(1L, "20260315", "20260315");
         }
 
         @Test
         @DisplayName("should split into 3 windows for >730 day range")
         void shouldSplitIntoThreeWindows() {
-            when(properties.isConfigured()).thenReturn(true);
+            when(properties.credentials(any())).thenReturn(new IbkrFlexQueryProperties.Credentials("synthetic-token", "123"));
 
             // 2023-01-01 to 2026-01-02 = 732 days → 3 windows:
             //   Window 1: 2023-01-01 ~ 2024-01-01 (365+1 days, capped by plusDays(365))
             //   Window 2: 2024-01-02 ~ 2025-01-01
             //   Window 3: 2025-01-02 ~ 2026-01-02 (capped to endDate)
-            SyncRequest request = new SyncRequest("ibkr", "2023-01-01", "2026-01-02");
+            SyncRequest request = com.vortex.fixtures.AccountFixtures.request("U12345", "ibkr", "2023-01-01", "2026-01-02");
             request.setBatchId(7L);
 
-            when(flexClient.fetchReport(anyString(), anyString())).thenReturn("<xml/>");
+            when(flexClient.fetchReport(org.mockito.ArgumentMatchers.eq(1L), anyString(), anyString())).thenReturn("<xml/>");
 
             FlexQueryParseResult r1 = buildParseResult(50, 5);
             FlexQueryParseResult r2 = buildParseResult(50, 5);
@@ -219,7 +219,7 @@ class IbkrSyncAdapterTest {
 
             assertTrue(result.isSuccess());
             assertEquals(150, result.getTotalRecords());
-            verify(flexClient, times(3)).fetchReport(anyString(), anyString());
+            verify(flexClient, times(3)).fetchReport(org.mockito.ArgumentMatchers.eq(1L), anyString(), anyString());
         }
     }
 
@@ -230,13 +230,13 @@ class IbkrSyncAdapterTest {
         @Test
         @DisplayName("should use defaults when no dates provided")
         void shouldUseDefaultDates() {
-            when(properties.isConfigured()).thenReturn(true);
+            when(properties.credentials(any())).thenReturn(new IbkrFlexQueryProperties.Credentials("synthetic-token", "123"));
 
-            SyncRequest request = new SyncRequest("ibkr");
+            SyncRequest request = com.vortex.fixtures.AccountFixtures.request("U12345", "ibkr");
             request.setBatchId(3L);
             // No startTime/endTime set
 
-            when(flexClient.fetchReport(anyString(), anyString())).thenReturn("<xml/>");
+            when(flexClient.fetchReport(org.mockito.ArgumentMatchers.eq(1L), anyString(), anyString())).thenReturn("<xml/>");
 
             FlexQueryParseResult parseResult = buildParseResult(10, 1);
             when(flexQueryParser.parse("<xml/>")).thenReturn(parseResult);
@@ -251,7 +251,7 @@ class IbkrSyncAdapterTest {
             assertEquals(10, result.getTotalRecords());
 
             // Should call fetchReport exactly once (90 days default ≤ 365)
-            verify(flexClient, times(1)).fetchReport(anyString(), anyString());
+            verify(flexClient, times(1)).fetchReport(org.mockito.ArgumentMatchers.eq(1L), anyString(), anyString());
         }
     }
 
@@ -262,11 +262,11 @@ class IbkrSyncAdapterTest {
         @Test
         @DisplayName("should return failure when flexClient throws exception")
         void shouldReturnFailureOnClientException() {
-            when(properties.isConfigured()).thenReturn(true);
+            when(properties.credentials(any())).thenReturn(new IbkrFlexQueryProperties.Credentials("synthetic-token", "123"));
 
-            SyncRequest request = new SyncRequest("ibkr", "2026-01-01", "2026-03-31");
+            SyncRequest request = com.vortex.fixtures.AccountFixtures.request("U12345", "ibkr", "2026-01-01", "2026-03-31");
             request.setBatchId(4L);
-            when(flexClient.fetchReport(anyString(), anyString()))
+            when(flexClient.fetchReport(org.mockito.ArgumentMatchers.eq(1L), anyString(), anyString()))
                     .thenThrow(new IbkrFlexClient.IbkrFlexClientException("HTTP 500 error"));
 
             SyncResult result = adapter.sync(request);
@@ -280,11 +280,11 @@ class IbkrSyncAdapterTest {
         @Test
         @DisplayName("should return failure when parser throws exception")
         void shouldReturnFailureOnParseException() {
-            when(properties.isConfigured()).thenReturn(true);
+            when(properties.credentials(any())).thenReturn(new IbkrFlexQueryProperties.Credentials("synthetic-token", "123"));
 
-            SyncRequest request = new SyncRequest("ibkr", "2026-01-01", "2026-03-31");
+            SyncRequest request = com.vortex.fixtures.AccountFixtures.request("U12345", "ibkr", "2026-01-01", "2026-03-31");
             request.setBatchId(5L);
-            when(flexClient.fetchReport(anyString(), anyString())).thenReturn("<bad-xml/>");
+            when(flexClient.fetchReport(org.mockito.ArgumentMatchers.eq(1L), anyString(), anyString())).thenReturn("<bad-xml/>");
             when(flexQueryParser.parse("<bad-xml/>"))
                     .thenThrow(new FlexQueryParser.FlexQueryParseException("Invalid XML"));
 
@@ -302,12 +302,12 @@ class IbkrSyncAdapterTest {
         @Test
         @DisplayName("should skip phase updates when batchId is null")
         void shouldSkipPhaseUpdatesWhenBatchIdNull() {
-            when(properties.isConfigured()).thenReturn(true);
+            when(properties.credentials(any())).thenReturn(new IbkrFlexQueryProperties.Credentials("synthetic-token", "123"));
 
-            SyncRequest request = new SyncRequest("ibkr", "2026-01-01", "2026-03-31");
+            SyncRequest request = com.vortex.fixtures.AccountFixtures.request("U12345", "ibkr", "2026-01-01", "2026-03-31");
             // batchId NOT set (remains null)
 
-            when(flexClient.fetchReport(anyString(), anyString())).thenReturn("<xml/>");
+            when(flexClient.fetchReport(org.mockito.ArgumentMatchers.eq(1L), anyString(), anyString())).thenReturn("<xml/>");
 
             FlexQueryParseResult parseResult = buildParseResult(5, 0);
             when(flexQueryParser.parse("<xml/>")).thenReturn(parseResult);
@@ -335,12 +335,12 @@ class IbkrSyncAdapterTest {
         @Test
         @DisplayName("should return failure when residual non-terminal rows exist")
         void shouldReturnFailureWhenResidualPending() {
-            when(properties.isConfigured()).thenReturn(true);
+            when(properties.credentials(any())).thenReturn(new IbkrFlexQueryProperties.Credentials("synthetic-token", "123"));
 
-            SyncRequest request = new SyncRequest("ibkr", "2026-01-01", "2026-03-31");
+            SyncRequest request = com.vortex.fixtures.AccountFixtures.request("U12345", "ibkr", "2026-01-01", "2026-03-31");
             request.setBatchId(9L);
 
-            when(flexClient.fetchReport(anyString(), anyString())).thenReturn("<xml/>");
+            when(flexClient.fetchReport(org.mockito.ArgumentMatchers.eq(1L), anyString(), anyString())).thenReturn("<xml/>");
             FlexQueryParseResult parseResult = buildParseResult(10, 0);
             when(flexQueryParser.parse("<xml/>")).thenReturn(parseResult);
 
@@ -366,12 +366,12 @@ class IbkrSyncAdapterTest {
         @Test
         @DisplayName("should return failure combining failed + residual counts")
         void shouldReturnFailureForBothFailedAndResidual() {
-            when(properties.isConfigured()).thenReturn(true);
+            when(properties.credentials(any())).thenReturn(new IbkrFlexQueryProperties.Credentials("synthetic-token", "123"));
 
-            SyncRequest request = new SyncRequest("ibkr", "2026-01-01", "2026-03-31");
+            SyncRequest request = com.vortex.fixtures.AccountFixtures.request("U12345", "ibkr", "2026-01-01", "2026-03-31");
             request.setBatchId(10L);
 
-            when(flexClient.fetchReport(anyString(), anyString())).thenReturn("<xml/>");
+            when(flexClient.fetchReport(org.mockito.ArgumentMatchers.eq(1L), anyString(), anyString())).thenReturn("<xml/>");
             FlexQueryParseResult parseResult = buildParseResult(10, 0);
             when(flexQueryParser.parse("<xml/>")).thenReturn(parseResult);
 
@@ -395,12 +395,12 @@ class IbkrSyncAdapterTest {
         @Test
         @DisplayName("should succeed when residualCount is 0 (happy path unaffected)")
         void shouldSucceedWithoutResidual() {
-            when(properties.isConfigured()).thenReturn(true);
+            when(properties.credentials(any())).thenReturn(new IbkrFlexQueryProperties.Credentials("synthetic-token", "123"));
 
-            SyncRequest request = new SyncRequest("ibkr", "2026-01-01", "2026-03-31");
+            SyncRequest request = com.vortex.fixtures.AccountFixtures.request("U12345", "ibkr", "2026-01-01", "2026-03-31");
             request.setBatchId(11L);
 
-            when(flexClient.fetchReport(anyString(), anyString())).thenReturn("<xml/>");
+            when(flexClient.fetchReport(org.mockito.ArgumentMatchers.eq(1L), anyString(), anyString())).thenReturn("<xml/>");
             FlexQueryParseResult parseResult = buildParseResult(5, 0);
             when(flexQueryParser.parse("<xml/>")).thenReturn(parseResult);
 
@@ -435,7 +435,7 @@ class IbkrSyncAdapterTest {
 
         List<IbkrOrderRecord> orders = new ArrayList<>();
         for (int i = 0; i < orderCount; i++) {
-            IbkrOrderRecord order = new IbkrOrderRecord();
+            IbkrOrderRecord order = new IbkrOrderRecord(); order.setAccountId("SYNTH-ACCOUNT");
             order.setOrderID(String.valueOf(1000 + i));
             order.setSymbol("AAPL");
             order.setBuySell("BUY");
@@ -450,7 +450,7 @@ class IbkrSyncAdapterTest {
 
         List<IbkrTradeConfirm> confirms = new ArrayList<>();
         for (int i = 0; i < tradeConfirmCount; i++) {
-            IbkrTradeConfirm confirm = new IbkrTradeConfirm();
+            IbkrTradeConfirm confirm = new IbkrTradeConfirm(); confirm.setAccountId("SYNTH-ACCOUNT");
             confirm.setTradeID("TC" + (2000 + i));
             confirm.setOrderID(String.valueOf(1000 + i));
             confirm.setSymbol("AAPL");

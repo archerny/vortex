@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Table, Tag, Button, message, Modal, Form, Input, Select, Tooltip, Spin, Row, Col, Switch } from 'antd';
+import { Card, Table, Tag, Button, message, Modal, Form, Input, Select } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { fetchAllBrokers, createBroker, updateBroker } from '../services/brokerApi';
 
@@ -92,45 +92,7 @@ const BrokerManagement = () => {
       filters: countryOptions.map((item) => ({ text: item.label, value: item.value })),
       onFilter: (value, record) => record.country === value,
     },
-    {
-      title: '描述',
-      dataIndex: 'description',
-      key: 'description',
-      ellipsis: true,
-      render: (text) => (
-        <Tooltip title={text}>
-          <span style={{ color: '#666' }}>{text || '-'}</span>
-        </Tooltip>
-      ),
-    },
-    {
-      title: '关联邮箱',
-      dataIndex: 'email',
-      key: 'email',
-      render: (text) => <span style={{ color: '#666' }}>{text || '-'}</span>,
-    },
-    {
-      title: '关联电话',
-      dataIndex: 'phone',
-      key: 'phone',
-      render: (text) => <span style={{ color: '#666' }}>{text || '-'}</span>,
-    },
-    {
-      title: '状态',
-      dataIndex: 'isActive',
-      key: 'isActive',
-      width: 100,
-      render: (isActive) => (
-        <Tag color={isActive ? 'green' : 'default'}>
-          {isActive ? '启用' : '禁用'}
-        </Tag>
-      ),
-      filters: [
-        { text: '启用', value: true },
-        { text: '禁用', value: false },
-      ],
-      onFilter: (value, record) => record.isActive === value,
-    },
+    { title: '券商简介', dataIndex: 'introduction', key: 'introduction', ellipsis: true, render: (value) => value || '-' },
     {
       title: '操作',
       key: 'action',
@@ -147,11 +109,8 @@ const BrokerManagement = () => {
     form.setFieldsValue({
       brokerName: record.brokerName,
       brokerCode: record.brokerCode,
-      isActive: record.isActive,
+      introduction: record.introduction,
       country: record.country,
-      description: record.description,
-      email: record.email,
-      phone: record.phone,
     });
     setIsModalOpen(true);
   };
@@ -213,7 +172,7 @@ const BrokerManagement = () => {
 
   return (
     <Card
-      title="券商账户管理"
+      title="券商管理"
       extra={
         <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
           新增券商
@@ -226,7 +185,6 @@ const BrokerManagement = () => {
         loading={loading}
         rowKey="id"
         pagination={{ pageSize: 10 }}
-        rowClassName={(record) => (!record.isActive ? 'inactive-row' : '')}
       />
 
       <Modal
@@ -249,30 +207,10 @@ const BrokerManagement = () => {
           layout="vertical"
           style={{ marginTop: 20 }}
         >
-          <Row gutter={16}>
-            <Col flex="auto">
-              <Form.Item
-                label="券商名称"
-                name="brokerName"
-                rules={[
-                  { required: true, message: '请输入券商名称' },
-                  { max: 100, message: '券商名称不能超过100个字符' },
-                ]}
-              >
-                <Input placeholder="请输入券商名称" />
-              </Form.Item>
-            </Col>
-            <Col flex="100px">
-              <Form.Item
-                label="状态"
-                name="isActive"
-                valuePropName="checked"
-                initialValue={true}
-              >
-                <Switch checkedChildren="启用" unCheckedChildren="禁用" />
-              </Form.Item>
-            </Col>
-          </Row>
+          <Form.Item label="券商名称" name="brokerName"
+            rules={[{ required: true, message: '请输入券商名称' }, { max: 100, message: '券商名称不能超过100个字符' }]}>
+            <Input placeholder="请输入券商名称" />
+          </Form.Item>
 
           <Form.Item
             label="国家/地区"
@@ -290,7 +228,7 @@ const BrokerManagement = () => {
           <Form.Item
             label="券商代码"
             name="brokerCode"
-            tooltip="用于关联同步适配器（如 IBKR、Tiger）。若为手动录入的券商，留空即可。"
+            tooltip="选择券商对应的同步适配器代码；托管账户请在账户管理录入。"
           >
             <Select
               placeholder="请选择券商代码（选填，留空表示手动录入）"
@@ -301,36 +239,8 @@ const BrokerManagement = () => {
             />
           </Form.Item>
 
-          <Form.Item
-            label="描述"
-            name="description"
-            rules={[{ max: 200, message: '描述不能超过200个字符' }]}
-          >
-            <Input.TextArea
-              placeholder="请输入券商账户描述（选填）"
-              rows={3}
-              showCount
-              maxLength={200}
-            />
-          </Form.Item>
-
-          <Form.Item
-            label="关联邮箱"
-            name="email"
-            rules={[
-              { type: 'email', message: '请输入有效的邮箱地址' },
-              { max: 100, message: '邮箱不能超过100个字符' },
-            ]}
-          >
-            <Input placeholder="请输入关联邮箱（选填）" />
-          </Form.Item>
-
-          <Form.Item
-            label="关联电话"
-            name="phone"
-            rules={[{ max: 30, message: '电话号码不能超过30个字符' }]}
-          >
-            <Input placeholder="请输入关联电话（选填）" />
+          <Form.Item label="券商简介" name="introduction" rules={[{ max: 500, message: '券商简介不能超过500个字符' }]}>
+            <Input.TextArea placeholder="介绍券商的基本情况（选填）" rows={4} showCount maxLength={500} />
           </Form.Item>
         </Form>
       </Modal>

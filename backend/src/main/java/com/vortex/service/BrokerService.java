@@ -2,15 +2,12 @@ package com.vortex.service;
 
 import com.vortex.entity.Broker;
 import com.vortex.repository.BrokerRepository;
-import com.vortex.repository.BrokerSyncBatchRepository;
-import com.vortex.sync.exception.SyncConflictException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * 券商业务逻辑服务
@@ -20,11 +17,8 @@ import java.util.Set;
 public class BrokerService {
 
     private final BrokerRepository brokerRepository;
-    private final LedgerWriteLock lock;
-    private final BrokerSyncBatchRepository batches;
-
-    public BrokerService(BrokerRepository brokerRepository, LedgerWriteLock lock, BrokerSyncBatchRepository batches) {
-        this.brokerRepository = brokerRepository; this.lock = lock; this.batches = batches;
+    public BrokerService(BrokerRepository brokerRepository) {
+        this.brokerRepository = brokerRepository;
     }
 
     /**
@@ -49,20 +43,6 @@ public class BrokerService {
     }
 
     /**
-     * 查询所有启用的券商
-     */
-    public List<Broker> findActiveBrokers() {
-        return brokerRepository.findByIsActive(true);
-    }
-
-    /**
-     * 查询所有未启用的券商
-     */
-    public List<Broker> findInactiveBrokers() {
-        return brokerRepository.findByIsActive(false);
-    }
-
-    /**
      * 根据国家/地区查询券商
      */
     public List<Broker> findByCountry(String country) {
@@ -82,9 +62,8 @@ public class BrokerService {
     @Transactional
     public Broker create(Broker broker) {
         if (broker.getId() != null) throw new IllegalArgumentException("新建券商不能指定已有ID");
-        lock.acquire();
+        broker.setIntroduction(normalizeIntroduction(broker.getIntroduction()));
         String code = normalizeCode(broker.getBrokerCode());
-        if (code != null) ensureIdle();
         requireAvailableCode(code, null); broker.setBrokerCode(code);
         if (brokerRepository.existsByBrokerName(broker.getBrokerName())) {
             throw new IllegalArgumentException("Broker name already exists: " + broker.getBrokerName());
@@ -97,7 +76,6 @@ public class BrokerService {
      */
     @Transactional
     public Broker update(Long id, Broker brokerData) {
-        lock.acquire();
         Broker existing = brokerRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Broker not found, ID: " + id));
 
@@ -108,18 +86,12 @@ public class BrokerService {
         }
 
         String code = normalizeCode(brokerData.getBrokerCode());
-        if (!Objects.equals(code, existing.getBrokerCode())
-                || (existing.getBrokerCode() != null && !Objects.equals(existing.getIsActive(), brokerData.getIsActive()))) {
-            ensureIdle();
-        }
         requireAvailableCode(code, id);
+        String introduction = normalizeIntroduction(brokerData.getIntroduction());
         existing.setBrokerCode(code);
         existing.setBrokerName(brokerData.getBrokerName());
         existing.setCountry(brokerData.getCountry());
-        existing.setDescription(brokerData.getDescription());
-        existing.setEmail(brokerData.getEmail());
-        existing.setPhone(brokerData.getPhone());
-        existing.setIsActive(brokerData.getIsActive());
+        if (brokerData.getIntroduction() != null) existing.setIntroduction(introduction);
 
         return brokerRepository.save(existing);
     }
@@ -129,22 +101,8 @@ public class BrokerService {
      */
     @Transactional
     public void delete(Long id) {
-        lock.acquire();
-        Broker broker = brokerRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Broker not found"));
-        if (broker.getBrokerCode() != null) ensureIdle();
+        brokerRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Broker not found"));
         brokerRepository.deleteById(id);
-    }
-
-    @Transactional
-    public Broker bindSyncCode(Long id, String code) {
-        lock.acquire(); ensureIdle();
-        Broker broker = brokerRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("请选择已有的记账账户"));
-        if (!Boolean.TRUE.equals(broker.getIsActive())) throw new IllegalArgumentException("请先启用该记账账户");
-        if (broker.getBrokerCode() != null && !broker.getBrokerCode().equals(code)) {
-            throw new IllegalArgumentException("该账户已关联其他券商同步，请选择未关联的账户");
-        }
-        requireAvailableCode(code, id); broker.setBrokerCode(code);
-        return brokerRepository.save(broker);
     }
 
     private String normalizeCode(String code) {
@@ -154,15 +112,17 @@ public class BrokerService {
         return value;
     }
 
+    private String normalizeIntroduction(String value) {
+        if (value == null) return null;
+        String text = value.trim();
+        if (text.length() > 500) throw new IllegalArgumentException("券商简介最多500字符");
+        return text.isEmpty() ? null : text;
+    }
+
     private void requireAvailableCode(String code, Long id) {
         if (code != null) brokerRepository.findByBrokerCode(code).ifPresent(other -> {
-            if (!Objects.equals(other.getId(), id)) throw new IllegalArgumentException("该同步券商已关联其他记账账户");
+            if (!Objects.equals(other.getId(), id)) throw new IllegalArgumentException("该券商代码已被其他券商使用");
         });
     }
 
-    private void ensureIdle() {
-        batches.findFirstByStatusInOrderByIdDesc(Set.of("PENDING", "PROCESSING", "CLEANUP_FAILED")).ifPresent(batch -> {
-            throw new SyncConflictException("同步进行中或清理未完成，暂不能更改同步账户", batch.getId(), batch.getStatus());
-        });
-    }
 }

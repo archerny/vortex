@@ -69,7 +69,7 @@ class IbkrImportWorkerTest {
     // ============ Test data builders ============
 
     private IbkrStagedOrder buildStkOrder(String orderId) {
-        IbkrStagedOrder staged = new IbkrStagedOrder();
+        IbkrStagedOrder staged = new IbkrStagedOrder(); staged.setAccountId("SYNTH-ACCOUNT");
         staged.setId(100L);
         staged.setBatchId(1L);
         staged.setStatus("PENDING");
@@ -125,15 +125,15 @@ class IbkrImportWorkerTest {
             staged.setOrderTime(null); staged.setOrderType(null); staged.setMultiplier(multiplier); staged.setPutCall(putCall);
             staged.setPrice("0"); staged.setAmount("0"); staged.setCommission("0"); staged.setTradeCharge("0");
             staged.setBuySell(code.equals("Ex") ? "SELL" : "BUY");
-            IbkrStagedTradeConfirm confirm = new IbkrStagedTradeConfirm(); confirm.setCode(code);
-            when(stagedTradeConfirmRepository.findByOrderId(staged.getOrderId())).thenReturn(List.of(confirm));
+            IbkrStagedTradeConfirm confirm = new IbkrStagedTradeConfirm(); confirm.setAccountId("SYNTH-ACCOUNT"); confirm.setCode(code);
+            when(stagedTradeConfirmRepository.findByAccountIdAndOrderId(org.mockito.ArgumentMatchers.nullable(String.class), org.mockito.ArgumentMatchers.eq(staged.getOrderId()))).thenReturn(List.of(confirm));
             if (valid) {
                 when(tradeRecordRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
-                importWorker.importSingleOrder(1L, 1L, staged);
+                importWorker.importSingleOrder(1L, 1L, 1L, staged);
                 assertEquals("IMPORTED", staged.getStatus()); verify(tradeRecordRepository).save(any());
             } else {
                 ImportOneFailedException failure = assertThrows(ImportOneFailedException.class,
-                        () -> importWorker.importSingleOrder(1L, 1L, staged));
+                        () -> importWorker.importSingleOrder(1L, 1L, 1L, staged));
                 CategorizedSyncException reason = assertInstanceOf(CategorizedSyncException.class, failure.getCause());
                 assertEquals(FailureCategory.UNRECOGNIZED, reason.getCategory());
                 assertTrue(reason.getMessage().contains("expected 100"));
@@ -146,18 +146,18 @@ class IbkrImportWorkerTest {
         void shouldSkipMatchingExistingEventWithoutRequiringHistoricMultiplier() {
             IbkrStagedOrder staged = buildOptOrder("SYNTH-REPEAT-OPTION");
             staged.setOrderTime(null); staged.setOrderType(null); staged.setMultiplier("100");
-            IbkrStagedTradeConfirm confirm = new IbkrStagedTradeConfirm(); confirm.setCode("A");
-            when(stagedTradeConfirmRepository.findByOrderId(staged.getOrderId())).thenReturn(List.of(confirm));
-            when(tradeRecordRepository.existsByExternalBrokerAndExternalId("ibkr", staged.getOrderId())).thenReturn(false, true);
+            IbkrStagedTradeConfirm confirm = new IbkrStagedTradeConfirm(); confirm.setAccountId("SYNTH-ACCOUNT"); confirm.setCode("A");
+            when(stagedTradeConfirmRepository.findByAccountIdAndOrderId(org.mockito.ArgumentMatchers.nullable(String.class), org.mockito.ArgumentMatchers.eq(staged.getOrderId()))).thenReturn(List.of(confirm));
+            when(tradeRecordRepository.existsByBrokerAccountIdAndExternalBrokerAndExternalId(1L, "ibkr", staged.getOrderId())).thenReturn(false, true);
             var stored = new java.util.concurrent.atomic.AtomicReference<TradeRecord>();
             when(tradeRecordRepository.save(any())).thenAnswer(invocation -> {
                 TradeRecord record = invocation.getArgument(0); record.setId(500L); stored.set(record); return record;
             });
-            importWorker.importSingleOrder(1L, 1L, staged);
-            when(tradeRecordRepository.findByExternalBrokerAndExternalId("ibkr", staged.getOrderId()))
+            importWorker.importSingleOrder(1L, 1L, 1L, staged);
+            when(tradeRecordRepository.findByBrokerAccountIdAndExternalBrokerAndExternalId(1L, "ibkr", staged.getOrderId()))
                     .thenAnswer(invocation -> Optional.of(stored.get()));
             staged.setMultiplier(null);
-            importWorker.importSingleOrder(2L, 1L, staged);
+            importWorker.importSingleOrder(2L, 1L, 1L, staged);
             assertEquals("SKIPPED", staged.getStatus());
             assertEquals(1L, stored.get().getSyncBatchId());
             verify(tradeRecordRepository).save(any());
@@ -167,13 +167,13 @@ class IbkrImportWorkerTest {
         @DisplayName("should map STK order correctly")
         void shouldMapStkOrderCorrectly() {
             IbkrStagedOrder staged = buildStkOrder("ORD001");
-            when(tradeRecordRepository.existsByExternalBrokerAndExternalId("ibkr", "ORD001")).thenReturn(false);
+            when(tradeRecordRepository.existsByBrokerAccountIdAndExternalBrokerAndExternalId(1L, "ibkr", "ORD001")).thenReturn(false);
 
-            TradeRecord savedRecord = new TradeRecord();
+            TradeRecord savedRecord = new TradeRecord(); savedRecord.setBrokerAccountId(1L);
             savedRecord.setId(500L);
             when(tradeRecordRepository.save(any(TradeRecord.class))).thenReturn(savedRecord);
 
-            importWorker.importSingleOrder(1L, 1L, staged);
+            importWorker.importSingleOrder(1L, 1L, 1L, staged);
 
             ArgumentCaptor<TradeRecord> captor = ArgumentCaptor.forClass(TradeRecord.class);
             verify(tradeRecordRepository).save(captor.capture());
@@ -208,13 +208,13 @@ class IbkrImportWorkerTest {
         @DisplayName("should map OPT order with correct symbol format")
         void shouldMapOptOrderWithCorrectSymbol() {
             IbkrStagedOrder staged = buildOptOrder("ORD002");
-            when(tradeRecordRepository.existsByExternalBrokerAndExternalId("ibkr", "ORD002")).thenReturn(false);
+            when(tradeRecordRepository.existsByBrokerAccountIdAndExternalBrokerAndExternalId(1L, "ibkr", "ORD002")).thenReturn(false);
 
-            TradeRecord savedRecord = new TradeRecord();
+            TradeRecord savedRecord = new TradeRecord(); savedRecord.setBrokerAccountId(1L);
             savedRecord.setId(501L);
             when(tradeRecordRepository.save(any(TradeRecord.class))).thenReturn(savedRecord);
 
-            importWorker.importSingleOrder(1L, 1L, staged);
+            importWorker.importSingleOrder(1L, 1L, 1L, staged);
 
             ArgumentCaptor<TradeRecord> captor = ArgumentCaptor.forClass(TradeRecord.class);
             verify(tradeRecordRepository).save(captor.capture());
@@ -230,13 +230,13 @@ class IbkrImportWorkerTest {
         void shouldMapSellTradeType() {
             IbkrStagedOrder staged = buildStkOrder("ORD003");
             staged.setBuySell("SELL");
-            when(tradeRecordRepository.existsByExternalBrokerAndExternalId("ibkr", "ORD003")).thenReturn(false);
+            when(tradeRecordRepository.existsByBrokerAccountIdAndExternalBrokerAndExternalId(1L, "ibkr", "ORD003")).thenReturn(false);
 
-            TradeRecord savedRecord = new TradeRecord();
+            TradeRecord savedRecord = new TradeRecord(); savedRecord.setBrokerAccountId(1L);
             savedRecord.setId(502L);
             when(tradeRecordRepository.save(any(TradeRecord.class))).thenReturn(savedRecord);
 
-            importWorker.importSingleOrder(1L, 1L, staged);
+            importWorker.importSingleOrder(1L, 1L, 1L, staged);
 
             ArgumentCaptor<TradeRecord> captor = ArgumentCaptor.forClass(TradeRecord.class);
             verify(tradeRecordRepository).save(captor.capture());
@@ -255,13 +255,13 @@ class IbkrImportWorkerTest {
         @DisplayName("should skip duplicate records")
         void shouldSkipDuplicateRecords() {
             IbkrStagedOrder staged = buildStkOrder("ORD_DUP");
-            when(tradeRecordRepository.existsByExternalBrokerAndExternalId("ibkr", "ORD_DUP")).thenReturn(true);
-            TradeRecord existing = importWorker.mapToTradeRecord(99L, 1L, staged);
+            when(tradeRecordRepository.existsByBrokerAccountIdAndExternalBrokerAndExternalId(1L, "ibkr", "ORD_DUP")).thenReturn(true);
+            TradeRecord existing = importWorker.mapToTradeRecord(99L, 1L, 1L, staged);
             existing.setId(99L);
-            when(tradeRecordRepository.findByExternalBrokerAndExternalId("ibkr", "ORD_DUP"))
+            when(tradeRecordRepository.findByBrokerAccountIdAndExternalBrokerAndExternalId(1L, "ibkr", "ORD_DUP"))
                     .thenReturn(Optional.of(existing));
 
-            importWorker.importSingleOrder(1L, 1L, staged);
+            importWorker.importSingleOrder(1L, 1L, 1L, staged);
 
             verify(tradeRecordRepository, never()).save(any(TradeRecord.class));
             assertEquals("SKIPPED", staged.getStatus());
@@ -281,14 +281,14 @@ class IbkrImportWorkerTest {
         void shouldThrowWhenMappingThrows() {
             IbkrStagedOrder staged = buildStkOrder("ORD_ERR");
             staged.setTradeDate(null); // will cause parse error
-            when(tradeRecordRepository.existsByExternalBrokerAndExternalId("ibkr", "ORD_ERR")).thenReturn(false);
+            when(tradeRecordRepository.existsByBrokerAccountIdAndExternalBrokerAndExternalId(1L, "ibkr", "ORD_ERR")).thenReturn(false);
 
             // Per P0-1 fix: worker no longer saves FAILED itself — that would
             // run inside the rolled-back REQUIRES_NEW tx and be lost. It now
             // wraps + rethrows so IbkrImportService can invoke markFailed() in
             // a fresh tx via the Spring AOP proxy.
             ImportOneFailedException ex = assertThrows(ImportOneFailedException.class,
-                    () -> importWorker.importSingleOrder(1L, 1L, staged));
+                    () -> importWorker.importSingleOrder(1L, 1L, 1L, staged));
             assertSame(staged, ex.getStaged());
             assertNotNull(ex.getCause());
 
@@ -303,12 +303,12 @@ class IbkrImportWorkerTest {
         @DisplayName("should throw ImportOneFailedException when save() throws")
         void shouldThrowWhenSaveThrows() {
             IbkrStagedOrder staged = buildStkOrder("ORD_SAVE_ERR");
-            when(tradeRecordRepository.existsByExternalBrokerAndExternalId("ibkr", "ORD_SAVE_ERR")).thenReturn(false);
+            when(tradeRecordRepository.existsByBrokerAccountIdAndExternalBrokerAndExternalId(1L, "ibkr", "ORD_SAVE_ERR")).thenReturn(false);
             when(tradeRecordRepository.save(any(TradeRecord.class)))
                     .thenThrow(new RuntimeException("DB down"));
 
             ImportOneFailedException ex = assertThrows(ImportOneFailedException.class,
-                    () -> importWorker.importSingleOrder(1L, 1L, staged));
+                    () -> importWorker.importSingleOrder(1L, 1L, 1L, staged));
             assertSame(staged, ex.getStaged());
             assertEquals("DB down", ex.getCause().getMessage());
         }
@@ -368,17 +368,17 @@ class IbkrImportWorkerTest {
         @DisplayName("should detect BookTrade when orderTime and orderType are null")
         void shouldDetectBookTrade() {
             IbkrStagedOrder staged = buildBookTradeOrder("ORD_BOOK");
-            when(tradeRecordRepository.existsByExternalBrokerAndExternalId("ibkr", "ORD_BOOK")).thenReturn(false);
+            when(tradeRecordRepository.existsByBrokerAccountIdAndExternalBrokerAndExternalId(1L, "ibkr", "ORD_BOOK")).thenReturn(false);
 
-            IbkrStagedTradeConfirm confirm = new IbkrStagedTradeConfirm();
+            IbkrStagedTradeConfirm confirm = new IbkrStagedTradeConfirm(); confirm.setAccountId("SYNTH-ACCOUNT");
             confirm.setCode("Ex");
-            when(stagedTradeConfirmRepository.findByOrderId("ORD_BOOK")).thenReturn(List.of(confirm));
+            when(stagedTradeConfirmRepository.findByAccountIdAndOrderId(org.mockito.ArgumentMatchers.nullable(String.class), org.mockito.ArgumentMatchers.eq("ORD_BOOK"))).thenReturn(List.of(confirm));
 
-            TradeRecord savedRecord = new TradeRecord();
+            TradeRecord savedRecord = new TradeRecord(); savedRecord.setBrokerAccountId(1L);
             savedRecord.setId(600L);
             when(tradeRecordRepository.save(any(TradeRecord.class))).thenReturn(savedRecord);
 
-            importWorker.importSingleOrder(1L, 1L, staged);
+            importWorker.importSingleOrder(1L, 1L, 1L, staged);
 
             ArgumentCaptor<TradeRecord> captor = ArgumentCaptor.forClass(TradeRecord.class);
             verify(tradeRecordRepository).save(captor.capture());
@@ -392,17 +392,17 @@ class IbkrImportWorkerTest {
         @DisplayName("should detect Ep code as OPTION_EXPIRE")
         void shouldDetectExpireCode() {
             IbkrStagedOrder staged = buildBookTradeOrder("ORD_EXPIRE");
-            when(tradeRecordRepository.existsByExternalBrokerAndExternalId("ibkr", "ORD_EXPIRE")).thenReturn(false);
+            when(tradeRecordRepository.existsByBrokerAccountIdAndExternalBrokerAndExternalId(1L, "ibkr", "ORD_EXPIRE")).thenReturn(false);
 
-            IbkrStagedTradeConfirm confirm = new IbkrStagedTradeConfirm();
+            IbkrStagedTradeConfirm confirm = new IbkrStagedTradeConfirm(); confirm.setAccountId("SYNTH-ACCOUNT");
             confirm.setCode("Ep;P");
-            when(stagedTradeConfirmRepository.findByOrderId("ORD_EXPIRE")).thenReturn(List.of(confirm));
+            when(stagedTradeConfirmRepository.findByAccountIdAndOrderId(org.mockito.ArgumentMatchers.nullable(String.class), org.mockito.ArgumentMatchers.eq("ORD_EXPIRE"))).thenReturn(List.of(confirm));
 
-            TradeRecord savedRecord = new TradeRecord();
+            TradeRecord savedRecord = new TradeRecord(); savedRecord.setBrokerAccountId(1L);
             savedRecord.setId(601L);
             when(tradeRecordRepository.save(any(TradeRecord.class))).thenReturn(savedRecord);
 
-            importWorker.importSingleOrder(1L, 1L, staged);
+            importWorker.importSingleOrder(1L, 1L, 1L, staged);
 
             ArgumentCaptor<TradeRecord> captor = ArgumentCaptor.forClass(TradeRecord.class);
             verify(tradeRecordRepository).save(captor.capture());
@@ -413,17 +413,17 @@ class IbkrImportWorkerTest {
         @DisplayName("should detect A code as OPTION_ASSIGNED")
         void shouldDetectAssignedCode() {
             IbkrStagedOrder staged = buildBookTradeOrder("ORD_ASSIGN");
-            when(tradeRecordRepository.existsByExternalBrokerAndExternalId("ibkr", "ORD_ASSIGN")).thenReturn(false);
+            when(tradeRecordRepository.existsByBrokerAccountIdAndExternalBrokerAndExternalId(1L, "ibkr", "ORD_ASSIGN")).thenReturn(false);
 
-            IbkrStagedTradeConfirm confirm = new IbkrStagedTradeConfirm();
+            IbkrStagedTradeConfirm confirm = new IbkrStagedTradeConfirm(); confirm.setAccountId("SYNTH-ACCOUNT");
             confirm.setCode("A");
-            when(stagedTradeConfirmRepository.findByOrderId("ORD_ASSIGN")).thenReturn(List.of(confirm));
+            when(stagedTradeConfirmRepository.findByAccountIdAndOrderId(org.mockito.ArgumentMatchers.nullable(String.class), org.mockito.ArgumentMatchers.eq("ORD_ASSIGN"))).thenReturn(List.of(confirm));
 
-            TradeRecord savedRecord = new TradeRecord();
+            TradeRecord savedRecord = new TradeRecord(); savedRecord.setBrokerAccountId(1L);
             savedRecord.setId(602L);
             when(tradeRecordRepository.save(any(TradeRecord.class))).thenReturn(savedRecord);
 
-            importWorker.importSingleOrder(1L, 1L, staged);
+            importWorker.importSingleOrder(1L, 1L, 1L, staged);
 
             ArgumentCaptor<TradeRecord> captor = ArgumentCaptor.forClass(TradeRecord.class);
             verify(tradeRecordRepository).save(captor.capture());
@@ -437,11 +437,11 @@ class IbkrImportWorkerTest {
             // trigger_ref_type=NONE, producing garbage trade_records rows. It
             // now throws and routes through the FAILED → cleanup path.
             IbkrStagedOrder staged = buildBookTradeOrder("ORD_NO_CONF");
-            when(tradeRecordRepository.existsByExternalBrokerAndExternalId("ibkr", "ORD_NO_CONF")).thenReturn(false);
-            when(stagedTradeConfirmRepository.findByOrderId("ORD_NO_CONF")).thenReturn(Collections.emptyList());
+            when(tradeRecordRepository.existsByBrokerAccountIdAndExternalBrokerAndExternalId(1L, "ibkr", "ORD_NO_CONF")).thenReturn(false);
+            when(stagedTradeConfirmRepository.findByAccountIdAndOrderId(org.mockito.ArgumentMatchers.nullable(String.class), org.mockito.ArgumentMatchers.eq("ORD_NO_CONF"))).thenReturn(Collections.emptyList());
 
             ImportOneFailedException ex = assertThrows(ImportOneFailedException.class,
-                    () -> importWorker.importSingleOrder(1L, 1L, staged));
+                    () -> importWorker.importSingleOrder(1L, 1L, 1L, staged));
             assertSame(staged, ex.getStaged());
             assertInstanceOf(IllegalStateException.class, ex.getCause());
             assertTrue(ex.getCause().getMessage().contains("no associated TradeConfirm"),
@@ -455,14 +455,14 @@ class IbkrImportWorkerTest {
         @DisplayName("should throw ImportOneFailedException when BookTrade code is blank")
         void shouldThrowWhenBlankCode() {
             IbkrStagedOrder staged = buildBookTradeOrder("ORD_BLANK");
-            when(tradeRecordRepository.existsByExternalBrokerAndExternalId("ibkr", "ORD_BLANK")).thenReturn(false);
+            when(tradeRecordRepository.existsByBrokerAccountIdAndExternalBrokerAndExternalId(1L, "ibkr", "ORD_BLANK")).thenReturn(false);
 
-            IbkrStagedTradeConfirm confirm = new IbkrStagedTradeConfirm();
+            IbkrStagedTradeConfirm confirm = new IbkrStagedTradeConfirm(); confirm.setAccountId("SYNTH-ACCOUNT");
             confirm.setCode("   ");
-            when(stagedTradeConfirmRepository.findByOrderId("ORD_BLANK")).thenReturn(List.of(confirm));
+            when(stagedTradeConfirmRepository.findByAccountIdAndOrderId(org.mockito.ArgumentMatchers.nullable(String.class), org.mockito.ArgumentMatchers.eq("ORD_BLANK"))).thenReturn(List.of(confirm));
 
             ImportOneFailedException ex = assertThrows(ImportOneFailedException.class,
-                    () -> importWorker.importSingleOrder(1L, 1L, staged));
+                    () -> importWorker.importSingleOrder(1L, 1L, 1L, staged));
             assertInstanceOf(IllegalStateException.class, ex.getCause());
             assertTrue(ex.getCause().getMessage().contains("blank code"),
                     "expected 'blank code' in: " + ex.getCause().getMessage());
@@ -472,14 +472,14 @@ class IbkrImportWorkerTest {
         @DisplayName("should throw ImportOneFailedException when BookTrade code is unknown")
         void shouldThrowWhenUnknownCode() {
             IbkrStagedOrder staged = buildBookTradeOrder("ORD_UNK");
-            when(tradeRecordRepository.existsByExternalBrokerAndExternalId("ibkr", "ORD_UNK")).thenReturn(false);
+            when(tradeRecordRepository.existsByBrokerAccountIdAndExternalBrokerAndExternalId(1L, "ibkr", "ORD_UNK")).thenReturn(false);
 
-            IbkrStagedTradeConfirm confirm = new IbkrStagedTradeConfirm();
+            IbkrStagedTradeConfirm confirm = new IbkrStagedTradeConfirm(); confirm.setAccountId("SYNTH-ACCOUNT");
             confirm.setCode("XYZ;Q");
-            when(stagedTradeConfirmRepository.findByOrderId("ORD_UNK")).thenReturn(List.of(confirm));
+            when(stagedTradeConfirmRepository.findByAccountIdAndOrderId(org.mockito.ArgumentMatchers.nullable(String.class), org.mockito.ArgumentMatchers.eq("ORD_UNK"))).thenReturn(List.of(confirm));
 
             ImportOneFailedException ex = assertThrows(ImportOneFailedException.class,
-                    () -> importWorker.importSingleOrder(1L, 1L, staged));
+                    () -> importWorker.importSingleOrder(1L, 1L, 1L, staged));
             assertInstanceOf(IllegalStateException.class, ex.getCause());
             assertTrue(ex.getCause().getMessage().contains("did not match any known option event"),
                     "expected 'did not match' in: " + ex.getCause().getMessage());
@@ -489,17 +489,17 @@ class IbkrImportWorkerTest {
         @DisplayName("should detect GEA as OPTION_ASSIGNED")
         void shouldDetectGeaAssignedCode() {
             IbkrStagedOrder staged = buildBookTradeOrder("ORD_GEA");
-            when(tradeRecordRepository.existsByExternalBrokerAndExternalId("ibkr", "ORD_GEA")).thenReturn(false);
+            when(tradeRecordRepository.existsByBrokerAccountIdAndExternalBrokerAndExternalId(1L, "ibkr", "ORD_GEA")).thenReturn(false);
 
-            IbkrStagedTradeConfirm confirm = new IbkrStagedTradeConfirm();
+            IbkrStagedTradeConfirm confirm = new IbkrStagedTradeConfirm(); confirm.setAccountId("SYNTH-ACCOUNT");
             confirm.setCode("GEA");
-            when(stagedTradeConfirmRepository.findByOrderId("ORD_GEA")).thenReturn(List.of(confirm));
+            when(stagedTradeConfirmRepository.findByAccountIdAndOrderId(org.mockito.ArgumentMatchers.nullable(String.class), org.mockito.ArgumentMatchers.eq("ORD_GEA"))).thenReturn(List.of(confirm));
 
-            TradeRecord savedRecord = new TradeRecord();
+            TradeRecord savedRecord = new TradeRecord(); savedRecord.setBrokerAccountId(1L);
             savedRecord.setId(605L);
             when(tradeRecordRepository.save(any(TradeRecord.class))).thenReturn(savedRecord);
 
-            importWorker.importSingleOrder(1L, 1L, staged);
+            importWorker.importSingleOrder(1L, 1L, 1L, staged);
 
             ArgumentCaptor<TradeRecord> captor = ArgumentCaptor.forClass(TradeRecord.class);
             verify(tradeRecordRepository).save(captor.capture());
@@ -510,17 +510,17 @@ class IbkrImportWorkerTest {
         @DisplayName("Exercise codes should take priority over Expire in compound code")
         void exerciseShouldTakePriorityOverExpire() {
             IbkrStagedOrder staged = buildBookTradeOrder("ORD_COMPOUND");
-            when(tradeRecordRepository.existsByExternalBrokerAndExternalId("ibkr", "ORD_COMPOUND")).thenReturn(false);
+            when(tradeRecordRepository.existsByBrokerAccountIdAndExternalBrokerAndExternalId(1L, "ibkr", "ORD_COMPOUND")).thenReturn(false);
 
-            IbkrStagedTradeConfirm confirm = new IbkrStagedTradeConfirm();
+            IbkrStagedTradeConfirm confirm = new IbkrStagedTradeConfirm(); confirm.setAccountId("SYNTH-ACCOUNT");
             confirm.setCode("Ep;Ex");
-            when(stagedTradeConfirmRepository.findByOrderId("ORD_COMPOUND")).thenReturn(List.of(confirm));
+            when(stagedTradeConfirmRepository.findByAccountIdAndOrderId(org.mockito.ArgumentMatchers.nullable(String.class), org.mockito.ArgumentMatchers.eq("ORD_COMPOUND"))).thenReturn(List.of(confirm));
 
-            TradeRecord savedRecord = new TradeRecord();
+            TradeRecord savedRecord = new TradeRecord(); savedRecord.setBrokerAccountId(1L);
             savedRecord.setId(604L);
             when(tradeRecordRepository.save(any(TradeRecord.class))).thenReturn(savedRecord);
 
-            importWorker.importSingleOrder(1L, 1L, staged);
+            importWorker.importSingleOrder(1L, 1L, 1L, staged);
 
             ArgumentCaptor<TradeRecord> captor = ArgumentCaptor.forClass(TradeRecord.class);
             verify(tradeRecordRepository).save(captor.capture());
@@ -536,7 +536,7 @@ class IbkrImportWorkerTest {
     class BackfillTest {
 
         private TradeRecord stock() {
-            TradeRecord record = new TradeRecord();
+            TradeRecord record = new TradeRecord(); record.setBrokerAccountId(1L);
             record.setId(10L); record.setBrokerId(1L); record.setSyncBatchId(2L);
             record.setSymbol("SYNTH"); record.setUnderlyingSymbol("SYNTH");
             record.setTradeDate(LocalDate.of(2026, 1, 15)); record.setCurrency(Currency.USD);
@@ -558,7 +558,7 @@ class IbkrImportWorkerTest {
 
         private void candidates(TradeRecord stock, List<TradeRecord> options) {
             when(tradeRecordRepository.findById(10L)).thenReturn(Optional.of(stock));
-            when(tradeRecordRepository.findOptSideBookTradesForMatching(any(), any(), any(), any(), any(), any(), any()))
+            when(tradeRecordRepository.findOptSideBookTradesForMatching(org.mockito.ArgumentMatchers.eq(1L), any(), any(), any(), any(), any(), any(), any()))
                     .thenReturn(options);
         }
 

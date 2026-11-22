@@ -7,6 +7,7 @@ import { menuItems, menuKeyToPath, pathToMenuKey, menuKeyToParent } from '../con
 import Dashboard from '../pages/Dashboard';
 import CashFlow from '../pages/CashFlow';
 import BrokerManagement from '../pages/BrokerManagement';
+import BrokerAccountsManagement from '../pages/BrokerAccountsManagement';
 import TradeRecords from '../pages/trade/TradeRecords';
 import TradeRecordDetail from '../pages/trade/TradeRecordDetail';
 import StockProfitAnalysis from '../pages/profit/StockProfitAnalysis';
@@ -123,6 +124,8 @@ const AppLayout = () => {
         return <CashFlow />;
       case '6':
         return <BrokerManagement />;
+      case '11':
+        return <BrokerAccountsManagement />;
       case '3':
         return <TradeRecords />;
       case '4-1':

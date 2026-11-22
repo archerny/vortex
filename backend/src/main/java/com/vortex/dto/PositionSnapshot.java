@@ -30,6 +30,16 @@ public class PositionSnapshot {
     /** 券商名称 */
     private String brokerName;
 
+    private Long brokerAccountId;
+    private String accountId;
+    private String accountName;
+    public Long getBrokerAccountId() { return brokerAccountId; }
+    public void setBrokerAccountId(Long value) { brokerAccountId = value; }
+    public String getAccountId() { return accountId; }
+    public void setAccountId(String value) { accountId = value; }
+    public String getAccountName() { return accountName; }
+    public void setAccountName(String value) { accountName = value; }
+
     public PositionSnapshot() {
     }
 

@@ -18,6 +18,11 @@ import java.util.Optional;
  * 提供交易记录表的数据访问方法
  */
 public interface TradeRecordRepository extends BaseRepository<TradeRecord, Long> {
+    boolean existsByBrokerAccountIdAndExternalBrokerAndExternalId(Long brokerAccountId, String externalBroker, String externalId);
+    Optional<TradeRecord> findByBrokerAccountIdAndExternalBrokerAndExternalId(Long brokerAccountId, String externalBroker, String externalId);
+
+    List<TradeRecord> findByBrokerAccountIdAndIsDeletedFalseOrderByTradeDateDesc(Long brokerAccountId);
+
 
     boolean existsBySymbolInAndTradeDateGreaterThanEqualAndTradeTriggerNotAndIsDeletedFalse(
             java.util.Collection<String> symbols, LocalDate date, TradeTrigger excludedTrigger);
@@ -179,6 +184,9 @@ public interface TradeRecordRepository extends BaseRepository<TradeRecord, Long>
     boolean existsByTradeTriggerAndTriggerRefIdAndAssetTypeInAndIsDeletedFalse(
             TradeTrigger trigger, Long triggerRefId, List<AssetType> assetTypes);
 
+    boolean existsByTradeTriggerAndTriggerRefIdAndBrokerAccountIdNotAndIsDeletedFalse(
+            TradeTrigger trigger, Long triggerRefId, Long brokerAccountId);
+
     /**
      * Find STK-side BookTrade records that need trigger_ref_id back-fill.
      * These are records where:
@@ -211,9 +219,10 @@ public interface TradeRecordRepository extends BaseRepository<TradeRecord, Long>
             "AND t.assetType IN (:assetTypes) " +
             "AND t.underlyingSymbol = :underlyingSymbol " +
             "AND t.tradeDate = :tradeDate " +
-            "AND t.brokerId = :brokerId AND t.currency = :currency " +
+            "AND t.brokerAccountId = :brokerAccountId AND t.brokerId = :brokerId AND t.currency = :currency " +
             "AND t.isDeleted = false")
     List<TradeRecord> findOptSideBookTradesForMatching(
+            @Param("brokerAccountId") Long brokerAccountId,
             @Param("trigger") TradeTrigger trigger,
             @Param("refType") TriggerRefType refType,
             @Param("assetTypes") List<AssetType> assetTypes,

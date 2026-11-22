@@ -39,7 +39,7 @@ class MarketEventHistoryServiceTest {
     }
 
     TradeRecord trade(String symbol, LocalDate date) {
-        TradeRecord record = new TradeRecord();
+        TradeRecord record = new TradeRecord(); record.setBrokerAccountId(1L);
         record.setSymbol(symbol); record.setTradeDate(date); record.setBrokerId(999L);
         record.setTradeTrigger(TradeTrigger.MANUAL);
         return record;

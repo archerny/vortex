@@ -34,11 +34,13 @@ public class BrokerSyncService {
     private final Map<String, BrokerSyncAdapter> adapterMap;
 
     private final BrokerRepository brokerRepository;
+    private final com.vortex.service.BrokerAccountService accounts;
 
     /**
      * 构造方法：Spring 自动注入所有 BrokerSyncAdapter 实现
      */
-    public BrokerSyncService(List<BrokerSyncAdapter> adapters, BrokerRepository brokerRepository) {
+    public BrokerSyncService(List<BrokerSyncAdapter> adapters, BrokerRepository brokerRepository, com.vortex.service.BrokerAccountService accounts) {
+        this.accounts = accounts;
         this.brokerRepository = brokerRepository;
         this.adapterMap = adapters.stream()
                 .collect(Collectors.toMap(BrokerSyncAdapter::getBrokerCode, Function.identity()));
@@ -76,16 +78,28 @@ public class BrokerSyncService {
             return SyncResult.failure(brokerCode, errorMsg, 0);
         }
 
-        // Execute sync
-        var broker = brokerRepository.findByBrokerCode(brokerCode).orElse(null);
-        if (broker == null || !Boolean.TRUE.equals(broker.getIsActive())) {
-            return SyncResult.failure(brokerCode, "请先关联并启用该券商的记账账户", 0);
-        }
+        try { prepareRequest(request); }
+        catch (IllegalArgumentException error) { return SyncResult.failure(brokerCode, error.getMessage(), 0); }
         logger.info("[BrokerSync] Starting sync with {} adapter...", brokerCode);
         SyncResult result = adapter.sync(request);
         logger.info("[BrokerSync] Sync completed: {}", result);
 
         return result;
+    }
+
+    public void prepareRequest(SyncRequest request) {
+        Broker broker = brokerRepository.findByBrokerCode(request.getBrokerCode())
+                .orElseThrow(() -> new IllegalArgumentException("券商不存在"));
+        var account = accounts.resolve(request.getBrokerAccountId(), broker.getId());
+        if (!Boolean.TRUE.equals(account.getIsActive())) {
+            throw new IllegalArgumentException("请先启用所选账户");
+        }
+        if (account.getAccountId() == null || account.getAccountId().isBlank()) throw new IllegalArgumentException("请先补齐托管账户的真实账户ID");
+        if (request.getAccountId() != null && !request.getAccountId().equals(account.getAccountId())) {
+            throw new IllegalArgumentException("账户ID已变更，请重新发起同步");
+        }
+        request.setBrokerAccountId(account.getId());
+        request.setAccountId(account.getAccountId());
     }
 
     /**
@@ -101,7 +115,7 @@ public class BrokerSyncService {
 
         for (String brokerCode : adapterMap.keySet()) {
             Optional<Broker> brokerOpt = brokerRepository.findByBrokerCode(brokerCode);
-            if (brokerOpt.isPresent() && Boolean.TRUE.equals(brokerOpt.get().getIsActive())) {
+            if (brokerOpt.isPresent()) {
                 Broker broker = brokerOpt.get();
                 result.add(new BrokerSyncInfo(
                         brokerCode,

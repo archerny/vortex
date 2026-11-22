@@ -24,6 +24,11 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class OrderedMarketEventRegressionTest {
+    @org.junit.jupiter.api.BeforeEach
+    void wireManagedAccountFixture() {
+        org.springframework.test.util.ReflectionTestUtils.setField(tradeService, "brokerAccountService", com.vortex.fixtures.AccountFixtures.service("SYNTH-ACCOUNT"));
+    }
+
     @Mock TradeRecordRepository trades;
     @Mock BrokerRepository brokers;
     @Mock StrategyRepository strategies;
@@ -53,7 +58,7 @@ class OrderedMarketEventRegressionTest {
         event.setProcessed(true);
         when(splits.findByIsDeletedFalseOrderByEventDateDesc()).thenReturn(List.of(event));
         when(brokers.existsById(1L)).thenReturn(true);
-        TradeRecord trade = new TradeRecord();
+        TradeRecord trade = new TradeRecord(); trade.setBrokerAccountId(1L);
         trade.setTradeDate(DATE.minusDays(1)); trade.setBrokerId(1L);
         trade.setAssetType(AssetType.STOCK); trade.setSymbol("SYNTH-A");
         trade.setUnderlyingSymbol("SYNTH-A"); trade.setTradeType(TradeType.BUY);
@@ -69,7 +74,7 @@ class OrderedMarketEventRegressionTest {
         StockSplitEvent later = split(2L, DATE.plusDays(10));
         when(splits.findById(1L)).thenReturn(java.util.Optional.of(first));
         when(splits.findByIsDeletedFalseOrderByEventDateDesc()).thenReturn(List.of(later, first));
-        PositionSnapshot position = new PositionSnapshot();
+        PositionSnapshot position = new PositionSnapshot(); position.setBrokerAccountId(1L);
         position.setSymbol("SYNTH-A"); position.setUnderlyingSymbol("SYNTH-A");
         position.setBrokerId(1L); position.setQuantity(100);
         position.setAssetType(AssetType.STOCK); position.setCurrency(Currency.USD);
@@ -134,7 +139,7 @@ class OrderedMarketEventRegressionTest {
     }
 
     static TradeRecord trade(String symbol, LocalDate date) {
-        TradeRecord record = new TradeRecord();
+        TradeRecord record = new TradeRecord(); record.setBrokerAccountId(1L);
         record.setSymbol(symbol); record.setUnderlyingSymbol(symbol); record.setTradeDate(date);
         record.setBrokerId(1L); record.setQuantity(100); record.setPrice(BigDecimal.ONE);
         record.setFee(BigDecimal.ZERO); record.setCurrency(Currency.USD); record.setAssetType(AssetType.STOCK);

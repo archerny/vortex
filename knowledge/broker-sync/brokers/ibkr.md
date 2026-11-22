@@ -2,9 +2,9 @@
 
 ## 拉取与暂存
 
-`IbkrSyncAdapter`使用Trade Confirmation Flex Query。`IbkrFlexClient`先调用`SendRequest`，再轮询`GetStatement`获取XML。适配器按日期范围分窗，窗口末日最多取起始日加365天，下一窗从上一窗末日的下一天开始，请求日期使用`yyyyMMdd`。Token／Query ID由同步配置页保存到数据库；客户端一次读取同一行的凭证快照，不缓存旧值或回退启动文件。Token和Query ID进行URL编码，请求URL日志遮盖Token及q参数，查询元数据日志仍可显示Query ID；远程错误只保留受限错误码和固定描述，HTTP／XML异常不携带原始消息或原因链，防止回显Token。既有错误码分类待办仍未修复。配置步骤见 [IBKR接入指南](../../../docs/broker-sync/brokers/ibkr/README.md)和 [0046](../../../design/0046-2026-11-20-ibkr-settings-database-snapshots.md)。
+`IbkrSyncAdapter`使用Trade Confirmation Flex Query。`IbkrFlexClient`先调用`SendRequest`，再轮询`GetStatement`获取XML。适配器按日期范围分窗，窗口末日最多取起始日加365天，下一窗从上一窗末日的下一天开始，请求日期使用`yyyyMMdd`。账户在账户管理录入，Token／Query ID在同步配置的账户行明文保存到 `broker_sync_connections`；客户端一次读取同一行的凭证快照，不缓存旧值或回退启动文件。Token和Query ID进行URL编码，请求URL日志遮盖Token及q参数，查询元数据日志仍可显示Query ID；远程错误只保留受限错误码和固定描述，HTTP／XML异常不携带原始消息或原因链，防止回显Token。既有错误码分类待办仍未修复。配置步骤见 [IBKR接入指南](../../../docs/broker-sync/brokers/ibkr/README.md)和 [0047](../../../design/0047-2026-11-21-broker-accounts-and-sync-connections.md)。
 
-`FlexQueryParser` 校验单账户、单份规定结构的 TCF 报表。`Order` 写入 `ibkr_staged_orders`，`TradeConfirm` 写入 `ibkr_staged_trade_confirms`，`SymbolSummary` 不导入。暂存 Worker 按 `order_id` 和 `trade_id` 分别去重。前端可按批次查看两表，查询接口为 `GET /api/sync/ibkr/orders` 和 `GET /api/sync/ibkr/trade-confirms`。见 [Flex 客户端](../../../backend/src/main/java/com/vortex/sync/adapter/ibkr/IbkrFlexClient.java)、[XML 解析器](../../../backend/src/main/java/com/vortex/sync/adapter/ibkr/FlexQueryParser.java)和 [原始数据控制器](../../../backend/src/main/java/com/vortex/controller/IbkrStagedDataController.java)。
+`FlexQueryParser` 校验单账户、单份规定结构的 TCF 报表。`Order` 写入 `ibkr_staged_orders`，`TradeConfirm` 写入 `ibkr_staged_trade_confirms`，`SymbolSummary` 不导入。暂存 Worker 按 `(account_id, order_id)` 和 `(account_id, trade_id)` 分别去重。前端可按批次查看两表，查询接口为 `GET /api/sync/ibkr/orders` 和 `GET /api/sync/ibkr/trade-confirms`。见 [Flex 客户端](../../../backend/src/main/java/com/vortex/sync/adapter/ibkr/IbkrFlexClient.java)、[XML 解析器](../../../backend/src/main/java/com/vortex/sync/adapter/ibkr/FlexQueryParser.java)和 [原始数据控制器](../../../backend/src/main/java/com/vortex/controller/IbkrStagedDataController.java)。
 
 ## 支持的报表结构
 
@@ -12,7 +12,7 @@
 
 TradeConfirms 只接受直接的属性式 Order、TradeConfirm、SymbolSummary。未知节点、嵌套包装、记录子元素及非空文本明确拒绝，允许格式空白、注释及额外属性。非空报表须同时包含 Order 和 TradeConfirm；仅订单、仅成交或仅汇总均不完整。合法零交易是完整封套、非空账户及没有记录的 TradeConfirms，不是缺少节点。
 
-结构错误按 UNRECOGNIZED 返回固定的 `Unsupported IBKR TCF report structure: …` 原因，不输出账户或来源值。所有窗口解析完成后才进入暂存；任何窗口不支持都会使当前批次失败并沿既有清理流程处理，原成功批次保留。日期分窗仍可返回多个文件，每份分别校验；账户校验限每份报表，不新增跨窗口／独立请求的账户绑定，不证明成交集合完整或券商数据覆盖全部历史。 [0034 方案](../../../design/0034-2026-11-17-ibkr-single-account-tcf-validation.md) · [结构回归](../../../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrReportStructureTest.java) · [故障处理](../../../docs/broker-sync/recovery.md#ibkr-报表结构不受支持)
+结构错误按 UNRECOGNIZED 返回固定的 `Unsupported IBKR TCF report structure: …` 原因，不输出账户或来源值。所有窗口解析完成后才进入暂存；任何窗口不支持都会使当前批次失败并沿既有清理流程处理，原成功批次保留。日期分窗仍可返回多个文件，每份分别校验；每份报表（包括零交易报表）的账户都必须符合本批真实账户 ID 快照，缺少记录级账户时继承已验证的报表账户，不证明成交集合完整或券商数据覆盖全部历史。 [0034 方案](../../../design/0034-2026-11-17-ibkr-single-account-tcf-validation.md) · [结构回归](../../../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrReportStructureTest.java) · [故障处理](../../../docs/broker-sync/recovery.md#ibkr-报表结构不受支持)
 
 结构及批次回归使用合成 XML 与 Mockito 仓储／网络，覆盖拒绝、合法空报表、重复、重试、后续窗口失败及旧批次不变。按 [0039](../../../design/0039-2026-11-17-test-suite-maintenance.md) 整理后，字段映射也使用合成报表，覆盖字符串和流两个入口、Order／ExchTrade／BookTrade、原始费用精度及日期；不再依赖个人 XML。默认全量测试无需排除解析方法，原清理运行记录见 [测试清理依据](../../../docs/TODO-ARCHIVE.md#测试清理依据)，早期分组验证见 [归档](../../../docs/TODO-ARCHIVE.md)；它们不代表真实券商报表或账本对账。
 
@@ -24,8 +24,8 @@ TradeConfirms 只接受直接的属性式 Order、TradeConfirm、SymbolSummary�
 
 - 正式交易以订单为粒度。`STK` 映射到股票，`OPT` 按 `putCall` 的 `C` 或 `P` 映射到期权。期权 symbol 使用 `description` 的首个词作为标的，再拼到期日、方向和去掉尾零的行权价。
 - `tradeDate` 使用 `yyyyMMdd`。`BUY`、`SELL` 分别映射为买卖方向。`CNH` 与 `CNY` 都映射为 `CNY`，`USD` 和 `HKD` 保持原值。金额取原始 `amount` 的绝对值，费用为佣金和附加费的绝对值之和。数量先取 BigDecimal 绝对值，只接受非零且不超过 2147483647 的数值整数，再用 `intValueExact()` 无损转换；拒绝小数、零、缺失、非法与超范围数量，不截断或舍入。
-- `order_time` 和 `order_type` 同时为空时，订单进入 BookTrade 分支，交易触发来源为 `OPTION`。其他订单使用 `MANUAL/NONE`。BookTrade 按 `order_id` 读取第一条成交确认的 `code`，按分号拆分后精确匹配。`Ex`、`MEx`、`AEx` 的行权判定优先于 `Ep` 的到期判定，后者优先于 `A`、`GEA` 的指派判定。确认记录缺失、code 为空或无法识别时，该订单失败并最终触发整批清理。
-- 期权事件初始 `trigger_ref_id` 为 0。导入后只回填本批未删除、未关联的股票侧行权／指派记录，指向同次事件的期权侧簿记记录，不是原始开仓记录。候选必须同券商、币种、交易日、底层证券及事件类型，且是未删除、关联 ID 为 0 的 CALL／PUT。按用户确认的历史准确前提，直接信任正式记录，已有和本批记录按同一组业务条件匹配，不查询历史批次状态、原始暂存来源或设置人工记录例外。
+- `order_time` 和 `order_type` 同时为空时，订单进入 BookTrade 分支，交易触发来源为 `OPTION`。其他订单使用 `MANUAL/NONE`。BookTrade 按同来源账户的 `order_id` 读取第一条成交确认的 `code`，按分号拆分后精确匹配。`Ex`、`MEx`、`AEx` 的行权判定优先于 `Ep` 的到期判定，后者优先于 `A`、`GEA` 的指派判定。确认记录缺失、code 为空或无法识别时，该订单失败并最终触发整批清理。
+- 期权事件初始 `trigger_ref_id` 为 0。导入后只回填本批未删除、未关联的股票侧行权／指派记录，指向同次事件的期权侧簿记记录，不是原始开仓记录。候选必须同一本地账户、券商、币种、交易日、底层证券及事件类型，且是未删除、关联 ID 为 0 的 CALL／PUT。按用户确认的历史准确前提，直接信任正式记录，已有和本批记录按同一组业务条件匹配，不查询历史批次状态、原始暂存来源或设置人工记录例外。
 - 行权的期权侧为 SELL，指派为 BUY；股票侧分别是行权 CALL→BUY／PUT→SELL、指派 CALL→SELL／PUT→BUY。期权代码须解析出有效日历到期日，代码中的底层证券及 C/P 须与记录一致；正式记录没有独立的到期日字段可交叉核对。股票单价与行权价精确相等，股数等于合约数乘100，使用long防溢出，无舍入或容差。不同到期日仍有多个完整匹配时不猜测，不按事件日推断到期日。
 - 所有条件同时核对后必须恰好有一个匹配。0 或多个匹配均以 UNRECOGNIZED 失败，提示 `exact_matches` 与人工排查；不再逐步取首条或保留0继续成功。唯一候选若已被另一条有效股票／ETF期权事件引用，也拒绝；不先删除已占用候选来消除歧义。股票侧在持锁重读后重新核对资格，已有关联不改写。
 - 项目按100乘数处理。仅本次新导入、尚无正式记录的行权／指派期权侧检查当前暂存订单 multiplier 为精确数值100，缺失、非法或非100失败；STK、普通成交、到期记录不受此新增门槛影响。关联不回查历史来源。正式重复兜底不追加乘数门槛，暂存阶段既有同ID来源内容一致性仍须满足，不能把来源内容冲突当作合法重复。不自动支持合并／拆分簿记或非标准交割合约。
@@ -39,15 +39,15 @@ TradeConfirms 只接受直接的属性式 Order、TradeConfirm、SymbolSummary�
 
 | 检查入口 | 比较范围 |
 | --- | --- |
-| 订单暂存，按 `orderID` | 既有暂存行实际保存的全部来源字段；不新增 Order 层未保存的 exchange／code |
-| 成交暂存，按 `tradeID` | 全部已保存来源字段，包含父 orderID、执行标识及 Code |
-| 正式入库，按 `external_broker + external_id` | 已有正式记录可表达的业务投影：券商、日期、证券、方向、数量、价格、金额、费用、币种及触发类型／引用类型 |
+| 订单暂存，按来源账户及 `orderID` | 既有暂存行实际保存的全部来源字段；不新增 Order 层未保存的 exchange／code |
+| 成交暂存，按来源账户及 `tradeID` | 全部已保存来源字段，包含父 orderID、执行标识及 Code |
+| 正式入库，按 `broker_account_id + external_broker + external_id` | 已有正式记录可表达的业务投影：本地账户、券商、日期、证券、方向、数量、价格、金额、费用、币种及触发类型／引用类型 |
 
 新 ID 正常处理。相同 ID 只有内容一致才跳过，不覆盖原记录或改动其批次；不同内容按 UNRECOGNIZED 报错，整批失败并仅清理本批新增的数据。暂存冲突中止 STAGING，正式入库冲突沿用独立失败标记、适配器检查及框架清理。此前成功批次保留，同一冲突直接重试仍失败；清理失败继续进入 CLEANUP_FAILED。
 
 比较忽略处理状态、批次、错误说明、数据库主键及审计时间。数值用完整精度 `BigDecimal.compareTo`，尾零和科学计数法差异不冲突，不舍入或忽略正负号。普通文本去首尾空白，空白与 null 等价；缺失数值不等于零；Code 按分号拆成集合比较。订单 orderID、成交 tradeID 及其父 orderID 必须存在且不含首尾空白，异常标识直接拒绝，不修剪后保存，避免绕过去重。诊断包含已有内部行引用和差异字段名，不打印字段前后值；正式入库原有的软删除、用户策略及后续回填关联不被重置。 [0033 标识补充](../../../design/0033-2026-11-17-ibkr-strict-duplicate-identifiers.md)
 
-暂存来源一致时不重新比较用户后来编辑的正式交易。缺少来源暂存而命中正式记录时，兜底仅比较正式表的业务投影，不能核对未保存的账户、费用组成或原始符号；既有单价／金额固定小数位或旧费用舍入也可能导致拒绝，不作自动修复。新 tradeID 仍作为新明细处理，不额外证明成交集合完整性或订单终态；不自动合并后续成交、不覆盖或重算历史账本。 [比较实现](../../../backend/src/main/java/com/vortex/sync/adapter/ibkr/IbkrRecordContent.java) · [0032](../../../design/0032-2026-11-17-ibkr-duplicate-content-consistency.md) · [冲突排查](../../../docs/broker-sync/recovery.md#ibkr-重复记录内容冲突)
+暂存来源一致时不重新比较用户后来编辑的正式交易。缺少来源暂存而命中正式记录时，兜底仅比较正式表的业务投影，不能核对未保存的费用组成或原始符号；账户归属由正式表的本地账户主键核对；既有单价／金额固定小数位或旧费用舍入也可能导致拒绝，不作自动修复。新 tradeID 仍作为新明细处理，不额外证明成交集合完整性或订单终态；不自动合并后续成交、不覆盖或重算历史账本。 [比较实现](../../../backend/src/main/java/com/vortex/sync/adapter/ibkr/IbkrRecordContent.java) · [0032](../../../design/0032-2026-11-17-ibkr-duplicate-content-consistency.md) · [冲突排查](../../../docs/broker-sync/recovery.md#ibkr-重复记录内容冲突)
 
 [重复内容回归](../../../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrDuplicateConsistencyTest.java) 和 [批次调用链回归](../../../backend/src/test/java/com/vortex/sync/adapter/ibkr/IbkrDuplicateBatchTest.java) 使用合成数据与 Mockito 仓储／网络，覆盖持久化来源字段、规范化、异常 ID、正式投影、重复及冲突、整批清理、重试和原成功批次逐字段不变。内存调用链不证明真实事务或并发唯一约束，原命令、结果及限制见 [完成记录](../../../docs/TODO-ARCHIVE.md)。
 

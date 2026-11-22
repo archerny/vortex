@@ -49,15 +49,15 @@ class IbkrDuplicateConsistencyTest {
 
     @Test
     void shouldRejectChangedOrder() {
-        IbkrStagedOrder stored = new IbkrStagedOrder();
+        IbkrStagedOrder stored = new IbkrStagedOrder(); stored.setAccountId("SYNTH-ACCOUNT");
         stored.setId(11L);
         stored.setBatchId(1L);
         stored.setOrderId("SYNTH-ORDER");
         stored.setQuantity("10");
-        IbkrOrderRecord incoming = new IbkrOrderRecord();
+        IbkrOrderRecord incoming = new IbkrOrderRecord(); incoming.setAccountId("SYNTH-ACCOUNT");
         incoming.setOrderID("SYNTH-ORDER");
         incoming.setQuantity("20");
-        when(orders.findByOrderId("SYNTH-ORDER")).thenReturn(Optional.of(stored));
+        when(orders.findByAccountIdAndOrderId(org.mockito.ArgumentMatchers.nullable(String.class), org.mockito.ArgumentMatchers.eq("SYNTH-ORDER"))).thenReturn(Optional.of(stored));
 
         CategorizedSyncException error = assertThrows(CategorizedSyncException.class,
                 () -> new IbkrStagingWorker(orders, confirms).stageOrder(2L, incoming));
@@ -71,17 +71,17 @@ class IbkrDuplicateConsistencyTest {
 
     @Test
     void shouldRejectChangedTrade() {
-        IbkrStagedTradeConfirm stored = new IbkrStagedTradeConfirm();
+        IbkrStagedTradeConfirm stored = new IbkrStagedTradeConfirm(); stored.setAccountId("SYNTH-ACCOUNT");
         stored.setId(12L);
         stored.setBatchId(1L);
         stored.setTradeId("SYNTH-TRADE");
         stored.setOrderId("SYNTH-ORDER");
         stored.setCommission("-1.25");
-        IbkrTradeConfirm incoming = new IbkrTradeConfirm();
+        IbkrTradeConfirm incoming = new IbkrTradeConfirm(); incoming.setAccountId("SYNTH-ACCOUNT");
         incoming.setTradeID("SYNTH-TRADE");
         incoming.setOrderID("SYNTH-ORDER");
         incoming.setCommission("-1.50");
-        when(confirms.findByTradeId("SYNTH-TRADE")).thenReturn(Optional.of(stored));
+        when(confirms.findByAccountIdAndTradeId(org.mockito.ArgumentMatchers.nullable(String.class), org.mockito.ArgumentMatchers.eq("SYNTH-TRADE"))).thenReturn(Optional.of(stored));
 
         CategorizedSyncException error = assertThrows(CategorizedSyncException.class,
                 () -> new IbkrStagingWorker(orders, confirms).stageTradeConfirm(2L, incoming));
@@ -298,14 +298,14 @@ class IbkrDuplicateConsistencyTest {
     void shouldRejectDifferentExistingFormalTrade(String field, Consumer<TradeRecord> mutation) {
         IbkrStagedOrder staged = storedOrder(order());
         IbkrImportWorker worker = new IbkrImportWorker(orders, confirms, trades, eventHistory);
-        TradeRecord existing = worker.mapToTradeRecord(1L, 1L, staged);
+        TradeRecord existing = worker.mapToTradeRecord(1L, 1L, 1L, staged);
         existing.setId(55L);
         mutation.accept(existing);
-        when(trades.existsByExternalBrokerAndExternalId("ibkr", staged.getOrderId())).thenReturn(true);
-        when(trades.findByExternalBrokerAndExternalId("ibkr", staged.getOrderId())).thenReturn(Optional.of(existing));
+        when(trades.existsByBrokerAccountIdAndExternalBrokerAndExternalId(1L, "ibkr", staged.getOrderId())).thenReturn(true);
+        when(trades.findByBrokerAccountIdAndExternalBrokerAndExternalId(1L, "ibkr", staged.getOrderId())).thenReturn(Optional.of(existing));
 
         var error = assertThrows(ImportOneFailedException.class,
-                () -> worker.importSingleOrder(2L, 1L, staged));
+                () -> worker.importSingleOrder(2L, 1L, 1L, staged));
 
         var cause = assertInstanceOf(CategorizedSyncException.class, error.getCause());
         assertEquals(FailureCategory.UNRECOGNIZED, cause.getCategory());
@@ -323,20 +323,20 @@ class IbkrDuplicateConsistencyTest {
         staged.setBatchId(2L);
         staged.setOrderTime(null);
         staged.setOrderType(null);
-        IbkrStagedTradeConfirm event = new IbkrStagedTradeConfirm();
+        IbkrStagedTradeConfirm event = new IbkrStagedTradeConfirm(); event.setAccountId("SYNTH-ACCOUNT");
         event.setCode("Ex;P");
-        when(confirms.findByOrderId(staged.getOrderId())).thenReturn(List.of(event));
+        when(confirms.findByAccountIdAndOrderId(org.mockito.ArgumentMatchers.nullable(String.class), org.mockito.ArgumentMatchers.eq(staged.getOrderId()))).thenReturn(List.of(event));
         IbkrImportWorker worker = new IbkrImportWorker(orders, confirms, trades, eventHistory);
-        TradeRecord existing = worker.mapToTradeRecord(1L, 1L, staged);
+        TradeRecord existing = worker.mapToTradeRecord(1L, 1L, 1L, staged);
         existing.setId(55L);
         existing.setTriggerRefId(999L);
         existing.setStrategyId(888L);
         existing.setIsDeleted(true);
         existing.setPrice(new BigDecimal("10.0000"));
-        when(trades.existsByExternalBrokerAndExternalId("ibkr", staged.getOrderId())).thenReturn(true);
-        when(trades.findByExternalBrokerAndExternalId("ibkr", staged.getOrderId())).thenReturn(Optional.of(existing));
+        when(trades.existsByBrokerAccountIdAndExternalBrokerAndExternalId(1L, "ibkr", staged.getOrderId())).thenReturn(true);
+        when(trades.findByBrokerAccountIdAndExternalBrokerAndExternalId(1L, "ibkr", staged.getOrderId())).thenReturn(Optional.of(existing));
 
-        worker.importSingleOrder(2L, 1L, staged);
+        worker.importSingleOrder(2L, 1L, 1L, staged);
 
         assertEquals("SKIPPED", staged.getStatus());
         assertEquals(999L, existing.getTriggerRefId());
@@ -349,9 +349,9 @@ class IbkrDuplicateConsistencyTest {
     @Test
     void shouldFailIfExistingFormalTradeDisappearsBeforeContentCanBeVerified() {
         IbkrStagedOrder staged = storedOrder(order());
-        when(trades.existsByExternalBrokerAndExternalId("ibkr", staged.getOrderId())).thenReturn(true);
+        when(trades.existsByBrokerAccountIdAndExternalBrokerAndExternalId(1L, "ibkr", staged.getOrderId())).thenReturn(true);
         var error = assertThrows(ImportOneFailedException.class,
-                () -> new IbkrImportWorker(orders, confirms, trades, eventHistory).importSingleOrder(2L, 1L, staged));
+                () -> new IbkrImportWorker(orders, confirms, trades, eventHistory).importSingleOrder(2L, 1L, 1L, staged));
         assertEquals(FailureCategory.INTERNAL,
                 assertInstanceOf(CategorizedSyncException.class, error.getCause()).getCategory());
         verify(trades, never()).save(any());
@@ -359,11 +359,11 @@ class IbkrDuplicateConsistencyTest {
 
     @Test
     void shouldRejectWhitespaceInFormalIdentifierBeforeCheckingForDuplicates() {
-        IbkrStagedOrder staged = new IbkrStagedOrder();
+        IbkrStagedOrder staged = new IbkrStagedOrder(); staged.setAccountId("SYNTH-ACCOUNT");
         staged.setId(11L);
         staged.setOrderId("\u2003SYNTH-ORDER\u2003");
         var error = assertThrows(ImportOneFailedException.class,
-                () -> new IbkrImportWorker(orders, confirms, trades, eventHistory).importSingleOrder(2L, 1L, staged));
+                () -> new IbkrImportWorker(orders, confirms, trades, eventHistory).importSingleOrder(2L, 1L, 1L, staged));
         assertTrue(error.getCause().getMessage().contains("surrounding whitespace"));
         verifyNoInteractions(trades, orders);
     }
@@ -378,7 +378,7 @@ class IbkrDuplicateConsistencyTest {
         verify(orders).save(captor.capture());
         IbkrStagedOrder stored = captor.getValue();
         stored.setId(11L);
-        lenient().when(orders.findByOrderId(incoming.getOrderID())).thenReturn(Optional.of(stored));
+        lenient().when(orders.findByAccountIdAndOrderId(org.mockito.ArgumentMatchers.nullable(String.class), org.mockito.ArgumentMatchers.eq(incoming.getOrderID()))).thenReturn(Optional.of(stored));
         clearInvocations(orders);
         return stored;
     }
@@ -389,13 +389,13 @@ class IbkrDuplicateConsistencyTest {
         verify(confirms).save(captor.capture());
         IbkrStagedTradeConfirm stored = captor.getValue();
         stored.setId(12L);
-        lenient().when(confirms.findByTradeId(incoming.getTradeID())).thenReturn(Optional.of(stored));
+        lenient().when(confirms.findByAccountIdAndTradeId(org.mockito.ArgumentMatchers.nullable(String.class), org.mockito.ArgumentMatchers.eq(incoming.getTradeID()))).thenReturn(Optional.of(stored));
         clearInvocations(confirms);
         return stored;
     }
 
     private IbkrOrderRecord order() {
-        IbkrOrderRecord order = new IbkrOrderRecord();
+        IbkrOrderRecord order = new IbkrOrderRecord(); order.setAccountId("SYNTH-ACCOUNT");
         order.setOrderID("SYNTH-ORDER");
         order.setAccountId("SYNTH-ACCOUNT");
         order.setCurrency("USD");
@@ -413,7 +413,7 @@ class IbkrDuplicateConsistencyTest {
     }
 
     private IbkrTradeConfirm confirm() {
-        IbkrTradeConfirm confirm = new IbkrTradeConfirm();
+        IbkrTradeConfirm confirm = new IbkrTradeConfirm(); confirm.setAccountId("SYNTH-ACCOUNT");
         confirm.setTradeID("SYNTH-TRADE");
         confirm.setOrderID("SYNTH-ORDER");
         confirm.setAccountId("SYNTH-ACCOUNT");

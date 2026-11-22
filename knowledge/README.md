@@ -9,9 +9,9 @@
 | [券商同步](broker-sync/README.md) | IBKR、Tiger、异步批次、暂存和导入、失败清理 |
 | [前端架构](frontend-architecture.md) | 应用入口、菜单路由、页面分层、API 封装和界面能力 |
 
-资金流水、策略和券商基础管理的服务端入口分别是 [CashFlowRecordController](../backend/src/main/java/com/vortex/controller/CashFlowRecordController.java)、[StrategyController](../backend/src/main/java/com/vortex/controller/StrategyController.java) 和 [BrokerController](../backend/src/main/java/com/vortex/controller/BrokerController.java)。
+托管账户通过 [BrokerAccountController](../backend/src/main/java/com/vortex/controller/BrokerAccountController.java) 管理，券商与账户一对多；账户资料及迁移说明见 [账户指南](../docs/accounts.md)。资金流水、策略和券商基础管理的服务端入口分别是 [CashFlowRecordController](../backend/src/main/java/com/vortex/controller/CashFlowRecordController.java)、[StrategyController](../backend/src/main/java/com/vortex/controller/StrategyController.java) 和 [BrokerController](../backend/src/main/java/com/vortex/controller/BrokerController.java)。
 
-资金流水 API 支持查询、新增和软删除，没有更新接口；前端只提供查询和新增。券商新建和更新均可保存 `brokerCode`，非空代码唯一；绑定账户的标识／启用状态变更及删除受活动同步批次保护。IBKR在同步配置页绑定账户并将Token／Query ID保存到数据库。策略支持查询、新增、更新和软删除。前端开关只控制本地按钮或展示，不是服务端权限控制。
+资金流水 API 支持查询、新增和软删除，没有更新接口；前端只提供查询和新增。券商管理维护名称、非空唯一的技术代码、国家／地区和独立简介，不设启停状态；托管账户独立维护所属券商、账户名称、真实账户 ID、邮箱、手机号／电话、账户备注及启停状态。同券商可有多个账户，真实账户 ID 在该券商下唯一。V33 为每个旧券商创建“待补全账户”并保留历史关联；补齐真实 ID 后才可同步，补齐前可改名或停用。交易、流水、持仓、期权关联及同步均使用本地账户主键区分账户。同步连接按账户保存 IBKR Token／Query ID 或 Tiger ID／私钥，Tiger 资金账号来自账户资料；凭证以数据库明文为唯一运行时来源。活动批次期间仍允许编辑账户和连接，批次记录选定账户与真实 ID 快照，账户模型、联系方式迁移及券商资料边界见 [0047 统一方案](../design/0047-2026-11-21-broker-accounts-and-sync-connections.md)。策略支持查询、新增、更新和软删除。前端开关只控制本地按钮或展示，不是服务端权限控制。
 
 正式持仓成本／盈亏、实时行情、自动同步调度、富途／长桥／Schwab 适配器和导出尚未实现；图表 Demo 是合成演示。已知未修复缺陷为 Tiger 时间格式衔接和 IBKR 错误码／分类，见 [TODO](../docs/TODO.md)。运行证据见 [待办归档](../docs/TODO-ARCHIVE.md)。
 

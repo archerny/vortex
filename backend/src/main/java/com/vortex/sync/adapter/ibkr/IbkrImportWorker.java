@@ -89,17 +89,17 @@ public class IbkrImportWorker {
      *         the still-attached {@code staged} ref and the original cause
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void importSingleOrder(Long batchId, Long brokerId, IbkrStagedOrder staged) {
+    public void importSingleOrder(Long batchId, Long brokerId, Long brokerAccountId, IbkrStagedOrder staged) {
         try {
             history.lock();
             IbkrRecordContent.requireId("orderID", staged.getOrderId());
             // Deduplication check
-            if (tradeRecordRepository.existsByExternalBrokerAndExternalId(BROKER_CODE, staged.getOrderId())) {
+            if (tradeRecordRepository.existsByBrokerAccountIdAndExternalBrokerAndExternalId(brokerAccountId, BROKER_CODE, staged.getOrderId())) {
                 TradeRecord existing = tradeRecordRepository
-                        .findByExternalBrokerAndExternalId(BROKER_CODE, staged.getOrderId())
+                        .findByBrokerAccountIdAndExternalBrokerAndExternalId(brokerAccountId, BROKER_CODE, staged.getOrderId())
                         .orElseThrow(() -> new CategorizedSyncException(FailureCategory.INTERNAL, null,
                                 "Existing IBKR trade disappeared during duplicate content validation"));
-                TradeRecord candidate = mapToTradeRecord(batchId, brokerId, staged);
+                TradeRecord candidate = mapToTradeRecord(batchId, brokerId, brokerAccountId, staged);
                 IbkrRecordContent.requireSameTrade(existing, candidate);
                 staged.setStatus("SKIPPED");
                 staged.setErrorMessage("Duplicate: matching business content already exists in trade_records");
@@ -109,7 +109,7 @@ public class IbkrImportWorker {
             }
 
             // Map to TradeRecord
-            TradeRecord tradeRecord = mapToTradeRecord(batchId, brokerId, staged);
+            TradeRecord tradeRecord = mapToTradeRecord(batchId, brokerId, brokerAccountId, staged);
             if ((tradeRecord.getAssetType() == AssetType.OPTION_CALL || tradeRecord.getAssetType() == AssetType.OPTION_PUT)
                     && tradeRecord.getTradeTrigger() == TradeTrigger.OPTION
                     && (tradeRecord.getTriggerRefType() == TriggerRefType.OPTION_EXERCISE
@@ -193,6 +193,7 @@ public class IbkrImportWorker {
             throw linkageFailure(stkRecord, "Stock-side record is not eligible for exact option-event linkage");
         }
         List<TradeRecord> matches = tradeRecordRepository.findOptSideBookTradesForMatching(
+                        stkRecord.getBrokerAccountId(),
                         TradeTrigger.OPTION, stkRecord.getTriggerRefType(),
                         List.of(AssetType.OPTION_CALL, AssetType.OPTION_PUT),
                         stkRecord.getUnderlyingSymbol(), stkRecord.getTradeDate(),
@@ -234,12 +235,13 @@ public class IbkrImportWorker {
     /**
      * Map IbkrStagedOrder → TradeRecord following Appendix A mapping rules.
      */
-    TradeRecord mapToTradeRecord(Long batchId, Long brokerId, IbkrStagedOrder staged) {
+    TradeRecord mapToTradeRecord(Long batchId, Long brokerId, Long brokerAccountId, IbkrStagedOrder staged) {
         TradeRecord record = new TradeRecord();
 
         // A.1 Direct mappings
         record.setTradeDate(parseIbkrDate(staged.getTradeDate()));
         record.setBrokerId(brokerId);
+        record.setBrokerAccountId(brokerAccountId);
         record.setCurrency(mapCurrency(staged.getCurrency()));
         record.setTradeType(mapTradeType(staged.getBuySell()));
         record.setQuantity(parseAbsQuantity(staged.getQuantity()));
@@ -305,7 +307,7 @@ public class IbkrImportWorker {
      */
     private TriggerRefType resolveBookTradeRefType(IbkrStagedOrder staged) {
         List<IbkrStagedTradeConfirm> confirms =
-                stagedTradeConfirmRepository.findByOrderId(staged.getOrderId());
+                stagedTradeConfirmRepository.findByAccountIdAndOrderId(staged.getAccountId(), staged.getOrderId());
 
         if (confirms.isEmpty()) {
             throw new IllegalStateException(String.format(
@@ -353,6 +355,7 @@ public class IbkrImportWorker {
 
     private boolean isExactOptionMatch(TradeRecord stock, TradeRecord option) {
         if (option.getId() == null || !Boolean.FALSE.equals(option.getIsDeleted())
+                || !java.util.Objects.equals(stock.getBrokerAccountId(), option.getBrokerAccountId())
                 || !stock.getBrokerId().equals(option.getBrokerId()) || stock.getCurrency() != option.getCurrency()
                 || !stock.getTradeDate().equals(option.getTradeDate())
                 || !stock.getUnderlyingSymbol().equals(option.getUnderlyingSymbol())

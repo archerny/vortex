@@ -4,19 +4,21 @@
 
 | 接口 | 当前行为 |
 | --- | --- |
-| `POST /api/broker-sync/trigger` | 校验 `brokerCode`，创建 `PENDING` 批次并提交异步任务。返回 HTTP 200 和批次信息 |
-| `GET /api/broker-sync/brokers` | 返回已注册且在 `brokers` 表中有对应启用账户的适配器，不检查凭据 |
-| `GET /api/broker-sync/ibkr/settings` | 返回账户、Query ID、Token是否配置及就绪状态；不返回Token或密文 |
-| `PUT /api/broker-sync/ibkr/settings` | 事务内绑定账户及保存凭证；首次须Token，后续省略／留空则保留 |
-| `DELETE /api/broker-sync/ibkr/settings` | 持久化清空凭证，保留账户和账本 |
-| `GET /api/broker-sync/batches` | 按可选的 `brokerCode`、`status` 查询批次，按 `startedAt` 倒序 |
+| `POST /api/broker-sync/trigger` | 校验 `brokerCode` 及所选 `brokerAccountId` 的归属、启停与真实 ID，创建 `PENDING` 批次并提交异步任务。返回 HTTP 200 和批次信息 |
+| `GET /api/broker-sync/brokers` | 返回已注册且在 `brokers` 表中有对应券商资料的适配器，不检查凭据 |
+| `GET /api/broker-sync/connections` | 列出全部托管账户、支持状态、非秘密配置与就绪状态 |
+| `GET /api/broker-sync/connections/{brokerAccountId}` | 返回单账户连接元数据，不返回Token／私钥 |
+| `PUT /api/broker-sync/connections/{brokerAccountId}` | 保存与账户券商类型一致的凭证；秘密字段首次必填，后续省略／留空保留；不修改账户资料 |
+| `DELETE /api/broker-sync/connections/{brokerAccountId}` | 删除该账户连接，保留账户、其他账户连接和账本 |
+| `/api/broker-sync/ibkr/settings`（GET／PUT／DELETE） | 保留旧IBKR接口响应结构，由统一连接服务读写；只在该券商恰好一个账户时使用，旧 `brokerId` 保持券商主键语义；多账户拒绝并提示使用账户连接 API |
+| `GET /api/broker-sync/batches` | 按可选的 `brokerCode`、`status`、`brokerAccountId` 查询批次，按 `startedAt` 倒序 |
 | `GET /api/broker-sync/batches/{id}` | 按 ID 查询单个批次，找不到时返回 HTTP 404 |
 
-新建同步表单要求选择日期范围，并提交 `yyyy-MM-dd` 格式的 `startTime` 和 `endTime`。API 允许省略日期。省略时，批次表中缺失的日期各自记录为当天，适配器仍根据原请求计算抓取范围，默认结束为当天、起始为结束前 90 天。前端提交成功后刷新一次批次列表，后续由用户手动刷新。见 [控制器](../../backend/src/main/java/com/vortex/controller/BrokerSyncController.java)、[批次服务](../../backend/src/main/java/com/vortex/service/BrokerSyncBatchService.java)和 [批次页](../../frontend/src/pages/sync/batches/SyncBatchesTab.jsx)。
+新建同步表单提交本地账户主键、券商代码和日期范围；不提交真实 ID，真实 ID 由服务端读取并存入批次快照。旧请求省略账户主键时只允许唯一账户，多账户返回 400。新建同步表单要求选择日期范围，并提交 `yyyy-MM-dd` 格式的 `startTime` 和 `endTime`。API 允许省略日期。省略时，批次表中缺失的日期各自记录为当天，适配器仍根据原请求计算抓取范围，默认结束为当天、起始为结束前 90 天。前端提交成功后刷新一次批次列表，后续由用户手动刷新。见 [控制器](../../backend/src/main/java/com/vortex/controller/BrokerSyncController.java)、[批次服务](../../backend/src/main/java/com/vortex/service/BrokerSyncBatchService.java)和 [批次页](../../frontend/src/pages/sync/batches/SyncBatchesTab.jsx)。
 
 ## 异步执行
 
-保存／清空IBKR配置和账户绑定变更、停用、删除与批次创建共用`LedgerWriteLock`；存在PENDING／PROCESSING／CLEANUP_FAILED时拒绝并返回409。每次Flex请求从数据库读取同一组已提交凭证，不需重启，不允许批次中途切换；运行时解密失败明确失败，不回退旧配置。路由在券商请求前拒绝缺失或停用账户。 [0046](../../design/0046-2026-11-20-ibkr-settings-database-snapshots.md)
+保存／清空连接及账户变更可在活动批次期间执行。IBKR每份报表从数据库读取同一组已提交凭证，SendRequest和GetStatement使用该Token，后续报表可使用新配置。Tiger在批次开始捕获同一组Tiger ID／私钥／资金账号，客户端和所有日期窗口均使用该快照。导入从已持久化批次取得本地账户归属，即使拉取期间券商代码转移，也不重新按代码选择记账账户。IBKR 所有报表（含空报表）和 Tiger 返回订单须符合本次真实账户 ID 快照。路由在券商请求前校验账户启用、真实 ID 已补齐。账户资料及凭证编辑仍由本地用户安排时机，进一步保护设计记录在 TODO。 [0047](../../design/0047-2026-11-21-broker-accounts-and-sync-connections.md)
 
 `BrokerSyncAsyncExecutor` 在 `syncTaskExecutor` 线程池执行。它将批次置为 `PROCESSING`、阶段置为 `FETCHING`，将批次 ID 写入 `SyncRequest`，再由 `BrokerSyncService` 根据 `brokerCode` 路由。适配器在开始暂存和导入前分别切换到 `STAGING` 和 `IMPORTING`。适配器返回成功时，执行器写入结果计数。适配器返回失败或执行中抛出异常时，执行器调用统一失败处理器。
 
@@ -38,7 +40,7 @@
 
 启动恢复扫描 `PENDING` 和 `PROCESSING`，并调用同一失败处理器。`CLEANUP_FAILED` 继续占用活动索引，由人工确认残留后处理。当前流程无 Resume 接口。历史 `PARTIAL` 和 `INTERRUPTED` 仍有前端展示标签，当前应用不生成这两种状态。见 [V28](../../backend/src/main/resources/db/migration/V28__simplify_sync_batch_state_model.sql)、[失败处理器](../../backend/src/main/java/com/vortex/sync/core/SyncBatchFailureHandler.java)和 [启动恢复](../../backend/src/main/java/com/vortex/sync/core/SyncBatchRecoveryRunner.java)。
 
-IBKR 股票侧期权事件回填也是同步成功的必要步骤：同券商全部条件核对后，无匹配、多匹配或已占用均使整个批次失败，查询及保存异常向上传播；本次新导入期权交割记录的乘数不受支持也失败。历史正式记录直接信任，不回查旧来源或历史状态。失败原因保留到批次，沿用 FAILED／CLEANUP_FAILED 流程，不另设“未关联但完成”状态。 [关联规则](brokers/ibkr.md#导入映射) · [0042](../../design/0042-2026-11-18-trust-existing-option-event-records.md)
+IBKR 股票侧期权事件回填也是同步成功的必要步骤：同一本地账户全部条件核对后，无匹配、多匹配或已占用均使整个批次失败，查询及保存异常向上传播；本次新导入期权交割记录的乘数不受支持也失败。历史正式记录直接信任，不回查旧来源或历史状态。失败原因保留到批次，沿用 FAILED／CLEANUP_FAILED 流程，不另设“未关联但完成”状态。 [关联规则](brokers/ibkr.md#导入映射) · [0042](../../design/0042-2026-11-18-trust-existing-option-event-records.md)
 
 ## 与市场事件的协调
 

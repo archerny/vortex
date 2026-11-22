@@ -2,14 +2,12 @@ package com.vortex.sync.adapter.tiger;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
+import java.util.function.Supplier;
 
 /**
  * 老虎证券 API 配置属性
  *
- * 从 application.properties / application-local.properties 中读取配置：
- * - broker.tiger.tiger-id
- * - broker.tiger.private-key
- * - broker.tiger.account
+ * 正式应用从托管账户的数据库连接读取配置，独立测试可注入合成凭证。
  */
 @Component
 @ConfigurationProperties(prefix = "broker.tiger")
@@ -23,11 +21,36 @@ public class TigerApiProperties {
 
     /** 资金账号 */
     private String account;
+    private volatile Supplier<Credentials> credentialSource;
+    private volatile java.util.function.LongFunction<Credentials> accountCredentialSource;
+
+    public record Credentials(String tigerId, String privateKey, String account) {
+        public boolean isConfigured() {
+            return tigerId != null && !tigerId.isBlank() && privateKey != null && !privateKey.isBlank()
+                    && account != null && !account.isBlank();
+        }
+        @Override public String toString() { return "Credentials[redacted]"; }
+    }
+
+    public void useDatabaseCredentials(Supplier<Credentials> source) { credentialSource = source; }
+
+    public void useAccountCredentials(java.util.function.LongFunction<Credentials> source) { accountCredentialSource = source; }
+
+    public Credentials credentials(Long brokerAccountId) {
+        if (accountCredentialSource == null) return credentials();
+        return brokerAccountId == null ? new Credentials(null, null, null) : accountCredentialSource.apply(brokerAccountId);
+    }
+
+    public Credentials credentials() {
+        if (accountCredentialSource != null) return credentials((Long) null);
+        Supplier<Credentials> source = credentialSource;
+        return source == null ? new Credentials(tigerId, privateKey, account) : source.get();
+    }
 
     // ============ Getters and Setters ============
 
     public String getTigerId() {
-        return tigerId;
+        return credentials().tigerId();
     }
 
     public void setTigerId(String tigerId) {
@@ -35,7 +58,7 @@ public class TigerApiProperties {
     }
 
     public String getPrivateKey() {
-        return privateKey;
+        return credentials().privateKey();
     }
 
     public void setPrivateKey(String privateKey) {
@@ -43,7 +66,7 @@ public class TigerApiProperties {
     }
 
     public String getAccount() {
-        return account;
+        return credentials().account();
     }
 
     public void setAccount(String account) {
@@ -54,8 +77,6 @@ public class TigerApiProperties {
      * 检查配置是否完整
      */
     public boolean isConfigured() {
-        return tigerId != null && !tigerId.isBlank()
-                && privateKey != null && !privateKey.isBlank()
-                && account != null && !account.isBlank();
+        return credentials().isConfigured();
     }
 }

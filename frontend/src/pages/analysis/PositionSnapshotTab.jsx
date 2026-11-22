@@ -9,7 +9,7 @@ import {
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { fetchPositions } from '../../services/positionApi';
-import { fetchActiveBrokers } from '../../services/brokerApi';
+import { fetchBrokerAccounts, accountLabel } from '../../services/brokerAccountApi';
 import { assetTypeMap, assetTypeColorMap } from '../../constants/tradeConstants';
 
 const { Text } = Typography;
@@ -19,27 +19,27 @@ const { Text } = Typography;
  */
 const PositionSnapshotTab = () => {
   const [positionDate, setPositionDate] = useState(dayjs());
-  const [positionBrokerId, setPositionBrokerId] = useState(null);
+  const [positionAccountId, setPositionAccountId] = useState(null);
   const [positionData, setPositionData] = useState([]);
   const [positionLoading, setPositionLoading] = useState(false);
   const [hasQueried, setHasQueried] = useState(false);
-  const [brokerList, setBrokerList] = useState([]);
+  const [accountList, setAccountList] = useState([]);
   const [positionUnderlyingFilter, setPositionUnderlyingFilter] = useState(null);
   const initialQueryDone = useRef(false);
 
   // 加载券商列表
   useEffect(() => {
-    const loadBrokers = async () => {
+    const loadAccounts = async () => {
       try {
-        const result = await fetchActiveBrokers();
+        const result = await fetchBrokerAccounts();
         if (result.status === 'SUCCESS') {
-          setBrokerList(result.data || []);
+          setAccountList(result.data || []);
         }
       } catch (error) {
         console.error('Failed to fetch broker list:', error);
       }
     };
-    loadBrokers();
+    loadAccounts();
   }, []);
 
   // 查询持仓快照
@@ -51,9 +51,9 @@ const PositionSnapshotTab = () => {
     setPositionLoading(true);
     try {
       const dateStr = positionDate.format('YYYY-MM-DD');
-      const res = await fetchPositions(dateStr, positionBrokerId);
+      const res = await fetchPositions(dateStr, null, positionAccountId);
       if (res.status === 'SUCCESS') {
-        const list = (res.data || []).map((item, index) => ({ ...item, key: `${item.symbol}-${item.brokerId}-${index}` }));
+        const list = (res.data || []).map((item, index) => ({ ...item, key: `${item.symbol}-${item.brokerAccountId}-${index}` }));
         setPositionData(list);
         setHasQueried(true);
         if (list.length === 0) {
@@ -70,7 +70,7 @@ const PositionSnapshotTab = () => {
     } finally {
       setPositionLoading(false);
     }
-  }, [positionDate, positionBrokerId]);
+  }, [positionDate, positionAccountId]);
 
   // 组件挂载时自动查询今天的持仓数据
   useEffect(() => {
@@ -82,6 +82,8 @@ const PositionSnapshotTab = () => {
 
   // 持仓表格列定义
   const positionColumns = [
+    { title: '账户 ID', dataIndex: 'accountId', key: 'accountId', render: (value) => value || '待补全' },
+    { title: '账户名称', dataIndex: 'accountName', key: 'accountName' },
     {
       title: '证券代码',
       dataIndex: 'symbol',
@@ -163,15 +165,15 @@ const PositionSnapshotTab = () => {
               />
             </div>
             <div>
-              <Text type="secondary" style={{ fontSize: 12, marginRight: 6 }}>券商</Text>
+              <Text type="secondary" style={{ fontSize: 12, marginRight: 6 }}>账户</Text>
               <Select
-                value={positionBrokerId}
-                onChange={(value) => setPositionBrokerId(value)}
+                value={positionAccountId}
+                onChange={(value) => setPositionAccountId(value)}
                 allowClear
-                placeholder="全部券商"
+                placeholder="全部账户"
                 style={{ width: 160 }}
                 options={[
-                  ...brokerList.map((b) => ({ label: b.brokerName, value: b.id })),
+                  ...accountList.map((b) => ({ label: accountLabel(b), value: b.id })),
                 ]}
               />
             </div>

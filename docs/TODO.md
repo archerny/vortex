@@ -4,6 +4,20 @@
 
 以下条目的证据类型及验证状态分别记录在条目中，未勾选项尚未完成修复验收。P1 优先处理账本或导入中的静默错误，P2 包括精度口径、诊断、隐私和测试可复现性。既有请求日志脱敏方案见 [0024 IBKR 请求日志 Token 脱敏](../design/0024-2026-11-12-ibkr-token-log-redaction.md)。实际 XML 离线核对及合成复现见 [IBKR 样例与初次审阅](TODO-ARCHIVE.md#ibkr-样例与初次审阅)。
 
+- [ ] **P2 后续设计券商凭证与同步账户保护**
+
+  2026-11-21用户确认当前是个人本地使用、只读券商连接，按 [0047](../design/0047-2026-11-21-broker-accounts-and-sync-connections.md) 使用数据库明文Token／Query ID，配置及账户修改允许在活动批次期间执行。此决策修订0045／0046的加密、独立密钥及活动批次保护。证据见 [配置读写](../backend/src/main/java/com/vortex/sync/adapter/ibkr/IbkrSyncSettingsService.java)、[券商写入](../backend/src/main/java/com/vortex/service/BrokerService.java)和 [V31](../backend/src/main/resources/db/migration/V31__store_ibkr_token_as_plaintext.sql)。
+
+  用户随后确认没有历史加密凭证，已按 [0047](../design/0047-2026-11-21-broker-accounts-and-sync-connections.md) 移除历史密文兼容。后续保护方案以当前明文数据为迁移起点。
+
+  2026-11-21按 [0047](../design/0047-2026-11-21-broker-accounts-and-sync-connections.md) 将配置扩展为账户连接，同时纳入Tiger页面和数据库凭证。范围因此包含 `broker_sync_connections` 中IBKR的Token及Tiger私钥，未来保护方案需覆盖两类凭证；当前仍采用个人本地明文使用方式。证据见 [连接服务](../backend/src/main/java/com/vortex/service/BrokerSyncConnectionService.java)和 [V32](../backend/src/main/resources/db/migration/V32__create_account_sync_connections.sql)。
+
+  2026-11-22 按 [0047](../design/0047-2026-11-21-broker-accounts-and-sync-connections.md) 分离券商与真实托管账户，扩展到同券商多账户凭证。批次已保存本地账户与真实 ID 快照，导入不再按当前券商代码重新选账户；这解决了代码转移导致的归属变化，未引入凭证加密或活动批次编辑锁。后续保护需覆盖 [账户资料](../backend/src/main/java/com/vortex/service/BrokerAccountService.java) 的真实 ID／状态编辑及分账户连接。
+
+  影响范围包括数据库及其备份中的明文凭证、配置接口的本地访问边界，以及同步期间账户资料和后续报表凭证变更的协调。当前由个人用户安排同步与修改时机，后续设计按用户可用时间推进。
+
+  验收需先明确实际部署和访问场景，再给出凭证存储、访问控制、备份恢复和同步账户／配置变更协调方案，补齐未来引入保护措施时的明文数据迁移及失败恢复路径，并用合成凭证、并发配置／同步、应用重启和数据库恢复场景实际验证。当前状态为待设计，下一步在用户安排后新建方案。
+
 - [ ] **P1 统一 Tiger 暂存与导入的时间格式**
 
   暂存阶段将成交时间写成带 `T` 的日期时间文本，导入映射却只接受毫秒时间戳数字。经正常暂存流程写入的已成交订单会被判为无法识别，进而触发批次失败及清理。 [暂存时间转换](../backend/src/main/java/com/vortex/sync/adapter/tiger/TigerStagingWorker.java) · [导入时间解析](../backend/src/main/java/com/vortex/sync/adapter/tiger/TigerTradeRecordMapper.java)

@@ -92,7 +92,10 @@ public class IbkrSyncAdapter implements BrokerSyncAdapter {
         Long batchId = request.getBatchId();
 
         // 1. Check configuration
-        if (!properties.isConfigured()) {
+        var configured = properties.credentials(request.getBrokerAccountId());
+        if (request.getBrokerAccountId() == null || request.getAccountId() == null || request.getAccountId().isBlank()
+                || configured == null || configured.token() == null || configured.token().isBlank()
+                || configured.queryId() == null || configured.queryId().isBlank()) {
             logger.error("[IbkrSync] batch={} [AUTH] IBKR Flex Query credentials not configured. " +
                     "Please save Flex Token and Query ID on the Sync Management configuration tab", batchId);
             return SyncResult.failure(getBrokerCode(),
@@ -108,7 +111,7 @@ public class IbkrSyncAdapter implements BrokerSyncAdapter {
             logger.info("[IbkrSync] batch={} Sync date range: {} ~ {}", batchId, startDate, endDate);
 
             // 3. Fetch all data in windows (≤365 days each)
-            List<FlexQueryParseResult> allResults = fetchInWindows(batchId, startDate, endDate);
+            List<FlexQueryParseResult> allResults = fetchInWindows(batchId, request.getBrokerAccountId(), request.getAccountId(), startDate, endDate);
             List<IbkrOrderRecord> allOrders = new ArrayList<>();
             List<IbkrTradeConfirm> allTradeConfirms = new ArrayList<>();
             for (FlexQueryParseResult result : allResults) {
@@ -249,7 +252,7 @@ public class IbkrSyncAdapter implements BrokerSyncAdapter {
      * Split the date range into ≤365-day windows and fetch data for each window.
      * Returns the complete FlexQueryParseResult (orders + tradeConfirms) for each window.
      */
-    private List<FlexQueryParseResult> fetchInWindows(Long batchId, LocalDate startDate, LocalDate endDate) {
+    private List<FlexQueryParseResult> fetchInWindows(Long batchId, Long brokerAccountId, String accountId, LocalDate startDate, LocalDate endDate) {
         List<FlexQueryParseResult> allResults = new ArrayList<>();
 
         LocalDate windowStart = startDate;
@@ -261,7 +264,7 @@ public class IbkrSyncAdapter implements BrokerSyncAdapter {
             }
 
             logger.info("[IbkrSync] batch={} Fetching window: {} ~ {}", batchId, windowStart, windowEnd);
-            FlexQueryParseResult parseResult = fetchForWindow(batchId, windowStart, windowEnd);
+            FlexQueryParseResult parseResult = fetchForWindow(batchId, brokerAccountId, accountId, windowStart, windowEnd);
             allResults.add(parseResult);
             logger.info("[IbkrSync] batch={} Window {} ~ {} returned {} orders, {} tradeConfirms",
                     batchId, windowStart, windowEnd,
@@ -276,16 +279,23 @@ public class IbkrSyncAdapter implements BrokerSyncAdapter {
     /**
      * Fetch and parse data for a single date window.
      */
-    private FlexQueryParseResult fetchForWindow(Long batchId, LocalDate startDate, LocalDate endDate) {
+    private FlexQueryParseResult fetchForWindow(Long batchId, Long brokerAccountId, String accountId, LocalDate startDate, LocalDate endDate) {
         // Convert to yyyyMMdd for IBKR Flex API
         String fromDate = startDate.format(IBKR_DATE_FORMATTER);
         String toDate = endDate.format(IBKR_DATE_FORMATTER);
 
         // Fetch raw XML report
-        String xmlReport = flexClient.fetchReport(fromDate, toDate);
+        String xmlReport = flexClient.fetchReport(brokerAccountId, fromDate, toDate);
 
         // Parse XML into structured result
         FlexQueryParseResult parseResult = flexQueryParser.parse(xmlReport);
+        if (!accountId.equals(parseResult.getAccountId() == null ? null : parseResult.getAccountId().trim())) {
+            throw new CategorizedSyncException(FailureCategory.UNRECOGNIZED, null,
+                    "IBKR report account does not match the selected managed account");
+        }
+        // Missing per-record account IDs inherit the validated statement account.
+        parseResult.getOrders().forEach(order -> order.setAccountId(accountId));
+        parseResult.getTradeConfirms().forEach(confirm -> confirm.setAccountId(accountId));
 
         logger.info("[IbkrSync] batch={} Parsed report: account={}, range={} ~ {}, orders={}, tradeConfirms={}",
                 batchId,

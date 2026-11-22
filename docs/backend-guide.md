@@ -32,11 +32,11 @@ curl http://localhost:8080/api/health
 ## Build and run the JAR
 
 ```bash
-mvn -f backend/pom.xml clean package
+mvn -f backend/pom.xml -DskipTests clean package
 java -jar backend/target/vortex-backend-1.0.0.jar --spring.profiles.active=dev
 ```
 
-`clean package` 默认执行单测。确需跳过时显式使用 `-DskipTests`，不能将跳过后的构建描述为测试通过。Maven 会打包资源目录中存在的本地 profile 文件，分发构建应使用没有凭据文件的工作树，在运行时注入配置。
+示例显式跳过测试以生成包，不能描述为测试通过；按任务另行运行相关指定类。省略 `-DskipTests` 会执行全量单测，须由用户明确指定。Maven 会打包资源目录中存在的本地 profile 文件，分发构建应使用没有凭据文件的工作树，在运行时注入配置。
 
 `deploy/build-backend.sh` 生成 JAR、启动脚本及压缩包。脚本的 `-p` 当前不影响 Maven 构建或生成脚本的默认 profile；启动脚本需显式传入 profile，详见 [部署指南](../deploy/README.md)。
 
@@ -51,7 +51,7 @@ java -jar backend/target/vortex-backend-1.0.0.jar --spring.profiles.active=dev
 | [`entity/`](../backend/src/main/java/com/vortex/entity/)／[`dto/`](../backend/src/main/java/com/vortex/dto/) | 持久化对象、枚举与接口数据 |
 | [`sync/core/`](../backend/src/main/java/com/vortex/sync/core/) | 适配器路由、异步执行、失败处理与批次清理 |
 | [`sync/adapter/`](../backend/src/main/java/com/vortex/sync/adapter/) | IBKR／Tiger 拉取、暂存、映射和单条 Worker |
-| [`db/migration/`](../backend/src/main/resources/db/migration/) | 当前 V1–V30，结构变更追加迁移 |
+| [`db/migration/`](../backend/src/main/resources/db/migration/) | 当前 V1–V35，结构变更追加迁移 |
 
 Controller／Service／Repository 分层、同步整批失败清理、精度和历史数据要求见 [研发约定](../AGENTS.md)。市场事件写入与同步有共同协调约束，修改前阅读 [市场事件](../knowledge/market-events.md) 和 [同步生命周期](../knowledge/broker-sync/lifecycle.md)。
 
@@ -60,10 +60,11 @@ Controller／Service／Repository 分层、同步整批失败清理、精度和�
 从工作树根目录执行，无需数据库配置或应用 profile：
 
 ```bash
-mvn -f backend/pom.xml test
 mvn -f backend/pom.xml -Dtest=TradeRecordServiceTest test
 mvn -f backend/pom.xml '-Dtest=TradeVerificationServiceTest#validCallOptionSymbol_shouldPass' test
 ```
+
+全量命令 `mvn -f backend/pom.xml test` 仅在用户明确指定后执行，提交前提醒遵循 [研发约定](../AGENTS.md#测试范围与提交提醒)。
 
 JUnit 5／Mockito 隔离 Repository 和券商客户端；解析夹具全部使用合成 XML。测试包含 Controller、Service、同步核心和两个适配器，覆盖金额与费用、数量限制、持仓、事件顺序／历史锁、重复内容、期权关联、失败清理和恢复。清单以实际源测试及本轮 Surefire 报告为准，不维护固定用例数量。筛选运行时须核对嵌套及参数化案例。 [单测规范](unit-test-spec.md)
 

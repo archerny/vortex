@@ -3,9 +3,9 @@ import { Alert, Table, Tag, Select, Space, Typography, Tooltip, Card, Button, me
 import { ReloadOutlined, PlusOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
-import { fetchSyncBatches, triggerSync, fetchSupportedBrokers } from '../../../services/brokerSyncApi';
+import { fetchSyncBatches, triggerSync } from '../../../services/brokerSyncApi';
 import { fetchAllBrokers } from '../../../services/brokerApi';
-import { fetchIbkrSettings } from '../../../services/ibkrSettingsApi';
+import { fetchSyncConnections } from '../../../services/syncConnectionApi';
 
 dayjs.extend(duration);
 
@@ -20,20 +20,20 @@ const { Text } = Typography;
  * 券商下拉选项来源：/api/brokers（券商管理录入的券商），遵循
  * "券商管理是券商选项的单一数据源" 原则。
  */
-const SyncBatchesTab = ({ refreshKey = 0, onConfigureIbkr }) => {
+const SyncBatchesTab = ({ refreshKey = 0, onConfigure }) => {
   const [batches, setBatches] = useState([]);
   const [loading, setLoading] = useState(false);
   const [filters, setFilters] = useState({ brokerCode: undefined, status: undefined });
 
   // 筛选用的券商下拉选项（来自券商管理）
   const [filterBrokerOptions, setFilterBrokerOptions] = useState([]);
+  const [filterAccountOptions, setFilterAccountOptions] = useState([]);
 
   // New sync modal state
   const [modalOpen, setModalOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [syncBrokerOptions, setSyncBrokerOptions] = useState([]);
   const [brokersLoading, setBrokersLoading] = useState(false);
-  const [ibkrReady, setIbkrReady] = useState(false);
   const [form] = Form.useForm();
 
   const loadBatches = useCallback(async () => {
@@ -42,6 +42,7 @@ const SyncBatchesTab = ({ refreshKey = 0, onConfigureIbkr }) => {
       const params = {};
       if (filters.brokerCode) params.brokerCode = filters.brokerCode;
       if (filters.status) params.status = filters.status;
+      if (filters.brokerAccountId) params.brokerAccountId = filters.brokerAccountId;
       const result = await fetchSyncBatches(params);
       setBatches(result.data || []);
     } catch (error) {
@@ -60,7 +61,9 @@ const SyncBatchesTab = ({ refreshKey = 0, onConfigureIbkr }) => {
   useEffect(() => {
     const loadFilterBrokers = async () => {
       try {
-        const result = await fetchAllBrokers();
+        const [result, connections] = await Promise.all([fetchAllBrokers(), fetchSyncConnections()]);
+        setFilterAccountOptions((connections.data || []).map(account => ({ value: account.brokerAccountId,
+          label: `${account.brokerName} · ${account.accountName} · ${account.accountId || '待补全账户ID'}` })));
         const brokers = (result.data || [])
           .filter((b) => b.brokerCode) // 筛选只包含有 brokerCode 的券商（可参与同步）
           .map((b) => ({
@@ -80,21 +83,17 @@ const SyncBatchesTab = ({ refreshKey = 0, onConfigureIbkr }) => {
     setModalOpen(true);
     setBrokersLoading(true);
     try {
-      const [accounts, settings] = await Promise.allSettled([fetchSupportedBrokers(), fetchIbkrSettings()]);
-      if (accounts.status === 'rejected') throw accounts.reason;
-      const ready = settings.status === 'fulfilled' && !!settings.value.data?.ready;
-      if (settings.status === 'rejected') message.error('无法读取IBKR配置，其他券商仍可同步；请检查同步配置');
-      setIbkrReady(ready);
-      const brokers = (accounts.value.data || []).map((info) => ({
-        label: info.brokerCode === 'ibkr' ? `IBKR · ${info.brokerName}` : info.brokerName || info.brokerCode.toUpperCase(),
-        value: info.brokerCode,
-        disabled: info.brokerCode === 'ibkr' && !ready,
+      const accounts = await fetchSyncConnections();
+      const brokers = (accounts.data || []).filter((info) => info.active && info.supported).map((info) => ({
+        label: `${info.brokerName} · ${info.accountName} · ${info.accountId || '待补全账户ID'}${info.ready ? '' : '（未就绪）'}`,
+        value: info.brokerAccountId,
+        brokerCode: info.brokerCode,
+        disabled: !info.ready,
       }));
-      if (!brokers.some((broker) => broker.value === 'ibkr')) brokers.push({ label: 'IBKR（请先完成同步配置）', value: 'ibkr', disabled: true });
       setSyncBrokerOptions(brokers);
     } catch (error) {
-      setSyncBrokerOptions([]); setIbkrReady(false);
-      message.error('加载券商列表失败');
+      setSyncBrokerOptions([]);
+      message.error('加载账户连接失败');
     } finally { setBrokersLoading(false); }
   };
 
@@ -104,7 +103,8 @@ const SyncBatchesTab = ({ refreshKey = 0, onConfigureIbkr }) => {
       const values = await form.validateFields();
       setSubmitting(true);
 
-      const payload = { brokerCode: values.brokerCode };
+      const selected = syncBrokerOptions.find(option => option.value === values.brokerAccountId);
+      const payload = { brokerAccountId: values.brokerAccountId, brokerCode: selected.brokerCode };
       if (values.dateRange && values.dateRange.length === 2) {
         payload.startTime = values.dateRange[0].format('YYYY-MM-DD');
         payload.endTime = values.dateRange[1].format('YYYY-MM-DD');
@@ -217,6 +217,7 @@ const SyncBatchesTab = ({ refreshKey = 0, onConfigureIbkr }) => {
   };
 
   const columns = [
+    { title: '账户 ID', key: 'accountId', width: 160, render: (_, row) => row.accountId || row.brokerAccount?.accountId || (row.brokerAccountId ? '账户 ID 待补全' : '历史归属未知') },
     {
       title: 'ID',
       dataIndex: 'id',
@@ -334,7 +335,7 @@ const SyncBatchesTab = ({ refreshKey = 0, onConfigureIbkr }) => {
     <div>
       <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'flex-end' }}>
         <Space>
-          <Button onClick={onConfigureIbkr}>同步配置</Button>
+          <Button onClick={onConfigure}>同步配置</Button>
           <Button type="primary" icon={<PlusOutlined />} onClick={openModal}>
             新建同步
           </Button>
@@ -357,6 +358,11 @@ const SyncBatchesTab = ({ refreshKey = 0, onConfigureIbkr }) => {
               options={filterBrokerOptions}
               notFoundContent="请先在券商管理中录入券商"
             />
+          </Space>
+          <Space>
+            <Text>账户：</Text>
+            <Select allowClear placeholder="全部账户" style={{ width: 230 }} value={filters.brokerAccountId}
+              onChange={(value) => setFilters(previous => ({ ...previous, brokerAccountId: value }))} options={filterAccountOptions} />
           </Space>
           <Space>
             <Text>状态：</Text>
@@ -405,15 +411,15 @@ const SyncBatchesTab = ({ refreshKey = 0, onConfigureIbkr }) => {
         cancelText="取消"
         destroyOnClose
       >
-        {!ibkrReady && <Alert type="info" showIcon message="IBKR尚未就绪，请先关联记账账户并配置Flex凭证" action={<Button size="small" onClick={() => { setModalOpen(false); onConfigureIbkr?.(); }}>前往同步配置</Button>} />}
+        {!brokersLoading && !syncBrokerOptions.some((account) => !account.disabled) && <Alert type="info" showIcon message="暂无就绪的账户连接，请先完成同步配置" action={<Button size="small" onClick={() => { setModalOpen(false); onConfigure?.(); }}>前往同步配置</Button>} />}
         <Form form={form} layout="vertical" style={{ marginTop: 16 }}>
           <Form.Item
-            name="brokerCode"
-            label="券商"
-            rules={[{ required: true, message: '请选择券商' }]}
+            name="brokerAccountId"
+            label="托管账户"
+            rules={[{ required: true, message: '请选择托管账户' }]}
           >
             <Select
-              placeholder="请选择券商"
+              placeholder="请选择托管账户"
               options={syncBrokerOptions}
               loading={brokersLoading}
               notFoundContent="暂无可同步账户，请先完成同步配置"

@@ -10,11 +10,11 @@
 
 | 功能 | 页面和实际能力 |
 | --- | --- |
-| 交易记录 | [`trade/`](../frontend/src/pages/trade/) 提供列表、统计、新增、详情和详情中的编辑、删除。详情在前端根据期权合约和关联 ID 整理相关交易，复用列表列定义。 |
+| 交易记录 | [`trade/`](../frontend/src/pages/trade/) 提供列表、统计、新增、详情和详情中的编辑、删除。新增／编辑提交本地账户主键，列表显示券商、账户名称及真实账户 ID；详情在同一账户内根据期权合约和关联 ID 整理相关交易，复用列表列定义。 |
 | 交易数据分析 | [`analysis/`](../frontend/src/pages/analysis/) 查询指定日期的持仓快照，并按需调用交易核对接口。持仓的计算口径见 [交易与持仓](trades-and-positions.md)。 |
 | 市场事件 | [`market-events/`](../frontend/src/pages/market-events/) 通过三个标签页查询、新增并处理、受限撤销代码变更、拆股和实物分红；提示录入顺序及关联历史锁。 |
-| 同步管理 | [`sync/`](../frontend/src/pages/sync/) 展示和筛选批次；同步配置可新建／绑定IBKR账户，保存或清空数据库凭证，Token不回显且不存浏览器；新建同步按配置状态启用IBKR并提供配置入口，配置异常不影响其他券商。历史批次标签与v2筛选条件分别维护。原始数据查看仅覆盖IBKR订单与成交确认，均为只读。 [券商同步](broker-sync/README.md) |
-| 出入金、券商和策略 | [CashFlow](../frontend/src/pages/CashFlow.jsx) 查询和新增出入金记录。[BrokerManagement](../frontend/src/pages/BrokerManagement.jsx) 查询、新增和更新券商。[StrategyManagement](../frontend/src/pages/StrategyManagement.jsx) 支持策略的查询、新增、编辑和删除。 |
+| 同步管理 | [`sync/`](../frontend/src/pages/sync/) 展示和筛选批次；同步配置列出全部托管账户，按账户配置IBKR或Tiger连接，保存或清空数据库明文凭证，Token／私钥重新打开为空并支持留空保留。账户新增及资料修改跳转账户管理；新建同步仅允许账户启用、真实账户 ID 已补齐且凭证完整的账户；提交本地 `brokerAccountId`，列表显示真实 `accountId` 并支持账户筛选。历史批次标签与v2筛选条件分别维护。原始数据查看仅覆盖IBKR订单与成交确认，均为只读。 [0047](../design/0047-2026-11-21-broker-accounts-and-sync-connections.md) |
+| 出入金、券商、托管账户和策略 | [CashFlow](../frontend/src/pages/CashFlow.jsx) 按账户查询和新增出入金。[BrokerManagement](../frontend/src/pages/BrokerManagement.jsx) 管理券商名称、代码、国家／地区及独立简介，不提供状态开关；[BrokerAccountsManagement](../frontend/src/pages/BrokerAccountsManagement.jsx) 独立管理账户名称、真实账户 ID、所属券商、邮箱、手机号／电话、账户备注及状态，路径 `#/broker-accounts`。券商页面不保存或展示账户联系方式及备注；托管账户页不再提供“券商管理”按钮，券商入口保留在左侧菜单。同券商支持多账户，所属券商创建后固定，历史待补全账户可先改名或停用。[StrategyManagement](../frontend/src/pages/StrategyManagement.jsx) 支持策略查询、新增、编辑和删除。 |
 | 仪表盘和盈亏 | [Dashboard](../frontend/src/pages/Dashboard.jsx) 显示零值统计和空列表。[个股](../frontend/src/pages/profit/StockProfitAnalysis.jsx)、[策略](../frontend/src/pages/profit/StrategyProfitAnalysis.jsx)和[账户](../frontend/src/pages/profit/AccountProfitAnalysis.jsx)盈亏页面显示占位提示。 |
 | 技术选型 Demo | 盈亏分析下的 [`chart-demo/`](../frontend/src/pages/profit/chart-demo/) 使用固定合成数据展示金融图、分析图、三维曲面和期权链表格；不接入账本、行情或券商业务接口。 |
 

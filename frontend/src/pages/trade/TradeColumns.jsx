@@ -11,6 +11,9 @@ import { feeText, compareFees } from '../../utils/tradeFee';
  * @param {function} onViewDetail - 查看详情回调
  */
 const getTradeColumns = (amountVisible, brokerMap, strategyMap, onViewDetail) => [
+  { title: '券商名称', key: 'brokerName', width: 130, render: (_, record) => record.broker?.brokerName || brokerMap[record.brokerId] || '-' },
+  { title: '账户 ID', key: 'accountId', width: 150, render: (_, record) => record.brokerAccount?.accountId || '待补全' },
+  { title: '账户名称', key: 'accountName', width: 130, render: (_, record) => record.brokerAccount?.accountName || '-' },
   {
     title: '日期',
     dataIndex: 'tradeDate',

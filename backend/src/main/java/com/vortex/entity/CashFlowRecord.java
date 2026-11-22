@@ -29,6 +29,14 @@ public class CashFlowRecord extends BaseEntity {
     @Column(name = "broker_id", nullable = false)
     private Long brokerId;
 
+    @Column(name = "broker_account_id", nullable = false)
+    private Long brokerAccountId;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "broker_account_id", insertable = false, updatable = false)
+    @com.fasterxml.jackson.annotation.JsonProperty(access = com.fasterxml.jackson.annotation.JsonProperty.Access.READ_ONLY)
+    private BrokerAccount brokerAccount;
+
     /**
      * 关联的券商实体（只读，用于查询时自动关联券商信息）
      */
@@ -104,6 +112,11 @@ public class CashFlowRecord extends BaseEntity {
     public void setBrokerId(Long brokerId) {
         this.brokerId = brokerId;
     }
+
+    public Long getBrokerAccountId() { return brokerAccountId; }
+    public void setBrokerAccountId(Long value) { brokerAccountId = value; }
+    public BrokerAccount getBrokerAccount() { return brokerAccount; }
+    public void setBrokerAccount(BrokerAccount value) { brokerAccount = value; }
 
     public Broker getBroker() {
         return broker;

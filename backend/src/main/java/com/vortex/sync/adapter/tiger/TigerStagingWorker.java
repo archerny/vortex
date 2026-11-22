@@ -52,9 +52,12 @@ public class TigerStagingWorker {
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public boolean stageOrder(Long batchId, TigerOrderRecord record) {
+        if (record.getAccount() == null || record.getAccount().isBlank()) {
+            throw new IllegalArgumentException("Tiger source account is required");
+        }
         String tigerId = String.valueOf(record.getOrderId());
 
-        if (stagedOrderRepository.existsByTigerId(tigerId)) {
+        if (stagedOrderRepository.existsByAccountAndTigerId(record.getAccount(), tigerId)) {
             logger.debug("[TigerStaging] Order already staged, skipping: tigerId={}", tigerId);
             return false;
         }

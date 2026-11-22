@@ -37,6 +37,9 @@ public class TradeRecordService {
     @Autowired
     private StrategyRepository strategyRepository;
 
+    @Autowired
+    private BrokerAccountService brokerAccountService;
+
     /**
      * 获取交易记录统计数据
      * 包括：总交易次数、各类型交易次数、各币种交易费用总和
@@ -73,6 +76,10 @@ public class TradeRecordService {
     /**
      * 查询所有未删除的交易记录（按ID倒序）
      */
+    public List<TradeRecord> findByBrokerAccountId(Long id) {
+        return tradeRecordRepository.findByBrokerAccountIdAndIsDeletedFalseOrderByTradeDateDesc(id);
+    }
+
     public List<TradeRecord> findAll() {
         return tradeRecordRepository.findByIsDeletedFalseOrderByIdDesc();
     }
@@ -134,6 +141,10 @@ public class TradeRecordService {
     public TradeRecord create(TradeRecord record) {
         if (record.getId() != null) throw new IllegalArgumentException("New trade id is managed by the server");
         history.lock();
+        var selectedAccount = brokerAccountService.resolve(record.getBrokerAccountId(), record.getBrokerId());
+        record.setBrokerAccountId(selectedAccount.getId());
+        record.setBrokerAccount(selectedAccount); record.setBroker(selectedAccount.getBroker());
+        record.setBrokerId(selectedAccount.getBrokerId());
         // 校验券商是否存在
         if (!brokerRepository.existsById(record.getBrokerId())) {
             throw new IllegalArgumentException("Broker not found, ID: " + record.getBrokerId());
@@ -188,6 +199,15 @@ public class TradeRecordService {
 
         history.assertUserTradeWritable(existing);
 
+        var selectedAccount = brokerAccountService.resolve(recordData.getBrokerAccountId(), recordData.getBrokerId());
+        if (!Objects.equals(existing.getBrokerAccountId(), selectedAccount.getId())
+                && tradeRecordRepository.existsByTradeTriggerAndTriggerRefIdAndBrokerAccountIdNotAndIsDeletedFalse(
+                        TradeTrigger.OPTION, id, selectedAccount.getId())) {
+            throw new IllegalArgumentException("该交易仍被其他账户的期权关联记录引用，不能移动账户");
+        }
+        recordData.setBrokerAccountId(selectedAccount.getId());
+        recordData.setBrokerAccount(selectedAccount); recordData.setBroker(selectedAccount.getBroker());
+        recordData.setBrokerId(selectedAccount.getBrokerId());
         // 校验券商是否存在
         if (!brokerRepository.existsById(recordData.getBrokerId())) {
             throw new IllegalArgumentException("Broker not found, ID: " + recordData.getBrokerId());
@@ -202,6 +222,8 @@ public class TradeRecordService {
         history.assertUserTradeWritable(recordData);
         existing.setTradeDate(recordData.getTradeDate());
         existing.setBrokerId(recordData.getBrokerId());
+        existing.setBrokerAccountId(recordData.getBrokerAccountId());
+        existing.setBrokerAccount(selectedAccount); existing.setBroker(selectedAccount.getBroker());
         existing.setAssetType(recordData.getAssetType());
         existing.setSymbol(recordData.getSymbol());
         existing.setUnderlyingSymbol(recordData.getUnderlyingSymbol());
@@ -266,6 +288,14 @@ public class TradeRecordService {
                     && refType != TriggerRefType.OPTION_EXERCISE
                     && refType != TriggerRefType.OPTION_ASSIGNED) {
                 throw new IllegalArgumentException("Option triggered trade trigger_ref_type must be one of OPTION_EXPIRE / OPTION_EXERCISE / OPTION_ASSIGNED");
+            }
+            if (refId != null && refId != 0L) {
+                TradeRecord source = tradeRecordRepository.findById(refId)
+                        .filter(value -> Boolean.FALSE.equals(value.getIsDeleted()))
+                        .orElseThrow(() -> new IllegalArgumentException("关联期权交易不存在"));
+                if (!Objects.equals(record.getBrokerAccountId(), source.getBrokerAccountId())) {
+                    throw new IllegalArgumentException("关联期权交易必须属于同一托管账户");
+                }
             }
             // 期权到期时，price 和 amount 应为 0
             if (refType == TriggerRefType.OPTION_EXPIRE) {

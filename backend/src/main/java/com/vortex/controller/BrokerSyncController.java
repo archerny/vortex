@@ -78,13 +78,15 @@ public class BrokerSyncController {
                     String.format("Unsupported broker: %s", request.getBrokerCode()));
         }
 
+        brokerSyncService.prepareRequest(request);
+
         // Step 2: Parse optional date range
         LocalDate syncDateFrom = parseDate(request.getStartTime());
         LocalDate syncDateTo = parseDate(request.getEndTime());
 
         // Step 3: Create batch record (PENDING) — committed immediately
         BrokerSyncBatch batch = batchService.createBatch(
-                request.getBrokerCode(), syncDateFrom, syncDateTo);
+                request.getBrokerCode(), syncDateFrom, syncDateTo, request.getBrokerAccountId(), request.getAccountId());
 
         // Step 4: Submit async execution (non-blocking)
         asyncExecutor.execute(batch.getId(), request);
@@ -139,8 +141,9 @@ public class BrokerSyncController {
     @GetMapping("/batches")
     public ResponseEntity<Map<String, Object>> listBatches(
             @RequestParam(required = false) String brokerCode,
-            @RequestParam(required = false) String status) {
-        List<BrokerSyncBatch> batches = batchService.listBatches(brokerCode, status);
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) Long brokerAccountId) {
+        List<BrokerSyncBatch> batches = batchService.listBatches(brokerCode, status, brokerAccountId);
         return buildSuccessResponse("Query successful", batches);
     }
 
@@ -158,6 +161,11 @@ public class BrokerSyncController {
                 .map(batch -> buildSuccessResponse("Query successful", batch))
                 .orElse(buildErrorResponse(HttpStatus.NOT_FOUND,
                         String.format("Sync batch not found: id=%d", id)));
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, Object>> invalidAccount(IllegalArgumentException error) {
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, error.getMessage());
     }
 
     // ============ Response builders ============

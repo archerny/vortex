@@ -129,6 +129,7 @@ public class MarketEventProcessingService {
             TradeRecord record = new TradeRecord();
             record.setTradeDate(event.getEventDate());
             record.setBrokerId(position.getBrokerId());
+            record.setBrokerAccountId(position.getBrokerAccountId());
             record.setAssetType(position.getAssetType());
             record.setSymbol(event.getSymbol());
             record.setUnderlyingSymbol(position.getUnderlyingSymbol() != null ? position.getUnderlyingSymbol() : event.getSymbol());
@@ -184,13 +185,14 @@ public class MarketEventProcessingService {
 
         for (PositionSnapshot position : relevantPositions) {
             // 计算平均持仓成本
-            BigDecimal avgCost = calculateAverageCost(position.getSymbol(), position.getBrokerId(), dayBefore);
+            BigDecimal avgCost = calculateAverageCost(position.getSymbol(), position.getBrokerId(), position.getBrokerAccountId(), dayBefore);
             BigDecimal totalCost = avgCost.multiply(BigDecimal.valueOf(position.getQuantity()));
 
             // ① SELL oldSymbol
             TradeRecord sellRecord = new TradeRecord();
             sellRecord.setTradeDate(event.getEventDate());
             sellRecord.setBrokerId(position.getBrokerId());
+            sellRecord.setBrokerAccountId(position.getBrokerAccountId());
             sellRecord.setAssetType(position.getAssetType());
             sellRecord.setSymbol(event.getOldSymbol());
             sellRecord.setUnderlyingSymbol(event.getOldSymbol());
@@ -210,6 +212,7 @@ public class MarketEventProcessingService {
             TradeRecord buyRecord = new TradeRecord();
             buyRecord.setTradeDate(event.getEventDate());
             buyRecord.setBrokerId(position.getBrokerId());
+            buyRecord.setBrokerAccountId(position.getBrokerAccountId());
             buyRecord.setAssetType(position.getAssetType());
             buyRecord.setSymbol(event.getNewSymbol());
             buyRecord.setUnderlyingSymbol(event.getNewSymbol());
@@ -280,6 +283,7 @@ public class MarketEventProcessingService {
             TradeRecord record = new TradeRecord();
             record.setTradeDate(event.getEventDate());
             record.setBrokerId(position.getBrokerId());
+            record.setBrokerAccountId(position.getBrokerAccountId());
             record.setAssetType(AssetType.STOCK); // 分红获得的是股票
             record.setSymbol(event.getDividendSymbol());
             record.setUnderlyingSymbol(event.getDividendSymbol());
@@ -319,7 +323,7 @@ public class MarketEventProcessingService {
      * TODO: 当前使用移动加权平均法，未来在做盈亏分析时需要深度考虑成本计算方式，
      *       可能需要支持 FIFO、LIFO 等不同算法，届时需重构此方法。
      */
-    private BigDecimal calculateAverageCost(String symbol, Long brokerId, LocalDate asOfDate) {
+    private BigDecimal calculateAverageCost(String symbol, Long brokerId, Long brokerAccountId, LocalDate asOfDate) {
         List<TradeRecord> records = tradeRecordRepository
                 .findByTradeDateLessThanEqualAndBrokerIdAndIsDeletedFalseOrderByTradeDateAsc(asOfDate, brokerId);
 
@@ -327,7 +331,7 @@ public class MarketEventProcessingService {
         int holdingQty = 0;                      // 当前持仓数量
 
         for (TradeRecord record : records) {
-            if (!symbol.equals(record.getSymbol())) {
+            if (!symbol.equals(record.getSymbol()) || !Objects.equals(brokerAccountId, record.getBrokerAccountId())) {
                 continue;
             }
             BigDecimal amount = record.getAmount() != null ? record.getAmount() : BigDecimal.ZERO;

@@ -11,6 +11,8 @@ import java.util.List;
  * 提供出入金记录表的数据访问方法
  */
 public interface CashFlowRecordRepository extends BaseRepository<CashFlowRecord, Long> {
+    List<CashFlowRecord> findByBrokerAccountIdAndIsDeletedFalseOrderByRecordDateDesc(Long brokerAccountId);
+
 
     /**
      * 查询所有未删除的记录（按日期倒序）

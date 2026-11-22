@@ -9,11 +9,12 @@ const BASE_URL = '/api/positions';
  * @param {string} date 截止日期，格式 YYYY-MM-DD（必填）
  * @param {number|null} brokerId 券商ID（可选）
  */
-export const fetchPositions = async (date, brokerId = null) => {
+export const fetchPositions = async (date, brokerId = null, brokerAccountId = null) => {
   const params = { date };
   if (brokerId) {
     params.brokerId = brokerId;
   }
+  if (brokerAccountId) params.brokerAccountId = brokerAccountId;
   const response = await axios.get(BASE_URL, { params });
   return response.data;
 };

@@ -21,6 +21,7 @@ export const menuKeyToPath = {
   '1': 'dashboard',
   '2': 'cashflow',
   '6': 'broker',
+  '11': 'broker-accounts',
   '3': 'trades',
   '7': 'strategy',
   '8': 'anomaly',
@@ -42,6 +43,7 @@ export const pathToMenuKey = Object.fromEntries(
 export const menuKeyToParent = {
   '2': 'account',
   '6': 'account',
+  '11': 'account',
   '3': 'trade',
   '7': 'trade',
   '8': 'trade',
@@ -133,6 +135,11 @@ export const menuItems = [
         key: '6',
         icon: React.createElement(BankOutlined),
         label: '券商管理',
+      },
+      {
+        key: '11',
+        icon: React.createElement(BankOutlined),
+        label: '托管账户',
       },
     ],
   },

@@ -25,9 +25,16 @@ public class CashFlowRecordService {
     @Autowired
     private BrokerRepository brokerRepository;
 
+    @Autowired
+    private BrokerAccountService brokerAccountService;
+
     /**
      * 查询所有未删除的出入金记录（按日期倒序）
      */
+    public List<CashFlowRecord> findByBrokerAccountId(Long id) {
+        return cashFlowRecordRepository.findByBrokerAccountIdAndIsDeletedFalseOrderByRecordDateDesc(id);
+    }
+
     public List<CashFlowRecord> findAll() {
         return cashFlowRecordRepository.findByIsDeletedFalseOrderByRecordDateDesc();
     }
@@ -73,6 +80,9 @@ public class CashFlowRecordService {
      */
     @Transactional
     public CashFlowRecord create(CashFlowRecord record) {
+        var selectedAccount = brokerAccountService.resolve(record.getBrokerAccountId(), record.getBrokerId());
+        record.setBrokerAccountId(selectedAccount.getId()); record.setBrokerId(selectedAccount.getBrokerId());
+        record.setBrokerAccount(selectedAccount); record.setBroker(selectedAccount.getBroker());
         // 校验券商是否存在
         if (!brokerRepository.existsById(record.getBrokerId())) {
             throw new IllegalArgumentException("Broker not found, ID: " + record.getBrokerId());
