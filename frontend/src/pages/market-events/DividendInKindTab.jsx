@@ -10,10 +10,9 @@ import {
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import {
-  fetchAllDividendInKindEvents, createDividendInKindEvent, deleteDividendInKindEvent,
+  fetchAllDividendInKindEvents, createDividendInKindEvent,
 } from '../../services/marketEventApi';
 import { currencyOptions, currencyColorMap } from '../../constants/tradeConstants';
-import MarketEventUndoButton from './MarketEventUndoButton';
 import { marketEventErrorMessage } from '../../utils/marketEventError';
 
 const { Text } = Typography;
@@ -48,10 +47,6 @@ const DividendInKindTab = () => {
   useEffect(() => { loadData(); }, []);
 
   const columns = [
-    {
-      title: '操作', key: 'actions', width: 110,
-      render: (_, event) => <MarketEventUndoButton event={event} remove={deleteDividendInKindEvent} onSuccess={loadData} />,
-    },
     {
       title: '事件日期',
       dataIndex: 'eventDate',

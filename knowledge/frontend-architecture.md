@@ -10,9 +10,9 @@
 
 | 功能 | 页面和实际能力 |
 | --- | --- |
-| 交易记录 | [`trade/`](../frontend/src/pages/trade/) 提供列表、统计、新增、详情和详情中的编辑、删除。新增／编辑提交本地账户主键，列表显示券商、账户名称及真实账户 ID；详情在同一账户内根据期权合约和关联 ID 整理相关交易，复用列表列定义。 |
+| 交易记录 | [`trade/`](../frontend/src/pages/trade/) 提供列表、统计、新增、详情和详情中的编辑、删除。新增／编辑提交本地账户主键，列表显示券商、账户名称及真实账户 ID，表格在卡片内横向滚动，账户／策略／证券筛选栏自适应换行；详情在同一账户内根据期权合约和关联 ID 整理相关交易，复用列表列定义。 |
 | 交易数据分析 | [`analysis/`](../frontend/src/pages/analysis/) 查询指定日期的持仓快照，并按需调用交易核对接口。持仓的计算口径见 [交易与持仓](trades-and-positions.md)。 |
-| 市场事件 | [`market-events/`](../frontend/src/pages/market-events/) 通过三个标签页查询、新增并处理、受限撤销代码变更、拆股和实物分红；提示录入顺序及关联历史锁。 |
+| 市场事件 | [`market-events/`](../frontend/src/pages/market-events/) 通过三个标签页查询、新增并处理代码变更、拆股和实物分红，不提供撤销按钮；提示录入顺序及关联历史锁。 |
 | 同步管理 | [`sync/`](../frontend/src/pages/sync/) 展示和筛选批次；同步配置列出全部托管账户，按账户配置IBKR或Tiger连接，保存或清空数据库明文凭证，Token／私钥重新打开为空并支持留空保留。账户新增及资料修改跳转账户管理；新建同步仅允许账户启用、真实账户 ID 已补齐且凭证完整的账户；提交本地 `brokerAccountId`，列表显示真实 `accountId` 并支持账户筛选。历史批次标签与v2筛选条件分别维护。原始数据查看仅覆盖IBKR订单与成交确认，均为只读。 [0047](../design/0047-2026-11-21-broker-accounts-and-sync-connections.md) |
 | 出入金、券商、托管账户和策略 | [CashFlow](../frontend/src/pages/CashFlow.jsx) 按账户查询和新增出入金。[BrokerManagement](../frontend/src/pages/BrokerManagement.jsx) 管理券商名称、代码、国家／地区及独立简介，不提供状态开关；[BrokerAccountsManagement](../frontend/src/pages/BrokerAccountsManagement.jsx) 独立管理账户名称、真实账户 ID、所属券商、邮箱、手机号／电话、账户备注及状态，路径 `#/broker-accounts`。券商页面不保存或展示账户联系方式及备注；托管账户页不再提供“券商管理”按钮，券商入口保留在左侧菜单。同券商支持多账户，所属券商创建后固定，历史待补全账户可先改名或停用。[StrategyManagement](../frontend/src/pages/StrategyManagement.jsx) 支持策略查询、新增、编辑和删除。 |
 | 仪表盘和盈亏 | [Dashboard](../frontend/src/pages/Dashboard.jsx) 显示零值统计和空列表。[个股](../frontend/src/pages/profit/StockProfitAnalysis.jsx)、[策略](../frontend/src/pages/profit/StrategyProfitAnalysis.jsx)和[账户](../frontend/src/pages/profit/AccountProfitAnalysis.jsx)盈亏页面显示占位提示。 |
@@ -30,7 +30,7 @@
 
 [费用 API 回归](../frontend/src/services/__tests__/tradeFeePrecision.test.js) 通过模拟 Axios 验证高精度费用读取、回填和提交；[展示及排序回归](../frontend/src/utils/__tests__/tradeFee.test.jsx) 在 Node 中使用真实列表列和统计组件的静态渲染，覆盖完整小数、极小费用、零／缺省值、遮罩、精确排序及旧响应兼容。原费用修订的单测、构建与合成接口浏览器验收记录见 [归档](../docs/TODO-ARCHIVE.md)，没有连接真实后端或用户账本；不在架构说明中维护固定测试数量。
 
-市场事件页面通过共享撤销组件确认操作。失败保留弹窗和原因，成功刷新列表；交易与事件写入的冲突提示显示后端提供的阻挡事件、日期和证券，相关接口返回 409。三类撤销交互的既有合成接口点验见 [归档](../docs/TODO-ARCHIVE.md)，未操作真实账本。 [操作指南](../docs/market-events.md) · [冲突格式化测试](../frontend/src/utils/__tests__/marketEventError.test.js)
+市场事件页面不提供修改或撤销已处理事件的入口，三个列表均不显示撤销操作列。交易与事件写入的冲突提示继续显示后端提供的阻挡事件、日期和证券，相关接口返回 409。页面入口修订见 [0048](../design/0048-2026-11-22-trade-table-and-event-actions.md)，后端受限撤销 API 保持原有规则；早期撤销交互记录仅作为历史证据保留在 [归档](../docs/TODO-ARCHIVE.md)。 [操作指南](../docs/market-events.md) · [冲突格式化测试](../frontend/src/utils/__tests__/marketEventError.test.js)
 
 ## 图表技术选型演示
 

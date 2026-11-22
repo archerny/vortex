@@ -67,7 +67,7 @@ const MarketEvents = () => {
 
       {/* Tab 切换区域 */}
       <Alert type="info" showIcon style={{ marginBottom: 16 }} message="按日期顺序处理市场事件"
-        description="请先补齐关联证券在事件前的交易，再录入事件，最后录入事件当天及以后的交易。处理后只锁定关联证券的更早历史；同日关联事件暂不支持。已处理事件需先撤销再重建，无关证券仍可补录。" />
+        description="请先补齐关联证券在事件前的交易，再录入事件，最后录入事件当天及以后的交易。处理后只锁定关联证券的更早历史；同日关联事件暂不支持。已处理事件不支持在页面修改或撤销，录入前请确认信息；无关证券仍可补录。" />
       <Tabs defaultActiveKey="symbolChange" items={tabItems} type="card" />
     </div>
   );

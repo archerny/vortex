@@ -10,10 +10,9 @@ import {
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import {
-  fetchAllSymbolChangeEvents, createSymbolChangeEvent, deleteSymbolChangeEvent,
+  fetchAllSymbolChangeEvents, createSymbolChangeEvent,
 } from '../../services/marketEventApi';
 import { currencyOptions, currencyColorMap } from '../../constants/tradeConstants';
-import MarketEventUndoButton from './MarketEventUndoButton';
 import { marketEventErrorMessage } from '../../utils/marketEventError';
 
 const { Text } = Typography;
@@ -48,10 +47,6 @@ const SymbolChangeTab = () => {
   useEffect(() => { loadData(); }, []);
 
   const columns = [
-    {
-      title: '操作', key: 'actions', width: 110,
-      render: (_, event) => <MarketEventUndoButton event={event} remove={deleteSymbolChangeEvent} onSuccess={loadData} />,
-    },
     {
       title: '事件日期',
       dataIndex: 'eventDate',

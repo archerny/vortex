@@ -55,7 +55,7 @@ npm --prefix frontend run preview
 
 交易费用使用后端的 `feeExact` 和分币种精确统计字符串，展示及输入不固定小数位；表单使用 `InputNumber.stringMode`，避免保存时经过 JavaScript 浮点数。金额隐藏和编辑开关是浏览器设置，其中编辑开关只控制普通交易详情的按钮。 [交易契约](../knowledge/trades-and-positions.md)
 
-市场事件的新增、冲突提示、撤销失败保留弹窗及成功刷新，应按 [操作指南](market-events.md) 点验。仅有内存单测和构建结果不能证明浏览器交互正确。使用合成 API 的本地验收工具见 [e2e 指南](../e2e/README.md#ordered-market-event-check)。
+交易表格应在卡片内横向滚动，窄屏筛选栏换行，末列详情仍可访问。市场事件应点验三个标签页均无撤销按钮，并核对新增弹窗、取消及冲突提示，操作范围见 [操作指南](market-events.md)。仅有内存单测和构建结果不能证明浏览器交互正确。使用合成 API 的本地验收工具见 [e2e 指南](../e2e/README.md#ordered-market-event-check)。
 
 仪表盘和个股／账户／策略盈亏仍是占位页。技术选型 Demo 位于 `#/profit-chart-demo`，四个标签页展示 Lightweight Charts、ECharts、Plotly 和 Ant Design 期权链。数据固定为合成样本，不调用账本或行情接口；布局的健康检查仍会运行。Plotly 曲面需要 WebGL，页面与面板按需加载，构建可能有大分块提示。 [演示内容与限制](../knowledge/frontend-architecture.md#图表技术选型演示)
 

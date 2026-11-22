@@ -204,15 +204,21 @@ const TradeRecords = () => {
 
     <Card
       title="交易记录"
-      extra={
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <Select allowClear placeholder="全部账户" style={{ width: 230 }} value={selectedAccountId}
+      extra={<Button type="primary" icon={<PlusOutlined />} onClick={handleAddRecord}>新增记录</Button>}
+    >
+      <Row gutter={[16, 12]} style={{ marginBottom: 16 }}>
+        <Col xs={24} md={8}>
+          <div style={{ marginBottom: 8 }}>托管账户</div>
+          <Select aria-label="托管账户筛选" allowClear placeholder="全部账户" style={{ width: '100%' }} value={selectedAccountId}
             onChange={setSelectedAccountId} options={accountList.map(account => ({ value: account.id, label: accountLabel(account) }))} />
-          <span>所属策略：</span>
+        </Col>
+        <Col xs={24} md={8}>
+          <div style={{ marginBottom: 8 }}>所属策略</div>
           <Select
+            aria-label="所属策略筛选"
             allowClear
-            placeholder="选择策略"
-            style={{ width: 150 }}
+            placeholder="全部策略"
+            style={{ width: '100%' }}
             value={selectedStrategy}
             onChange={(value) => setSelectedStrategy(value || null)}
           >
@@ -220,20 +226,19 @@ const TradeRecords = () => {
               <Select.Option key={s.id} value={s.id}>{s.strategyName}</Select.Option>
             ))}
           </Select>
-          <span>底层证券：</span>
+        </Col>
+        <Col xs={24} md={8}>
+          <div style={{ marginBottom: 8 }}>底层证券</div>
           <Input
+            aria-label="底层证券筛选"
             allowClear
             placeholder="输入证券代码，如 AAPL"
-            style={{ width: 200 }}
+            style={{ width: '100%' }}
             value={selectedAsset}
             onChange={(e) => setSelectedAsset(e.target.value || null)}
           />
-          <Button type="primary" icon={<PlusOutlined />} onClick={handleAddRecord}>
-            新增记录
-          </Button>
-        </div>
-      }
-    >
+        </Col>
+      </Row>
       <Table
         columns={tradeColumns}
         dataSource={tradeData.filter((item) => {
@@ -254,6 +259,7 @@ const TradeRecords = () => {
           onShowSizeChange: (_, size) => setPageSize(size),
         }}
         size="middle"
+        scroll={{ x: 'max-content' }}
       />
 
       <Modal

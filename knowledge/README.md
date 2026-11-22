@@ -5,7 +5,7 @@
 | 主题 | 当前范围 |
 | --- | --- |
 | [交易与持仓](trades-and-positions.md) | 交易来源、持仓快照、关联交易、异常核对和盈亏边界 |
-| [市场事件](market-events.md) | 拆股、代码变更、实物分红、顺序处理、历史锁与受限撤销 |
+| [市场事件](market-events.md) | 拆股、代码变更、实物分红、顺序处理、历史锁与后端受限撤销（页面无撤销入口） |
 | [券商同步](broker-sync/README.md) | IBKR、Tiger、异步批次、暂存和导入、失败清理 |
 | [前端架构](frontend-architecture.md) | 应用入口、菜单路由、页面分层、API 封装和界面能力 |
 

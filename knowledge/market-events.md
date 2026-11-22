@@ -2,7 +2,7 @@
 
 ## 录入与处理状态
 
-市场事件包含拆股、证券代码变更和实物分红。前端三个标签页提供列表、新增并处理、受限撤销。后端还支持按 ID、证券代码或日期查询；仅未处理事件允许修改，已处理事件须先撤销再重建。事件日期使用 `LocalDate`，数据库存储为 `DATE`。事件被处理后记录 `processed` 和 `processedAt`。无符合条件的持仓或应生成的数量为零时，事件仍可标记为已处理。 [市场事件 API](../backend/src/main/java/com/vortex/controller/MarketEventController.java) · [市场事件实体](../backend/src/main/java/com/vortex/entity/BaseMarketEvent.java) · [市场事件页面](../frontend/src/pages/market-events/MarketEvents.jsx) · [V13 处理状态](../backend/src/main/resources/db/migration/V13__add_market_event_processing_fields.sql)
+市场事件包含拆股、证券代码变更和实物分红。前端三个标签页提供列表、新增并处理，不提供已处理事件的修改或撤销入口（[0048](../design/0048-2026-11-22-trade-table-and-event-actions.md)）。后端保留受限撤销 API，还支持按 ID、证券代码或日期查询；仅未处理事件允许修改，已处理事件须先撤销再重建。事件日期使用 `LocalDate`，数据库存储为 `DATE`。事件被处理后记录 `processed` 和 `processedAt`。无符合条件的持仓或应生成的数量为零时，事件仍可标记为已处理。 [市场事件 API](../backend/src/main/java/com/vortex/controller/MarketEventController.java) · [市场事件实体](../backend/src/main/java/com/vortex/entity/BaseMarketEvent.java) · [市场事件页面](../frontend/src/pages/market-events/MarketEvents.jsx) · [V13 处理状态](../backend/src/main/resources/db/migration/V13__add_market_event_processing_fields.sql)
 
 录入或修改时，服务端会查找相关证券最近一条未软删除的交易，缺少币种时据此补齐。拆股和实物分红查原证券，代码变更查旧证券代码。没有交易记录时拒绝保存。实物分红另须提供分红证券的 `dividendCurrency`，它可与原证券币种不同。 [拆股服务](../backend/src/main/java/com/vortex/service/StockSplitEventService.java) · [代码变更服务](../backend/src/main/java/com/vortex/service/SymbolChangeEventService.java) · [实物分红服务](../backend/src/main/java/com/vortex/service/DividendInKindEventService.java)
 
@@ -32,7 +32,7 @@
 
 处理成功后，关联证券在 D 之前的正式交易不可新增、修改或删除；D 当天的普通交易可随后录入。无关证券仍可补录，按实际 symbol 匹配，不将 underlyingSymbol 相同的期权合约视为同一证券。修改交易同时检查旧、新范围，不能通过移动日期、证券或券商绕过；其他字段编辑也无隐式例外。MARKET_EVENT 行只能随所属事件维护，普通 CRUD 不可单独创建、修改、删除或改写来源。前端详情也不提供其编辑／删除按钮。 [统一边界](../backend/src/main/java/com/vortex/service/MarketEventHistoryService.java) · [交易入口](../backend/src/main/java/com/vortex/service/TradeRecordService.java)
 
-历史锁直接从已处理且未撤销的三类事件推导，没有独立锁定日期表。零持仓、零输出的已处理事件同样生效；多个约束叠加。撤销只允许关联范围的尾部事件：没有同日或更晚的已处理关联事件，也没有 D 当天或之后的有效普通交易。撤销在同一事务删除本事件的 MARKET_EVENT 派生行、软删除事件并清除处理状态，其他事件及其约束保留。用户先回退后续相关数据，再撤销、修正历史并按日期重新创建；不会自动级联撤销。
+历史锁直接从已处理且未撤销的三类事件推导，没有独立锁定日期表。零持仓、零输出的已处理事件同样生效；多个约束叠加。后端撤销 API 只允许关联范围的尾部事件：没有同日或更晚的已处理关联事件，也没有 D 当天或之后的有效普通交易。撤销在同一事务删除本事件的 MARKET_EVENT 派生行、软删除事件并清除处理状态，其他事件及其约束保留。用户先回退后续相关数据，再撤销、修正历史并按日期重新创建；不会自动级联撤销。
 
 ## 并发、同步与旧状态
 
