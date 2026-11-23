@@ -1,0 +1,24 @@
+.trade-distribution-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 12px;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+  color: #666;
+  font-size: 13px;
+}
+
+.trade-distribution-legend li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.trade-distribution-legend li > span {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}

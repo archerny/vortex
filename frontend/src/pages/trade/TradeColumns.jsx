@@ -2,24 +2,34 @@ import React from 'react';
 import { Tag } from 'antd';
 import { assetTypeMap, tradeTypeMap, assetTypeColorMap, tradeTypeColorMap, amountColorMap } from '../../constants/tradeConstants';
 import { feeText, compareFees } from '../../utils/tradeFee';
+import './TradeTable.css';
+
+export const getTradeTableLayout = (columns) => ({
+  className: 'trade-record-table',
+  size: 'middle',
+  tableLayout: 'fixed',
+  scroll: { x: columns.reduce((width, column) => width + column.width, 0) },
+  style: { overflowWrap: 'anywhere' },
+});
 
 /**
  * 交易记录表格列定义
  * @param {boolean} amountVisible - 是否显示金额
- * @param {object} brokerMap - 券商ID→名称映射
- * @param {object} strategyMap - 策略ID→名称映射
- * @param {function} onViewDetail - 查看详情回调
  */
-const getTradeColumns = (amountVisible, brokerMap, strategyMap, onViewDetail) => [
-  { title: '券商名称', key: 'brokerName', width: 130, render: (_, record) => record.broker?.brokerName || brokerMap[record.brokerId] || '-' },
-  { title: '账户 ID', key: 'accountId', width: 150, render: (_, record) => record.brokerAccount?.accountId || '待补全' },
-  { title: '账户名称', key: 'accountName', width: 130, render: (_, record) => record.brokerAccount?.accountName || '-' },
+const getTradeColumns = (amountVisible) => [
+  {
+    title: '账户 ID',
+    key: 'accountId',
+    width: 96,
+    ellipsis: true,
+    render: (_, record) => record.brokerAccount?.accountId || '待补全',
+  },
   {
     title: '日期',
     dataIndex: 'tradeDate',
     key: 'tradeDate',
     sorter: (a, b) => new Date(a.tradeDate) - new Date(b.tradeDate),
-    width: 110,
+    width: 94,
   },
   {
     title: '类型',
@@ -27,28 +37,25 @@ const getTradeColumns = (amountVisible, brokerMap, strategyMap, onViewDetail) =>
     key: 'assetType',
     render: (assetType) => {
       const label = assetTypeMap[assetType] || assetType;
-      return <Tag color={assetTypeColorMap[assetType] || 'default'}>{label}</Tag>;
+      return <Tag style={{ marginInlineEnd: 0 }} color={assetTypeColorMap[assetType] || 'default'}>{label}</Tag>;
     },
     filters: Object.entries(assetTypeMap).map(([value, text]) => ({ text, value })),
     onFilter: (value, record) => record.assetType === value,
-    width: 90,
+    width: 80,
   },
   {
     title: '代码',
     dataIndex: 'symbol',
     key: 'symbol',
+    width: 144,
     ellipsis: true,
-    width: 160,
   },
   {
     title: '底层证券',
     dataIndex: 'underlyingSymbol',
     key: 'underlyingSymbol',
-    render: (underlyingSymbol, record) => {
-      const code = underlyingSymbol || record.symbol;
-      return <span title={code} style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>{code}</span>;
-    },
-    width: 140,
+    render: (underlyingSymbol, record) => underlyingSymbol || record.symbol,
+    width: 68,
     ellipsis: true,
   },
   {
@@ -57,11 +64,11 @@ const getTradeColumns = (amountVisible, brokerMap, strategyMap, onViewDetail) =>
     key: 'tradeType',
     render: (tradeType) => {
       const label = tradeTypeMap[tradeType] || tradeType;
-      return <Tag color={tradeTypeColorMap[tradeType] || 'default'}>{label}</Tag>;
+      return <Tag style={{ marginInlineEnd: 0 }} color={tradeTypeColorMap[tradeType] || 'default'}>{label}</Tag>;
     },
     filters: Object.entries(tradeTypeMap).map(([value, text]) => ({ text, value })),
     onFilter: (value, record) => record.tradeType === value,
-    width: 90,
+    width: 55,
   },
   {
     title: '数量',
@@ -69,7 +76,7 @@ const getTradeColumns = (amountVisible, brokerMap, strategyMap, onViewDetail) =>
     key: 'quantity',
     render: (quantity) => amountVisible ? (quantity != null ? quantity.toLocaleString() : '-') : '****',
     sorter: (a, b) => a.quantity - b.quantity,
-    width: 80,
+    width: 55,
   },
   {
     title: '价格',
@@ -77,7 +84,7 @@ const getTradeColumns = (amountVisible, brokerMap, strategyMap, onViewDetail) =>
     key: 'price',
     render: (price) => amountVisible ? (price != null ? Number(price).toFixed(2) : '-') : '****',
     sorter: (a, b) => a.price - b.price,
-    width: 90,
+    width: 55,
   },
   {
     title: '金额',
@@ -95,7 +102,7 @@ const getTradeColumns = (amountVisible, brokerMap, strategyMap, onViewDetail) =>
       );
     },
     sorter: (a, b) => a.amount - b.amount,
-    width: 120,
+    width: 78,
   },
   {
     title: '费用',
@@ -103,14 +110,14 @@ const getTradeColumns = (amountVisible, brokerMap, strategyMap, onViewDetail) =>
     key: 'fee',
     render: (_, record) => amountVisible ? (feeText(record) ?? '-') : '****',
     sorter: compareFees,
-    width: 80,
+    width: 86,
   },
   {
     title: '币种',
     dataIndex: 'currency',
     key: 'currency',
     render: (currency) => (
-      <Tag color={currency === 'CNY' ? 'blue' : currency === 'HKD' ? 'green' : 'purple'}>{currency}</Tag>
+      <Tag style={{ marginInlineEnd: 0 }} color={currency === 'CNY' ? 'blue' : currency === 'HKD' ? 'green' : 'purple'}>{currency}</Tag>
     ),
     filters: [
       { text: 'CNY', value: 'CNY' },
@@ -118,14 +125,14 @@ const getTradeColumns = (amountVisible, brokerMap, strategyMap, onViewDetail) =>
       { text: 'HKD', value: 'HKD' },
     ],
     onFilter: (value, record) => record.currency === value,
-    width: 80,
+    width: 59,
   },
   {
     title: '操作',
     key: 'action',
-    width: 60,
+    width: 44,
     render: (_, record) => (
-      <a onClick={() => onViewDetail(record)}>详情</a>
+      <a href={`#/trade-detail/${record.id}`}>详情</a>
     ),
   },
 ];

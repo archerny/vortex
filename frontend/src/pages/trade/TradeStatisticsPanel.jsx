@@ -1,7 +1,8 @@
 import React from 'react';
 import { feeText, hasFee } from '../../utils/tradeFee';
 import { Card, Row, Col, Statistic, Divider } from 'antd';
-import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
+import './TradeStatisticsPanel.css';
 
 /**
  * 交易统计面板组件
@@ -17,6 +18,7 @@ const TradeStatisticsPanel = ({ statistics, amountVisible }) => {
     { type: 'PUT期权', value: statistics.optionPutCount || 0 },
     { type: 'ETF', value: statistics.etfCount || 0 },
   ].filter(item => item.value > 0);
+  const pieTotal = pieData.reduce((total, entry) => total + entry.value, 0);
 
   // 饼图颜色映射
   const PIE_COLORS = {
@@ -30,6 +32,8 @@ const TradeStatisticsPanel = ({ statistics, amountVisible }) => {
   const renderPieLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
     const RADIAN = Math.PI / 180;
     const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+    if (percent * 2 * Math.PI * radius < 44 || outerRadius - innerRadius < 14) return null;
+
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
     return (
@@ -43,7 +47,7 @@ const TradeStatisticsPanel = ({ statistics, amountVisible }) => {
   const PieTooltipContent = ({ active, payload }) => {
     if (active && payload && payload.length) {
       const data = payload[0];
-      const percent = statistics ? ((data.value / statistics.totalCount) * 100).toFixed(1) : 0;
+      const percent = ((data.value / pieTotal) * 100).toFixed(1);
       return (
         <div style={{ background: '#fff', padding: '8px 12px', border: '1px solid #e8e8e8', borderRadius: 4, boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }}>
           <div style={{ color: data.payload.fill || '#333', fontWeight: 500 }}>{data.name}</div>
@@ -54,17 +58,10 @@ const TradeStatisticsPanel = ({ statistics, amountVisible }) => {
     return null;
   };
 
-  // 自定义图例格式化
-  const pieLegendFormatter = (value) => {
-    const item = pieData.find(d => d.type === value);
-    const count = item ? item.value : 0;
-    return <span style={{ color: '#666', fontSize: 13 }}>{value}  {count}次</span>;
-  };
-
   return (
-    <Row gutter={16} style={{ marginBottom: 16 }}>
+    <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
       {/* 左侧：交易概览 */}
-      <Col span={6}>
+      <Col xs={24} lg={6}>
         <Card title="交易概览" size="small" style={{ height: '100%' }}>
           <Statistic
             title="总交易次数"
@@ -110,41 +107,42 @@ const TradeStatisticsPanel = ({ statistics, amountVisible }) => {
         </Card>
       </Col>
       {/* 中间：交易类型分布饼图 */}
-      <Col span={9}>
+      <Col xs={24} md={12} lg={9}>
         <Card title="交易类型分布" size="small" style={{ height: '100%' }}>
           {pieData.length > 0 ? (
-            <ResponsiveContainer width="100%" height={280}>
-              <PieChart>
-                <Pie
-                  data={pieData}
-                  dataKey="value"
-                  nameKey="type"
-                  cx="40%"
-                  cy="50%"
-                  outerRadius={100}
-                  innerRadius={50}
-                  stroke="#fff"
-                  strokeWidth={2}
-                  label={renderPieLabel}
-                  labelLine={false}
-                  isAnimationActive={true}
-                >
-                  {pieData.map((entry) => (
-                    <Cell key={entry.type} fill={PIE_COLORS[entry.type] || '#8884d8'} />
-                  ))}
-                </Pie>
-                <Tooltip content={<PieTooltipContent />} />
-                <Legend
-                  layout="vertical"
-                  verticalAlign="middle"
-                  align="right"
-                  formatter={pieLegendFormatter}
-                  iconType="circle"
-                  iconSize={10}
-                  wrapperStyle={{ paddingLeft: 20 }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
+            <>
+              <ResponsiveContainer width="100%" height={216}>
+                <PieChart>
+                  <Pie
+                    data={pieData}
+                    dataKey="value"
+                    nameKey="type"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius="94%"
+                    innerRadius="48%"
+                    stroke="#fff"
+                    strokeWidth={2}
+                    label={renderPieLabel}
+                    labelLine={false}
+                    isAnimationActive={true}
+                  >
+                    {pieData.map((entry) => (
+                      <Cell key={entry.type} fill={PIE_COLORS[entry.type]} />
+                    ))}
+                  </Pie>
+                  <Tooltip content={<PieTooltipContent />} />
+                </PieChart>
+              </ResponsiveContainer>
+              <ul className="trade-distribution-legend" role="list" aria-label="交易类型图例">
+                {pieData.map(({ type, value }) => (
+                  <li key={type}>
+                    <span aria-hidden="true" style={{ backgroundColor: PIE_COLORS[type] }} />
+                    {`${type} ${value}次 (${((value / pieTotal) * 100).toFixed(1)}%)`}
+                  </li>
+                ))}
+              </ul>
+            </>
           ) : (
             <div style={{ height: 280, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#999' }}>
               暂无交易数据
@@ -153,7 +151,7 @@ const TradeStatisticsPanel = ({ statistics, amountVisible }) => {
         </Card>
       </Col>
       {/* 右侧：Top 10 热门证券（Recharts 水平条形图） */}
-      <Col span={9}>
+      <Col xs={24} md={12} lg={9}>
         <Card title="Top 10 热门证券" size="small" style={{ height: '100%' }}>
           {statistics.topSymbols && statistics.topSymbols.length > 0 ? (() => {
             const barColors = ['#597ef7', '#73d13d', '#ff7a45', '#36cfc9', '#f759ab',

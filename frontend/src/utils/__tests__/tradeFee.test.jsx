@@ -10,8 +10,8 @@ describe('exact trade fee display', () => {
 
   it('renders the exact list value and preserves the amount visibility switch', () => {
     const record = { fee: Number(exact), feeExact: exact };
-    const visible = getTradeColumns(true, {}, {}, () => {}).find((column) => column.key === 'fee');
-    const hidden = getTradeColumns(false, {}, {}, () => {}).find((column) => column.key === 'fee');
+    const visible = getTradeColumns(true).find((column) => column.key === 'fee');
+    const hidden = getTradeColumns(false).find((column) => column.key === 'fee');
     expect(visible.render(record.fee, record)).toBe(exact);
     expect(hidden.render(record.fee, record)).toBe('****');
     expect(visible.render(null, { fee: null })).toBe('-');
@@ -44,7 +44,7 @@ describe('exact trade fee display', () => {
     ['1e-8', '0.000000009', 1],
     ['10.01', '9.99', 1],
   ])('sorts %s against %s using exact decimal values', (left, right, expected) => {
-    const column = getTradeColumns(true, {}, {}, () => {}).find((item) => item.key === 'fee');
+    const column = getTradeColumns(true).find((item) => item.key === 'fee');
     expect(column.sorter({ feeExact: left }, { feeExact: right })).toBe(expected);
     expect(compareFees({ feeExact: right }, { feeExact: left })).toBe(expected === 0 ? 0 : -expected);
   });

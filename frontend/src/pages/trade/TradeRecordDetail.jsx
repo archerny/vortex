@@ -14,7 +14,7 @@ import {
   tradeTriggerMap, tradeTriggerColorMap, triggerRefTypeMap, triggerRefTypeColorMap,
   amountColorMap,
 } from '../../constants/tradeConstants';
-import getTradeColumns from './TradeColumns';
+import getTradeColumns, { getTradeTableLayout } from './TradeColumns';
 import { feeForInput, feeText } from '../../utils/tradeFee';
 import { marketEventErrorMessage } from '../../utils/marketEventError';
 
@@ -208,11 +208,6 @@ const TradeRecordDetail = ({ recordId, onBack }) => {
     );
   }
 
-  // 查看关联交易详情 - 跳转到对应的详情页
-  const handleViewRelatedDetail = (relatedRecord) => {
-    window.location.hash = `#/trade-detail/${relatedRecord.id}`;
-  };
-
   /** 打开编辑弹窗，回填当前记录数据 */
   const handleEdit = () => {
     editForm.setFieldsValue({
@@ -352,7 +347,7 @@ const TradeRecordDetail = ({ recordId, onBack }) => {
   ) : null;
 
   // 关联交易表格列（复用 TradeColumns）
-  const relatedColumns = getTradeColumns(amountVisible, brokerMap, strategyMap, handleViewRelatedDetail);
+  const relatedColumns = getTradeColumns(amountVisible);
 
   return (
     <Card>
@@ -479,10 +474,10 @@ const TradeRecordDetail = ({ recordId, onBack }) => {
             }
           `}</style>
           <Table
+            {...getTradeTableLayout(relatedColumns)}
             columns={relatedColumns}
             dataSource={relatedRecords}
             rowKey="id"
-            size="middle"
             pagination={relatedRecords.length > 10 ? { pageSize: 10 } : false}
             rowClassName={(row) => row.id === record?.id ? 'related-current-row' : ''}
           />

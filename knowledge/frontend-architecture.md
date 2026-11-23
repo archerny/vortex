@@ -10,7 +10,7 @@
 
 | 功能 | 页面和实际能力 |
 | --- | --- |
-| 交易记录 | [`trade/`](../frontend/src/pages/trade/) 提供列表、统计、新增、详情和详情中的编辑、删除。新增／编辑提交本地账户主键，列表显示券商、账户名称及真实账户 ID，表格在卡片内横向滚动，账户／策略／证券筛选栏自适应换行；详情在同一账户内根据期权合约和关联 ID 整理相关交易，复用列表列定义。 |
+| 交易记录 | [`trade/`](../frontend/src/pages/trade/) 提供列表、统计、新增、详情和详情中的编辑、删除。新增／编辑提交本地账户主键，账户／策略／证券筛选栏自适应换行。主列表和详情的同账户相关交易表均在首列显示账户 ID，历史空 ID 显示「待补全」。券商名称和账户名称在详情基本信息中展示。两张表使用中等行距和明确列宽，代码过长时单行省略，可悬停查看全值，精确费用可换行。可用宽度低于列宽之和时在表格内横向滚动。 [0049 交易表格](../design/0049-2026-11-23-responsive-trade-records.md#交易表格) |
 | 交易数据分析 | [`analysis/`](../frontend/src/pages/analysis/) 查询指定日期的持仓快照，并按需调用交易核对接口。持仓的计算口径见 [交易与持仓](trades-and-positions.md)。 |
 | 市场事件 | [`market-events/`](../frontend/src/pages/market-events/) 通过三个标签页查询、新增并处理代码变更、拆股和实物分红，不提供撤销按钮；提示录入顺序及关联历史锁。 |
 | 同步管理 | [`sync/`](../frontend/src/pages/sync/) 展示和筛选批次；同步配置列出全部托管账户，按账户配置IBKR或Tiger连接，保存或清空数据库明文凭证，Token／私钥重新打开为空并支持留空保留。账户新增及资料修改跳转账户管理；新建同步仅允许账户启用、真实账户 ID 已补齐且凭证完整的账户；提交本地 `brokerAccountId`，列表显示真实 `accountId` 并支持账户筛选。历史批次标签与v2筛选条件分别维护。原始数据查看仅覆盖IBKR订单与成交确认，均为只读。 [0047](../design/0047-2026-11-21-broker-accounts-and-sync-connections.md) |
@@ -27,6 +27,8 @@
 交易费用在列表、详情、统计及编辑中统一保留原始数字精度，不固定显示两位小数。页面使用后端的精确十进制字符串，兼容旧数字字段；统计仍在后端按币种汇总。新增和编辑使用 `InputNumber.stringMode`，以原字符串提交，展示与保存使用同一数值。费用列按精确十进制比较排序，极小费用不会因 JavaScript 数字下溢被隐藏；原有遮罩、缺省值和零费用提示保留。相关契约见 [0029](../design/0029-2026-11-17-preserve-trade-fee-precision.md)、[0030 展示修订](../design/0030-2026-11-17-display-exact-trade-fees.md) 与 [交易与持仓](trades-and-positions.md)。
 
 [package.json](../frontend/package.json) 定义开发、构建和测试命令，`package-lock.json` 包含 Vitest 和图表依赖的锁定记录。Vitest 在 Node 环境中运行，[常量测试](../frontend/src/constants/__tests__/) 覆盖菜单映射和交易常量，[演示数据测试](../frontend/src/pages/profit/chart-demo/__tests__/mockData.test.js) 覆盖合成价格、报价、收益边界和曲面维度。运行和排查步骤见 [前端指南](../docs/frontend-guide.md)。
+
+[交易统计面板](../frontend/src/pages/trade/TradeStatisticsPanel.jsx) 的圆环居中，半径随绘图区缩放。下方图例随宽度换行，显示各交易类型的次数及其占图中交易总数的比例。小扇区可通过图例或悬停提示读取数值。窄窗口下三张统计卡片按栅格断点换行。 [0049 统计卡片](../design/0049-2026-11-23-responsive-trade-records.md#统计卡片)
 
 [费用 API 回归](../frontend/src/services/__tests__/tradeFeePrecision.test.js) 通过模拟 Axios 验证高精度费用读取、回填和提交；[展示及排序回归](../frontend/src/utils/__tests__/tradeFee.test.jsx) 在 Node 中使用真实列表列和统计组件的静态渲染，覆盖完整小数、极小费用、零／缺省值、遮罩、精确排序及旧响应兼容。原费用修订的单测、构建与合成接口浏览器验收记录见 [归档](../docs/TODO-ARCHIVE.md)，没有连接真实后端或用户账本；不在架构说明中维护固定测试数量。
 

@@ -8,21 +8,19 @@ import { fetchBrokerAccounts, accountLabel } from '../../services/brokerAccountA
 import { fetchAllStrategies } from '../../services/strategyApi';
 import { assetTypeMap, tradeTypeMap } from '../../constants/tradeConstants';
 import { marketEventErrorMessage } from '../../utils/marketEventError';
+import getTradeColumns, { getTradeTableLayout } from './TradeColumns';
+import TradeStatisticsPanel from './TradeStatisticsPanel';
 
 // 新增表单中仅展示 BUY / SELL，不再展示旧枚举值
 const newTradeTypeOptions = {
   BUY: '买入',
   SELL: '卖出',
 };
-import getTradeColumns from './TradeColumns';
-import TradeStatisticsPanel from './TradeStatisticsPanel';
 
 const TradeRecords = () => {
   const [tradeData, setTradeData] = useState([]);
   const [accountList, setAccountList] = useState([]);
   const [strategyList, setStrategyList] = useState([]);
-  const [brokerMap, setBrokerMap] = useState({});
-  const [strategyMap, setStrategyMap] = useState({});
   const [loading, setLoading] = useState(false);
   const [statistics, setStatistics] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -69,19 +67,15 @@ const TradeRecords = () => {
     }
   };
 
-  // 加载券商列表
+  // 加载托管账户列表
   const loadAccounts = async () => {
     try {
       const result = await fetchBrokerAccounts();
       if (result.status === 'SUCCESS') {
-        const list = result.data || [];
-        setAccountList(list);
-        const map = {};
-        list.forEach((b) => { map[b.brokerId] = b.broker?.brokerName; });
-        setBrokerMap(map);
+        setAccountList(result.data || []);
       }
     } catch (error) {
-      console.error('Failed to fetch broker list:', error);
+      console.error('Failed to fetch broker accounts:', error);
     }
   };
 
@@ -90,11 +84,7 @@ const TradeRecords = () => {
     try {
       const result = await fetchAllStrategies();
       if (result.status === 'SUCCESS') {
-        const list = result.data || [];
-        setStrategyList(list);
-        const map = {};
-        list.forEach((s) => { map[s.id] = s.strategyName; });
-        setStrategyMap(map);
+        setStrategyList(result.data || []);
       }
     } catch (error) {
       console.error('Failed to fetch strategy list:', error);
@@ -109,12 +99,7 @@ const TradeRecords = () => {
     loadStatistics();
   }, []);
 
-  // 查看详情 - 跳转到独立详情页
-  const handleViewDetail = (record) => {
-    window.location.hash = `#/trade-detail/${record.id}`;
-  };
-
-  const tradeColumns = getTradeColumns(amountVisible, brokerMap, strategyMap, handleViewDetail);
+  const tradeColumns = getTradeColumns(amountVisible);
 
   const handleAddRecord = () => {
     setIsModalVisible(true);
@@ -240,6 +225,7 @@ const TradeRecords = () => {
         </Col>
       </Row>
       <Table
+        {...getTradeTableLayout(tradeColumns)}
         columns={tradeColumns}
         dataSource={tradeData.filter((item) => {
           if (selectedAccountId && item.brokerAccountId !== selectedAccountId) return false;
@@ -258,8 +244,6 @@ const TradeRecords = () => {
           pageSizeOptions: ['10', '20', '50', '100'],
           onShowSizeChange: (_, size) => setPageSize(size),
         }}
-        size="middle"
-        scroll={{ x: 'max-content' }}
       />
 
       <Modal
