@@ -1,0 +1,27 @@
+.sync-batches-table.ant-table-wrapper .ant-table.ant-table-middle .ant-table-cell {
+  padding-inline: 6px;
+  overflow-wrap: anywhere;
+}
+
+.sync-batches-table .ant-table-thead th {
+  white-space: nowrap;
+}
+
+.sync-batches-table .ant-btn-link {
+  padding-inline: 2px;
+}
+
+.sync-batch-times,
+.sync-batch-times .ant-typography {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.sync-batch-times > div {
+  white-space: nowrap;
+}
+
+.sync-batch-error {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

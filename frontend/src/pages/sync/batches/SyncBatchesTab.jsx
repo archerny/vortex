@@ -6,6 +6,7 @@ import duration from 'dayjs/plugin/duration';
 import { fetchSyncBatches, triggerSync } from '../../../services/brokerSyncApi';
 import { fetchAllBrokers } from '../../../services/brokerApi';
 import { fetchSyncConnections } from '../../../services/syncConnectionApi';
+import './SyncBatchesTab.css';
 
 dayjs.extend(duration);
 
@@ -24,6 +25,7 @@ const SyncBatchesTab = ({ refreshKey = 0, onConfigure }) => {
   const [batches, setBatches] = useState([]);
   const [loading, setLoading] = useState(false);
   const [filters, setFilters] = useState({ brokerCode: undefined, status: undefined });
+  const [errorBatch, setErrorBatch] = useState(null);
 
   // 筛选用的券商下拉选项（来自券商管理）
   const [filterBrokerOptions, setFilterBrokerOptions] = useState([]);
@@ -217,20 +219,21 @@ const SyncBatchesTab = ({ refreshKey = 0, onConfigure }) => {
   };
 
   const columns = [
-    { title: '账户 ID', key: 'accountId', width: 160, render: (_, row) => row.accountId || row.brokerAccount?.accountId || (row.brokerAccountId ? '账户 ID 待补全' : '历史归属未知') },
+    { title: '账户名称', dataIndex: ['brokerAccount', 'accountName'], key: 'accountName', width: 106, ellipsis: true, render: (name) => name || '-' },
+    { title: '账户 ID', key: 'accountId', width: 104, ellipsis: true, render: (_, row) => row.accountId || row.brokerAccount?.accountId || (row.brokerAccountId ? '账户 ID 待补全' : '历史归属未知') },
     {
-      title: 'ID',
+      title: '批次 ID',
       dataIndex: 'id',
       key: 'id',
-      width: 70,
+      width: 58,
     },
     {
       title: '券商',
       dataIndex: 'brokerCode',
       key: 'brokerCode',
-      width: 100,
+      width: 66,
       render: (code) => (
-        <Tag color={brokerTagColor[code] || 'default'}>
+        <Tag color={brokerTagColor[code] || 'default'} style={{ marginInlineEnd: 0 }}>
           {code ? code.toUpperCase() : '-'}
         </Tag>
       ),
@@ -238,35 +241,36 @@ const SyncBatchesTab = ({ refreshKey = 0, onConfigure }) => {
     {
       title: '同步日期范围',
       key: 'dateRange',
-      width: 200,
+      width: 108,
       render: (_, record) => (
-        <Text>
-          {record.syncDateFrom} ~ {record.syncDateTo}
-        </Text>
+        <div>
+          <div>{record.syncDateFrom || '-'}</div>
+          <div>至 {record.syncDateTo || '-'}</div>
+        </div>
       ),
     },
     {
-      title: '总记录数',
+      title: '总数',
       dataIndex: 'totalCount',
       key: 'totalCount',
-      width: 90,
+      width: 54,
       align: 'center',
     },
     {
-      title: '已导入',
+      title: '导入',
       dataIndex: 'importedCount',
       key: 'importedCount',
-      width: 80,
+      width: 52,
       align: 'center',
       render: (count) => (
         <Text style={{ color: count > 0 ? '#52c41a' : undefined }}>{count}</Text>
       ),
     },
     {
-      title: '已跳过',
+      title: '跳过',
       dataIndex: 'skippedCount',
       key: 'skippedCount',
-      width: 80,
+      width: 52,
       align: 'center',
       render: (count) => (
         <Text type={count > 0 ? 'secondary' : undefined}>{count}</Text>
@@ -276,7 +280,7 @@ const SyncBatchesTab = ({ refreshKey = 0, onConfigure }) => {
       title: '状态',
       dataIndex: 'status',
       key: 'status',
-      width: 100,
+      width: 76,
       render: (status, record) => {
         const tooltipParts = [];
         if (record.phase) tooltipParts.push(`阶段: ${record.phase}`);
@@ -286,7 +290,7 @@ const SyncBatchesTab = ({ refreshKey = 0, onConfigure }) => {
         const tooltipTitle = tooltipParts.length > 0 ? tooltipParts.join('；') : undefined;
         return (
           <Tooltip title={tooltipTitle}>
-            <Tag color={statusTagColor[status] || 'default'}>
+            <Tag color={statusTagColor[status] || 'default'} style={{ marginInlineEnd: 0 }}>
               {statusLabel[status] || status}
             </Tag>
           </Tooltip>
@@ -294,37 +298,32 @@ const SyncBatchesTab = ({ refreshKey = 0, onConfigure }) => {
       },
     },
     {
-      title: '开始时间',
-      dataIndex: 'startedAt',
-      key: 'startedAt',
-      width: 170,
-      render: formatTime,
-    },
-    {
-      title: '完成时间',
-      dataIndex: 'completedAt',
-      key: 'completedAt',
-      width: 170,
-      render: formatTime,
+      title: '执行时间',
+      key: 'executionTime',
+      width: 168,
+      render: (_, record) => (
+        <div className="sync-batch-times">
+          <div><Text type="secondary">开始</Text> {formatTime(record.startedAt)}</div>
+          <div><Text type="secondary">完成</Text> {formatTime(record.completedAt)}</div>
+        </div>
+      ),
     },
     {
       title: '耗时',
       key: 'duration',
-      width: 90,
+      width: 64,
       render: (_, record) => calculateDuration(record.startedAt, record.completedAt),
     },
     {
-      title: '错误信息',
+      title: '错误',
       dataIndex: 'errorMessage',
       key: 'errorMessage',
-      ellipsis: true,
-      render: (msg) =>
+      width: 54,
+      render: (msg, record) =>
         msg ? (
-          <Tooltip title={msg}>
-            <Text type="danger" ellipsis style={{ maxWidth: 200 }}>
-              {msg}
-            </Text>
-          </Tooltip>
+          <Button type="link" size="small" aria-label={`查看批次 #${record.id} 错误信息`} onClick={() => setErrorBatch(record)}>
+            查看
+          </Button>
         ) : (
           '-'
         ),
@@ -334,8 +333,7 @@ const SyncBatchesTab = ({ refreshKey = 0, onConfigure }) => {
   return (
     <div>
       <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'flex-end' }}>
-        <Space>
-          <Button onClick={onConfigure}>同步配置</Button>
+        <Space wrap>
           <Button type="primary" icon={<PlusOutlined />} onClick={openModal}>
             新建同步
           </Button>
@@ -346,7 +344,7 @@ const SyncBatchesTab = ({ refreshKey = 0, onConfigure }) => {
       </div>
 
       <Card size="small" style={{ marginBottom: 16 }}>
-        <Space size="middle">
+        <Space size="middle" wrap>
           <Space>
             <Text>券商：</Text>
             <Select
@@ -385,6 +383,7 @@ const SyncBatchesTab = ({ refreshKey = 0, onConfigure }) => {
       </Card>
 
       <Table
+        className="sync-batches-table"
         columns={columns}
         dataSource={batches}
         rowKey="id"
@@ -394,9 +393,19 @@ const SyncBatchesTab = ({ refreshKey = 0, onConfigure }) => {
           showSizeChanger: true,
           showTotal: (total) => `共 ${total} 条`,
         }}
-        scroll={{ x: 1410 }}
+        tableLayout="fixed"
+        scroll={{ x: columns.reduce((width, column) => width + column.width, 0) }}
         size="middle"
       />
+
+      <Modal
+        title={errorBatch ? `批次 #${errorBatch.id} 错误信息` : '批次错误信息'}
+        open={errorBatch !== null}
+        onCancel={() => setErrorBatch(null)}
+        footer={null}
+      >
+        <div className="sync-batch-error">{errorBatch?.errorMessage}</div>
+      </Modal>
 
       <Modal
         title="新建同步任务"

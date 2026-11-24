@@ -27,7 +27,7 @@ const SyncManagement = () => {
     {
       key: 'settings',
       label: '同步配置',
-      children: <SyncConnectionSettingsTab onSaved={() => setRefreshKey((value) => value + 1)} onDone={() => setActiveKey('batches')} />,
+      children: <SyncConnectionSettingsTab onSaved={() => setRefreshKey((value) => value + 1)} />,
     },
     {
       key: 'staged-data',

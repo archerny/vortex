@@ -82,8 +82,8 @@ const PositionSnapshotTab = () => {
 
   // 持仓表格列定义
   const positionColumns = [
-    { title: '账户 ID', dataIndex: 'accountId', key: 'accountId', render: (value) => value || '待补全' },
     { title: '账户名称', dataIndex: 'accountName', key: 'accountName' },
+    { title: '账户 ID', dataIndex: 'accountId', key: 'accountId', render: (value) => value || '待补全' },
     {
       title: '证券代码',
       dataIndex: 'symbol',

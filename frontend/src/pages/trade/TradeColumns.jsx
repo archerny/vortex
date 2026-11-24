@@ -18,9 +18,17 @@ export const getTradeTableLayout = (columns) => ({
  */
 const getTradeColumns = (amountVisible) => [
   {
+    title: '账户名称',
+    dataIndex: ['brokerAccount', 'accountName'],
+    key: 'accountName',
+    width: 96,
+    ellipsis: true,
+    render: (name) => name || '-',
+  },
+  {
     title: '账户 ID',
     key: 'accountId',
-    width: 96,
+    width: 92,
     ellipsis: true,
     render: (_, record) => record.brokerAccount?.accountId || '待补全',
   },
@@ -29,7 +37,7 @@ const getTradeColumns = (amountVisible) => [
     dataIndex: 'tradeDate',
     key: 'tradeDate',
     sorter: (a, b) => new Date(a.tradeDate) - new Date(b.tradeDate),
-    width: 94,
+    width: 90,
   },
   {
     title: '类型',
@@ -47,7 +55,7 @@ const getTradeColumns = (amountVisible) => [
     title: '代码',
     dataIndex: 'symbol',
     key: 'symbol',
-    width: 144,
+    width: 113,
     ellipsis: true,
   },
   {
@@ -55,7 +63,7 @@ const getTradeColumns = (amountVisible) => [
     dataIndex: 'underlyingSymbol',
     key: 'underlyingSymbol',
     render: (underlyingSymbol, record) => underlyingSymbol || record.symbol,
-    width: 68,
+    width: 64,
     ellipsis: true,
   },
   {
@@ -68,7 +76,7 @@ const getTradeColumns = (amountVisible) => [
     },
     filters: Object.entries(tradeTypeMap).map(([value, text]) => ({ text, value })),
     onFilter: (value, record) => record.tradeType === value,
-    width: 55,
+    width: 54,
   },
   {
     title: '数量',
@@ -76,7 +84,7 @@ const getTradeColumns = (amountVisible) => [
     key: 'quantity',
     render: (quantity) => amountVisible ? (quantity != null ? quantity.toLocaleString() : '-') : '****',
     sorter: (a, b) => a.quantity - b.quantity,
-    width: 55,
+    width: 52,
   },
   {
     title: '价格',
@@ -84,7 +92,7 @@ const getTradeColumns = (amountVisible) => [
     key: 'price',
     render: (price) => amountVisible ? (price != null ? Number(price).toFixed(2) : '-') : '****',
     sorter: (a, b) => a.price - b.price,
-    width: 55,
+    width: 52,
   },
   {
     title: '金额',
@@ -102,7 +110,7 @@ const getTradeColumns = (amountVisible) => [
       );
     },
     sorter: (a, b) => a.amount - b.amount,
-    width: 78,
+    width: 70,
   },
   {
     title: '费用',
@@ -110,7 +118,7 @@ const getTradeColumns = (amountVisible) => [
     key: 'fee',
     render: (_, record) => amountVisible ? (feeText(record) ?? '-') : '****',
     sorter: compareFees,
-    width: 86,
+    width: 76,
   },
   {
     title: '币种',
@@ -125,12 +133,12 @@ const getTradeColumns = (amountVisible) => [
       { text: 'HKD', value: 'HKD' },
     ],
     onFilter: (value, record) => record.currency === value,
-    width: 59,
+    width: 55,
   },
   {
     title: '操作',
     key: 'action',
-    width: 44,
+    width: 38,
     render: (_, record) => (
       <a href={`#/trade-detail/${record.id}`}>详情</a>
     ),

@@ -70,8 +70,8 @@ const CashFlow = () => {
 
   // 出入金记录表格列定义
   const cashFlowColumns = [
-    { title: '账户 ID', dataIndex: ['brokerAccount', 'accountId'], key: 'accountId', render: (value) => value || '待补全' },
     { title: '账户名称', dataIndex: ['brokerAccount', 'accountName'], key: 'accountName' },
+    { title: '账户 ID', dataIndex: ['brokerAccount', 'accountId'], key: 'accountId', render: (value) => value || '待补全' },
     {
       title: '日期',
       dataIndex: 'recordDate',

@@ -1,3 +1,12 @@
 .trade-record-table.ant-table-wrapper .ant-table.ant-table-middle .ant-table-cell {
-  padding-inline: 6px;
+  padding-inline: 4px;
+}
+
+.trade-record-table.ant-table-wrapper .ant-table-column-title {
+  white-space: nowrap;
+}
+
+.trade-record-table.ant-table-wrapper .ant-table-column-sorter,
+.trade-record-table.ant-table-wrapper .ant-table-filter-trigger {
+  margin-inline-start: 2px;
 }

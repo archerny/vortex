@@ -3,21 +3,21 @@ import { Table, Space, Typography, Card, Button, InputNumber, Tag, Tooltip, mess
 import { ReloadOutlined, SearchOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { fetchIbkrStagedOrders } from '../../../../services/syncStagedDataApi';
+import { useIbkrStagedLeadingColumns } from './useIbkrStagedLeadingColumns';
 
 const { Text } = Typography;
 
 /**
  * IBKR Staged Orders 表格
  *
- * 展示 ibkr_staged_orders 全字段（4 个管理字段 + 30 个业务字段 + 3 个公共字段）。
- * 列顺序按 IbkrStagedOrder 实体的定义顺序排列。前两列（tradeDate、symbol）
- * 冻结左侧方便横向滚动时定位行。
+ * 显示同步账户和 ibkr_staged_orders 的字段。
  */
 const IbkrStagedOrdersTable = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [batchIdInput, setBatchIdInput] = useState(null);
   const [appliedBatchId, setAppliedBatchId] = useState(null);
+  const leadingColumns = useIbkrStagedLeadingColumns();
 
   const loadOrders = useCallback(async (batchId) => {
     setLoading(true);
@@ -28,6 +28,7 @@ const IbkrStagedOrdersTable = () => {
       }
       const result = await fetchIbkrStagedOrders(params);
       setOrders(result.data || []);
+      if (result.accountInfoUnavailable) message.warning('无法加载同步账户信息');
     } catch (error) {
       console.error('Failed to load IBKR staged orders:', error);
       message.error('加载 IBKR 原始订单失败');
@@ -68,23 +69,8 @@ const IbkrStagedOrdersTable = () => {
     return dayjs(time).format('YYYY-MM-DD HH:mm:ss');
   };
 
-  // 列定义：顺序与 IbkrStagedOrder 实体字段声明顺序保持一致
   const columns = [
-    // ============ Frozen columns for navigation ============
-    {
-      title: 'Trade Date',
-      dataIndex: 'tradeDate',
-      key: 'tradeDate',
-      width: 110,
-      fixed: 'left',
-    },
-    {
-      title: 'Symbol',
-      dataIndex: 'symbol',
-      key: 'symbol',
-      width: 110,
-      fixed: 'left',
-    },
+    ...leadingColumns,
     // ============ Management fields ============
     { title: 'ID', dataIndex: 'id', key: 'id', width: 80 },
     { title: 'Batch ID', dataIndex: 'batchId', key: 'batchId', width: 90 },
@@ -122,8 +108,8 @@ const IbkrStagedOrdersTable = () => {
         ),
     },
     // ============ IBKR Order business fields (30) ============
-    { title: 'Account ID', dataIndex: 'accountId', key: 'accountId', width: 140 },
-    { title: 'Acct Alias', dataIndex: 'acctAlias', key: 'acctAlias', width: 140 },
+    { title: 'IBKR Account ID', dataIndex: 'accountId', key: 'accountId', width: 140 },
+    { title: 'IBKR Acct Alias', dataIndex: 'acctAlias', key: 'acctAlias', width: 140 },
     { title: 'Currency', dataIndex: 'currency', key: 'currency', width: 90 },
     { title: 'Asset Category', dataIndex: 'assetCategory', key: 'assetCategory', width: 120 },
     {

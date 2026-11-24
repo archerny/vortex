@@ -43,9 +43,9 @@ export default function BrokerAccountsManagement() {
   </Space>}>
     <Alert type="info" showIcon message="同一券商可录入多个账户。待补全账户保留历史数据，填写真实账户 ID 后才可同步。" style={{ marginBottom: 16 }} />
     <Table rowKey="id" loading={loading} dataSource={accounts} columns={[
-      { title: '券商名称', key: 'broker', render: (_, row) => row.broker?.brokerName || brokers.find(b => b.id === row.brokerId)?.brokerName },
       { title: '账户名称', dataIndex: 'accountName' },
       { title: '账户 ID', dataIndex: 'accountId', render: (id) => id || <Tag color="orange">待补全</Tag> },
+      { title: '券商名称', key: 'broker', render: (_, row) => row.broker?.brokerName || brokers.find(b => b.id === row.brokerId)?.brokerName },
       { title: '关联邮箱', dataIndex: 'email', render: (value) => value || '-' },
       { title: '手机号 / 电话', dataIndex: 'phone', render: (value) => value || '-' },
       { title: '账户备注', dataIndex: 'description', ellipsis: true, render: (value) => value || '-' },

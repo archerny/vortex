@@ -6,11 +6,15 @@
 
 页面使用 URL hash 导航。[menuConfig.js](../frontend/src/constants/menuConfig.js) 定义菜单、路径映射和父菜单关系。`AppLayout` 监听 `hashchange` 并渲染相应页面。`#/trade-detail/<id>` 由布局单独解析，归属交易记录菜单。页面通过 [PageHeaderContext](../frontend/src/contexts/PageHeaderContext.jsx) 提供面包屑，布局渲染面包屑，页面可在内容区使用 [PageHeaderTitle](../frontend/src/components/PageHeader.jsx)。
 
+账户管理菜单以机构图标标识「券商管理」，以账户卡片图标标识「托管账户」。 [账户菜单](../design/0050-2026-11-24-account-display-conventions.md#账户菜单)
+
 ## 页面与数据入口
+
+展示托管账户的表格统一将账户名称和账户 ID 放在第一、第二列，适用于交易记录、相关交易、持仓快照、出入金记录、托管账户、同步批次、同步配置和 IBKR 原始数据。 [表格列顺序](../design/0050-2026-11-24-account-display-conventions.md#表格列顺序)
 
 | 功能 | 页面和实际能力 |
 | --- | --- |
-| 交易记录 | [`trade/`](../frontend/src/pages/trade/) 提供列表、统计、新增、详情和详情中的编辑、删除。新增／编辑提交本地账户主键，账户／策略／证券筛选栏自适应换行。主列表和详情的同账户相关交易表均在首列显示账户 ID，历史空 ID 显示「待补全」。券商名称和账户名称在详情基本信息中展示。两张表使用中等行距和明确列宽，代码过长时单行省略，可悬停查看全值，精确费用可换行。可用宽度低于列宽之和时在表格内横向滚动。 [0049 交易表格](../design/0049-2026-11-23-responsive-trade-records.md#交易表格) |
+| 交易记录 | [`trade/`](../frontend/src/pages/trade/) 提供列表、统计、新增、详情和详情中的编辑、删除。新增／编辑提交本地账户主键，账户／策略／证券筛选栏自适应换行。主列表与详情的同账户相关交易表共用列定义，历史空 ID 显示「待补全」。券商名称在详情基本信息中展示。两张表使用中等行距和明确列宽，长账户名称、账户 ID 和证券代码可悬停查看全值，精确费用可换行。可用宽度低于列宽之和时在表格内横向滚动。 [0049 交易表格](../design/0049-2026-11-23-responsive-trade-records.md#交易表格) |
 | 交易数据分析 | [`analysis/`](../frontend/src/pages/analysis/) 查询指定日期的持仓快照，并按需调用交易核对接口。持仓的计算口径见 [交易与持仓](trades-and-positions.md)。 |
 | 市场事件 | [`market-events/`](../frontend/src/pages/market-events/) 通过三个标签页查询、新增并处理代码变更、拆股和实物分红，不提供撤销按钮；提示录入顺序及关联历史锁。 |
 | 同步管理 | [`sync/`](../frontend/src/pages/sync/) 展示和筛选批次；同步配置列出全部托管账户，按账户配置IBKR或Tiger连接，保存或清空数据库明文凭证，Token／私钥重新打开为空并支持留空保留。账户新增及资料修改跳转账户管理；新建同步仅允许账户启用、真实账户 ID 已补齐且凭证完整的账户；提交本地 `brokerAccountId`，列表显示真实 `accountId` 并支持账户筛选。历史批次标签与v2筛选条件分别维护。原始数据查看仅覆盖IBKR订单与成交确认，均为只读。 [0047](../design/0047-2026-11-21-broker-accounts-and-sync-connections.md) |
@@ -46,5 +50,11 @@
 数据来自 [mockData.js](../frontend/src/pages/profit/chart-demo/mockData.js)，标的为 `DEMO-A`/`DEMO-B`，样本时点固定为 2026-10-30，货币为 USD。报价、Greeks 和收益曲面只用于渲染示意；到期收益使用演示假设（乘数 100、不计费用），不构成已实现的正式定价或盈亏分析能力。布局仍执行已有的 `/api/health` 检查。
 
 ECharts 与 Plotly 的构建分块较大，当前通过页面和标签页的动态加载控制首次访问影响；本演示验证功能和交互，未开展大规模行情性能基准测试。
+
+同步批次表在同一列显示开始与完成时间，并以「错误 → 查看」打开完整错误信息。侧栏展开时以 1280 CSS 像素视口可看到整张表为布局目标。可用宽度不足时筛选可换行，表格内可横向滚动。 [同步管理页面优化](../design/0051-2026-11-24-sync-management-layout.md)
+
+同步管理使用顶部标签页切换批次与配置。批次工具栏提供新建同步和刷新，配置卡片顶部提供刷新。新建同步缺少就绪连接时，可从弹窗进入同步配置。 [布局与操作](../design/0051-2026-11-24-sync-management-layout.md#布局与操作)
+
+原始数据的 Orders 和 Confirms 表按 `batchId` 从 IBKR 批次列表补充同步账户信息，首列展示关联账户的当前名称，第二列展示批次的账户 ID 快照。报表自己的 ID 和别名分别显示为 `IBKR Account ID` 和 `IBKR Acct Alias`。宽窗口固定账户、日期和证券列，窄窗口可横向滚动。字段缺失显示 `-`。 [IBKR 原始数据](../design/0050-2026-11-24-account-display-conventions.md#ibkr-原始数据)
 
 相关决策见 [相关交易展示](../design/0004-2026-03-12-related-trades-display.md) 和 [同步原始数据查看](../design/0015-2026-04-21-sync-staged-data-viewer.md)。

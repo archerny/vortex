@@ -6,6 +6,8 @@
 
 `FlexQueryParser` 校验单账户、单份规定结构的 TCF 报表。`Order` 写入 `ibkr_staged_orders`，`TradeConfirm` 写入 `ibkr_staged_trade_confirms`，`SymbolSummary` 不导入。暂存 Worker 按 `(account_id, order_id)` 和 `(account_id, trade_id)` 分别去重。前端可按批次查看两表，查询接口为 `GET /api/sync/ibkr/orders` 和 `GET /api/sync/ibkr/trade-confirms`。见 [Flex 客户端](../../../backend/src/main/java/com/vortex/sync/adapter/ibkr/IbkrFlexClient.java)、[XML 解析器](../../../backend/src/main/java/com/vortex/sync/adapter/ibkr/FlexQueryParser.java)和 [原始数据控制器](../../../backend/src/main/java/com/vortex/controller/IbkrStagedDataController.java)。
 
+原始数据按 `batchId` 查询同步账户。首列显示关联账户的当前名称，第二列显示本批账户 ID 快照。报表的 `accountId` 与 `acctAlias` 原样展示，以便核对来源。 [账户信息展示规范](../../../design/0050-2026-11-24-account-display-conventions.md#ibkr-原始数据)
+
 ## 支持的报表结构
 
 两个解析入口都只接受 `FlexQueryResponse type="TCF" → FlexStatements → FlexStatement → TradeConfirms` 的直接父子结构，三个内部层级各恰好一个；不再取第一份或在缺失时返回空成功。`FlexStatements.count` 可省略，提供时必须为 `1`。报表账户必须非空，来源 Order／TradeConfirm／SymbolSummary 如指定非空 accountId，去首尾空白后须与报表账户一致，不改写字段。

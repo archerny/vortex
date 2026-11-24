@@ -6,7 +6,7 @@ import { clearSyncConnection, connectionError, fetchSyncConnection, fetchSyncCon
 
 const openAccountManagement = () => { window.location.hash = '#/broker-accounts'; };
 
-export default function SyncConnectionSettingsTab({ onSaved, onDone }) {
+export default function SyncConnectionSettingsTab({ onSaved }) {
   const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
@@ -98,11 +98,7 @@ export default function SyncConnectionSettingsTab({ onSaved, onDone }) {
   ];
   const config = syncConnectionConfig[connection?.brokerCode];
 
-  return <Card title="托管账户" extra={<Space wrap>
-    <Button onClick={openAccountManagement}>账户管理</Button>
-    <Button onClick={onDone}>查看同步批次</Button>
-    <Button icon={<ReloadOutlined />} onClick={load} loading={loading}>刷新</Button>
-  </Space>}>
+  return <Card title="托管账户" extra={<Button icon={<ReloadOutlined />} onClick={load} loading={loading}>刷新</Button>}>
     {loadError && <Alert type="error" showIcon message={loadError} style={{ marginBottom: 16 }} />}
     <Table rowKey="brokerAccountId" dataSource={accounts} columns={columns} loading={loading}
       locale={{ emptyText: '尚未录入托管账户，请前往账户管理添加' }} pagination={{ pageSize: 10 }} />

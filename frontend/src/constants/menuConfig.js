@@ -3,6 +3,7 @@ import {
   DashboardOutlined,
   DollarOutlined,
   BankOutlined,
+  IdcardOutlined,
   WalletOutlined,
   LineChartOutlined,
   SettingOutlined,
@@ -138,7 +139,7 @@ export const menuItems = [
       },
       {
         key: '11',
-        icon: React.createElement(BankOutlined),
+        icon: React.createElement(IdcardOutlined),
         label: '托管账户',
       },
     ],
