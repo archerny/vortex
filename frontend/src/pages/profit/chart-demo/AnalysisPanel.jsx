@@ -1,18 +1,23 @@
 import React, { useMemo, useState } from 'react';
 import { InputNumber, Segmented, Select, Space, Tag } from 'antd';
-import EChart from './EChart';
+import { use } from 'echarts/core';
+import { HeatmapChart, LineChart } from 'echarts/charts';
+import { AriaComponent, DataZoomComponent, GridComponent, LegendComponent, MarkLineComponent, TooltipComponent, VisualMapComponent } from 'echarts/components';
+import EChart from '../../../components/EChart';
+import { chartPalette } from '../../../constants/chartPalette';
 import { EXPIRIES, makePayoff, makePerformance, makeRiskCurve, mockIv, spotPrice, STRATEGIES } from './mockData';
 
-const COLORS = ['#3d70ef', '#13a390', '#c39a39'];
+use([LineChart, HeatmapChart, GridComponent, TooltipComponent, LegendComponent, DataZoomComponent, VisualMapComponent, MarkLineComponent, AriaComponent]);
+
 const base = {
   animationDuration: 350,
-  color: COLORS,
-  textStyle: { fontFamily: 'inherit', color: '#66758a' },
+  color: [chartPalette.blue, chartPalette.teal, chartPalette.gold],
+  textStyle: { fontFamily: 'inherit', color: chartPalette.muted },
   aria: { enabled: true },
   tooltip: { trigger: 'axis', confine: true },
   grid: { left: 60, right: 36, top: 42, bottom: 52 },
-  xAxis: { type: 'value', scale: true, min: 'dataMin', max: 'dataMax', axisLabel: { color: '#77859a' }, splitLine: { show: false }, name: '标的价格 ($)', nameLocation: 'middle', nameGap: 30 },
-  yAxis: { type: 'value', splitLine: { lineStyle: { color: '#eef2f7' } } },
+  xAxis: { type: 'value', scale: true, min: 'dataMin', max: 'dataMax', axisLabel: { color: chartPalette.axis }, splitLine: { show: false }, name: '标的价格 ($)', nameLocation: 'middle', nameGap: 30 },
+  yAxis: { type: 'value', splitLine: { lineStyle: { color: chartPalette.grid } } },
 };
 function ChartCard({ title, subtitle, children, extra, wide = false }) {
   return <div className={`demo-chart-card ${wide ? 'demo-span-all' : ''}`}><div className="demo-card-heading"><div><h3>{title}</h3><p>{subtitle}</p></div>{extra}</div>{children}</div>;

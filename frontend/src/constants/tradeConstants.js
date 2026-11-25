@@ -1,9 +1,9 @@
-// 证券类型：后端枚举 <-> 前端中文
+// 证券类型：后端枚举 <-> 前端标签
 export const assetTypeMap = {
   STOCK: '股票',
   ETF: 'ETF',
-  OPTION_CALL: 'CALL期权',
-  OPTION_PUT: 'PUT期权',
+  OPTION_CALL: 'CALL',
+  OPTION_PUT: 'PUT',
 };
 export const assetTypeReverseMap = Object.fromEntries(Object.entries(assetTypeMap).map(([k, v]) => [v, k]));
 

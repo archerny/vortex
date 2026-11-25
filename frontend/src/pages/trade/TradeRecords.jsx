@@ -118,7 +118,7 @@ const TradeRecords = () => {
       // 期权证券代码格式校验
       if (values.assetType === 'OPTION_CALL' || values.assetType === 'OPTION_PUT') {
         const optionFlag = values.assetType === 'OPTION_CALL' ? 'C' : 'P';
-        const optionLabel = values.assetType === 'OPTION_CALL' ? 'CALL期权' : 'PUT期权';
+        const optionLabel = assetTypeMap[values.assetType];
         const underlying = values.underlyingSymbol?.trim();
         const symbol = values.symbol?.trim();
         const expectedPattern = new RegExp(`^${underlying.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}-(\\d{8})-${optionFlag}[\\d.]+$`);

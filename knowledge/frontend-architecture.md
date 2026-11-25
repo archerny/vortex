@@ -34,7 +34,9 @@
 
 [package.json](../frontend/package.json) 定义开发、构建和测试命令，`package-lock.json` 包含 Vitest 和图表依赖的锁定记录。Vitest 在 Node 环境中运行，[常量测试](../frontend/src/constants/__tests__/) 覆盖菜单映射和交易常量，[演示数据测试](../frontend/src/pages/profit/chart-demo/__tests__/mockData.test.js) 覆盖合成价格、报价、收益边界和曲面维度。运行和排查步骤见 [前端指南](../docs/frontend-guide.md)。
 
-[交易统计面板](../frontend/src/pages/trade/TradeStatisticsPanel.jsx) 的圆环居中，半径随绘图区缩放。下方图例随宽度换行，显示各交易类型的次数及其占图中交易总数的比例。小扇区可通过图例或悬停提示读取数值。窄窗口下三张统计卡片按栅格断点换行。 [0049 统计卡片](../design/0049-2026-11-23-responsive-trade-records.md#统计卡片)
+[交易统计面板](../frontend/src/pages/trade/TradeStatisticsPanel.jsx) 的类型圆环和热门证券条形图按需加载 ECharts，与技术选型 Demo 共用 [画布容器](../frontend/src/components/EChart.jsx)和配色。圆环中心显示分类次数合计，图例显示各类型的次数和占比，条形图按接口排名显示证券和次数。图例随卡片宽度移到圆环右侧或下方，三张统计卡片按容器宽度换行。悬停可查看数据，空统计显示空态。 [0055 交易统计](../design/0055-2026-11-26-trade-statistics-echarts.md)
+
+交易列表、筛选、统计图、表单、详情、持仓及异常核对共用证券类型标签。期权显示为 `CALL` 和 `PUT`，筛选和接口使用 `OPTION_CALL` 和 `OPTION_PUT`。 [0054 证券类型标签](../design/0054-2026-11-26-option-type-labels.md)
 
 [费用 API 回归](../frontend/src/services/__tests__/tradeFeePrecision.test.js) 通过模拟 Axios 验证高精度费用读取、回填和提交；[展示及排序回归](../frontend/src/utils/__tests__/tradeFee.test.jsx) 在 Node 中使用真实列表列和统计组件的静态渲染，覆盖完整小数、极小费用、零／缺省值、遮罩、精确排序及旧响应兼容。原费用修订的单测、构建与合成接口浏览器验收记录见 [归档](../docs/TODO-ARCHIVE.md)，没有连接真实后端或用户账本；不在架构说明中维护固定测试数量。
 

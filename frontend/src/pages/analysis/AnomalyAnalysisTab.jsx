@@ -10,6 +10,7 @@ import {
   InfoCircleOutlined,
 } from '@ant-design/icons';
 import { verifyTradeRecords } from '../../services/tradeRecordApi';
+import { assetTypeMap } from '../../constants/tradeConstants';
 
 const { Text } = Typography;
 
@@ -96,15 +97,7 @@ const AnomalyAnalysisTab = () => {
       dataIndex: 'assetType',
       key: 'assetType',
       width: 120,
-      render: (type) => {
-        const labelMap = {
-          STOCK: '股票',
-          ETF: 'ETF',
-          OPTION_CALL: 'CALL期权',
-          OPTION_PUT: 'PUT期权',
-        };
-        return labelMap[type] || type;
-      },
+      render: (type) => assetTypeMap[type] || type,
     },
     {
       title: '当前代码',

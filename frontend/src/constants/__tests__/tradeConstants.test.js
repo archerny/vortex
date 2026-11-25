@@ -20,8 +20,8 @@ describe('tradeConstants - 证券类型映射', () => {
     expect(Object.keys(assetTypeMap)).toHaveLength(4);
     expect(assetTypeMap).toHaveProperty('STOCK');
     expect(assetTypeMap).toHaveProperty('ETF');
-    expect(assetTypeMap).toHaveProperty('OPTION_CALL');
-    expect(assetTypeMap).toHaveProperty('OPTION_PUT');
+    expect(assetTypeMap.OPTION_CALL).toBe('CALL');
+    expect(assetTypeMap.OPTION_PUT).toBe('PUT');
   });
 
   it('assetTypeReverseMap 应与 assetTypeMap 互为反转', () => {

@@ -63,7 +63,7 @@ npm --prefix frontend run preview
 
 市场事件应点验三个标签页均无撤销按钮，并核对新增弹窗、取消及冲突提示，操作范围见 [操作指南](market-events.md)。浏览器交互使用合成 API 验收，市场事件工具见 [e2e 指南](../e2e/README.md#ordered-market-event-check)。
 
-交易类型分布使用合成统计在宽、窄窗口间切换，核对圆环完整居中、图例换行、各类型的次数和占比可读、扇区悬停和零交易提示。小于 `lg` 断点时交易概览独占一行，小于 `md` 时三张统计卡片各占一行。 [统计布局方案](../design/0049-2026-11-23-responsive-trade-records.md#统计卡片)
+交易统计使用合成数据在宽、窄窗口间切换，核对圆环居中、图例位置、各类型次数和占比、热门证券排名、悬停提示和空态。统计面板宽于 900 CSS 像素时三张卡片并排，601 至 900 像素时概览独占一行，600 像素及以下单列显示。 [统计布局方案](../design/0055-2026-11-26-trade-statistics-echarts.md)
 
 仪表盘和个股／账户／策略盈亏仍是占位页。技术选型 Demo 位于 `#/profit-chart-demo`，四个标签页展示 Lightweight Charts、ECharts、Plotly 和 Ant Design 期权链。数据固定为合成样本，不调用账本或行情接口；布局的健康检查仍会运行。Plotly 曲面需要 WebGL，页面与面板按需加载，构建可能有大分块提示。 [演示内容与限制](../knowledge/frontend-architecture.md#图表技术选型演示)
 
