@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Table, Tag, Button, message, Modal, Form, Input, Select } from 'antd';
+import { Card, Table, Tag, Button, message, Modal, Form, Input, Select, Space, Descriptions, Typography } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { fetchAllBrokers, createBroker, updateBroker } from '../services/brokerApi';
 
@@ -19,11 +19,26 @@ const countryMap = {
   NZ: { label: '新西兰', color: 'cyan' },
 };
 
-// 券商技术标识符选项（用于关联同步适配器；留空表示纯手动录入的券商）
-// label 与 value 保持一致，展示为底层 code，便于与同步适配器 key 对应
+const brokerTagStyle = { maxWidth: '100%', marginInlineEnd: 0, whiteSpace: 'normal', overflowWrap: 'anywhere' };
+
+const renderBrokerCode = (code) => code
+  ? <Tag color="geekblue" style={brokerTagStyle}>{code}</Tag>
+  : <Typography.Text type="secondary">-</Typography.Text>;
+
+const renderCountry = (country) => {
+  const { label, color } = countryMap[country] || { label: country, color: 'default' };
+  return <Tag color={color} style={brokerTagStyle}>{label}</Tag>;
+};
+
+// 券商技术标识符选项；是否支持同步由已接入的适配器决定。
+// label 与 value 保持一致，展示为底层 code，便于识别券商及关联适配器。
 const brokerCodeOptions = [
   { label: 'ibkr', value: 'ibkr' },
   { label: 'tiger', value: 'tiger' },
+  { label: 'futu', value: 'futu' },
+  { label: 'schwab', value: 'schwab' },
+  { label: 'firstrade', value: 'firstrade' },
+  { label: 'csc', value: 'csc' },
 ];
 
 const BrokerManagement = () => {
@@ -31,6 +46,7 @@ const BrokerManagement = () => {
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBroker, setEditingBroker] = useState(null); // null 表示新增，否则为编辑
+  const [detailBroker, setDetailBroker] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [form] = Form.useForm();
 
@@ -67,38 +83,42 @@ const BrokerManagement = () => {
       title: '券商名称',
       dataIndex: 'brokerName',
       key: 'brokerName',
-      render: (text) => <span style={{ fontWeight: 'bold' }}>{text}</span>,
+      width: 176,
+      ellipsis: true,
+      render: (name) => <strong>{name}</strong>,
     },
     {
       title: '券商代码',
       dataIndex: 'brokerCode',
       key: 'brokerCode',
-      width: 120,
-      render: (code) =>
-        code ? (
-          <Tag color="geekblue">{code}</Tag>
-        ) : (
-          <span style={{ color: '#999' }}>-</span>
-        ),
+      width: 112,
+      render: renderBrokerCode,
     },
     {
       title: '国家/地区',
       dataIndex: 'country',
       key: 'country',
-      render: (country) => {
-        const info = countryMap[country] || { label: country, color: 'default' };
-        return <Tag color={info.color}>{info.label}</Tag>;
-      },
+      width: 128,
+      render: renderCountry,
       filters: countryOptions.map((item) => ({ text: item.label, value: item.value })),
       onFilter: (value, record) => record.country === value,
     },
-    { title: '券商简介', dataIndex: 'introduction', key: 'introduction', ellipsis: true, render: (value) => value || '-' },
+    {
+      title: '券商简介',
+      dataIndex: 'introduction',
+      key: 'introduction',
+      ellipsis: { showTitle: false },
+      render: (value) => value || '-',
+    },
     {
       title: '操作',
       key: 'action',
-      width: 80,
+      width: 124,
       render: (_, record) => (
-        <a onClick={() => handleEdit(record)}>更新</a>
+        <Space size={12}>
+          <Button type="link" size="small" style={{ paddingInline: 0 }} onClick={() => setDetailBroker(record)}>详情</Button>
+          <Button type="link" size="small" style={{ paddingInline: 0 }} onClick={() => handleEdit(record)}>更新</Button>
+        </Space>
       ),
     },
   ];
@@ -185,7 +205,29 @@ const BrokerManagement = () => {
         loading={loading}
         rowKey="id"
         pagination={{ pageSize: 10 }}
+        scroll={{ x: 720 }}
       />
+
+      <Modal
+        title="券商详情"
+        open={Boolean(detailBroker)}
+        onCancel={() => setDetailBroker(null)}
+        footer={<Button onClick={() => setDetailBroker(null)}>关闭</Button>}
+        width={600}
+      >
+        {detailBroker && (
+          <Descriptions bordered size="small" layout="vertical" column={2}>
+            <Descriptions.Item label="券商名称" span={2}>
+              <span style={{ overflowWrap: 'anywhere' }}>{detailBroker.brokerName}</span>
+            </Descriptions.Item>
+            <Descriptions.Item label="券商代码">{renderBrokerCode(detailBroker.brokerCode)}</Descriptions.Item>
+            <Descriptions.Item label="国家/地区">{renderCountry(detailBroker.country)}</Descriptions.Item>
+            <Descriptions.Item label="券商简介" span={2}>
+              <span style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>{detailBroker.introduction || '-'}</span>
+            </Descriptions.Item>
+          </Descriptions>
+        )}
+      </Modal>
 
       <Modal
         title={editingBroker ? '编辑券商信息' : '新增券商'}
@@ -228,10 +270,10 @@ const BrokerManagement = () => {
           <Form.Item
             label="券商代码"
             name="brokerCode"
-            tooltip="选择券商对应的同步适配器代码；托管账户请在账户管理录入。"
+            tooltip="用于识别券商；填写代码后，仍需该券商已接入才能同步。"
           >
             <Select
-              placeholder="请选择券商代码（选填，留空表示手动录入）"
+              placeholder="请选择券商代码（选填）"
               options={brokerCodeOptions}
               allowClear
               showSearch

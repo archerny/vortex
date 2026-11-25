@@ -17,8 +17,8 @@ public class Broker extends BaseEntity {
     private String brokerName;
 
     /**
-     * 券商技术标识符（如 ibkr、tiger），用于同步适配器关联。
-     * NULL 表示纯手动录入的券商，无同步适配器。
+     * 券商技术标识符（如 ibkr、tiger、futu），非空值唯一，可关联同步适配器。
+     * 允许为空；是否支持同步取决于对应适配器是否已注册。
      */
     @Column(name = "broker_code", length = 50)
     private String brokerCode;

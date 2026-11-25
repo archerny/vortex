@@ -3,6 +3,8 @@ package com.vortex.service;
 import com.vortex.entity.*;
 import com.vortex.repository.*;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -27,6 +29,36 @@ class BrokerServiceTest {
         service.delete(1L);
         verify(brokers).deleteById(1L);
     }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"futu", "schwab", "firstrade", "csc"})
+    void acceptsReferenceCodesForCreateAndUpdateWithoutSyncAdapter(String code) {
+        var input = broker(null, " " + code + " ");
+        when(brokers.save(any(Broker.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        assertSame(input, service.create(input));
+        assertEquals(code, input.getBrokerCode());
+
+        var existing = broker(1L, null);
+        existing.setIntroduction("Original introduction");
+        when(brokers.findById(1L)).thenReturn(Optional.of(existing));
+        when(brokers.findByBrokerCode(code)).thenReturn(Optional.of(existing));
+        assertSame(existing, service.update(1L, broker(null, code)));
+        assertEquals(code, existing.getBrokerCode());
+        assertEquals("Original introduction", existing.getIntroduction());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"futu", "schwab", "firstrade", "csc"})
+    void rejectsDuplicateReferenceCodesBeforeSavingOrMutating(String code) {
+        var existing = broker(1L, null);
+        when(brokers.findById(1L)).thenReturn(Optional.of(existing));
+        when(brokers.findByBrokerCode(code)).thenReturn(Optional.of(broker(2L, code)));
+        assertThrows(IllegalArgumentException.class, () -> service.create(broker(null, code)));
+        assertThrows(IllegalArgumentException.class, () -> service.update(1L, broker(null, code)));
+        assertNull(existing.getBrokerCode());
+        verify(brokers, never()).save(any());
+    }
+
     @Test void savesIntroductionAndKeepsItSeparateFromAccountNotes() {
         var input = broker(null, "ibkr"); input.setIntroduction(" Synthetic broker introduction ");
         when(brokers.save(input)).thenReturn(input);

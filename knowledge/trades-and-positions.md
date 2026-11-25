@@ -28,7 +28,7 @@ V33 新增本地 `broker_account_id`，交易和流水保留 `broker_id`，组�
 
 ## 持仓快照与数据核对
 
-`GET /api/positions?date=YYYY-MM-DD` 按截止日期查询持仓，可另传 `brokerId` 或 `brokerAccountId`（两者同时传入时均须符合）。服务读取截止日期当天及之前未软删除的交易，按 `(symbol, brokerId, brokerAccountId)` 聚合，`BUY` 加数量，`SELL` 减数量，过滤净数量为 0 的结果。负数量会保留，前端标记为可能异常。已生成的市场事件交易同样计入持仓。持仓页提示文字仍称暂未考虑市场事件，服务端的聚合规则以代码为准。 [持仓 API](../backend/src/main/java/com/vortex/controller/PositionController.java) · [持仓服务](../backend/src/main/java/com/vortex/service/PositionService.java) · [持仓页面](../frontend/src/pages/analysis/PositionSnapshotTab.jsx)
+`GET /api/positions?date=YYYY-MM-DD` 按截止日期查询持仓，可另传 `brokerId` 或 `brokerAccountId`（两者同时传入时均须符合）。服务读取截止日期当天及之前未软删除的交易，按 `(symbol, brokerId, brokerAccountId)` 聚合，`BUY` 加数量，`SELL` 减数量，过滤净数量为 0 的结果。负净数量作为空头保留，页面汇总空头明细条数，数量列保留负号并标记「空头」，期权数量用「张」。已生成的市场事件交易同样计入持仓。持仓页提示文字仍称暂未考虑市场事件，服务端的聚合规则以代码为准。 [持仓 API](../backend/src/main/java/com/vortex/controller/PositionController.java) · [持仓服务](../backend/src/main/java/com/vortex/service/PositionService.java) · [持仓页面](../frontend/src/pages/analysis/PositionSnapshotTab.jsx) · [空头展示](../design/0052-2026-11-26-position-snapshot-short-display.md)
 
 `GET /api/trade-records/verify` 对未软删除的交易执行六类核对，覆盖期权代码、港币结算非期权代码、期权被动操作价格及费用、美元结算股票代码、证券代码与资产类型一致性，以及触发类型与关联类型一致性。`errorCount` 是异常明细数，同一笔交易可能命中多条规则。核对接口只报告异常，不修改记录。 [核对服务](../backend/src/main/java/com/vortex/service/TradeVerificationService.java) · [结果 DTO](../backend/src/main/java/com/vortex/dto/TradeVerificationResult.java)
 

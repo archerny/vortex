@@ -18,7 +18,7 @@ public class PositionSnapshot {
     /** 证券类型 */
     private AssetType assetType;
 
-    /** 持仓数量（正数=多头，负数=异常） */
+    /** 净持仓数量（正数为多头，负数为空头） */
     private Integer quantity;
 
     /** 币种 */

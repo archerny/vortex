@@ -1,18 +1,16 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import {
-  Card, Table, Tag, Button, message, Statistic, Space, Spin, Typography, Tooltip,
+  Card, Table, Tag, Button, message, Statistic, Space, Spin, Typography,
   DatePicker, Select, Empty,
 } from 'antd';
-import {
-  ExclamationCircleOutlined,
-  SearchOutlined,
-} from '@ant-design/icons';
+import { SearchOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { fetchPositions } from '../../services/positionApi';
 import { fetchBrokerAccounts, accountLabel } from '../../services/brokerAccountApi';
 import { assetTypeMap, assetTypeColorMap } from '../../constants/tradeConstants';
 
 const { Text } = Typography;
+const isOptionPosition = ({ assetType }) => assetType === 'OPTION_CALL' || assetType === 'OPTION_PUT';
 
 /**
  * 持仓快照 Tab 组件
@@ -116,15 +114,12 @@ const PositionSnapshotTab = () => {
       key: 'quantity',
       width: 120,
       sorter: (a, b) => a.quantity - b.quantity,
-      render: (qty) => {
-        const isNegative = qty < 0;
-        return (
-          <Text strong style={{ color: isNegative ? '#ff4d4f' : undefined }}>
-            {qty.toLocaleString()}
-            {isNegative && <Tooltip title="持仓为负数，可能存在数据异常"><ExclamationCircleOutlined style={{ marginLeft: 4, color: '#ff4d4f' }} /></Tooltip>}
-          </Text>
-        );
-      },
+      render: (qty, position) => (
+        <Space size={[6, 2]} wrap>
+          <Text strong>{qty.toLocaleString()}{isOptionPosition(position) ? ' 张' : ''}</Text>
+          {qty < 0 && <Tag style={{ marginInlineEnd: 0 }}>空头</Tag>}
+        </Space>
+      ),
     },
     {
       title: '币种',
@@ -145,6 +140,8 @@ const PositionSnapshotTab = () => {
       width: 130,
     },
   ];
+
+  const shortPositionCount = positionData.filter(({ quantity }) => quantity < 0).length;
 
   return (
     <div>
@@ -224,16 +221,16 @@ const PositionSnapshotTab = () => {
                 />
                 <Statistic
                   title="期权合约"
-                  value={positionData.filter(p => p.assetType === 'OPTION_CALL' || p.assetType === 'OPTION_PUT').length}
+                  value={positionData.filter(isOptionPosition).length}
                   suffix="只"
                   valueStyle={{ fontSize: 22, color: '#fa8c16' }}
                 />
-                {positionData.some(p => p.quantity < 0) && (
+                {shortPositionCount > 0 && (
                   <Statistic
-                    title="异常（负持仓）"
-                    value={positionData.filter(p => p.quantity < 0).length}
-                    suffix="只"
-                    valueStyle={{ fontSize: 22, color: '#ff4d4f' }}
+                    title="空头持仓"
+                    value={shortPositionCount}
+                    suffix="条"
+                    valueStyle={{ fontSize: 22 }}
                   />
                 )}
               </Space>
